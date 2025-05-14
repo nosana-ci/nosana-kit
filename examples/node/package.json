@@ -1,0 +1,16 @@
+{
+  "name": "nosana-sdk-node-examples",
+  "version": "1.0.0",
+  "description": "Example scripts for using the Nosana SDK",
+  "scripts": {
+    "basic": "ts-node basic-usage.ts",
+    "jobs": "ts-node jobs-example.ts"
+  },
+  "dependencies": {
+    "@nosana/kit": "file:../.."
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  }
+} 
