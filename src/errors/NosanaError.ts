@@ -16,6 +16,7 @@ export const ErrorCodes = {
   TRANSACTION_ERROR: 'TRANSACTION_ERROR',
   PROGRAM_ERROR: 'PROGRAM_ERROR',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
+  NO_WALLET: 'NO_WALLET',
 } as const;
 
 export type ErrorCode = typeof ErrorCodes[keyof typeof ErrorCodes]; 

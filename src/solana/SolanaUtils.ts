@@ -1,18 +1,34 @@
-import { createSolanaClient, address, Address } from 'gill';
+import { createSolanaClient, address, Address, SolanaClient, getProgramDerivedAddress, getAddressEncoder } from 'gill';
 import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
 import { NosanaClient } from '../index.js';
 
 export class SolanaUtils {
   private readonly sdk: NosanaClient;
-  public readonly rpc;
+  public readonly rpc: SolanaClient["rpc"];
+  public readonly rpcSubscriptions: SolanaClient["rpcSubscriptions"];
+  public readonly sendAndConfirmTransaction: SolanaClient["sendAndConfirmTransaction"];
 
   constructor(sdk: NosanaClient) {
     this.sdk = sdk;
     const rpcEndpoint = this.sdk.config.solana.rpcEndpoint;
     if (!rpcEndpoint) throw new NosanaError('RPC URL is required', ErrorCodes.INVALID_CONFIG);
-    const { rpc } = createSolanaClient({ urlOrMoniker: rpcEndpoint });
+    const { rpc, rpcSubscriptions, sendAndConfirmTransaction } = createSolanaClient({ urlOrMoniker: rpcEndpoint });
 
     this.rpc = rpc;
+    this.rpcSubscriptions = rpcSubscriptions;
+    this.sendAndConfirmTransaction = sendAndConfirmTransaction;
+  }
+
+  public async pda(
+    seeds: Array<Address | string>,
+    programId: Address,
+  ): Promise<Address> {
+    const addressEncoder = getAddressEncoder();
+    const [pda] = await getProgramDerivedAddress({
+      programAddress: programId,
+      seeds: seeds.map(seed => typeof seed !== 'string' ? addressEncoder.encode(seed) : seed),
+    });
+    return pda;
   }
 
   public async getBalance(addressStr: string | Address): Promise<bigint> {

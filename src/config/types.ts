@@ -1,4 +1,4 @@
-import { KeyPairSigner } from 'gill';
+import { Address, KeyPairSigner, SolanaClusterMoniker } from 'gill';
 
 export enum NosanaNetwork {
   MAINNET = 'mainnet',
@@ -14,7 +14,7 @@ export enum NosanaLogLevel {
 }
 
 export interface SolanaConfig {
-  cluster: string;
+  cluster: SolanaClusterMoniker | "mainnet-beta" | "localhost";
   rpcEndpoint: string;
   wsEndpoint?: string; // Optional WebSocket endpoint, if different from HTTP
   commitment?: 'processed' | 'confirmed' | 'finalized';
@@ -23,11 +23,24 @@ export interface SolanaConfig {
 export interface WalletConfig {
   signer: KeyPairSigner;
 }
+export interface IpfsConfig {
+  api: string;
+  jwt: string;
+  gateway: string;
+}
 
 export interface ClientConfig {
   solana: SolanaConfig;
   wallet?: WalletConfig;
   logLevel: NosanaLogLevel;
+  ipfs: IpfsConfig;
+  programs: {
+    nosTokenAddress: Address;
+    jobsAddress: Address;
+    rewardsAddress: Address;
+    stakeAddress: Address;
+    poolsAddress: Address;
+  }
 }
 
 export interface PartialClientConfig {

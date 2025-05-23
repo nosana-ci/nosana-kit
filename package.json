@@ -19,7 +19,9 @@
   "author": "Nosana",
   "license": "MIT",
   "dependencies": {
-    "gill": "^0.1.0"
+    "@solana-program/token": "^0.5.1",
+    "bs58": "^6.0.0",
+    "gill": "^0.9.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
