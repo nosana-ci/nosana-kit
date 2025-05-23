@@ -5,61 +5,14 @@ import * as programClient from "../generated_client/index.js";
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import bs58 from 'bs58';
 
-
 export class JobsProgram extends BaseProgram {
-  public readonly client: typeof programClient; // TODO: Replace with actual JobsClient type
-  private _staticAccounts: {
-    rewardsReflection: Address,
-    rewardsVault: Address,
-    rewardsProgram: Address,
-  } | undefined;
-
-  private _initializingAccounts: Promise<{
-    rewardsReflection: Address,
-    rewardsVault: Address,
-    rewardsProgram: Address,
-  }> | undefined;
+  public readonly client: typeof programClient;
 
   constructor(sdk: NosanaClient) {
     super(sdk);
-    this.client = programClient; // Placeholder
+    this.client = programClient;
   }
 
-  /**
-   * Gets the static accounts, initializing them if needed.
-   */
-  async getStaticAccounts() {
-    if (this._staticAccounts) {
-      return this._staticAccounts;
-    }
-
-    // If we're already initializing, return the existing promise
-    if (this._initializingAccounts) {
-      return this._initializingAccounts;
-    }
-
-    // Start initialization and store the promise
-    this._initializingAccounts = this.initializeStaticAccounts();
-
-    // Wait for initialization to complete
-    this._staticAccounts = await this._initializingAccounts;
-    this._initializingAccounts = undefined;
-
-    return this._staticAccounts;
-  }
-
-  private async initializeStaticAccounts() {
-    return {
-      rewardsReflection: await this.sdk.solana.pda([
-        'reflection',
-      ], this.sdk.config.programs.rewardsAddress),
-      rewardsVault: await this.sdk.solana.pda([
-        this.sdk.config.programs.nosTokenAddress,
-      ], this.sdk.config.programs.rewardsAddress),
-      rewardsProgram: this.sdk.config.programs.rewardsAddress,
-      jobsProgram: this.sdk.config.programs.jobsAddress
-    };
-  }
 
   protected getProgramId(): Address {
     return this.sdk.config.programs.jobsAddress;
@@ -113,7 +66,7 @@ export class JobsProgram extends BaseProgram {
         vault: await this.sdk.solana.pda([
           params.market,
           this.sdk.config.programs.nosTokenAddress,
-        ], this.getProgramId()),
+        ], staticAccounts.jobsProgram),
         payer: this.sdk.config.wallet!.signer,
         rewardsReflection: staticAccounts.rewardsReflection,
         rewardsVault: staticAccounts.rewardsVault,
