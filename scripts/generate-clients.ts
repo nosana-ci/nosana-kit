@@ -6,5 +6,4 @@ import path from "path";
 
 const codama = createFromRoot(rootNodeFromAnchor(anchorIdl as AnchorIdl));
 
-const jsClient = path.join(__dirname, "..", "clients", "js");
-codama.accept(renderJavaScriptVisitor(path.join(jsClient, "src", "generated")));
+codama.accept(renderJavaScriptVisitor(path.join(__dirname, "..", "src", "generated_clients", "jobs")));

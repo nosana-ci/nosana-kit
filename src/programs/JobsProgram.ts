@@ -1,7 +1,7 @@
 import { BaseProgram } from './BaseProgram.js';
 import { Address, address as toAddress, createTransaction, signTransactionMessageWithSigners, getExplorerLink, getSignatureFromTransaction, generateKeyPairSigner, getProgramDerivedAddress, getAddressEncoder, Signature } from 'gill';
 import { ErrorCodes, NosanaClient, NosanaError } from '../index.js';
-import * as programClient from "../generated_client/index.js";
+import * as programClient from "../generated_clients/jobs/index.js";
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import bs58 from 'bs58';
 
