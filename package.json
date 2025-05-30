@@ -1,7 +1,7 @@
 {
-  "name": "@nosana/sdk",
+  "name": "@nosana/kit",
   "version": "0.1.0",
-  "description": "Nosana SDK",
+  "description": "Nosana KIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -9,12 +9,14 @@
     "test": "jest",
     "generate-clients": "ts-node scripts/generate-clients.ts",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write \"**/*.ts\""
+    "format": "prettier --write \"**/*.ts\"",
+    "publish:public": "npm version patch && npm run build && npm publish --access public"
   },
   "keywords": [
     "nosana",
     "solana",
     "sdk",
+    "kit",
     "blockchain"
   ],
   "author": "Nosana",

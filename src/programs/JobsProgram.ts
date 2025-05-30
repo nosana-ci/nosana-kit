@@ -1,5 +1,5 @@
 import { BaseProgram } from './BaseProgram.js';
-import { Address, createTransaction, signTransactionMessageWithSigners, getExplorerLink, getSignatureFromTransaction, generateKeyPairSigner, Signature, EncodedAccount, parseBase64RpcAccount, Account, Base58EncodedBytes } from 'gill';
+import { Address, createTransaction, signTransactionMessageWithSigners, getExplorerLink, getSignatureFromTransaction, generateKeyPairSigner, Signature, EncodedAccount, parseBase64RpcAccount, Account, Base58EncodedBytes, GetProgramAccountsMemcmpFilter } from 'gill';
 import { ErrorCodes, NosanaClient, NosanaError } from '../index.js';
 import * as programClient from "../generated_clients/jobs/index.js";
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
@@ -7,9 +7,9 @@ import bs58 from 'bs58';
 import { IPFS } from '../ipfs/IPFS.js';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../utils/index.js';
 
-export type Job = ConvertTypesForDb<programClient.JobAccountArgs>;
-export type Market = ConvertTypesForDb<programClient.MarketAccountArgs>;
-export type Run = ConvertTypesForDb<programClient.RunAccountArgs>;
+export type Job = ConvertTypesForDb<programClient.JobAccountArgs> & { address: Address };
+export type Market = ConvertTypesForDb<programClient.MarketAccountArgs> & { address: Address };
+export type Run = ConvertTypesForDb<programClient.RunAccountArgs> & { address: Address };
 
 export class JobsProgram extends BaseProgram {
   public readonly client: typeof programClient;
@@ -27,11 +27,52 @@ export class JobsProgram extends BaseProgram {
   /**
    * Fetch a job account by address
    */
-  async get(addr: Address): Promise<Account<programClient.JobAccount>> {
+  async get(addr: Address, checkRun: boolean = true): Promise<Job> {
     try {
-      return await this.client.fetchJobAccount(this.sdk.solana.rpc, addr);
+      const jobAccount = await this.client.fetchJobAccount(this.sdk.solana.rpc, addr);
+      const job = this.transformJobAccount(jobAccount);
+      if (checkRun && job.state === 0) {
+        // If job is queued, check if there is a run account for the job
+        const runs = await this.runs({ job: job.address });
+        if (runs.length > 0) {
+          const run = runs[0];
+          job.state = 1;
+          job.timeStart = run.time;
+          job.node = run.node;
+        }
+      }
+      return job;
     } catch (err) {
       this.sdk.logger.error(`Failed to fetch job ${err}`);
+      throw err;
+    }
+  }
+
+
+  /**
+   * Fetch a run account by address
+   */
+  async run(addr: Address): Promise<Run> {
+    try {
+      const runAccount = await this.client.fetchRunAccount(this.sdk.solana.rpc, addr);
+      const run = this.transformRunAccount(runAccount);
+      return run;
+    } catch (err) {
+      this.sdk.logger.error(`Failed to fetch run ${err}`);
+      throw err;
+    }
+  }
+
+  /**
+ * Fetch a run account by address
+ */
+  async market(addr: Address): Promise<Market> {
+    try {
+      const marketAccount = await this.client.fetchMarketAccount(this.sdk.solana.rpc, addr);
+      const market = this.transformMarketAccount(marketAccount);
+      return market;
+    } catch (err) {
+      this.sdk.logger.error(`Failed to fetch market ${err}`);
       throw err;
     }
   }
@@ -39,9 +80,24 @@ export class JobsProgram extends BaseProgram {
   /**
  * Fetch multiple job accounts by address
  */
-  async multiple(addresses: Address[]): Promise<Account<programClient.JobAccount>[]> {
+  async multiple(addresses: Address[], checkRuns: boolean = false): Promise<Job[]> {
     try {
-      return await this.client.fetchAllJobAccount(this.sdk.solana.rpc, addresses);
+      const jobAccounts = await this.client.fetchAllJobAccount(this.sdk.solana.rpc, addresses);;
+      const jobs = jobAccounts.map(jobAccount => (this.transformJobAccount(jobAccount)));
+      if (checkRuns) {
+        const runs = await this.runs();
+        jobs.forEach(job => {
+          if (job.state === 0) {
+            const run = runs.find(run => run.job === job.address);
+            if (run) {
+              job.state = 1;
+              job.timeStart = run.time;
+              job.node = run.node;
+            }
+          }
+        });
+      }
+      return jobs;
     } catch (err) {
       this.sdk.logger.error(`Failed to fetch job ${err}`);
       throw err;
@@ -51,8 +107,52 @@ export class JobsProgram extends BaseProgram {
   /**
   * Fetch all job accounts
   */
-  async all(): Promise<Account<programClient.JobAccount>[]> {
+  async all(filters?: {
+    state?: number,
+    market?: Address,
+    node?: Address,
+    project?: Address,
+  }, checkRuns: boolean = false): Promise<Job[]> {
     try {
+      const extraGPAFilters: GetProgramAccountsMemcmpFilter[] = [];
+      if (filters) {
+        if (typeof filters.state === 'number') {
+          extraGPAFilters.push({
+            memcmp: {
+              offset: BigInt(208),
+              bytes: bs58.encode(Buffer.from([filters.state])) as Base58EncodedBytes,
+              encoding: "base58",
+            },
+          });
+        }
+        if (filters.project) {
+          extraGPAFilters.push({
+            memcmp: {
+              offset: BigInt(176),
+              bytes: filters.project.toString() as Base58EncodedBytes,
+              encoding: "base58",
+            },
+          });
+        }
+        if (filters.node) {
+          extraGPAFilters.push({
+            memcmp: {
+              offset: BigInt(104),
+              bytes: filters.node.toString() as Base58EncodedBytes,
+              encoding: "base58",
+            },
+          });
+        }
+        if (filters.market) {
+          extraGPAFilters.push({
+            memcmp: {
+              offset: BigInt(72),
+              bytes: filters.market.toString() as Base58EncodedBytes,
+              encoding: "base58",
+            },
+          });
+        }
+      }
       const getProgramAccountsResponse = await this.sdk.solana.rpc
         .getProgramAccounts(this.getProgramId(), {
           encoding: "base64",
@@ -64,28 +164,142 @@ export class JobsProgram extends BaseProgram {
                 encoding: "base58",
               },
             },
+            ...extraGPAFilters,
           ],
         })
         .send();
 
-      // getProgramAccounts uses one format
-      // decodeOffer uses another
-      const encodedAccounts: Account<programClient.JobAccount>[] = getProgramAccountsResponse
+      const jobs: Job[] = getProgramAccountsResponse
         .map((result: typeof getProgramAccountsResponse[0]) => {
           try {
-            return programClient.decodeJobAccount(parseBase64RpcAccount(result.pubkey, result.account));
+            const jobAccount = programClient.decodeJobAccount(parseBase64RpcAccount(result.pubkey, result.account));
+            return this.transformJobAccount(jobAccount);
           } catch (err) {
             this.sdk.logger.error(`Failed to decode job ${err}`);
             return null;
           }
         })
-        .filter((account: Account<programClient.JobAccount> | null): account is Account<programClient.JobAccount> => account !== null);
-      return encodedAccounts;
+        .filter((account: Job | null): account is Job => account !== null);
+      if (checkRuns) {
+        const runs = await this.runs();
+        jobs.forEach(job => {
+          if (job.state === 0) {
+            const run = runs.find(run => run.job === job.address);
+            if (run) {
+              job.state = 1;
+              job.timeStart = run.time;
+              job.node = run.node;
+            }
+          }
+        });
+      }
+      return jobs;
     } catch (err) {
       this.sdk.logger.error(`Failed to fetch all jobs ${err}`);
       throw err;
     }
   }
+  /**
+  * Fetch all run accounts
+  */
+  async runs(filters?: {
+    node?: Address,
+    job?: Address,
+  }): Promise<Run[]> {
+    try {
+      const extraGPAFilters: GetProgramAccountsMemcmpFilter[] = [];
+      if (filters) {
+        if (filters.node) {
+          extraGPAFilters.push({
+            memcmp: {
+              offset: BigInt(40),
+              bytes: filters.node.toString() as Base58EncodedBytes,
+              encoding: "base58",
+            },
+          });
+        }
+        if (filters.job) {
+          extraGPAFilters.push({
+            memcmp: {
+              offset: BigInt(8),
+              bytes: filters.job.toString() as Base58EncodedBytes,
+              encoding: "base58",
+            },
+          });
+        }
+      }
+      const getProgramAccountsResponse = await this.sdk.solana.rpc
+        .getProgramAccounts(this.getProgramId(), {
+          encoding: "base64",
+          filters: [
+            {
+              memcmp: {
+                offset: BigInt(0),
+                bytes: bs58.encode(Buffer.from(programClient.RUN_ACCOUNT_DISCRIMINATOR)) as Base58EncodedBytes,
+                encoding: "base58",
+              },
+            },
+          ],
+        })
+        .send();
+
+      const runAccounts: Run[] = getProgramAccountsResponse
+        .map((result: typeof getProgramAccountsResponse[0]) => {
+          try {
+            const runAccount = programClient.decodeRunAccount(parseBase64RpcAccount(result.pubkey, result.account));
+            return this.transformRunAccount(runAccount);
+          } catch (err) {
+            this.sdk.logger.error(`Failed to decode run ${err}`);
+            return null;
+          }
+        })
+        .filter((account: Run | null): account is Run => account !== null);
+      return runAccounts;
+    } catch (err) {
+      this.sdk.logger.error(`Failed to fetch all runs ${err}`);
+      throw err;
+    }
+  }
+
+  /**
+  * Fetch all market accounts
+  */
+  async markets(): Promise<Market[]> {
+    try {
+      const getProgramAccountsResponse = await this.sdk.solana.rpc
+        .getProgramAccounts(this.getProgramId(), {
+          encoding: "base64",
+          filters: [
+            {
+              memcmp: {
+                offset: BigInt(0),
+                bytes: bs58.encode(Buffer.from(programClient.MARKET_ACCOUNT_DISCRIMINATOR)) as Base58EncodedBytes,
+                encoding: "base58",
+              },
+            },
+          ],
+        })
+        .send();
+
+      const marketAccounts: Market[] = getProgramAccountsResponse
+        .map((result: typeof getProgramAccountsResponse[0]) => {
+          try {
+            const marketAccount = programClient.decodeMarketAccount(parseBase64RpcAccount(result.pubkey, result.account));
+            return this.transformMarketAccount(marketAccount);
+          } catch (err) {
+            this.sdk.logger.error(`Failed to decode market ${err}`);
+            return null;
+          }
+        })
+        .filter((account: Market | null): account is Market => account !== null);
+      return marketAccounts;
+    } catch (err) {
+      this.sdk.logger.error(`Failed to fetch all markets ${err}`);
+      throw err;
+    }
+  }
+
+
 
   /**
    * Post a new job to the marketplace
@@ -172,7 +386,7 @@ export class JobsProgram extends BaseProgram {
  * @example
  * ```typescript
  * // Example: Monitor job accounts and save to file
- * const stopMonitoring = await jobsProgram.monitorAccountUpdates({
+ * const stopMonitoring = await jobsProgram.monitor({
  *   onJobAccount: async (jobAccount) => {
  *     console.log('Job updated:', jobAccount.address.toString());
  *     // Save to database, file, or process as needed
@@ -192,10 +406,10 @@ export class JobsProgram extends BaseProgram {
  * @param options Configuration options for monitoring
  * @returns A function to stop monitoring
  */
-  async monitorAccountUpdates(options: {
-    onJobAccount?: (jobAccount: Account<Job>) => Promise<void> | void;
-    onMarketAccount?: (marketAccount: Account<Market>) => Promise<void> | void;
-    onRunAccount?: (runAccount: Account<Run>) => Promise<void> | void;
+  async monitor(options: {
+    onJobAccount?: (jobAccount: Job) => Promise<void> | void;
+    onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
+    onRunAccount?: (runAccount: Run) => Promise<void> | void;
     onError?: (error: Error, accountType?: string) => Promise<void> | void;
   } = {}): Promise<() => void> {
     const {
@@ -300,9 +514,9 @@ export class JobsProgram extends BaseProgram {
   private async processSubscriptionNotifications(
     notificationIterable: AsyncIterable<any>,
     options: {
-      onJobAccount?: (jobAccount: Account<Job>) => Promise<void> | void;
-      onMarketAccount?: (marketAccount: Account<Market>) => Promise<void> | void;
-      onRunAccount?: (runAccount: Account<Run>) => Promise<void> | void;
+      onJobAccount?: (jobAccount: Job) => Promise<void> | void;
+      onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
+      onRunAccount?: (runAccount: Run) => Promise<void> | void;
       onError?: (error: Error, accountType?: string) => Promise<void> | void;
     },
     isMonitoring: () => boolean
@@ -337,29 +551,32 @@ export class JobsProgram extends BaseProgram {
   }
 
 
-  private transformJobAccount(jobAccount: programClient.JobAccount): Job {
+  public transformJobAccount(jobAccount: Account<programClient.JobAccount>): Job {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars 
-    const { discriminator: _, ...jobAccountData } = jobAccount;
+    const { discriminator: _, ...jobAccountData } = jobAccount.data;
 
     return {
+      address: jobAccount.address,
       ...convertBigIntToNumber(jobAccountData),
       ipfsJob: IPFS.solHashToIpfsHash(jobAccountData.ipfsJob),
       ipfsResult: IPFS.solHashToIpfsHash(jobAccountData.ipfsResult),
     }
   }
-  private transformRunAccount(runAccount: programClient.RunAccount): Run {
+  public transformRunAccount(runAccount: Account<programClient.RunAccount>): Run {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars 
-    const { discriminator: _, ...runAccountData } = runAccount;
+    const { discriminator: _, ...runAccountData } = runAccount.data;
 
     return {
+      address: runAccount.address,
       ...convertBigIntToNumber(runAccountData),
     }
   }
-  private transformMarketAccount(marketAccount: programClient.MarketAccount): Market {
+  public transformMarketAccount(marketAccount: Account<programClient.MarketAccount>): Market {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars 
-    const { discriminator: _, ...marketAccountData } = marketAccount;
+    const { discriminator: _, ...marketAccountData } = marketAccount.data;
 
     return {
+      address: marketAccount.address,
       ...convertBigIntToNumber(marketAccountData),
     }
   }
@@ -369,9 +586,9 @@ export class JobsProgram extends BaseProgram {
   private async handleAccountUpdate(
     accountData: any,
     options: {
-      onJobAccount?: (jobAccount: Account<Job>) => Promise<void> | void;
-      onMarketAccount?: (marketAccount: Account<Market>) => Promise<void> | void;
-      onRunAccount?: (runAccount: Account<Run>) => Promise<void> | void;
+      onJobAccount?: (jobAccount: Job) => Promise<void> | void;
+      onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
+      onRunAccount?: (runAccount: Run) => Promise<void> | void;
       onError?: (error: Error, accountType?: string) => Promise<void> | void;
     },
     isMonitoring: () => boolean
@@ -402,10 +619,10 @@ export class JobsProgram extends BaseProgram {
     }
   }
 
-  private async handleJobAccount(jobAccount: Account<programClient.JobAccount>, onJobAccount?: (jobAccount: Account<Job>) => Promise<void> | void, _isMonitoring?: () => boolean): Promise<void> {
+  private async handleJobAccount(jobAccount: Account<programClient.JobAccount>, onJobAccount?: (jobAccount: Job) => Promise<void> | void, _isMonitoring?: () => boolean): Promise<void> {
     if (onJobAccount) {
       try {
-        await onJobAccount({ ...jobAccount, data: this.transformJobAccount(jobAccount.data) });
+        await onJobAccount(this.transformJobAccount(jobAccount));
       } catch (error) {
         this.sdk.logger.error(`Error in onJobAccount callback: ${error}`);
         throw error;
@@ -414,10 +631,10 @@ export class JobsProgram extends BaseProgram {
     this.sdk.logger.debug(`Processed job account ${jobAccount.address.toString()}`);
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handleMarketAccount(marketAccount: Account<programClient.MarketAccount>, onMarketAccount?: (marketAccount: Account<Market>) => Promise<void> | void, _isMonitoring?: () => boolean): Promise<void> {
+  private async handleMarketAccount(marketAccount: Account<programClient.MarketAccount>, onMarketAccount?: (marketAccount: Market) => Promise<void> | void, _isMonitoring?: () => boolean): Promise<void> {
     if (onMarketAccount) {
       try {
-        await onMarketAccount({ ...marketAccount, data: this.transformMarketAccount(marketAccount.data) });
+        await onMarketAccount(this.transformMarketAccount(marketAccount));
       } catch (error) {
         this.sdk.logger.error(`Error in onMarketAccount callback: ${error}`);
         throw error;
@@ -425,10 +642,10 @@ export class JobsProgram extends BaseProgram {
     }
     this.sdk.logger.debug(`Processed market account ${marketAccount.address.toString()}`);
   }
-  private async handleRunAccount(runAccount: Account<programClient.RunAccount>, onRunAccount?: (runAccount: Account<Run>) => Promise<void> | void, _isMonitoring?: () => boolean): Promise<void> {
+  private async handleRunAccount(runAccount: Account<programClient.RunAccount>, onRunAccount?: (runAccount: Run) => Promise<void> | void, _isMonitoring?: () => boolean): Promise<void> {
     if (onRunAccount) {
       try {
-        await onRunAccount({ ...runAccount, data: this.transformRunAccount(runAccount.data) });
+        await onRunAccount(this.transformRunAccount(runAccount));
 
       } catch (error) {
         this.sdk.logger.error(`Error in onRunAccount callback: ${error}`);

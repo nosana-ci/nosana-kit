@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "Example scripts for using the Nosana SDK",
   "scripts": {
-    "basic": "ts-node basic-usage.ts",
-    "jobs": "ts-node jobs-example.ts",
-    "monitor-jobs": "ts-node monitor-job-accounts.ts"
+    "retrieve": "ts-node retrieve.ts",
+    "monitor": "ts-node monitor.ts"
   },
   "dependencies": {
     "@nosana/kit": "file:../.."

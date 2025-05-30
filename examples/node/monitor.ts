@@ -1,26 +1,23 @@
-import { NosanaClient, NosanaNetwork } from '@nosana/kit';
+import { NosanaClient, NosanaNetwork, Job, Market, Run } from '@nosana/kit';
 import { promises as fs } from 'fs';
-import { Account } from 'gill';
-import * as programClient from '../../src/generated_clients/jobs/index.js';
-import { Job, Market, Run } from '../../dist/programs/JobsProgram.js';
 
-// Type for storing job accounts in a more readable format
-type JobAccountData = {
+// Type for storing accounts in a more readable format
+type AccountData = {
   address: string;
-  data: any;
+  data: Job | Run | Market;
   lastUpdated: string;
 };
 
 async function main() {
   // Initialize the Nosana client
-  const client = new NosanaClient(NosanaNetwork.DEVNET);
+  const client = new NosanaClient(NosanaNetwork.MAINNET);
 
   console.log('Starting job account monitoring...');
 
   // Storage for accounts
-  const jobAccounts = new Map<string, JobAccountData>();
-  const runAccounts = new Map<string, JobAccountData>();
-  const marketAccounts = new Map<string, JobAccountData>();
+  const jobAccounts = new Map<string, AccountData>();
+  const runAccounts = new Map<string, AccountData>();
+  const marketAccounts = new Map<string, AccountData>();
 
   // Helper function to save accounts to file
   const saveAccountsToFile = async () => {
@@ -33,8 +30,8 @@ async function main() {
     };
 
     try {
-      await fs.writeFile('job_accounts.json', JSON.stringify(data, null, 2));
-      console.log(`💾 Saved ${data.totalAccounts} accounts to job_accounts.json`);
+      await fs.writeFile('accounts.json', JSON.stringify(data, null, 2));
+      console.log(`💾 Saved ${data.totalAccounts} accounts to accounts.json`);
     } catch (error) {
       console.error('Failed to save accounts to file:', error);
     }
@@ -42,22 +39,22 @@ async function main() {
 
   // Load existing accounts if file exists
   try {
-    const existingData = await fs.readFile('job_accounts.json', 'utf-8');
+    const existingData = await fs.readFile('accounts.json', 'utf-8');
     const parsed = JSON.parse(existingData);
 
     if (parsed.jobAccounts) {
       for (const [key, value] of Object.entries(parsed.jobAccounts)) {
-        jobAccounts.set(key, value as JobAccountData);
+        jobAccounts.set(key, value as AccountData);
       }
     }
     if (parsed.runAccounts) {
       for (const [key, value] of Object.entries(parsed.runAccounts)) {
-        runAccounts.set(key, value as JobAccountData);
+        runAccounts.set(key, value as AccountData);
       }
     }
     if (parsed.marketAccounts) {
       for (const [key, value] of Object.entries(parsed.marketAccounts)) {
-        marketAccounts.set(key, value as JobAccountData);
+        marketAccounts.set(key, value as AccountData);
       }
     }
 
@@ -68,11 +65,11 @@ async function main() {
 
   try {
     // Start monitoring job account updates with callback functions
-    const stopMonitoring = await client.jobs.monitorAccountUpdates({
-      onJobAccount: async (jobAccount: Account<Job>) => {
-        const accountData: JobAccountData = {
+    const stopMonitoring = await client.jobs.monitor({
+      onJobAccount: async (jobAccount: Job) => {
+        const accountData: AccountData = {
           address: jobAccount.address.toString(),
-          data: jobAccount.data,
+          data: jobAccount,
           lastUpdated: new Date().toISOString()
         };
 
@@ -83,10 +80,10 @@ async function main() {
         await saveAccountsToFile();
       },
 
-      onRunAccount: async (runAccount: Account<Run>) => {
-        const accountData: JobAccountData = {
+      onRunAccount: async (runAccount: Run) => {
+        const accountData: AccountData = {
           address: runAccount.address.toString(),
-          data: runAccount.data,
+          data: runAccount,
           lastUpdated: new Date().toISOString()
         };
 
@@ -97,10 +94,10 @@ async function main() {
         await saveAccountsToFile();
       },
 
-      onMarketAccount: async (marketAccount: Account<Market>) => {
-        const accountData: JobAccountData = {
+      onMarketAccount: async (marketAccount: Market) => {
+        const accountData: AccountData = {
           address: marketAccount.address.toString(),
-          data: marketAccount.data,
+          data: marketAccount,
           lastUpdated: new Date().toISOString()
         };
 
@@ -117,7 +114,7 @@ async function main() {
     });
 
     console.log('✅ Job account monitoring started successfully!');
-    console.log('📊 Monitoring will save account updates to job_accounts.json');
+    console.log('📊 Monitoring will save account updates to accounts.json');
     console.log('🔍 Watching for job, run, and market account updates...');
     console.log('⏹️  Press Ctrl+C to stop monitoring...');
 

@@ -27,6 +27,8 @@ describe('NosanaError', () => {
       TRANSACTION_ERROR: 'TRANSACTION_ERROR',
       PROGRAM_ERROR: 'PROGRAM_ERROR',
       VALIDATION_ERROR: 'VALIDATION_ERROR',
+      NO_WALLET: 'NO_WALLET',
+      FILE_ERROR: 'FILE_ERROR',
     });
   });
 }); 

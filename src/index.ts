@@ -17,7 +17,19 @@ export class NosanaClient {
   }
 }
 
-// Export types
+// Export types and configuration
 export * from './config/index.js';
 export * from './errors/NosanaError.js';
-export * from './logger/Logger.js'; 
+export * from './logger/Logger.js';
+
+// Export JobsProgram and related types
+export { JobsProgram } from './programs/JobsProgram.js';
+export type { Job, Market, Run } from './programs/JobsProgram.js';
+
+// Export IPFS utilities
+export * from './ipfs/IPFS.js';
+// Export all generated client types and functions
+export * from './generated_clients/jobs/index.js';
+
+// Export dependencies
+export * from 'gill';

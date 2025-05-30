@@ -28,3 +28,6 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db 
+
+# Examples
+examples/node/accounts.json

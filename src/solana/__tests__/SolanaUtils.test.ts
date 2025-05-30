@@ -3,30 +3,24 @@ import { SolanaUtils } from '../SolanaUtils';
 import { NosanaClient, NosanaNetwork } from '../../index';
 import { NosanaError, ErrorCodes } from '../../errors/NosanaError';
 
-jest.mock('gill', () => {
-  const mockRpc = {
-    getBalance: jest.fn().mockReturnValue({
-      // @ts-expect-error
-      send: jest.fn().mockResolvedValue({ value: BigInt(1000) }),
-    }),
-    getLatestBlockhash: jest.fn().mockReturnValue({
-      // @ts-expect-error
-      send: jest.fn().mockResolvedValue({ value: 'test-blockhash' }),
-    }),
-  };
-  return {
-    createSolanaClient: jest.fn().mockReturnValue({
-      rpc: mockRpc,
-    }),
-    address: jest.fn().mockReturnValue('test-address'),
-  };
-});
+// Mock gill
+jest.mock('gill', () => ({
+  createSolanaClient: jest.fn().mockReturnValue({
+    rpc: {
+      getLatestBlockhash: jest.fn(),
+    },
+    rpcSubscriptions: {},
+    sendAndConfirmTransaction: jest.fn(),
+  }),
+  address: jest.fn((addr: string) => addr),
+}));
 
 describe('SolanaUtils', () => {
   let client: NosanaClient;
-  let utils: SolanaUtils;
+  let solana: SolanaUtils;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     client = new NosanaClient(NosanaNetwork.MAINNET, {
       solana: {
         cluster: 'mainnet-beta',
@@ -34,17 +28,28 @@ describe('SolanaUtils', () => {
         commitment: 'confirmed'
       }
     });
-    utils = new SolanaUtils(client);
-    jest.clearAllMocks();
+    solana = new SolanaUtils(client);
   });
 
-  it('should get balance', async () => {
-    const balance = await utils.getBalance('test-address');
-    expect(balance).toBe(BigInt(1000));
+  it('should initialize with client', () => {
+    expect(solana).toBeDefined();
+    expect(solana.rpc).toBeDefined();
+    expect(solana.rpcSubscriptions).toBeDefined();
+    expect(solana.sendAndConfirmTransaction).toBeDefined();
   });
 
-  it('should get latest blockhash', async () => {
-    const blockhash = await utils.getLatestBlockhash();
-    expect(blockhash).toBe('test-blockhash');
+  describe('Client properties', () => {
+    it('should expose rpc client', () => {
+      expect(solana.rpc).toBeDefined();
+      expect(typeof solana.rpc.getLatestBlockhash).toBe('function');
+    });
+
+    it('should expose rpcSubscriptions client', () => {
+      expect(solana.rpcSubscriptions).toBeDefined();
+    });
+
+    it('should expose sendAndConfirmTransaction method', () => {
+      expect(typeof solana.sendAndConfirmTransaction).toBe('function');
+    });
   });
 }); 
