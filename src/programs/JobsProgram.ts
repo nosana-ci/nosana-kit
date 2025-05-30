@@ -1,5 +1,5 @@
 import { BaseProgram } from './BaseProgram.js';
-import { Address, address as toAddress, createTransaction, signTransactionMessageWithSigners, getExplorerLink, getSignatureFromTransaction, generateKeyPairSigner, Signature, EncodedAccount, parseBase64RpcAccount, Account } from 'gill';
+import { Address, createTransaction, signTransactionMessageWithSigners, getExplorerLink, getSignatureFromTransaction, generateKeyPairSigner, Signature, EncodedAccount, parseBase64RpcAccount, Account, Base58EncodedBytes } from 'gill';
 import { ErrorCodes, NosanaClient, NosanaError } from '../index.js';
 import * as programClient from "../generated_clients/jobs/index.js";
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
@@ -27,12 +27,63 @@ export class JobsProgram extends BaseProgram {
   /**
    * Fetch a job account by address
    */
-  async get(addressStr: string | Address) {
+  async get(addr: Address): Promise<Account<programClient.JobAccount>> {
     try {
-      const addr = toAddress(addressStr);
       return await this.client.fetchJobAccount(this.sdk.solana.rpc, addr);
     } catch (err) {
       this.sdk.logger.error(`Failed to fetch job ${err}`);
+      throw err;
+    }
+  }
+
+  /**
+ * Fetch multiple job accounts by address
+ */
+  async multiple(addresses: Address[]): Promise<Account<programClient.JobAccount>[]> {
+    try {
+      return await this.client.fetchAllJobAccount(this.sdk.solana.rpc, addresses);
+    } catch (err) {
+      this.sdk.logger.error(`Failed to fetch job ${err}`);
+      throw err;
+    }
+  }
+
+  /**
+  * Fetch all job accounts
+  */
+  async all(): Promise<Account<programClient.JobAccount>[]> {
+    try {
+      const getProgramAccountsResponse = await this.sdk.solana.rpc
+        .getProgramAccounts(this.getProgramId(), {
+          encoding: "base64",
+          filters: [
+            {
+              memcmp: {
+                offset: BigInt(0),
+                bytes: bs58.encode(Buffer.from(programClient.JOB_ACCOUNT_DISCRIMINATOR)) as Base58EncodedBytes,
+                encoding: "base58",
+              },
+            },
+          ],
+        })
+        .send();
+
+      // getProgramAccounts uses one format
+      // decodeOffer uses another
+      const encodedAccounts: Account<programClient.JobAccount>[] = getProgramAccountsResponse
+        .map((result: typeof getProgramAccountsResponse[0]) => {
+          try {
+            console.log(parseBase64RpcAccount(result.pubkey, result.account))
+            return programClient.decodeJobAccount(parseBase64RpcAccount(result.pubkey, result.account));
+          } catch (err) {
+            this.sdk.logger.error(`Failed to decode job ${err}`);
+            return null;
+          }
+        })
+        .filter((account: Account<programClient.JobAccount> | null): account is Account<programClient.JobAccount> => account !== null);
+      return encodedAccounts;
+    } catch (err) {
+      this.sdk.logger.error(`Failed to fetch all jobs ${err}`);
       throw err;
     }
   }
@@ -292,7 +343,7 @@ export class JobsProgram extends BaseProgram {
     }
     const jobDb = existingAccounts.get(runAccount.data.job.toString());
     if (!jobDb) {
-      const jobAccount = await this.get(runAccount.data.job.toString());
+      const jobAccount = await this.get(runAccount.data.job);
       if (jobAccount) {
         existingAccounts.set(runAccount.data.job.toString(), this.transformJobAccount(jobAccount.data));
       }
