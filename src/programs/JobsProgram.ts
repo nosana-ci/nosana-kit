@@ -4,12 +4,12 @@ import { ErrorCodes, NosanaClient, NosanaError } from '../index.js';
 import * as programClient from "../generated_clients/jobs/index.js";
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import bs58 from 'bs58';
-import { promises as fs } from 'fs';
 import { IPFS } from '../ipfs/IPFS.js';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../utils/index.js';
 
-export type JobDb = ConvertTypesForDb<programClient.JobAccountArgs>;
-
+export type Job = ConvertTypesForDb<programClient.JobAccountArgs>;
+export type Market = ConvertTypesForDb<programClient.MarketAccountArgs>;
+export type Run = ConvertTypesForDb<programClient.RunAccountArgs>;
 
 export class JobsProgram extends BaseProgram {
   public readonly client: typeof programClient;
@@ -73,7 +73,6 @@ export class JobsProgram extends BaseProgram {
       const encodedAccounts: Account<programClient.JobAccount>[] = getProgramAccountsResponse
         .map((result: typeof getProgramAccountsResponse[0]) => {
           try {
-            console.log(parseBase64RpcAccount(result.pubkey, result.account))
             return programClient.decodeJobAccount(parseBase64RpcAccount(result.pubkey, result.account));
           } catch (err) {
             this.sdk.logger.error(`Failed to decode job ${err}`);
@@ -167,61 +166,103 @@ export class JobsProgram extends BaseProgram {
   }
 
   /**
- * Monitor program account updates and store them in a JSON file
- * Uses WebSocket subscriptions with polling fallback for maximum reliability
+ * Monitor program account updates using callback functions
+ * Uses WebSocket subscriptions with automatic restart on failure
+ * 
+ * @example
+ * ```typescript
+ * // Example: Monitor job accounts and save to file
+ * const stopMonitoring = await jobsProgram.monitorAccountUpdates({
+ *   onJobAccount: async (jobAccount) => {
+ *     console.log('Job updated:', jobAccount.address.toString());
+ *     // Save to database, file, or process as needed
+ *   },
+ *   onRunAccount: async (runAccount) => {
+ *     console.log('Run updated:', runAccount.address.toString());
+ *   },
+ *   onError: async (error, accountType) => {
+ *     console.error('Error processing account:', error, accountType);
+ *   }
+ * });
+ * 
+ * // Stop monitoring when done
+ * stopMonitoring();
+ * ```
+ * 
  * @param options Configuration options for monitoring
  * @returns A function to stop monitoring
  */
   async monitorAccountUpdates(options: {
-    outputFile?: string;
-    useSubscriptions?: boolean;
+    onJobAccount?: (jobAccount: Account<Job>) => Promise<void> | void;
+    onMarketAccount?: (marketAccount: Account<Market>) => Promise<void> | void;
+    onRunAccount?: (runAccount: Account<Run>) => Promise<void> | void;
+    onError?: (error: Error, accountType?: string) => Promise<void> | void;
   } = {}): Promise<() => void> {
     const {
-      outputFile = 'job_accounts.json',
-      useSubscriptions = true, // Try subscriptions first
+      onJobAccount,
+      onMarketAccount,
+      onRunAccount,
+      onError
     } = options;
 
     const programId = this.getProgramId();
 
     try {
-      // Load existing accounts from file if it exists
-      const existingAccounts = await this.loadAccountsFromFile(outputFile);
-
       this.sdk.logger.info(`Starting to monitor job program account updates for program: ${programId}`);
 
-      let currentMethod: 'subscription' | 'polling' | null = null;
       let abortController: AbortController | null = null;
+      let isMonitoring = true;
 
       // Function to stop all monitoring
       const stopMonitoring = () => {
+        isMonitoring = false;
         if (abortController) {
           abortController.abort();
         }
-        this.sdk.logger.info(`Stopped monitoring job program account updates (was using: ${currentMethod})`);
+        this.sdk.logger.info(`Stopped monitoring job program account updates`);
       };
 
-      // Try WebSocket subscription first
-      if (useSubscriptions) {
-        try {
-          this.sdk.logger.info('Attempting to establish WebSocket subscription...');
+      // Function to start/restart subscription with retry logic
+      const startSubscription = async (): Promise<void> => {
+        while (isMonitoring) {
+          try {
+            this.sdk.logger.info('Attempting to establish WebSocket subscription...');
 
-          abortController = new AbortController();
-          const subscriptionIterable = await this.setupSubscription(abortController);
+            abortController = new AbortController();
+            const subscriptionIterable = await this.setupSubscription(abortController);
 
-          currentMethod = 'subscription';
-          this.sdk.logger.info('Successfully established WebSocket subscription');
+            this.sdk.logger.info('Successfully established WebSocket subscription');
 
-          // Start processing subscription notifications
-          this.processSubscriptionNotifications(subscriptionIterable, outputFile, existingAccounts);
+            // Start processing subscription notifications
+            await this.processSubscriptionNotifications(
+              subscriptionIterable,
+              { onJobAccount, onMarketAccount, onRunAccount, onError },
+              () => isMonitoring
+            );
 
-        } catch (error) {
-          this.sdk.logger.warn(`Failed to establish WebSocket subscription: ${error}`);
-          this.sdk.logger.info('Falling back to polling method...');
-          abortController = null;
+          } catch (error) {
+            this.sdk.logger.warn(`WebSocket subscription failed: ${error}`);
+
+            // Clean up current subscription
+            if (abortController) {
+              abortController.abort();
+              abortController = null;
+            }
+
+            if (isMonitoring) {
+              this.sdk.logger.info('Retrying WebSocket subscription in 5 seconds...');
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+          }
         }
-      }
+      };
 
-      this.sdk.logger.info(`Successfully started monitoring job program account updates using ${currentMethod}`);
+      // Start the subscription loop
+      startSubscription().catch(error => {
+        this.sdk.logger.error(`Failed to start subscription loop: ${error}`);
+      });
+
+      this.sdk.logger.info(`Successfully started monitoring job program account updates`);
 
       return stopMonitoring;
 
@@ -258,26 +299,45 @@ export class JobsProgram extends BaseProgram {
    */
   private async processSubscriptionNotifications(
     notificationIterable: AsyncIterable<any>,
-    outputFile: string,
-    existingAccounts: Map<string, any>,
+    options: {
+      onJobAccount?: (jobAccount: Account<Job>) => Promise<void> | void;
+      onMarketAccount?: (marketAccount: Account<Market>) => Promise<void> | void;
+      onRunAccount?: (runAccount: Account<Run>) => Promise<void> | void;
+      onError?: (error: Error, accountType?: string) => Promise<void> | void;
+    },
+    isMonitoring: () => boolean
   ): Promise<void> {
     try {
       for await (const notification of notificationIterable) {
+        // Check if monitoring should continue
+        if (!isMonitoring()) {
+          this.sdk.logger.info('Monitoring stopped, exiting subscription processing');
+          break;
+        }
+
         try {
           const { value } = notification;
-          await this.handleAccountUpdate(value, outputFile, existingAccounts);
+          await this.handleAccountUpdate(value, options, isMonitoring);
         } catch (error) {
-          this.sdk.logger.error(`Error handling subscription notification: ${error}`);
+          this.sdk.logger.error(`Error handling account update notification: ${error}`);
+          if (options.onError) {
+            try {
+              await options.onError(error instanceof Error ? error : new Error(String(error)));
+            } catch (callbackError) {
+              this.sdk.logger.error(`Error in onError callback: ${callbackError}`);
+            }
+          }
         }
       }
     } catch (error) {
       this.sdk.logger.error(`Subscription error: ${error}`);
-
+      // Throw the error so the calling function can restart the subscription
+      throw error;
     }
   }
 
 
-  private transformJobAccount(jobAccount: programClient.JobAccount): JobDb {
+  private transformJobAccount(jobAccount: programClient.JobAccount): Job {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars 
     const { discriminator: _, ...jobAccountData } = jobAccount;
 
@@ -286,32 +346,55 @@ export class JobsProgram extends BaseProgram {
       ipfsJob: IPFS.solHashToIpfsHash(jobAccountData.ipfsJob),
       ipfsResult: IPFS.solHashToIpfsHash(jobAccountData.ipfsResult),
     }
+  }
+  private transformRunAccount(runAccount: programClient.RunAccount): Run {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars 
+    const { discriminator: _, ...runAccountData } = runAccount;
 
+    return {
+      ...convertBigIntToNumber(runAccountData),
+    }
+  }
+  private transformMarketAccount(marketAccount: programClient.MarketAccount): Market {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars 
+    const { discriminator: _, ...marketAccountData } = marketAccount;
+
+    return {
+      ...convertBigIntToNumber(marketAccountData),
+    }
   }
   /**
-   * Handle account update and store/update in JSON file
+   * Handle account update using callback functions
    */
   private async handleAccountUpdate(
     accountData: any,
-    outputFile: string,
-    existingAccounts: Map<string, any>
+    options: {
+      onJobAccount?: (jobAccount: Account<Job>) => Promise<void> | void;
+      onMarketAccount?: (marketAccount: Account<Market>) => Promise<void> | void;
+      onRunAccount?: (runAccount: Account<Run>) => Promise<void> | void;
+      onError?: (error: Error, accountType?: string) => Promise<void> | void;
+    },
+    isMonitoring: () => boolean
   ): Promise<void> {
     try {
       const { account, pubkey } = accountData;
       const encodedAccount: EncodedAccount = parseBase64RpcAccount(pubkey, account);
-      const discriminator = (new Uint8Array(Buffer.from(account.data[0], 'base64').subarray(0, 8))).toString();
-      switch (discriminator) {
-        case programClient.JOB_ACCOUNT_DISCRIMINATOR.toString():
-          await this.handleJobAccount(encodedAccount, outputFile, existingAccounts);
+      const accountType = programClient.identifyNosanaJobsAccount(encodedAccount);
+      switch (accountType) {
+        case programClient.NosanaJobsAccount.JobAccount:
+          const jobAccount = programClient.decodeJobAccount(encodedAccount);
+          await this.handleJobAccount(jobAccount, options.onJobAccount, isMonitoring);
           break;
-        case programClient.MARKET_ACCOUNT_DISCRIMINATOR.toString():
-          await this.handleMarketAccount(encodedAccount);
+        case programClient.NosanaJobsAccount.MarketAccount:
+          const marketAccount = programClient.decodeMarketAccount(encodedAccount);
+          await this.handleMarketAccount(marketAccount, options.onMarketAccount, isMonitoring);
           break;
-        case programClient.RUN_ACCOUNT_DISCRIMINATOR.toString():
-          await this.handleRunAccount(encodedAccount, outputFile, existingAccounts);
+        case programClient.NosanaJobsAccount.RunAccount:
+          const runAccount = programClient.decodeRunAccount(encodedAccount);
+          await this.handleRunAccount(runAccount, options.onRunAccount, isMonitoring);
           break;
         default:
-          this.sdk.logger.error(`Unknown account discriminator: ${discriminator}`);
+          this.sdk.logger.error(`No support yet for account type: ${accountType}`);
           return;
       }
     } catch (error) {
@@ -319,80 +402,40 @@ export class JobsProgram extends BaseProgram {
     }
   }
 
-  private async handleJobAccount(maybeEncodedAccount: EncodedAccount | Account<programClient.JobAccount>, outputFile: string, existingAccounts: Map<string, JobDb>): Promise<void> {
-    let jobAccount: Account<programClient.JobAccount>;
-    if (maybeEncodedAccount.data instanceof Uint8Array) {
-      jobAccount = programClient.decodeJobAccount(maybeEncodedAccount as EncodedAccount);
-    } else {
-      jobAccount = maybeEncodedAccount as Account<programClient.JobAccount>;
+  private async handleJobAccount(jobAccount: Account<programClient.JobAccount>, onJobAccount?: (jobAccount: Account<Job>) => Promise<void> | void, _isMonitoring?: () => boolean): Promise<void> {
+    if (onJobAccount) {
+      try {
+        await onJobAccount({ ...jobAccount, data: this.transformJobAccount(jobAccount.data) });
+      } catch (error) {
+        this.sdk.logger.error(`Error in onJobAccount callback: ${error}`);
+        throw error;
+      }
     }
-    existingAccounts.set(jobAccount.address.toString(), this.transformJobAccount(jobAccount.data));
-    await this.saveAccountsToFile(outputFile, existingAccounts);
-    this.sdk.logger.debug(`Updated job account ${jobAccount.address.toString()} in ${outputFile}`);
+    this.sdk.logger.debug(`Processed job account ${jobAccount.address.toString()}`);
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handleMarketAccount(maybeEncodedAccount: EncodedAccount | Account<programClient.MarketAccount>): Promise<void> {
-    this.sdk.logger.debug(`Market account ${maybeEncodedAccount.address.toString()} update skipped (not implemented yet)`);
-  }
-  private async handleRunAccount(maybeEncodedAccount: EncodedAccount | Account<programClient.RunAccount>, outputFile: string, existingAccounts: Map<string, JobDb>): Promise<void> {
-    let runAccount: Account<programClient.RunAccount>;
-    if (maybeEncodedAccount.data instanceof Uint8Array) {
-      runAccount = programClient.decodeRunAccount(maybeEncodedAccount as EncodedAccount);
-    } else {
-      runAccount = maybeEncodedAccount as Account<programClient.RunAccount>;
-    }
-    const jobDb = existingAccounts.get(runAccount.data.job.toString());
-    if (!jobDb) {
-      const jobAccount = await this.get(runAccount.data.job);
-      if (jobAccount) {
-        existingAccounts.set(runAccount.data.job.toString(), this.transformJobAccount(jobAccount.data));
+  private async handleMarketAccount(marketAccount: Account<programClient.MarketAccount>, onMarketAccount?: (marketAccount: Account<Market>) => Promise<void> | void, _isMonitoring?: () => boolean): Promise<void> {
+    if (onMarketAccount) {
+      try {
+        await onMarketAccount({ ...marketAccount, data: this.transformMarketAccount(marketAccount.data) });
+      } catch (error) {
+        this.sdk.logger.error(`Error in onMarketAccount callback: ${error}`);
+        throw error;
       }
     }
-    await this.saveAccountsToFile(outputFile, existingAccounts);
-    this.sdk.logger.debug(`Updated run account ${runAccount.address.toString()} - associated job: ${runAccount.data.job.toString()}`);
+    this.sdk.logger.debug(`Processed market account ${marketAccount.address.toString()}`);
   }
+  private async handleRunAccount(runAccount: Account<programClient.RunAccount>, onRunAccount?: (runAccount: Account<Run>) => Promise<void> | void, _isMonitoring?: () => boolean): Promise<void> {
+    if (onRunAccount) {
+      try {
+        await onRunAccount({ ...runAccount, data: this.transformRunAccount(runAccount.data) });
 
-  /**
-   * Load existing accounts from JSON file
-   */
-  private async loadAccountsFromFile(outputFile: string): Promise<Map<string, any>> {
-    const accounts = new Map<string, any>();
-
-    try {
-      const data = await fs.readFile(outputFile, 'utf-8');
-      const accountsArray = JSON.parse(data);
-
-      for (const [key, account] of accountsArray) {
-        accounts.set(key, account);
-      }
-
-      this.sdk.logger.info(`Loaded ${accountsArray.length} existing job accounts from ${outputFile}`);
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        this.sdk.logger.info(`File ${outputFile} does not exist, starting with empty accounts`);
-      } else {
-        this.sdk.logger.warn(`Failed to load accounts from file: ${error}`);
+      } catch (error) {
+        this.sdk.logger.error(`Error in onRunAccount callback: ${error}`);
+        throw error;
       }
     }
-
-    return accounts;
-  }
-
-  /**
-   * Save accounts to JSON file
-   */
-  private async saveAccountsToFile(outputFile: string, accounts: Map<string, any>): Promise<void> {
-    try {
-      const jsonData = JSON.stringify(Object.fromEntries(accounts), null, 2);
-      await fs.writeFile(outputFile, jsonData, 'utf-8');
-    } catch (error) {
-      this.sdk.logger.error(`Failed to save job accounts to file: ${error}`);
-      throw new NosanaError(
-        'Failed to save job accounts to file',
-        ErrorCodes.FILE_ERROR,
-        error
-      );
-    }
+    this.sdk.logger.debug(`Processed run account ${runAccount.address.toString()}`);
   }
 
   // Add more methods as needed based on the Jobs program's functionality
