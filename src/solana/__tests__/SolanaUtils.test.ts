@@ -1,7 +1,6 @@
 import { jest } from '@jest/globals';
 import { SolanaUtils } from '../SolanaUtils';
 import { NosanaClient, NosanaNetwork } from '../../index';
-import { NosanaError, ErrorCodes } from '../../errors/NosanaError';
 
 // Mock gill
 jest.mock('gill', () => ({

@@ -1,3 +1,7 @@
+import { Buffer } from 'buffer';
+if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
+  window.Buffer = Buffer;
+}
 import { ClientConfig, getNosanaConfig, NosanaNetwork, PartialClientConfig } from './config/index.js';
 import { Logger } from './logger/Logger.js';
 import { JobsProgram } from './programs/JobsProgram.js';
