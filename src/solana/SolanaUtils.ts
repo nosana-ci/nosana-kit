@@ -1,4 +1,4 @@
-import { createSolanaClient, address, Address, SolanaClient, getProgramDerivedAddress, getAddressEncoder } from 'gill';
+import { createSolanaClient, address, Address, SolanaClient, getProgramDerivedAddress, getAddressEncoder, generateKeyPairSigner } from 'gill';
 import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
 import { NosanaClient } from '../index.js';
 
@@ -48,6 +48,9 @@ export class SolanaUtils {
   }
 
   public async getLatestBlockhash() {
+    console.log('testing gen key..');
+    const jobKey = await generateKeyPairSigner();
+    console.log('test', jobKey);
     try {
       const { value: blockhash } = await this.rpc.getLatestBlockhash().send();
       return blockhash;

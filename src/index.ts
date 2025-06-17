@@ -2,22 +2,123 @@ import { Buffer } from 'buffer';
 if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
   window.Buffer = Buffer;
 }
-import { ClientConfig, getNosanaConfig, NosanaNetwork, PartialClientConfig } from './config/index.js';
+import { ClientConfig, getNosanaConfig, NosanaNetwork, PartialClientConfig, WalletConfig } from './config/index.js';
 import { Logger } from './logger/Logger.js';
 import { JobsProgram } from './programs/JobsProgram.js';
 import { SolanaUtils } from './solana/SolanaUtils.js';
+import { createKeyPairSignerFromBytes, KeyPairSigner } from 'gill';
+import { loadKeypairSignerFromFile, loadKeypairSignerFromEnvironment, loadKeypairSignerFromEnvironmentBase58 } from 'gill/dist/node';
+import { NosanaError, ErrorCodes } from './errors/NosanaError.js';
+import bs58 from 'bs58';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class NosanaClient {
   public readonly config: ClientConfig;
   public readonly jobs: JobsProgram;
   public readonly solana: SolanaUtils;
   public readonly logger: Logger;
+  public wallet: KeyPairSigner | undefined;
 
   constructor(network: NosanaNetwork = NosanaNetwork.MAINNET, customConfig?: PartialClientConfig) {
     this.config = getNosanaConfig(network, customConfig);
+    if (this.config.wallet) {
+      this.setWallet(this.config.wallet);
+    }
     this.jobs = new JobsProgram(this);
     this.logger = Logger.getInstance();
     this.solana = new SolanaUtils(this);
+  }
+
+  public async setWallet(wallet: WalletConfig): Promise<KeyPairSigner | undefined> {
+    try {
+      // Check if we already have a KeyPairSigner type
+      if (wallet && typeof wallet === 'object' && 'address' in wallet && 'signMessages' in wallet) {
+        this.wallet = wallet as unknown as KeyPairSigner;
+        return this.wallet;
+      }
+
+      // If it's a string, try multiple conversion methods
+      if (typeof wallet === 'string') {
+        // Try to load from file path
+        if (await this.isValidFilePath(wallet)) {
+          try {
+            this.wallet = await loadKeypairSignerFromFile(wallet);
+            return this.wallet;
+          } catch (error) {
+            this.logger.debug(`Failed to load keypair from file: ${error}`);
+          }
+        }
+
+        // Try to load from environment variable
+        try {
+          this.wallet = await loadKeypairSignerFromEnvironment(wallet);
+          return this.wallet;
+        } catch (error) {
+          this.logger.debug(`Failed to load keypair from environment: ${error}`);
+        }
+
+        // Try to load from environment variable as base58
+        try {
+          this.wallet = await loadKeypairSignerFromEnvironmentBase58(wallet);
+          return this.wallet;
+        } catch (error) {
+          this.logger.debug(`Failed to load keypair from environment base58: ${error}`);
+        }
+
+        // Try to parse as JSON array
+        if ((wallet as string).startsWith('[')) {
+          try {
+            const key = JSON.parse(wallet);
+            this.wallet = await createKeyPairSignerFromBytes(new Uint8Array(key));
+            return this.wallet;
+          } catch (error) {
+            this.logger.debug(`Failed to parse as JSON array: ${error}`);
+          }
+        }
+
+        // Try to decode as base58
+        try {
+          const key = Buffer.from(bs58.decode(wallet)).toJSON().data;
+          this.wallet = await createKeyPairSignerFromBytes(new Uint8Array(key));
+          return this.wallet;
+        } catch (error) {
+          this.logger.debug(`Failed to decode as base58: ${error}`);
+        }
+      }
+
+      // If it's an array, try to create from bytes
+      if (Array.isArray(wallet)) {
+        try {
+          this.wallet = await createKeyPairSignerFromBytes(new Uint8Array(wallet));
+          return this.wallet;
+        } catch (error) {
+          this.logger.debug(`Failed to create from byte array: ${error}`);
+        }
+      }
+
+      // If we get here, none of the conversion methods worked
+      throw new Error('Unable to convert wallet to KeyPairSigner using any available method');
+
+    } catch (error) {
+      throw new NosanaError(
+        `Failed to convert wallet to KeyPairSigner: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        ErrorCodes.WALLET_CONVERSION_ERROR,
+        error
+      );
+    }
+  }
+
+  private async isValidFilePath(filePath: string): Promise<boolean> {
+    try {
+      if (!path.isAbsolute(filePath) && !filePath.startsWith('./') && !filePath.startsWith('../')) {
+        return false;
+      }
+      const stats = await fs.promises.stat(filePath);
+      return stats.isFile();
+    } catch {
+      return false;
+    }
   }
 }
 

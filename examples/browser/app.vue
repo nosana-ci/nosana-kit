@@ -143,7 +143,7 @@
                           <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">TypeScript</span>
                         </div>
                         <code class="text-sm font-mono text-[#10e80c]">
-                          const client = new NosanaClient(network: NosanaNetwork);
+                          new NosanaClient(network: NosanaNetwork)
                         </code>
                       </div>
 
@@ -183,17 +183,16 @@
 
                       <!-- Code Example -->
                       <div class="bg-gray-900 rounded-lg overflow-hidden mb-6">
-                        <div class="flex items-center justify-between bg-gray-800 px-4 py-2">
+                        <button @click="toggleCodeExample('init')"
+                          class="w-full flex items-center justify-between bg-gray-800 px-4 py-2 hover:bg-gray-700 transition-colors">
                           <span class="text-gray-300 text-sm font-medium">Example Usage</span>
-                          <button @click="toggleCodeExample('init')"
-                            class="text-gray-400 hover:text-white transition-colors">
-                            <svg :class="['w-4 h-4 transition-transform', showCodeExample.init ? 'rotate-180' : '']"
-                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                              </path>
-                            </svg>
-                          </button>
-                        </div>
+                          <svg
+                            :class="['w-4 h-4 transition-transform text-gray-400', showCodeExample.init ? 'rotate-180' : '']"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                          </svg>
+                        </button>
                         <div v-show="showCodeExample.init" class="p-4">
                           <pre
                             class="text-sm"><code class="text-green-400">import</code> <code class="text-blue-400">{ NosanaClient, NosanaNetwork }</code> <code class="text-green-400">from</code> <code class="text-yellow-400">'@nosana/kit'</code>
@@ -308,6 +307,10 @@
                             client.jobs.all(filters?: JobFilters): Promise&lt;Job[]&gt;
                           </code>
                           <p class="text-gray-700 text-sm">Retrieve multiple jobs with optional filtering capabilities.
+                            The SDK also provides additional methods like <code
+                              class="text-xs bg-gray-100 px-1 rounded">runs()</code>, <code
+                              class="text-xs bg-gray-100 px-1 rounded">multiple()</code>, and <code
+                              class="text-xs bg-gray-100 px-1 rounded">post()</code> for advanced use cases.
                           </p>
                         </div>
                       </div>
@@ -328,36 +331,41 @@
                             <div class="text-blue-600">interface</div>
                             <div class="text-purple-600">Job</div>
                             <div class="ml-4 text-gray-600">address: string</div>
-                            <div class="ml-4 text-gray-600">state: JobState</div>
-                            <div class="ml-4 text-gray-600">market: string</div>
+                            <div class="ml-4 text-gray-600">state: number</div>
+                            <div class="ml-4 text-gray-600">market: Address</div>
+                            <div class="ml-4 text-gray-600">node: Address</div>
+                            <div class="ml-4 text-gray-600">payer: Address</div>
+                            <div class="ml-4 text-gray-600">project: Address</div>
                             <div class="ml-4 text-gray-600">price: number</div>
                             <div class="ml-4 text-gray-600">ipfsJob: string</div>
-                            <div class="ml-4 text-gray-600">node?: string</div>
-                            <div class="ml-4 text-gray-600">timeStart?: number</div>
+                            <div class="ml-4 text-gray-600">ipfsResult: string</div>
+                            <div class="ml-4 text-gray-600">timeStart: number</div>
+                            <div class="ml-4 text-gray-600">timeEnd: number</div>
+                            <div class="ml-4 text-gray-600">timeout: number</div>
                           </div>
                           <div class="bg-white rounded p-3 text-sm font-mono">
                             <div class="text-blue-600">interface</div>
                             <div class="text-purple-600">JobFilters</div>
-                            <div class="ml-4 text-gray-600">state?: JobState</div>
-                            <div class="ml-4 text-gray-600">market?: string</div>
-                            <div class="ml-4 text-gray-600">limit?: number</div>
+                            <div class="ml-4 text-gray-600">state?: number</div>
+                            <div class="ml-4 text-gray-600">market?: Address</div>
+                            <div class="ml-4 text-gray-600">node?: Address</div>
+                            <div class="ml-4 text-gray-600">project?: Address</div>
                           </div>
                         </div>
                       </div>
 
                       <!-- Code Example -->
                       <div class="bg-gray-900 rounded-lg overflow-hidden mt-6">
-                        <div class="flex items-center justify-between bg-gray-800 px-4 py-2">
+                        <button @click="toggleCodeExample('jobs')"
+                          class="w-full flex items-center justify-between bg-gray-800 px-4 py-2 hover:bg-gray-700 transition-colors">
                           <span class="text-gray-300 text-sm font-medium">Example Usage</span>
-                          <button @click="toggleCodeExample('jobs')"
-                            class="text-gray-400 hover:text-white transition-colors">
-                            <svg :class="['w-4 h-4 transition-transform', showCodeExample.jobs ? 'rotate-180' : '']"
-                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                              </path>
-                            </svg>
-                          </button>
-                        </div>
+                          <svg
+                            :class="['w-4 h-4 transition-transform text-gray-400', showCodeExample.jobs ? 'rotate-180' : '']"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                          </svg>
+                        </button>
                         <div v-show="showCodeExample.jobs" class="p-4">
                           <pre class="text-sm"><code class="text-green-400">import</code> <code class="text-blue-400">{ address }</code> <code class="text-green-400">from</code> <code class="text-yellow-400">'@nosana/kit'</code>
 
@@ -367,8 +375,8 @@
 
 <code class="text-gray-500">// Get all jobs with filters</code>
 <code class="text-green-400">const</code> <code class="text-blue-400">runningJobs</code> <code class="text-white">=</code> <code class="text-green-400">await</code> <code class="text-blue-400">client</code><code class="text-white">.</code><code class="text-blue-400">jobs</code><code class="text-white">.</code><code class="text-yellow-400">all</code><code class="text-white">({</code>
-  <code class="text-blue-400">state</code><code class="text-white">:</code> <code class="text-orange-400">1</code><code class="text-gray-500">, // Running</code>
-  <code class="text-blue-400">limit</code><code class="text-white">:</code> <code class="text-orange-400">10</code>
+  <code class="text-blue-400">state</code><code class="text-white">:</code> <code class="text-orange-400">2</code><code class="text-gray-500">, // Completed</code>
+  <code class="text-blue-400">market</code><code class="text-white">:</code> <code class="text-yellow-400">'MarketAddress123...'</code>
 <code class="text-white">})</code></pre>
                         </div>
                       </div>
@@ -444,7 +452,11 @@
                             <option value="2">🟢 Done</option>
                             <option value="3">🔴 Stopped</option>
                           </select>
-                          <input v-model="jobFilters.limit" type="number" placeholder="Limit (10)" min="1" max="100"
+                          <input v-model="jobFilters.market" type="text" placeholder="Market Address (optional)"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-2" />
+                          <input v-model="jobFilters.node" type="text" placeholder="Node Address (optional)"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-2" />
+                          <input v-model="jobFilters.project" type="text" placeholder="Project Address (optional)"
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-3" />
                           <button @click="getAllJobs" :disabled="loading"
                             class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium text-sm shadow-lg hover:shadow-xl">
@@ -453,7 +465,7 @@
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                   stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor"
-                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                 </path>
                               </svg>
                               Fetching...
@@ -514,29 +526,33 @@
                             <div class="text-blue-600">interface</div>
                             <div class="text-purple-600">Market</div>
                             <div class="ml-4 text-gray-600">address: string</div>
+                            <div class="ml-4 text-gray-600">authority: Address</div>
                             <div class="ml-4 text-gray-600">jobExpiration: number</div>
                             <div class="ml-4 text-gray-600">jobPrice: number</div>
                             <div class="ml-4 text-gray-600">jobTimeout: number</div>
-                            <div class="ml-4 text-gray-600">nodeAccessKey: string</div>
-                            <div class="ml-4 text-gray-600">nodeStake: number</div>
+                            <div class="ml-4 text-gray-600">jobType: number</div>
+                            <div class="ml-4 text-gray-600">vault: Address</div>
                             <div class="ml-4 text-gray-600">vaultBump: number</div>
+                            <div class="ml-4 text-gray-600">nodeAccessKey: Address</div>
+                            <div class="ml-4 text-gray-600">nodeXnosMinimum: number</div>
+                            <div class="ml-4 text-gray-600">queueType: number</div>
+                            <div class="ml-4 text-gray-600">queue: Address[]</div>
                           </div>
                         </div>
                       </div>
 
                       <!-- Code Example -->
                       <div class="bg-gray-900 rounded-lg overflow-hidden mb-6">
-                        <div class="flex items-center justify-between bg-gray-800 px-4 py-2">
+                        <button @click="toggleCodeExample('markets')"
+                          class="w-full flex items-center justify-between bg-gray-800 px-4 py-2 hover:bg-gray-700 transition-colors">
                           <span class="text-gray-300 text-sm font-medium">Example Usage</span>
-                          <button @click="toggleCodeExample('markets')"
-                            class="text-gray-400 hover:text-white transition-colors">
-                            <svg :class="['w-4 h-4 transition-transform', showCodeExample.markets ? 'rotate-180' : '']"
-                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                              </path>
-                            </svg>
-                          </button>
-                        </div>
+                          <svg
+                            :class="['w-4 h-4 transition-transform text-gray-400', showCodeExample.markets ? 'rotate-180' : '']"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                          </svg>
+                        </button>
                         <div v-show="showCodeExample.markets" class="p-4">
                           <pre
                             class="text-sm"><code class="text-gray-500">// Get all available markets</code>
@@ -659,18 +675,16 @@
 
                       <!-- Code Example -->
                       <div class="bg-gray-900 rounded-lg overflow-hidden mb-6">
-                        <div class="flex items-center justify-between bg-gray-800 px-4 py-2">
+                        <button @click="toggleCodeExample('monitoring')"
+                          class="w-full flex items-center justify-between bg-gray-800 px-4 py-2 hover:bg-gray-700 transition-colors">
                           <span class="text-gray-300 text-sm font-medium">Example Usage</span>
-                          <button @click="toggleCodeExample('monitoring')"
-                            class="text-gray-400 hover:text-white transition-colors">
-                            <svg
-                              :class="['w-4 h-4 transition-transform', showCodeExample.monitoring ? 'rotate-180' : '']"
-                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                              </path>
-                            </svg>
-                          </button>
-                        </div>
+                          <svg
+                            :class="['w-4 h-4 transition-transform text-gray-400', showCodeExample.monitoring ? 'rotate-180' : '']"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                          </svg>
+                        </button>
                         <div v-show="showCodeExample.monitoring" class="p-4">
                           <pre class="text-sm"><code class="text-gray-500">// Start monitoring with callbacks</code>
 <code class="text-green-400">const</code> <code class="text-blue-400">stopMonitoring</code> <code class="text-white">=</code> <code class="text-green-400">await</code> <code class="text-blue-400">client</code><code class="text-white">.</code><code class="text-blue-400">jobs</code><code class="text-white">.</code><code class="text-yellow-400">monitor</code><code class="text-white">({</code>
@@ -849,7 +863,7 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-
+const { NosanaClient, NosanaNetwork, address } = await import('@nosana/kit')
 // Reactive state
 const selectedNetwork = ref('mainnet')
 const isConnected = ref(false)
@@ -857,7 +871,9 @@ const loading = ref(false)
 const jobAddress = ref()
 const jobFilters = ref({
   state: '',
-  limit: 10
+  market: '',
+  node: '',
+  project: ''
 })
 const isMonitoring = ref(false)
 const autoScroll = ref(true)
@@ -980,9 +996,6 @@ const initializeClient = async () => {
     loading.value = true
     addLog(`Initializing Nosana SDK for ${selectedNetwork.value}...`, LogType.INFO)
 
-    // Dynamic import to avoid SSR issues
-    const { NosanaClient, NosanaNetwork } = await import('@nosana/kit')
-
     const network = selectedNetwork.value === 'mainnet'
       ? NosanaNetwork.MAINNET
       : NosanaNetwork.DEVNET
@@ -1016,7 +1029,7 @@ const testConnection = async () => {
 
     // Test by getting the latest blockhash
     const latestBlockhash = await client.solana.getLatestBlockhash()
-    addLog(`✅ Connection successful! Latest blockhash: ${latestBlockhash.blockhash.slice(0, 8)}...`, LogType.SUCCESS)
+    addLog(`✅ Connection successful! Latest blockhash: ${latestBlockhash.blockhash}`, LogType.SUCCESS)
 
   } catch (error) {
     addLog(`❌ Connection test failed: ${error.message}`, LogType.ERROR)
@@ -1037,7 +1050,6 @@ const getJob = async () => {
     addLog(`🔍 Fetching job: ${jobAddress.value}`, LogType.INFO)
     scrollToTerminal()
 
-    const { address } = await import('@nosana/kit')
     const job = await client.jobs.get(address(jobAddress.value))
 
     addLog(`✅ Job retrieved successfully!`, LogType.SUCCESS)
@@ -1073,17 +1085,24 @@ const getAllJobs = async () => {
     if (jobFilters.value.state !== '') {
       filters.state = parseInt(jobFilters.value.state)
     }
-
+    if (jobFilters.value.market !== '') {
+      filters.market = address(jobFilters.value.market)
+    }
+    if (jobFilters.value.node !== '') {
+      filters.node = address(jobFilters.value.node)
+    }
+    if (jobFilters.value.project !== '') {
+      filters.project = address(jobFilters.value.project)
+    }
     const jobs = await client.jobs.all(filters)
-    const limitedJobs = jobs.slice(0, jobFilters.value.limit || 10)
+    // Show first 20 jobs to avoid overwhelming the terminal
+    const limitedJobs = jobs.slice(0, 20)
 
     addLog(`✅ Retrieved ${limitedJobs.length} jobs (total: ${jobs.length})`, LogType.SUCCESS)
 
     limitedJobs.forEach((job, index) => {
       addLog(`📋 Job ${index + 1}:`, LogType.INFO)
-      addLog(`   Address: ${job.address}`, LogType.INFO)
-      addLog(`   State: ${getJobStateName(job.state)}`, LogType.INFO)
-      addLog(`   Price: ${job.price}`, LogType.INFO)
+      addLog(job, LogType.INFO)
     })
 
   } catch (error) {
@@ -1111,11 +1130,7 @@ const getMarkets = async () => {
 
     markets.forEach((market, index) => {
       addLog(`🏪 Market ${index + 1}:`, LogType.INFO)
-      addLog(`   Address: ${market.address}`, LogType.INFO)
-      addLog(`   Job Expiration: ${market.jobExpiration}`, LogType.INFO)
-      addLog(`   Job Price: ${market.jobPrice}`, LogType.INFO)
-      addLog(`   Job Timeout: ${market.jobTimeout}`, LogType.INFO)
-      addLog(`   Node Access Key: ${market.nodeAccessKey}`, LogType.INFO)
+      addLog(market, LogType.INFO)
     })
 
   } catch (error) {
