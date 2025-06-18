@@ -17,7 +17,13 @@ export default defineNuxtConfig({
       global: 'globalThis',
     },
     optimizeDeps: {
-      include: ['@nosana/kit']
+      include: ['@nosana/kit'],
+      exclude: ['gill/node', 'gill']
+    },
+    resolve: {
+      alias: {
+        'gill/node': 'gill'
+      }
     }
   }
 })

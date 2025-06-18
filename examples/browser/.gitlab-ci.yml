@@ -1,0 +1,10 @@
+include:
+  - project: nosana-ci/tools/cicd/gitlab-ci
+    file: npm-generic.yml
+    rules:
+      - changes:
+          - examples/browser/**/*
+
+variables:
+  NODE_VERSION: 22
+  OUTPUT_DIR: .output/public

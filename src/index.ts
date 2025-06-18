@@ -7,11 +7,8 @@ import { Logger } from './logger/Logger.js';
 import { JobsProgram } from './programs/JobsProgram.js';
 import { SolanaUtils } from './solana/SolanaUtils.js';
 import { createKeyPairSignerFromBytes, KeyPairSigner } from 'gill';
-import { loadKeypairSignerFromFile, loadKeypairSignerFromEnvironment, loadKeypairSignerFromEnvironmentBase58 } from 'gill/node';
 import { NosanaError, ErrorCodes } from './errors/NosanaError.js';
 import bs58 from 'bs58';
-import * as fs from 'fs';
-import * as path from 'path';
 
 export class NosanaClient {
   public readonly config: ClientConfig;
@@ -38,32 +35,63 @@ export class NosanaClient {
         return this.wallet;
       }
 
+      // Check if it's a browser wallet adapter (has publicKey and signTransaction/signMessage)
+      if (wallet && typeof wallet === 'object' && 'publicKey' in wallet && ('signTransaction' in wallet || 'signMessage' in wallet)) {
+        // Convert browser wallet adapter to KeyPairSigner-like interface
+        const browserWallet = wallet as any;
+        this.wallet = {
+          address: browserWallet.publicKey.toString(),
+          signMessages: async (messages: Uint8Array[]) => {
+            if (browserWallet.signMessage) {
+              return Promise.all(messages.map(msg => browserWallet.signMessage(msg)));
+            }
+            throw new Error('Browser wallet does not support message signing');
+          },
+          signTransactions: async (transactions: any[]) => {
+            if (browserWallet.signTransaction) {
+              return Promise.all(transactions.map(tx => browserWallet.signTransaction(tx)));
+            }
+            throw new Error('Browser wallet does not support transaction signing');
+          }
+        } as unknown as KeyPairSigner;
+        return this.wallet;
+      }
+
       // If it's a string, try multiple conversion methods
       if (typeof wallet === 'string') {
-        // Try to load from file path
-        if (await this.isValidFilePath(wallet)) {
+        // Only try file/environment loading in Node.js environment
+        if (typeof window === 'undefined') {
           try {
-            this.wallet = await loadKeypairSignerFromFile(wallet);
-            return this.wallet;
+            const { loadKeypairSignerFromFile, loadKeypairSignerFromEnvironment, loadKeypairSignerFromEnvironmentBase58 } = await import('gill/node');
+
+            // Try to load from file path
+            if (await this.isValidFilePath(wallet)) {
+              try {
+                this.wallet = await loadKeypairSignerFromFile(wallet);
+                return this.wallet;
+              } catch (error) {
+                this.logger.debug(`Failed to load keypair from file: ${error}`);
+              }
+            }
+
+            // Try to load from environment variable
+            try {
+              this.wallet = await loadKeypairSignerFromEnvironment(wallet);
+              return this.wallet;
+            } catch (error) {
+              this.logger.debug(`Failed to load keypair from environment: ${error}`);
+            }
+
+            // Try to load from environment variable as base58
+            try {
+              this.wallet = await loadKeypairSignerFromEnvironmentBase58(wallet);
+              return this.wallet;
+            } catch (error) {
+              this.logger.debug(`Failed to load keypair from environment base58: ${error}`);
+            }
           } catch (error) {
-            this.logger.debug(`Failed to load keypair from file: ${error}`);
+            this.logger.debug(`Node.js modules not available: ${error}`);
           }
-        }
-
-        // Try to load from environment variable
-        try {
-          this.wallet = await loadKeypairSignerFromEnvironment(wallet);
-          return this.wallet;
-        } catch (error) {
-          this.logger.debug(`Failed to load keypair from environment: ${error}`);
-        }
-
-        // Try to load from environment variable as base58
-        try {
-          this.wallet = await loadKeypairSignerFromEnvironmentBase58(wallet);
-          return this.wallet;
-        } catch (error) {
-          this.logger.debug(`Failed to load keypair from environment base58: ${error}`);
         }
 
         // Try to parse as JSON array
@@ -110,7 +138,17 @@ export class NosanaClient {
   }
 
   private async isValidFilePath(filePath: string): Promise<boolean> {
+    // Only validate file paths in Node.js environment
+    if (typeof window !== 'undefined') {
+      return false; // Browser environment, no file system access
+    }
+
     try {
+      const [fs, path] = await Promise.all([
+        import('fs'),
+        import('path')
+      ]);
+
       if (!path.isAbsolute(filePath) && !filePath.startsWith('./') && !filePath.startsWith('../')) {
         return false;
       }

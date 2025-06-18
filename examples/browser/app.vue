@@ -333,9 +333,60 @@
                           <!-- Wallet Input Method Selection -->
                           <select v-model="walletInputMethod"
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3">
+                            <option value="browser">🌐 Connect Browser Wallet</option>
                             <option value="paste">📋 Paste Private Key</option>
                             <option value="file">📁 Upload Keypair File</option>
                           </select>
+
+                          <!-- Browser Wallet Connection -->
+                          <div v-if="walletInputMethod === 'browser'" class="mb-3">
+                            <div v-if="!browserWallet.connected" class="space-y-3">
+                              <div class="text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                                <p class="text-sm text-gray-600 mb-3">
+                                  Connect your browser wallet to use with the SDK
+                                </p>
+                                <div class="space-y-2">
+                                  <div class="grid grid-cols-2 gap-2">
+                                    <button @click="connectWallet('phantom')"
+                                      class="flex items-center justify-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-xs font-medium">
+                                      👻 Phantom
+                                    </button>
+                                    <button @click="connectWallet('solflare')"
+                                      class="flex items-center justify-center px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-xs font-medium">
+                                      🔥 Solflare
+                                    </button>
+                                  </div>
+                                  <div class="flex justify-center">
+                                    <button @click="connectWallet('backpack')"
+                                      class="flex items-center justify-center px-3 py-2 bg-black text-white rounded-lg hover:bg-gray-800 text-xs font-medium w-32">
+                                      🎒 Backpack
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div v-else class="p-3 bg-green-50 border border-green-200 rounded-lg">
+                              <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-2">
+                                  <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                  <span class="text-sm font-medium text-green-800">
+                                    {{ browserWallet.name }}
+                                  </span>
+                                </div>
+                                <button @click="disconnectBrowserWallet"
+                                  class="text-xs text-green-600 hover:text-green-800 underline">
+                                  Disconnect
+                                </button>
+                              </div>
+                              <div class="text-xs font-mono text-green-700 break-all">
+                                {{ browserWallet.publicKey?.substring(0, 8) }}...{{
+                                  browserWallet.publicKey?.substring(browserWallet.publicKey.length - 8) }}
+                              </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">
+                              🌐 Connect popular Solana wallets like Phantom, Solflare, and Backpack!
+                            </p>
+                          </div>
 
                           <!-- Paste Private Key Input -->
                           <div v-if="walletInputMethod === 'paste'" class="mb-3">
@@ -1024,12 +1075,21 @@ const isFullscreenTerminal = ref(false)
 
 // Wallet state
 const currentWallet = ref(null)
-const walletInputMethod = ref('paste')
+const walletInputMethod = ref('browser')
 const walletInputs = ref({
   privateKey: '',
   fileContent: null
 })
 const fileInput = ref(null)
+
+// Browser wallet state
+const browserWallet = ref({
+  connected: false,
+  connecting: false,
+  name: null,
+  publicKey: null,
+  adapter: null
+})
 
 // Documentation visibility
 const showTypeInfo = ref({
@@ -1052,6 +1112,8 @@ let stopMonitoring = null
 // Computed properties
 const canSetWallet = computed(() => {
   switch (walletInputMethod.value) {
+    case 'browser':
+      return browserWallet.value.connected
     case 'paste':
       return walletInputs.value.privateKey.trim().length > 0
     case 'file':
@@ -1179,6 +1241,15 @@ const setWallet = async () => {
     let inputType = 'unknown'
 
     switch (walletInputMethod.value) {
+      case 'browser':
+        if (!browserWallet.value.connected || !browserWallet.value.adapter) {
+          throw new Error('Browser wallet not connected')
+        }
+        // For browser wallets, we'll use the adapter directly
+        // The SDK's setWallet method should accept a wallet adapter
+        walletData = browserWallet.value.adapter
+        inputType = `${browserWallet.value.name} browser wallet`
+        break
       case 'paste':
         walletData = walletInputs.value.privateKey.trim()
         // Try to detect the format for better logging
@@ -1209,7 +1280,12 @@ const setWallet = async () => {
       currentWallet.value = wallet.address
       addLog(`✅ Wallet set successfully!`, LogType.SUCCESS)
       addLog(`📍 Address: ${wallet.address}`, LogType.INFO)
-      addLog(`🔍 Detected format: ${inputType}`, LogType.INFO)
+      addLog(`🔍 Source: ${inputType}`, LogType.INFO)
+
+      // For browser wallets, also show the wallet name
+      if (walletInputMethod.value === 'browser') {
+        addLog(`🦊 Connected via: ${browserWallet.value.name}`, LogType.INFO)
+      }
     } else {
       throw new Error('Wallet set but no address returned')
     }
@@ -1222,9 +1298,17 @@ const setWallet = async () => {
   }
 }
 
-const clearWallet = () => {
+const clearWallet = async () => {
   currentWallet.value = null
-  client.wallet = undefined
+  if (client) {
+    client.wallet = undefined
+  }
+
+  // Also disconnect browser wallet if it's connected
+  if (browserWallet.value.connected) {
+    await disconnectBrowserWallet()
+  }
+
   addLog('🗑️ Wallet cleared', LogType.INFO)
   scrollToTerminal()
 }
@@ -1234,6 +1318,97 @@ const loadDemoKeypair = () => {
 
   walletInputMethod.value = 'paste'
   walletInputs.value.privateKey = demoKeypair
+}
+
+// Browser wallet operations
+const connectWallet = async (walletName) => {
+  try {
+    browserWallet.value.connecting = true
+    addLog(`🌐 Connecting to ${walletName} wallet...`, LogType.INFO)
+
+    let adapter
+
+    switch (walletName) {
+      case 'phantom':
+        if (process.client && window.phantom?.solana) {
+          adapter = window.phantom.solana
+        }
+        break
+      case 'solflare':
+        if (process.client && window.solflare) {
+          adapter = window.solflare
+        }
+        break
+      case 'backpack':
+        if (process.client && window.backpack) {
+          adapter = window.backpack
+        }
+        break
+      default:
+        throw new Error('Unsupported wallet')
+    }
+
+    if (!adapter) {
+      throw new Error(`${walletName} wallet not found. Please install the ${walletName} browser extension and refresh the page.`)
+    }
+
+    // Request connection
+    const connection = await adapter.connect()
+
+    if (adapter.publicKey) {
+      browserWallet.value = {
+        connected: true,
+        connecting: false,
+        name: walletName.charAt(0).toUpperCase() + walletName.slice(1),
+        publicKey: adapter.publicKey.toString(),
+        adapter: adapter
+      }
+
+      addLog(`✅ Successfully connected to ${walletName}!`, LogType.SUCCESS)
+      addLog(`📍 Public Key: ${adapter.publicKey.toString()}`, LogType.INFO)
+      addLog(`🔗 Connection: ${connection ? 'Established' : 'Ready'}`, LogType.INFO)
+    } else {
+      throw new Error('Failed to get public key from wallet')
+    }
+
+  } catch (error) {
+    addLog(`❌ Failed to connect to ${walletName}: ${error.message}`, LogType.ERROR)
+    browserWallet.value.connecting = false
+    browserWallet.value.connected = false
+  } finally {
+    browserWallet.value.connecting = false
+  }
+}
+
+const disconnectBrowserWallet = async () => {
+  try {
+    if (browserWallet.value.adapter && browserWallet.value.adapter.disconnect) {
+      console.log('bro', browserWallet.value.adapter, browserWallet.value)
+      await browserWallet.value.adapter.disconnect()
+    }
+
+    browserWallet.value = {
+      connected: false,
+      connecting: false,
+      name: null,
+      publicKey: null,
+      adapter: null
+    }
+
+    // Clear the current wallet if it was set from browser wallet
+    if (currentWallet.value && currentWallet.value === browserWallet.value.publicKey) {
+      currentWallet.value = null
+      if (client) {
+        client.wallet = undefined
+      }
+    }
+
+    addLog('🔌 Browser wallet disconnected', LogType.INFO)
+    scrollToTerminal()
+
+  } catch (error) {
+    addLog(`❌ Error disconnecting wallet: ${error.message}`, LogType.ERROR)
+  }
 }
 
 // SDK operations

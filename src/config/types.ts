@@ -20,7 +20,7 @@ export interface SolanaConfig {
   commitment?: 'processed' | 'confirmed' | 'finalized';
 }
 
-export type WalletConfig = KeyPairSigner | string | Iterable<number>;
+export type WalletConfig = KeyPairSigner | string | Iterable<number> | any;
 
 export interface IpfsConfig {
   api: string;
