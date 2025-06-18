@@ -143,7 +143,7 @@
                           <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">TypeScript</span>
                         </div>
                         <code class="text-sm font-mono text-[#10e80c]">
-                          new NosanaClient(network: NosanaNetwork)
+                          new NosanaClient(network: NosanaNetwork, customConfig?: PartialClientConfig)
                         </code>
                       </div>
 
@@ -169,8 +169,52 @@
                             <div class="text-blue-600">interface</div>
                             <div class="text-[#10e80c]">NosanaClient</div>
                             <div class="ml-4 text-gray-600">config: ClientConfig</div>
-                            <div class="ml-4 text-gray-600">solana: Connection</div>
-                            <div class="ml-4 text-gray-600">jobs: JobsAPI</div>
+                            <div class="ml-4 text-gray-600">solana: SolanaUtils</div>
+                            <div class="ml-4 text-gray-600">jobs: JobsProgram</div>
+                            <div class="ml-4 text-gray-600">logger: Logger</div>
+                            <div class="ml-4 text-gray-600">wallet?: KeyPairSigner</div>
+                            <div class="ml-4 text-gray-600">setWallet(config: WalletConfig):
+                              Promise&lt;KeyPairSigner&gt;</div>
+                          </div>
+                          <div class="bg-white rounded p-3 text-sm font-mono">
+                            <div class="text-blue-600">interface</div>
+                            <div class="text-[#10e80c]">ClientConfig</div>
+                            <div class="ml-4 text-gray-600">solana: SolanaConfig</div>
+                            <div class="ml-4 text-gray-600">programs: ProgramsConfig</div>
+                            <div class="ml-4 text-gray-600">ipfs: IpfsConfig</div>
+                            <div class="ml-4 text-gray-600">wallet?: WalletConfig</div>
+                          </div>
+                          <div class="bg-white rounded p-3 text-sm font-mono">
+                            <div class="text-blue-600">type</div>
+                            <div class="text-[#10e80c]">PartialClientConfig</div>
+                            <div class="ml-4 text-gray-600">= Partial&lt;ClientConfig&gt;</div>
+                            <div class="ml-6 text-gray-500">// All properties optional for custom configuration</div>
+                          </div>
+                          <div class="bg-white rounded p-3 text-sm font-mono">
+                            <div class="text-blue-600">interface</div>
+                            <div class="text-[#10e80c]">SolanaConfig</div>
+                            <div class="ml-4 text-gray-600">rpcEndpoint: string</div>
+                            <div class="ml-4 text-gray-600">cluster: SolanaClusterMoniker</div>
+                          </div>
+                          <div class="bg-white rounded p-3 text-sm font-mono">
+                            <div class="text-blue-600">interface</div>
+                            <div class="text-[#10e80c]">ProgramsConfig</div>
+                            <div class="ml-4 text-gray-600">jobsAddress: Address</div>
+                            <div class="ml-4 text-gray-600">nosTokenAddress: Address</div>
+                            <div class="ml-4 text-gray-600">rewardsAddress: Address</div>
+                          </div>
+                          <div class="bg-white rounded p-3 text-sm font-mono">
+                            <div class="text-blue-600">interface</div>
+                            <div class="text-[#10e80c]">IpfsConfig</div>
+                            <div class="ml-4 text-gray-600">gatewayUrl: string</div>
+                            <div class="ml-4 text-gray-600">pinataJwt?: string</div>
+                            <div class="ml-4 text-gray-600">timeout?: number</div>
+                          </div>
+                          <div class="bg-white rounded p-3 text-sm font-mono">
+                            <div class="text-blue-600">type</div>
+                            <div class="text-[#10e80c]">WalletConfig</div>
+                            <div class="ml-4 text-gray-600">= string | number[] | KeyPairSigner</div>
+                            <div class="ml-6 text-gray-500">// JSON string, number array, or keypair instance</div>
                           </div>
                         </div>
                       </div>
@@ -179,6 +223,9 @@
                       <p class="text-gray-700 mb-6">
                         Initialize a new Nosana client instance to interact with the decentralized compute network.
                         The network parameter determines which Solana cluster to connect to for blockchain operations.
+                        You can optionally provide custom configuration to override default settings like RPC endpoints,
+                        program addresses, or IPFS gateways. You can also set a wallet to enable transaction signing and
+                        job posting.
                       </p>
 
                       <!-- Code Example -->
@@ -200,11 +247,21 @@
 <code class="text-gray-500">// Initialize for devnet (testing)</code>
 <code class="text-green-400">const</code> <code class="text-blue-400">client</code> <code class="text-white">=</code> <code class="text-green-400">new</code> <code class="text-yellow-400">NosanaClient</code><code class="text-white">(</code><code class="text-blue-400">NosanaNetwork</code><code class="text-white">.</code><code class="text-blue-400">DEVNET</code><code class="text-white">)</code>
 
-<code class="text-gray-500">// Initialize for mainnet (production)</code>
-<code class="text-green-400">const</code> <code class="text-blue-400">prodClient</code> <code class="text-white">=</code> <code class="text-green-400">new</code> <code class="text-yellow-400">NosanaClient</code><code class="text-white">(</code><code class="text-blue-400">NosanaNetwork</code><code class="text-white">.</code><code class="text-blue-400">MAINNET</code><code class="text-white">)</code>
+<code class="text-gray-500">// Initialize for mainnet with custom config</code>
+<code class="text-green-400">const</code> <code class="text-blue-400">customConfig</code> <code class="text-white">=</code> <code class="text-white">{</code>
+  <code class="text-blue-400">solana</code><code class="text-white">:</code> <code class="text-white">{</code>
+    <code class="text-blue-400">rpcEndpoint</code><code class="text-white">:</code> <code class="text-yellow-400">'https://custom-rpc.com'</code>
+  <code class="text-white">}</code>
+<code class="text-white">}</code>
+<code class="text-green-400">const</code> <code class="text-blue-400">prodClient</code> <code class="text-white">=</code> <code class="text-green-400">new</code> <code class="text-yellow-400">NosanaClient</code><code class="text-white">(</code><code class="text-blue-400">NosanaNetwork</code><code class="text-white">.</code><code class="text-blue-400">MAINNET</code><code class="text-white">,</code> <code class="text-blue-400">customConfig</code><code class="text-white">)</code>
 
 <code class="text-gray-500">// Access configuration</code>
-<code class="text-blue-400">console</code><code class="text-white">.</code><code class="text-yellow-400">log</code><code class="text-white">(</code><code class="text-blue-400">client</code><code class="text-white">.</code><code class="text-blue-400">config</code><code class="text-white">.</code><code class="text-blue-400">solana</code><code class="text-white">.</code><code class="text-blue-400">rpcEndpoint</code><code class="text-white">)</code></pre>
+<code class="text-blue-400">console</code><code class="text-white">.</code><code class="text-yellow-400">log</code><code class="text-white">(</code><code class="text-blue-400">client</code><code class="text-white">.</code><code class="text-blue-400">config</code><code class="text-white">.</code><code class="text-blue-400">solana</code><code class="text-white">.</code><code class="text-blue-400">rpcEndpoint</code><code class="text-white">)</code>
+
+<code class="text-gray-500">// Set wallet for transaction signing</code>
+<code class="text-green-400">const</code> <code class="text-blue-400">keypair</code> <code class="text-white">=</code> <code class="text-yellow-400">'[66,240,117,68,169,30...]'</code>
+<code class="text-green-400">const</code> <code class="text-blue-400">wallet</code> <code class="text-white">=</code> <code class="text-green-400">await</code> <code class="text-blue-400">client</code><code class="text-white">.</code><code class="text-yellow-400">setWallet</code><code class="text-white">(</code><code class="text-blue-400">keypair</code><code class="text-white">)</code>
+<code class="text-blue-400">console</code><code class="text-white">.</code><code class="text-yellow-400">log</code><code class="text-white">(</code><code class="text-yellow-400">'Wallet address:'</code><code class="text-white">,</code> <code class="text-blue-400">wallet</code><code class="text-white">.</code><code class="text-blue-400">address</code><code class="text-white">)</code></pre>
                         </div>
                       </div>
 
@@ -229,6 +286,7 @@
                     <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 sticky top-24">
                       <h4 class="font-semibold text-gray-900 mb-4">🎮 Try It Now</h4>
                       <div class="space-y-4">
+                        <!-- Network Status -->
                         <div class="bg-white rounded-lg p-4 border border-blue-200">
                           <div class="flex items-center space-x-2 mb-3">
                             <div :class="[
@@ -246,6 +304,89 @@
                             💡 Switch networks using the dropdown in the header
                           </p>
                         </div>
+
+                        <!-- Wallet Management -->
+                        <div class="bg-white rounded-lg p-4 border border-blue-200">
+                          <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-semibold text-gray-700">
+                              🔐 Wallet
+                            </span>
+                            <div class="flex items-center">
+                              <div :class="[
+                                'w-2 h-2 rounded-full mr-2',
+                                currentWallet ? 'bg-green-500' : 'bg-gray-400'
+                              ]"></div>
+                              <span class="text-xs font-medium"
+                                :class="currentWallet ? 'text-green-700' : 'text-gray-600'">
+                                {{ currentWallet ? 'Connected' : 'None' }}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div v-if="currentWallet" class="mb-3 p-2 bg-green-50 rounded text-xs">
+                            <div class="font-mono text-green-800 break-all">
+                              {{ currentWallet.substring(0, 8) }}...{{ currentWallet.substring(currentWallet.length - 8)
+                              }}
+                            </div>
+                          </div>
+
+                          <!-- Wallet Input Method Selection -->
+                          <select v-model="walletInputMethod"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3">
+                            <option value="paste">📋 Paste Private Key</option>
+                            <option value="file">📁 Upload Keypair File</option>
+                          </select>
+
+                          <!-- Paste Private Key Input -->
+                          <div v-if="walletInputMethod === 'paste'" class="mb-3">
+                            <textarea v-model="walletInputs.privateKey"
+                              placeholder="Paste your private key in any format:&#10;• JSON Array: [66,240,117,68,169,30,179,62,...]&#10;• Number Array: 66,240,117,68,169,30,179,62,...&#10;• Base58: 2Ld9Q8E9TxsSPf9Zkxn55u2EuuXBZUiV..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              rows="4"></textarea>
+                            <p class="text-xs text-gray-500 mt-1">
+                              💡 Supports JSON array, number array, or Base58 format - the SDK will auto-detect!
+                            </p>
+                          </div>
+
+                          <!-- File Upload -->
+                          <div v-if="walletInputMethod === 'file'" class="mb-3">
+                            <input ref="fileInput" type="file" accept=".json" @change="handleFileUpload"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                            <p class="text-xs text-gray-500 mt-1">
+                              📁 Upload a JSON keypair file (e.g., from Solana CLI)
+                            </p>
+                          </div>
+
+                          <!-- Set Wallet Button -->
+                          <button @click="setWallet" :disabled="loading || !canSetWallet"
+                            class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium text-sm shadow-lg hover:shadow-xl mb-2">
+                            <span v-if="loading" class="flex items-center justify-center">
+                              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                  stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                              </svg>
+                              Setting...
+                            </span>
+                            <span v-else>🔐 Set Wallet</span>
+                          </button>
+
+                          <!-- Clear Wallet Button -->
+                          <button v-if="currentWallet" @click="clearWallet"
+                            class="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all duration-200 font-medium text-sm">
+                            🗑️ Clear Wallet
+                          </button>
+
+                          <!-- Demo Keypair Button -->
+                          <button @click="loadDemoKeypair"
+                            class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 font-medium text-sm mt-2">
+                            🎯 Load Demo Keypair
+                          </button>
+                        </div>
+
+                        <!-- Connection Test -->
                         <button @click="testConnection" :disabled="loading"
                           class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg hover:shadow-xl">
                           <span v-if="loading" class="flex items-center justify-center">
@@ -253,7 +394,7 @@
                               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                               </circle>
                               <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                               </path>
                             </svg>
                             Testing...
@@ -862,7 +1003,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 const { NosanaClient, NosanaNetwork, address } = await import('@nosana/kit')
 // Reactive state
 const selectedNetwork = ref('mainnet')
@@ -881,6 +1022,15 @@ const logs = ref([])
 const terminal = ref(null)
 const isFullscreenTerminal = ref(false)
 
+// Wallet state
+const currentWallet = ref(null)
+const walletInputMethod = ref('paste')
+const walletInputs = ref({
+  privateKey: '',
+  fileContent: null
+})
+const fileInput = ref(null)
+
 // Documentation visibility
 const showTypeInfo = ref({
   init: false,
@@ -898,6 +1048,18 @@ const showCodeExample = ref({
 // SDK client
 let client = null
 let stopMonitoring = null
+
+// Computed properties
+const canSetWallet = computed(() => {
+  switch (walletInputMethod.value) {
+    case 'paste':
+      return walletInputs.value.privateKey.trim().length > 0
+    case 'file':
+      return walletInputs.value.fileContent !== null
+    default:
+      return false
+  }
+})
 
 // Log types
 const LogType = {
@@ -980,6 +1142,100 @@ const scrollToTerminal = () => {
   }
 }
 
+// Wallet operations
+const handleFileUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const content = e.target.result
+        JSON.parse(content) // Validate JSON
+        walletInputs.value.fileContent = content
+        addLog(`📁 File loaded: ${file.name}`, LogType.SUCCESS)
+      } catch (error) {
+        addLog(`❌ Invalid JSON file: ${error.message}`, LogType.ERROR)
+        walletInputs.value.fileContent = null
+        if (fileInput.value) {
+          fileInput.value.value = ''
+        }
+      }
+    }
+    reader.readAsText(file)
+  }
+}
+
+const setWallet = async () => {
+  if (!client) {
+    addLog('❌ SDK not initialized', LogType.ERROR)
+    scrollToTerminal()
+    return
+  }
+
+  try {
+    loading.value = true
+
+    let walletData
+    let inputType = 'unknown'
+
+    switch (walletInputMethod.value) {
+      case 'paste':
+        walletData = walletInputs.value.privateKey.trim()
+        // Try to detect the format for better logging
+        if (walletData.startsWith('[') && walletData.endsWith(']')) {
+          inputType = 'JSON array'
+        } else if (walletData.includes(',') && !walletData.includes('[')) {
+          inputType = 'number array'
+        } else if (walletData.length > 80 && !walletData.includes(',')) {
+          inputType = 'Base58'
+        } else {
+          inputType = 'auto-detected format'
+        }
+        break
+      case 'file':
+        walletData = walletInputs.value.fileContent
+        inputType = 'keypair file'
+        break
+      default:
+        throw new Error('Invalid wallet input method')
+    }
+
+    addLog(`🔐 Setting wallet from ${inputType}...`, LogType.INFO)
+    scrollToTerminal()
+
+    const wallet = await client.setWallet(walletData)
+
+    if (wallet && wallet.address) {
+      currentWallet.value = wallet.address
+      addLog(`✅ Wallet set successfully!`, LogType.SUCCESS)
+      addLog(`📍 Address: ${wallet.address}`, LogType.INFO)
+      addLog(`🔍 Detected format: ${inputType}`, LogType.INFO)
+    } else {
+      throw new Error('Wallet set but no address returned')
+    }
+
+  } catch (error) {
+    addLog(`❌ Failed to set wallet: ${error.message}`, LogType.ERROR)
+    currentWallet.value = null
+  } finally {
+    loading.value = false
+  }
+}
+
+const clearWallet = () => {
+  currentWallet.value = null
+  client.wallet = undefined
+  addLog('🗑️ Wallet cleared', LogType.INFO)
+  scrollToTerminal()
+}
+
+const loadDemoKeypair = () => {
+  const demoKeypair = '[66,240,117,68,169,30,179,62,57,123,28,249,122,218,186,173,196,222,208,58,126,168,32,91,126,64,102,33,220,51,49,97,6,197,228,206,210,117,23,184,89,48,217,110,194,137,242,129,112,23,140,120,148,249,210,18,105,192,40,197,250,132,40,149]'
+
+  walletInputMethod.value = 'paste'
+  walletInputs.value.privateKey = demoKeypair
+}
+
 // SDK operations
 const initializeClient = async () => {
   try {
@@ -991,6 +1247,12 @@ const initializeClient = async () => {
       }
       isMonitoring.value = false
       addLog('🛑 Stopped monitoring due to network switch', LogType.WARNING)
+    }
+
+    // Clear wallet when switching networks
+    if (currentWallet.value) {
+      currentWallet.value = null
+      addLog('🔐 Wallet cleared due to network switch', LogType.WARNING)
     }
 
     loading.value = true
