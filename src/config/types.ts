@@ -20,9 +20,8 @@ export interface SolanaConfig {
   commitment?: 'processed' | 'confirmed' | 'finalized';
 }
 
-export interface WalletConfig {
-  signer: KeyPairSigner;
-}
+export type WalletConfig = KeyPairSigner | string | Iterable<number>;
+
 export interface IpfsConfig {
   api: string;
   jwt: string;

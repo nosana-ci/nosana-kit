@@ -29,6 +29,7 @@ describe('NosanaError', () => {
       VALIDATION_ERROR: 'VALIDATION_ERROR',
       NO_WALLET: 'NO_WALLET',
       FILE_ERROR: 'FILE_ERROR',
+      WALLET_CONVERSION_ERROR: 'WALLET_CONVERSION_ERROR',
     });
   });
 }); 

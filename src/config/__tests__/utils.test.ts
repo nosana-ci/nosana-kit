@@ -90,14 +90,12 @@ describe('Config Utils', () => {
 
     it('should merge top-level properties', () => {
       const customConfig: PartialClientConfig = {
-        wallet: {
-          signer: 'test-signer' as any,
-        },
+        wallet: 'test-signer' as any,
       };
 
       const result = mergeConfigs(defaultConfig, customConfig);
 
-      expect(result.wallet).toEqual({ signer: 'test-signer' });
+      expect(result.wallet).toEqual('test-signer');
       expect(result.solana).toEqual(defaultConfig.solana); // Should keep default
     });
 

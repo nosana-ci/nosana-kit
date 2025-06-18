@@ -313,7 +313,7 @@ export class JobsProgram extends BaseProgram {
     node?: Address,
     instructionOnly?: boolean,
   }): Promise<ReturnType<typeof this.client.getListInstruction> | Signature> {
-    if (!this.sdk.config.wallet) {
+    if (!this.sdk.wallet) {
       throw new NosanaError('No wallet found', ErrorCodes.NO_WALLET);
     }
 
@@ -322,7 +322,7 @@ export class JobsProgram extends BaseProgram {
 
     const [associatedTokenAddress] = await findAssociatedTokenPda({
       mint: this.sdk.config.programs.nosTokenAddress,
-      owner: this.sdk.config.wallet!.signer.address,
+      owner: this.sdk.wallet!.address,
       tokenProgram: TOKEN_PROGRAM_ADDRESS
     });
     try {
@@ -337,10 +337,10 @@ export class JobsProgram extends BaseProgram {
           params.market,
           this.sdk.config.programs.nosTokenAddress,
         ], staticAccounts.jobsProgram),
-        payer: this.sdk.config.wallet!.signer,
+        payer: this.sdk.wallet!,
         rewardsReflection: staticAccounts.rewardsReflection,
         rewardsVault: staticAccounts.rewardsVault,
-        authority: this.sdk.config.wallet!.signer,
+        authority: this.sdk.wallet!,
         rewardsProgram: staticAccounts.rewardsProgram,
         ipfsJob: bs58.decode(params.ipfsHash).subarray(2),
         timeout: params.timeout
@@ -350,7 +350,7 @@ export class JobsProgram extends BaseProgram {
       // Create the transaction
       const transaction = createTransaction({
         instructions: [instruction],
-        feePayer: this.sdk.config.wallet!.signer,
+        feePayer: this.sdk.wallet!,
         latestBlockhash: await this.sdk.solana.getLatestBlockhash(),
         version: 0,
       });

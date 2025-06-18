@@ -7,7 +7,7 @@ import { Logger } from './logger/Logger.js';
 import { JobsProgram } from './programs/JobsProgram.js';
 import { SolanaUtils } from './solana/SolanaUtils.js';
 import { createKeyPairSignerFromBytes, KeyPairSigner } from 'gill';
-import { loadKeypairSignerFromFile, loadKeypairSignerFromEnvironment, loadKeypairSignerFromEnvironmentBase58 } from 'gill/dist/node';
+import { loadKeypairSignerFromFile, loadKeypairSignerFromEnvironment, loadKeypairSignerFromEnvironmentBase58 } from 'gill/node';
 import { NosanaError, ErrorCodes } from './errors/NosanaError.js';
 import bs58 from 'bs58';
 import * as fs from 'fs';
