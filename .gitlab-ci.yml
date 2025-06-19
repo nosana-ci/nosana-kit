@@ -5,12 +5,11 @@
 
 image: node:22.8.0
 
-stages:
-  - build
-  - deploy
+include:
+  - local: 'examples/browser/.gitlab-ci.yml'    
 
-deploy:
-  stage: deploy
+npm-publish:
+  stage: build
   only:
     - main
   script:
@@ -20,6 +19,3 @@ deploy:
     - npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
     - npm run publish:public
     # - git push # todo: fix, not working
-
-include:
-  - local: 'examples/browser/.gitlab-ci.yml'    

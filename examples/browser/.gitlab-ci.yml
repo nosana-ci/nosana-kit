@@ -5,6 +5,9 @@ include:
       - changes:
           - examples/browser/**/*
 
+before_script:
+  - cd examples/browser
+
 variables:
   NODE_VERSION: 22
   OUTPUT_DIR: .output/public
