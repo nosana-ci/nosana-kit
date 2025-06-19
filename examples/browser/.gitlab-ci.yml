@@ -6,8 +6,8 @@ include:
 
 variables:
   NODE_VERSION: 22
-  OUTPUT_DIR: examples/browser/.output/public
-  PURGE_FILE: examples/browser/purge.json
+  OUTPUT_DIR: .output/public
+  PURGE_FILE: purge.json
 
 .npm:
   image: node:$NODE_VERSION
