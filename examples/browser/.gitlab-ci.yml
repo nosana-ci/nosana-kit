@@ -8,6 +8,13 @@ include:
 before_script:
   - cd examples/browser
 
+test:
+  extends: .npm
+  stage: test
+  script: npm run lint
+  when: manual
+  allow_failure: true
+
 variables:
   NODE_VERSION: 22
   OUTPUT_DIR: .output/public
