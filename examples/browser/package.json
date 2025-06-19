@@ -15,7 +15,7 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
-    "@nosana/kit": "file:../../",
+    "@nosana/kit": "^0.1.2",
     "@nuxtjs/tailwindcss": "^7.0.0-beta.0",
     "@tailwindcss/typography": "^0.5.16",
     "nuxt": "^3.17.4",
