@@ -1,9 +1,9 @@
 include:
   - project: nosana-ci/tools/cicd/gitlab-ci
     file: npm-generic.yml
-    rules:
-      - changes:
-          - examples/browser/**/*
+    # rules:
+    #   - changes:
+    #       - examples/browser/**/*
 
 before_script:
   - cd examples/browser
