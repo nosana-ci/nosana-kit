@@ -20,10 +20,5 @@ export default defineNuxtConfig({
       include: ['@nosana/kit'],
       exclude: ['gill/node', 'gill']
     },
-    resolve: {
-      alias: {
-        'gill/node': 'gill'
-      }
-    }
   }
 })

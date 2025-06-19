@@ -299,8 +299,6 @@ export class JobsProgram extends BaseProgram {
     }
   }
 
-
-
   /**
    * Post a new job to the marketplace
    * @param params Parameters for listing a job
@@ -311,12 +309,7 @@ export class JobsProgram extends BaseProgram {
     timeout: number | bigint
     ipfsHash: string,
     node?: Address,
-    instructionOnly?: boolean,
-  }): Promise<ReturnType<typeof this.client.getListInstruction> | Signature> {
-    if (!this.sdk.wallet) {
-      throw new NosanaError('No wallet found', ErrorCodes.NO_WALLET);
-    }
-
+  }): Promise<ReturnType<typeof this.client.getListInstruction>> {
     const jobKey = await generateKeyPairSigner();
     const runKey = await generateKeyPairSigner();
 
@@ -345,37 +338,11 @@ export class JobsProgram extends BaseProgram {
         ipfsJob: bs58.decode(params.ipfsHash).subarray(2),
         timeout: params.timeout
       });
-      if (params.instructionOnly) return instruction;
-
-      // Create the transaction
-      const transaction = createTransaction({
-        instructions: [instruction],
-        feePayer: this.sdk.wallet!,
-        latestBlockhash: await this.sdk.solana.getLatestBlockhash(),
-        version: 0,
-      });
-
-      // Sign the transaction with all required signers
-      const signedTransaction = await signTransactionMessageWithSigners(transaction);
-
-      // Get the transaction signature for logging
-      const signature = getSignatureFromTransaction(signedTransaction);
-
-      // Log the transaction explorer link
-      const explorerLink = getExplorerLink({
-        cluster: this.sdk.config.solana.cluster,
-        transaction: signature
-      });
-      this.sdk.logger.info(`Sending list job transaction: ${explorerLink}`);
-
-      // Send and confirm the transaction
-      await this.sdk.solana.sendAndConfirmTransaction(signedTransaction);
-
-      this.sdk.logger.info("Job listing transaction confirmed!");
-      return signature;
+      return instruction;
     } catch (err) {
-      this.sdk.logger.error(`Failed to list job: ${err instanceof Error ? err.message : String(err)}`);
-      throw new Error(`Failed to list job: ${err instanceof Error ? err.message : String(err)}`);
+      const errorMessage = `Failed to create list instruction: ${err instanceof Error ? err.message : String(err)}`;
+      this.sdk.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
