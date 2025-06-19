@@ -42,9 +42,9 @@ pages:
       then
         apt update
         apt install -y jq
-        find $OUTPUT_DIR -type f | sed "s/${OUTPUT_DIR//\//\\/}/https:\/\/$FQDN/g" | jq -R -s -c 'split("\n")[:-1]' > $PURGE_FILE
+        find $OUTPUT_DIR -type f | sed "s/${OUTPUT_DIR//\//\\/}/https:\/\/$FQDN/g" | jq -R -s -c 'split("\n")[:-1]' > ../../$PURGE_FILE
       fi
-    - mv $OUTPUT_DIR public
+    - mv $OUTPUT_DIR ../../public
   artifacts:
     paths:
       - public
