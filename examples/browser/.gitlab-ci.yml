@@ -1,20 +1,77 @@
 include:
   - project: nosana-ci/tools/cicd/gitlab-ci
-    file: npm-generic.yml
-    # rules:
-    #   - changes:
-    #       - examples/browser/**/*
+    file: templates/semver.yml
+  - project: nosana-ci/tools/cicd/gitlab-ci
+    file: templates/cacheflush.yml
+
+variables:
+  NODE_VERSION: 22
+  OUTPUT_DIR: examples/browser/.output/public
+  PURGE_FILE: examples/browser/purge.json
+
+.npm:
+  image: node:$NODE_VERSION
+  cache:
+    key:
+      files:
+        - examples/browser/package-lock.json
+    paths:
+      - examples/browser/node_modules
+      - examples/browser/.npm
 
 before_script:
   - cd examples/browser
 
-test:
+build:
   extends: .npm
-  stage: test
-  script: npm run lint
-  when: manual
-  allow_failure: true
+  stage: build
+  script: npm ci --cache .npm --prefer-offline
+  rules:
+    - if: $CI_MERGE_REQUEST_ID                                          # merge requests
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH                       # main
+    - if: $DEPLOYMENT_BRANCH && $CI_COMMIT_BRANCH == $DEPLOYMENT_BRANCH # optional deployment branch
 
-variables:
-  NODE_VERSION: 22
-  OUTPUT_DIR: .output/public
+pages:
+  extends: .npm
+  stage: deploy
+  script:
+    - NODE_OPTIONS=--max_old_space_size=25384 npm run generate
+    - |
+      if [ -z ${SKIP_CACHEFLUSH} ] && [ -n ${FQDN} ]
+      then
+        apt update
+        apt install -y jq
+        find $OUTPUT_DIR -type f | sed "s/${OUTPUT_DIR//\//\\/}/https:\/\/$FQDN/g" | jq -R -s -c 'split("\n")[:-1]' > $PURGE_FILE
+      fi
+    - mv $OUTPUT_DIR public
+  artifacts:
+    paths:
+      - public
+      - $PURGE_FILE
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $AUTO_DEPLOY != null # main
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $AUTO_DEPLOY == null # main
+      when: manual
+    - if: $DEPLOYMENT_BRANCH && $CI_COMMIT_BRANCH == $DEPLOYMENT_BRANCH && $AUTO_DEPLOY != null # deployment branch
+    - if: $DEPLOYMENT_BRANCH && $CI_COMMIT_BRANCH == $DEPLOYMENT_BRANCH && $AUTO_DEPLOY == null # deployment branch
+      when: manual
+
+release:
+  extends: .release
+  stage: .post
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH                       # main
+    - if: $DEPLOYMENT_BRANCH && $CI_COMMIT_BRANCH == $DEPLOYMENT_BRANCH # optional deployment branch
+
+gitlab-release:
+  extends: .gitlab-release
+  stage: .post
+
+cacheflush:
+  extends: .cacheflush
+  stage: .post
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH                       # main
+    - if: $DEPLOYMENT_BRANCH && $CI_COMMIT_BRANCH == $DEPLOYMENT_BRANCH # optional deployment branch
+
+
