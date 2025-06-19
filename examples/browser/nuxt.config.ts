@@ -16,6 +16,12 @@ export default defineNuxtConfig({
     define: {
       global: 'globalThis',
     },
+    resolve: {
+      alias: {
+        // Force gill to use browser build instead of node build
+        'gill/node': 'gill/browser',
+      }
+    },
     optimizeDeps: {
       include: ['@nosana/kit'],
       exclude: ['gill/node']
