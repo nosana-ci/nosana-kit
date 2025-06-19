@@ -2,31 +2,28 @@ import { jest } from '@jest/globals';
 import { SolanaUtils } from '../SolanaUtils';
 import { NosanaClient, NosanaNetwork } from '../../index';
 import {
-  createTransaction,
-  signTransactionMessageWithSigners,
-  getSignatureFromTransaction,
-  generateKeyPairSigner,
-  IInstruction
+  IInstruction,
+  Address
 } from 'gill';
 import { NosanaError, ErrorCodes } from '../../errors/NosanaError';
 
 // Mock the gill library
 jest.mock('gill', () => ({
-  createSolanaClient: jest.fn().mockReturnValue({
+  createSolanaClient: jest.fn(() => ({
     rpc: {
-      getLatestBlockhash: jest.fn().mockReturnValue({
-        send: jest.fn().mockResolvedValue({
+      getLatestBlockhash: jest.fn(() => ({
+        send: jest.fn(() => Promise.resolve({
           value: { blockhash: 'mock-blockhash', lastValidBlockHeight: 100 }
-        })
-      }),
-      getBalance: jest.fn().mockReturnValue({
-        send: jest.fn().mockResolvedValue({ value: BigInt(1000000) })
-      })
+        }))
+      })),
+      getBalance: jest.fn(() => ({
+        send: jest.fn(() => Promise.resolve({ value: BigInt(1000000) }))
+      }))
     },
     rpcSubscriptions: {},
-    sendAndConfirmTransaction: jest.fn().mockResolvedValue('mock-signature')
-  }),
-  address: jest.fn((addr: string) => addr),
+    sendAndConfirmTransaction: jest.fn(() => Promise.resolve('mock-signature'))
+  })),
+  address: jest.fn((addr: string) => addr as Address),
   createTransaction: jest.fn(),
   signTransactionMessageWithSigners: jest.fn(),
   getSignatureFromTransaction: jest.fn(),
@@ -79,10 +76,10 @@ describe('SolanaUtils', () => {
 
   describe('send', () => {
     const mockInstruction = {
-      programAddress: 'mock-program',
-      accounts: [],
+      programAddress: 'mock-program' as Address,
+      accounts: [] as const,
       data: new Uint8Array([1, 2, 3])
-    };
+    } as IInstruction;
 
     const mockTransaction = {
       instructions: [mockInstruction],
@@ -202,7 +199,7 @@ describe('SolanaUtils', () => {
     it('should correctly identify transactions', () => {
       const instruction = { programAddress: 'mock', accounts: [], data: new Uint8Array() };
       const transaction = { instructions: [], version: 0 };
-      const signedTransaction = { instructions: [], version: 0, signatures: new Map() };
+      const signedTransaction = { instructions: [], version: 0, signatures: [] };
 
       expect((solanaUtils as any).isTransaction(instruction)).toBe(false);
       expect((solanaUtils as any).isTransaction([instruction])).toBe(false);
@@ -215,12 +212,12 @@ describe('SolanaUtils', () => {
       const signedTransaction = {
         instructions: [],
         version: 0,
-        signatures: new Map([['address', new Uint8Array([1, 2, 3])]])
+        signatures: [{ address: 'mock-address', signature: new Uint8Array([1, 2, 3]) }]
       };
       const emptySignedTransaction = {
         instructions: [],
         version: 0,
-        signatures: new Map()
+        signatures: []
       };
 
       expect((solanaUtils as any).isSignedTransaction(unsignedTransaction)).toBe(false);

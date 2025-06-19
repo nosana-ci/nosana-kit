@@ -62,7 +62,9 @@ export class NosanaClient {
         // Only try file/environment loading in Node.js environment
         if (typeof window === 'undefined') {
           try {
-            const { loadKeypairSignerFromFile, loadKeypairSignerFromEnvironment, loadKeypairSignerFromEnvironmentBase58 } = await import('gill/node');
+            // Use string concatenation to avoid bundler resolving this import at build time
+            const nodeModule = 'gill' + '/node';
+            const { loadKeypairSignerFromFile, loadKeypairSignerFromEnvironment, loadKeypairSignerFromEnvironmentBase58 } = await import(nodeModule);
 
             // Try to load from file path
             if (await this.isValidFilePath(wallet)) {
@@ -174,5 +176,5 @@ export * from './ipfs/IPFS.js';
 // Export all generated client types and functions
 export * from './generated_clients/jobs/index.js';
 
-// Export dependencies
+// Export dependencies 
 export * from 'gill';

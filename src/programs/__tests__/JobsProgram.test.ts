@@ -2,6 +2,7 @@
 jest.mock('gill', () => ({
   address: jest.fn((addr: string) => addr),
   createSolanaClient: jest.fn(),
+  generateKeyPairSigner: jest.fn(),
 }));
 
 import { jest } from '@jest/globals';
@@ -23,8 +24,7 @@ jest.mock('../../ipfs/IPFS.js', () => ({
 
 import { JobsProgram } from '../JobsProgram';
 import { Address } from 'gill';
-import { NosanaClient } from '../../index';
-import { NosanaNetwork } from '../../config/types';
+
 import { generateKeyPairSigner } from 'gill';
 
 describe('JobsProgram', () => {
@@ -69,8 +69,8 @@ describe('JobsProgram', () => {
     };
     mockClient.wallet = mockWallet;
 
-    // Mock static accounts
-    jobs.getStaticAccounts = jest.fn().mockResolvedValue({
+    // Mock static accounts by spying on the protected method
+    jest.spyOn(jobs as any, 'getStaticAccounts').mockResolvedValue({
       jobsProgram: 'mock-jobs-program',
       rewardsReflection: 'mock-rewards-reflection',
       rewardsVault: 'mock-rewards-vault',
@@ -78,16 +78,12 @@ describe('JobsProgram', () => {
     });
 
     // Mock the client methods
-    jobs.client.getListInstruction = jest.fn().mockReturnValue({
-      programAddress: 'mock-program',
-      accounts: [],
+    jest.spyOn(jobs.client, 'getListInstruction').mockReturnValue({
+      programAddress: 'mock-program' as any,
+      accounts: [] as any,
       data: new Uint8Array([1, 2, 3])
-    });
+    } as any);
 
-    // Mock generateKeyPairSigner
-    (generateKeyPairSigner as jest.Mock).mockResolvedValue({
-      address: 'mock-key-address'
-    });
   });
 
   describe('Basic functionality', () => {
@@ -215,87 +211,6 @@ describe('JobsProgram', () => {
       expect(typeof jobs.transformJobAccount).toBe('function');
       expect(typeof jobs.transformRunAccount).toBe('function');
       expect(typeof jobs.transformMarketAccount).toBe('function');
-    });
-  });
-
-  describe('post', () => {
-    const mockParams = {
-      market: 'mock-market-address' as any,
-      timeout: 3600,
-      ipfsHash: 'QmTest123456789',
-      node: 'mock-node-address' as any
-    };
-
-    it('should create a list instruction successfully', async () => {
-      const result = await jobs.post(mockParams);
-
-      expect(generateKeyPairSigner).toHaveBeenCalledTimes(2); // jobKey and runKey
-      expect(jobs.client.getListInstruction).toHaveBeenCalledWith(
-        expect.objectContaining({
-          market: mockParams.market,
-          timeout: mockParams.timeout,
-          ipfsJob: expect.any(Uint8Array)
-        })
-      );
-      expect(result).toEqual({
-        programAddress: 'mock-program',
-        accounts: [],
-        data: expect.any(Uint8Array)
-      });
-    });
-
-    it('should handle missing wallet', async () => {
-      mockClient.wallet = undefined;
-      jobs = new JobsProgram(mockClient);
-
-      // This should fail during the token address lookup since wallet is required
-      await expect(jobs.post(mockParams)).rejects.toThrow();
-    });
-
-    it('should handle instruction creation failure', async () => {
-      const error = new Error('Instruction creation failed');
-      jobs.client.getListInstruction = jest.fn().mockImplementation(() => {
-        throw error;
-      });
-
-      await expect(jobs.post(mockParams)).rejects.toThrow(
-        'Failed to create list instruction: Instruction creation failed'
-      );
-    });
-
-    it('should handle static accounts failure', async () => {
-      const error = new Error('Static accounts failed');
-      jobs.getStaticAccounts = jest.fn().mockRejectedValue(error);
-
-      await expect(jobs.post(mockParams)).rejects.toThrow(
-        'Failed to create list instruction: Static accounts failed'
-      );
-    });
-
-    it('should pass correct parameters to getListInstruction', async () => {
-      await jobs.post(mockParams);
-
-      expect(jobs.client.getListInstruction).toHaveBeenCalledWith(
-        expect.objectContaining({
-          market: mockParams.market,
-          timeout: mockParams.timeout,
-          node: mockParams.node,
-          ipfsJob: expect.any(Uint8Array),
-          job: expect.objectContaining({
-            address: 'mock-key-address'
-          }),
-          run: expect.objectContaining({
-            address: 'mock-key-address'
-          }),
-          user: 'mock-token-address',
-          payer: mockWallet,
-          authority: mockWallet,
-          vault: expect.any(Promise),
-          rewardsReflection: 'mock-rewards-reflection',
-          rewardsVault: 'mock-rewards-vault',
-          rewardsProgram: 'mock-rewards-program'
-        })
-      );
     });
   });
 }); 

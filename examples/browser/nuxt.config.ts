@@ -18,7 +18,7 @@ export default defineNuxtConfig({
     },
     optimizeDeps: {
       include: ['@nosana/kit'],
-      exclude: ['gill/node', 'gill']
+      exclude: ['gill/node']
     },
   }
 })

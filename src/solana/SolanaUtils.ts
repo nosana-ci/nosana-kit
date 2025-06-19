@@ -48,9 +48,6 @@ export class SolanaUtils {
   }
 
   public async getLatestBlockhash() {
-    console.log('testing gen key..');
-    const jobKey = await generateKeyPairSigner();
-    console.log('test', jobKey);
     try {
       const { value: blockhash } = await this.rpc.getLatestBlockhash().send();
       return blockhash;
