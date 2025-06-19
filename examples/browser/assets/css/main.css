@@ -3,58 +3,5 @@
 @tailwind utilities; */
 
 @layer components {
-  .terminal {
-    background-color: #1a202c;
-    color: #68d391;
-    font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 0.875rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    overflow: auto;
-    max-height: 400px;
-    scrollbar-width: thin;
-    scrollbar-color: #4a5568 #1a202c;
-  }
   
-  .terminal::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .terminal::-webkit-scrollbar-track {
-    background: #1a202c;
-  }
-  
-  .terminal::-webkit-scrollbar-thumb {
-    background: #4a5568;
-    border-radius: 4px;
-  }
-  
-  .terminal::-webkit-scrollbar-thumb:hover {
-    background: #718096;
-  }
-  
-  .terminal-line {
-    margin-bottom: 0.25rem;
-  }
-  
-  .terminal-timestamp {
-    color: #9ca3af;
-    margin-right: 0.5rem;
-  }
-  
-  .terminal-error {
-    color: #f87171;
-  }
-  
-  .terminal-success {
-    color: #68d391;
-  }
-  
-  .terminal-info {
-    color: #60a5fa;
-  }
-  
-  .terminal-warning {
-    color: #fbbf24;
-  }
 } 
