@@ -7,8 +7,25 @@ import bs58 from 'bs58';
 import { IPFS } from '../ipfs/IPFS.js';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../utils/index.js';
 
-export type Job = ConvertTypesForDb<programClient.JobAccountArgs> & { address: Address };
-export type Market = ConvertTypesForDb<programClient.MarketAccountArgs> & { address: Address };
+export enum JobState {
+  QUEUED = 0,
+  RUNNING = 1,
+  COMPLETED = 2,
+  STOPPED = 3
+}
+
+export enum MarketQueueType {
+  JOB_QUEUE = 0,
+  NODE_QUEUE = 1
+}
+export type Job = Omit<ConvertTypesForDb<programClient.JobAccountArgs>, 'state'> & {
+  address: Address;
+  state: JobState;
+};
+export type Market = Omit<ConvertTypesForDb<programClient.MarketAccountArgs>, 'queueType'> & {
+  address: Address;
+  queueType: MarketQueueType;
+};
 export type Run = ConvertTypesForDb<programClient.RunAccountArgs> & { address: Address };
 
 export class JobsProgram extends BaseProgram {
@@ -31,12 +48,12 @@ export class JobsProgram extends BaseProgram {
     try {
       const jobAccount = await this.client.fetchJobAccount(this.sdk.solana.rpc, addr);
       const job = this.transformJobAccount(jobAccount);
-      if (checkRun && job.state === 0) {
+      if (checkRun && job.state === JobState.QUEUED) {
         // If job is queued, check if there is a run account for the job
         const runs = await this.runs({ job: job.address });
         if (runs.length > 0) {
           const run = runs[0];
-          job.state = 1;
+          job.state = JobState.RUNNING;
           job.timeStart = run.time;
           job.node = run.node;
         }
@@ -87,10 +104,10 @@ export class JobsProgram extends BaseProgram {
       if (checkRuns) {
         const runs = await this.runs();
         jobs.forEach(job => {
-          if (job.state === 0) {
+          if (job.state === JobState.QUEUED) {
             const run = runs.find(run => run.job === job.address);
             if (run) {
-              job.state = 1;
+              job.state = JobState.RUNNING;
               job.timeStart = run.time;
               job.node = run.node;
             }
@@ -108,7 +125,7 @@ export class JobsProgram extends BaseProgram {
   * Fetch all job accounts
   */
   async all(filters?: {
-    state?: number,
+    state?: JobState,
     market?: Address,
     node?: Address,
     project?: Address,
@@ -183,10 +200,10 @@ export class JobsProgram extends BaseProgram {
       if (checkRuns) {
         const runs = await this.runs();
         jobs.forEach(job => {
-          if (job.state === 0) {
+          if (job.state === JobState.QUEUED) {
             const run = runs.find(run => run.job === job.address);
             if (run) {
-              job.state = 1;
+              job.state = JobState.RUNNING;
               job.timeStart = run.time;
               job.node = run.node;
             }
@@ -522,11 +539,13 @@ export class JobsProgram extends BaseProgram {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars 
     const { discriminator: _, ...jobAccountData } = jobAccount.data;
 
+    const converted = convertBigIntToNumber(jobAccountData);
     return {
       address: jobAccount.address,
-      ...convertBigIntToNumber(jobAccountData),
+      ...converted,
       ipfsJob: IPFS.solHashToIpfsHash(jobAccountData.ipfsJob),
       ipfsResult: IPFS.solHashToIpfsHash(jobAccountData.ipfsResult),
+      state: converted.state as JobState,
     }
   }
   public transformRunAccount(runAccount: Account<programClient.RunAccount>): Run {
@@ -542,11 +561,14 @@ export class JobsProgram extends BaseProgram {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars 
     const { discriminator: _, ...marketAccountData } = marketAccount.data;
 
+    const converted = convertBigIntToNumber(marketAccountData);
     return {
       address: marketAccount.address,
-      ...convertBigIntToNumber(marketAccountData),
+      ...converted,
+      queueType: converted.queueType as MarketQueueType,
     }
   }
+
   /**
    * Handle account update using callback functions
    */

@@ -22,10 +22,9 @@ jest.mock('../../ipfs/IPFS.js', () => ({
   },
 }));
 
-import { JobsProgram } from '../JobsProgram';
+import { JobsProgram, MarketQueueType } from '../JobsProgram';
 import { Address } from 'gill';
 
-import { generateKeyPairSigner } from 'gill';
 
 describe('JobsProgram', () => {
   let jobs: JobsProgram;
@@ -175,6 +174,7 @@ describe('JobsProgram', () => {
             jobTimeout: BigInt(3600),
             jobType: BigInt(1),
             vault: 'mock-vault',
+            queueType: MarketQueueType.NODE_QUEUE, // NODE_QUEUE
           }
         };
 
@@ -189,6 +189,7 @@ describe('JobsProgram', () => {
           jobTimeout: 3600,
           jobType: 1,
           vault: 'mock-vault',
+          queueType: MarketQueueType.NODE_QUEUE,
         });
       });
     });

@@ -169,7 +169,7 @@ export * from './logger/Logger.js';
 
 // Export JobsProgram and related types
 export { JobsProgram } from './programs/JobsProgram.js';
-export type { Job, Market, Run } from './programs/JobsProgram.js';
+export type { Job, Market, Run, JobState, MarketQueueType } from './programs/JobsProgram.js';
 
 // Export IPFS utilities
 export * from './ipfs/IPFS.js';
