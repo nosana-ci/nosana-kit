@@ -11,7 +11,7 @@ export class IPFS {
    * It prepends the 0x1220 (18,32) to make it 34 bytes and Base58 encodes it.
    * This result is IPFS addressable.
    */
-  static solHashToIpfsHash(hashArray: ReadonlyUint8Array): string {
+  static solHashToIpfsHash(hashArray: ReadonlyUint8Array): string | null {
     let finalArray: Uint8Array;
 
     if (hashArray.length === 32) {
@@ -24,8 +24,11 @@ export class IPFS {
       // Use the array as-is if it's not 32 bytes
       finalArray = new Uint8Array(hashArray);
     }
-
-    return bs58.encode(Buffer.from(finalArray));
+    const hash = bs58.encode(Buffer.from(finalArray));
+    if (hash === 'QmNLei78zWmzUdbeRB3CiUfAizWUrbeeZh5K1rhAQKCh51') {
+      return null;
+    }
+    return hash;
   }
 
   /**

@@ -15,7 +15,7 @@ export type ConvertTypesForDb<T> = {
   T[K] extends bigint
   ? number
   : T[K] extends ReadonlyUint8Array
-  ? string
+  ? string | null
   : T[K];
 };
 
