@@ -45,4 +45,6 @@ export interface ClientConfig {
 export interface PartialClientConfig {
   solana?: Partial<SolanaConfig>;
   wallet?: WalletConfig;
+  ipfs?: Partial<IpfsConfig>;
+  logLevel?: NosanaLogLevel;
 }

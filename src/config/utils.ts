@@ -15,6 +15,10 @@ export const mergeConfigs = (
       ...defaultConfig.solana,
       ...customConfig.solana,
     },
+    ipfs: {
+      ...defaultConfig.ipfs,
+      ...customConfig.ipfs,
+    },
   };
 }
 
@@ -33,5 +37,10 @@ export const getNosanaConfig = (network: NosanaNetwork = NosanaNetwork.MAINNET, 
 //   solana: {  
 //     rpcEndpoint: 'your-custom-rpc-endpoint-url',
 //   },
+//   ipfs: {
+//     jwt: 'your-custom-jwt-token',
+//     gateway: 'https://your-custom-gateway.com/ipfs/',
+//   },
+//   logLevel: NosanaLogLevel.DEBUG,
 // });
 
