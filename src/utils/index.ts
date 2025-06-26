@@ -33,3 +33,6 @@ export function convertBigIntToNumber<T extends Record<string, any>>(obj: T): Co
   }
   return result as ConvertBigIntToNumber<T>;
 }
+
+// Export wallet conversion utilities
+export * from './walletConverter.js';
