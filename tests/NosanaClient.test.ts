@@ -134,6 +134,59 @@ describe('NosanaClient', () => {
     // Note: Logger is a singleton; configs may share references if mutated post-construction.
     // We verify independence via constructor overrides and wallet state in other tests.
   });
+
+  describe('component integration', () => {
+    it('jobs program has access to parent SDK config and services', () => {
+      const sdk = new NosanaClient(NosanaNetwork.MAINNET);
+
+      // jobs program should be able to access SDK config
+      expect(sdk.jobs['sdk']).toBe(sdk);
+      expect(sdk.jobs['sdk'].config).toBe(sdk.config);
+    });
+
+    it('solana service uses SDK config for RPC endpoint', () => {
+      const customRpc = 'https://my-custom-rpc.example';
+      const sdk = new NosanaClient(NosanaNetwork.MAINNET, {
+        solana: { rpcEndpoint: customRpc }
+      });
+
+      expect(sdk.config.solana.rpcEndpoint).toBe(customRpc);
+      // SolanaService should use this config
+      expect(sdk.solana['sdk'].config.solana.rpcEndpoint).toBe(customRpc);
+    });
+
+    it('IPFS service uses SDK config for gateway and API', () => {
+      const customGateway = 'https://my-gateway.example/ipfs/';
+      const customApi = 'https://my-api.example';
+      const sdk = new NosanaClient(NosanaNetwork.MAINNET, {
+        ipfs: { gateway: customGateway, api: customApi }
+      });
+
+      expect(sdk.ipfs.config.gateway).toBe(customGateway);
+      expect(sdk.ipfs.config.api).toBe(customApi);
+    });
+
+    it('logger configuration is respected across all components', () => {
+      const sdk = new NosanaClient(NosanaNetwork.MAINNET, {
+        logLevel: NosanaLogLevel.ERROR
+      });
+
+      expect(sdk.config.logLevel).toBe(NosanaLogLevel.ERROR);
+      // Logger is singleton, so this affects all instances
+      expect(sdk.logger).toBe(sdk.jobs['sdk'].logger);
+      expect(sdk.logger).toBe(sdk.solana['sdk'].logger);
+    });
+
+    it('wallet set on SDK is accessible to jobs program', async () => {
+      const sdk = new NosanaClient(NosanaNetwork.MAINNET);
+      const wallet = await sdk.setWallet(keyArray);
+
+      expect(sdk.wallet).toBe(wallet);
+      // jobs program should see the same wallet
+      expect(sdk.jobs['sdk'].wallet).toBe(wallet);
+      expect(sdk.solana['sdk'].wallet).toBe(wallet);
+    });
+  });
 });
 
 
