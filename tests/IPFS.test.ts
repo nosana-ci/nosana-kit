@@ -172,6 +172,118 @@ describe('IPFS API', () => {
       expect(api.post).toHaveBeenCalledWith('/pinning/pinJSONToIPFS', { a: 1 });
     });
   });
+
+  describe('pinFile', () => {
+    it('pins file from path to Pinata (integration-style)', async () => {
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 'test-jwt', gateway: 'https://gw/' });
+
+      // Create a temporary test file
+      const fs = await import('fs');
+      const path = await import('path');
+      const os = await import('os');
+      const testFilePath = path.join(os.tmpdir(), 'test-ipfs-file.txt');
+      fs.writeFileSync(testFilePath, 'test content');
+
+      try {
+        const hash = await ipfs.pinFile(testFilePath);
+
+        expect(hash).toBe('QmPinnedHash');
+
+        const api = (axios.default.create as any).mock.results[0].value;
+        expect(api.post).toHaveBeenCalledWith(
+          '/pinning/pinFileToIPFS',
+          expect.any(Object),
+          expect.objectContaining({
+            headers: expect.objectContaining({
+              'Content-Type': expect.stringContaining('multipart/form-data'),
+              'Authorization': 'Bearer test-jwt'
+            })
+          })
+        );
+      } finally {
+        // Clean up
+        if (fs.existsSync(testFilePath)) {
+          fs.unlinkSync(testFilePath);
+        }
+      }
+    });
+  });
+
+  describe('pinFileFromBuffer', () => {
+    it('pins file from Buffer to Pinata', async () => {
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 'test-jwt', gateway: 'https://gw/' });
+
+      const fileBuffer = Buffer.from('test file content');
+      const fileName = 'test-file.txt';
+
+      const hash = await ipfs.pinFileFromBuffer(fileBuffer, fileName);
+
+      expect(hash).toBe('QmPinnedHash');
+
+      const api = (axios.default.create as any).mock.results[0].value;
+      expect(api.post).toHaveBeenCalledWith(
+        '/pinning/pinFileToIPFS',
+        expect.any(Object),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'Content-Type': expect.stringContaining('multipart/form-data'),
+            'Authorization': 'Bearer test-jwt'
+          })
+        })
+      );
+    });
+
+    it('pins file from stream-like Buffer to Pinata', async () => {
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 'test-jwt', gateway: 'https://gw/' });
+
+      // Create a Buffer that can be used by form-data
+      const { Readable } = await import('stream');
+      const fileBuffer = Buffer.from('test content');
+      // Create a stream from the buffer for form-data compatibility
+      const stream = Readable.from(fileBuffer);
+      const fileName = 'test-file.txt';
+
+      const hash = await ipfs.pinFileFromBuffer(stream as any, fileName);
+
+      expect(hash).toBe('QmPinnedHash');
+
+      const api = (axios.default.create as any).mock.results[0].value;
+      expect(api.post).toHaveBeenCalledWith(
+        '/pinning/pinFileToIPFS',
+        expect.any(Object),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'Authorization': 'Bearer test-jwt'
+          })
+        })
+      );
+    });
+
+    it('handles different file types', async () => {
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 'test-jwt', gateway: 'https://gw/' });
+
+      const { Readable } = await import('stream');
+      const imageBuffer = Buffer.from('fake-image-data');
+      const stream = Readable.from(imageBuffer);
+      const hash = await ipfs.pinFileFromBuffer(stream as any, 'image.png');
+
+      expect(hash).toBe('QmPinnedHash');
+    });
+
+    it('propagates API errors', async () => {
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 'test-jwt', gateway: 'https://gw/' });
+
+      // Make the next post call fail
+      const api = (axios.default.create as any).mock.results[0].value;
+      api.post.mockRejectedValueOnce(new Error('Pinata API error'));
+
+      const { Readable } = await import('stream');
+      const buffer = Buffer.from('test');
+      const stream = Readable.from(buffer);
+
+      await expect(ipfs.pinFileFromBuffer(stream as any, 'test.txt')).rejects.toThrow('Pinata API error');
+    });
+  });
 });
 
 
