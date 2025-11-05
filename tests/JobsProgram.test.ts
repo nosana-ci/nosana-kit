@@ -270,6 +270,30 @@ describe('JobsProgram', () => {
         expect(instr).toBeDefined();
       });
     });
+
+    describe('error handling', () => {
+      it('get propagates fetch errors', async () => {
+        vi.spyOn(programClient, 'fetchJobAccount' as any).mockRejectedValue(new Error('RPC error'));
+        await expect(jobs.get(newAddr(90))).rejects.toThrow('RPC error');
+      });
+
+      it('run propagates fetch errors', async () => {
+        vi.spyOn(programClient, 'fetchRunAccount' as any).mockRejectedValue(new Error('RPC error'));
+        await expect(jobs.run(newAddr(91))).rejects.toThrow('RPC error');
+      });
+
+      it('market propagates fetch errors', async () => {
+        vi.spyOn(programClient, 'fetchMarketAccount' as any).mockRejectedValue(new Error('RPC error'));
+        await expect(jobs.market(newAddr(92))).rejects.toThrow('RPC error');
+      });
+
+      it('all propagates getProgramAccounts errors', async () => {
+        const ctx = makeSdkRpc();
+        sdk = ctx.sdk; jobs = new JobsProgram(sdk);
+        (sdk as any).solana.rpc.getProgramAccounts = vi.fn().mockReturnValue({ send: vi.fn().mockRejectedValue(new Error('Network error')) });
+        await expect(jobs.all()).rejects.toThrow('Network error');
+      });
+    });
   });
 });
 
