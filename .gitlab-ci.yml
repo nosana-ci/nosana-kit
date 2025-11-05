@@ -6,23 +6,44 @@
 image: node:22.8.0
 
 include:
-  - local: 'examples/browser/.gitlab-ci.yml'    
+  - project: nosana-ci/tools/cicd/gitlab-ci
+    file: templates/semver.yml
 
-test:
+npm prettier:
   stage: test
   script:
     - npm ci
-    - npm test -- --run
+    - npm run prettier
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-npm-publish:
-  stage: build
-  allow_failure: true
-  only:
-    - main
+npm lint:
+  stage: test
   script:
     - npm ci
-    - git config --global user.email "dev@nosana.io"
-    - git config --global user.name "Nosana"
+    - npm run lint
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+npm test:
+  stage: test
+  script:
+    - npm ci
+    - npm test
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+
+npm publish prod:
+  stage: deploy
+  script:
+    - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" package.json
+    - npm ci
     - npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
     - npm run publish:public
-    # - git push # todo: fix, not working
+  when: manual
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"

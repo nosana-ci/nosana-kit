@@ -40,6 +40,20 @@ const completedJobs = await client.jobs.all({
 });
 ```
 
+## Architecture
+
+The SDK is organized into clear, purpose-driven modules:
+
+- **`services/`** - Utility services (SolanaService for RPC/transactions, NosService for NOS token operations)
+- **`programs/`** - On-chain program interfaces (JobsProgram, StakeProgram)
+- **`ipfs/`** - IPFS integration
+- **`config/`** - Network configurations
+- **`utils/`** - Helper utilities
+
+This structure makes it clear that:
+- **Services** = Helper services and utilities for common operations
+- **Programs** = Interfaces to on-chain Solana programs
+
 ## Configuration
 
 ### Networks
@@ -79,8 +93,9 @@ Main entry point for SDK interactions.
 **Properties:**
 - `config: ClientConfig` - Active configuration
 - `jobs: JobsProgram` - Jobs program interface
-- `solana: SolanaService` - Solana RPC and transaction utilities
-- `nos: NosService` - NOS token account operations
+- `stake: StakeProgram` - Staking program interface
+- `solana: SolanaService` - General Solana utilities (RPC, transactions, PDAs)
+- `nos: NosService` - NOS token operations service
 - `ipfs: IPFS` - IPFS operations and utilities
 - `logger: Logger` - Logging instance
 - `wallet?: KeyPairSigner` - Active wallet (if set)
@@ -378,7 +393,7 @@ enum MarketQueueType {
 
 ## Solana Service
 
-Low-level Solana operations.
+General Solana utility service for low-level RPC operations, transactions, and PDA derivations.
 
 ### Methods
 
@@ -461,6 +476,94 @@ const cid = await client.ipfs.pin({
 
 // Retrieve job results
 const results = await client.ipfs.retrieve(job.ipfsResult);
+```
+
+## Staking Program
+
+The StakeProgram provides methods to interact with Nosana staking accounts on-chain.
+
+### Get a Single Stake Account
+
+Fetch a stake account by its address:
+
+```typescript
+const stake = await client.stake.get('stake-account-address');
+
+console.log('Stake Account:', stake.address);
+console.log('Authority:', stake.authority);
+console.log('Staked Amount:', stake.amount);
+console.log('xNOS Tokens:', stake.xnos);
+console.log('Duration:', stake.duration);
+console.log('Time to Unstake:', stake.timeUnstake);
+console.log('Vault:', stake.vault);
+```
+
+### Get Multiple Stake Accounts
+
+Fetch multiple stake accounts by their addresses:
+
+```typescript
+const addresses = ['address1', 'address2', 'address3'];
+const stakes = await client.stake.multiple(addresses);
+
+stakes.forEach(stake => {
+  console.log(`${stake.address}: ${stake.amount} staked`);
+});
+```
+
+### Get All Stake Accounts
+
+Fetch all stake accounts in the program:
+
+```typescript
+// Get all stakes
+const allStakes = await client.stake.all();
+console.log(`Found ${allStakes.length} stake accounts`);
+```
+
+### Type Definitions
+
+```typescript
+interface Stake {
+  address: Address;
+  amount: number;
+  authority: Address;
+  duration: number;
+  timeUnstake: number;
+  vault: Address;
+  vaultBump: number;
+  xnos: number;
+}
+```
+
+### Use Cases
+
+- **Portfolio Tracking**: Monitor your staked NOS tokens
+- **Analytics**: Analyze staking patterns and distributions
+- **Governance**: Check voting power based on staked amounts
+- **Rewards Calculation**: Calculate rewards based on stake duration and amount
+
+### Example: Analyze Staking Distribution
+
+```typescript
+const allStakes = await client.stake.all();
+
+// Calculate total staked
+const totalStaked = allStakes.reduce((sum, stake) => sum + stake.amount, 0);
+
+// Find average stake
+const averageStake = totalStaked / allStakes.length;
+
+// Find largest stake
+const largestStake = allStakes.reduce((max, stake) => 
+  Math.max(max, stake.amount), 0
+);
+
+console.log('Staking Statistics:');
+console.log(`Total Staked: ${totalStaked.toLocaleString()} NOS`);
+console.log(`Average Stake: ${averageStake.toLocaleString()} NOS`);
+console.log(`Largest Stake: ${largestStake.toLocaleString()} NOS`);
+console.log(`Number of Stakers: ${allStakes.length}`);
 ```
 
 ## NOS Token Service

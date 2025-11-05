@@ -30,5 +30,3 @@ describe('NosanaError', () => {
     });
   });
 });
-
-

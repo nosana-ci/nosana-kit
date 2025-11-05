@@ -1,6 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { SolanaService } from '../src/solana/SolanaService.js';
-import type { SolanaClient, IInstruction, CompilableTransactionMessage, TransactionMessageWithBlockhashLifetime, FullySignedTransaction, TransactionWithBlockhashLifetime, Address, KeyPairSigner } from 'gill';
+import { SolanaService } from '../src/services/SolanaService.js';
+import type {
+  SolanaClient,
+  IInstruction,
+  CompilableTransactionMessage,
+  TransactionMessageWithBlockhashLifetime,
+  FullySignedTransaction,
+  TransactionWithBlockhashLifetime,
+  KeyPairSigner,
+} from 'gill';
 import { SdkFactory, AddressFactory } from './helpers/index.js';
 
 // Mock gill module used by SolanaService
@@ -8,10 +16,10 @@ vi.mock('gill', async (importOriginal) => {
   const actual = await importOriginal<typeof import('gill')>();
   const latestBlockhashValue = { blockhash: 'mock-blockhash', lastValidBlockHeight: 123 };
   const getLatestBlockhash = vi.fn(() => ({
-    send: vi.fn().mockResolvedValue({ value: latestBlockhashValue })
+    send: vi.fn().mockResolvedValue({ value: latestBlockhashValue }),
   }));
   const getBalance = vi.fn(() => ({
-    send: vi.fn().mockResolvedValue({ value: BigInt(1000) })
+    send: vi.fn().mockResolvedValue({ value: BigInt(1000) }),
   }));
 
   const rpc = { getLatestBlockhash, getBalance } as unknown as SolanaClient['rpc'];
@@ -23,7 +31,12 @@ vi.mock('gill', async (importOriginal) => {
   const createTransaction = vi.fn((args: any) => ({ ...args, created: true }));
   const signTransactionMessageWithSigners = vi.fn(async (txOrMsg: any) => ({
     ...txOrMsg,
-    signatures: [{ address: txOrMsg?.feePayer?.address ?? actual.address('11111111111111111111111111111111'), signature: new Uint8Array([1]) }]
+    signatures: [
+      {
+        address: txOrMsg?.feePayer?.address ?? actual.address('11111111111111111111111111111111'),
+        signature: new Uint8Array([1]),
+      },
+    ],
   }));
   const getSignatureFromTransaction = vi.fn(() => 'mock-signature');
   const getExplorerLink = vi.fn(() => 'https://explorer/tx/mock-signature');
@@ -58,7 +71,11 @@ type GillMock = {
 const gillMock = gill as unknown as GillMock;
 
 function makeInstruction(): IInstruction {
-  return { programAddress: AddressFactory.createValid(), accounts: [], data: new Uint8Array([1, 2, 3]) };
+  return {
+    programAddress: AddressFactory.createValid(),
+    accounts: [],
+    data: new Uint8Array([1, 2, 3]),
+  };
 }
 
 async function makeWallet(): Promise<KeyPairSigner> {
@@ -89,7 +106,7 @@ describe('SolanaService', () => {
       expect(gillMock.getSignatureFromTransaction).toHaveBeenCalled();
       expect(gillMock.getExplorerLink).toHaveBeenCalled();
       expect(service.sendAndConfirmTransaction).toHaveBeenCalled();
-      expect((await import('gill'))).toBeTruthy();
+      expect(await import('gill')).toBeTruthy();
 
       // signer/feePayer checks
       const calledTx = gillMock.signTransactionMessageWithSigners.mock.calls.at(-1)![0];
@@ -143,9 +160,13 @@ describe('SolanaService', () => {
       const sdk = SdkFactory.createForSolana({ wallet: await makeWallet() });
       const service = new SolanaService(sdk);
 
-      gillMock.createTransaction.mockImplementationOnce(() => { throw new Error('create failed'); });
+      gillMock.createTransaction.mockImplementationOnce(() => {
+        throw new Error('create failed');
+      });
 
-      await expect(service.send(makeInstruction())).rejects.toThrow('Failed to send transaction: create failed');
+      await expect(service.send(makeInstruction())).rejects.toThrow(
+        'Failed to send transaction: create failed'
+      );
     });
 
     it('propagates signing errors', async () => {
@@ -154,7 +175,9 @@ describe('SolanaService', () => {
 
       gillMock.signTransactionMessageWithSigners.mockRejectedValueOnce(new Error('sign failed'));
 
-      await expect(service.send(makeInstruction())).rejects.toThrow('Failed to send transaction: sign failed');
+      await expect(service.send(makeInstruction())).rejects.toThrow(
+        'Failed to send transaction: sign failed'
+      );
     });
   });
 
@@ -169,7 +192,9 @@ describe('SolanaService', () => {
     it('throws NosanaError on RPC failure', async () => {
       const sdk = SdkFactory.createForSolana();
       const service = new SolanaService(sdk);
-      const mockGetBalance = vi.fn(() => ({ send: vi.fn().mockRejectedValue(new Error('rpc error')) }));
+      const mockGetBalance = vi.fn(() => ({
+        send: vi.fn().mockRejectedValue(new Error('rpc error')),
+      }));
       service.rpc.getBalance = mockGetBalance as any;
       await expect(service.getBalance('invalid')).rejects.toMatchObject({ code: 'RPC_ERROR' });
     });
@@ -186,7 +211,9 @@ describe('SolanaService', () => {
     it('throws NosanaError on RPC failure', async () => {
       const sdk = SdkFactory.createForSolana();
       const service = new SolanaService(sdk);
-      const mockGetLatestBlockhash = vi.fn(() => ({ send: vi.fn().mockRejectedValue(new Error('rpc error')) }));
+      const mockGetLatestBlockhash = vi.fn(() => ({
+        send: vi.fn().mockRejectedValue(new Error('rpc error')),
+      }));
       service.rpc.getLatestBlockhash = mockGetLatestBlockhash as any;
       await expect(service.getLatestBlockhash()).rejects.toMatchObject({ code: 'RPC_ERROR' });
     });
@@ -204,5 +231,3 @@ describe('SolanaService', () => {
     });
   });
 });
-
-

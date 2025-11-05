@@ -5,10 +5,10 @@ describe('Logger', () => {
   beforeEach(() => {
     // reset singleton
     (Logger as unknown as { instance?: unknown }).instance = undefined;
-    vi.spyOn(console, 'debug').mockImplementation(() => { });
-    vi.spyOn(console, 'info').mockImplementation(() => { });
-    vi.spyOn(console, 'warn').mockImplementation(() => { });
-    vi.spyOn(console, 'error').mockImplementation(() => { });
+    vi.spyOn(console, 'debug').mockImplementation(() => {});
+    vi.spyOn(console, 'info').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -70,5 +70,3 @@ describe('Logger', () => {
     expect(console.info).toHaveBeenCalledWith('NEW [INFO] i2');
   });
 });
-
-

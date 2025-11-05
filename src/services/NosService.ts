@@ -40,7 +40,7 @@ export class NosService {
   /**
    * Retrieve all token accounts for all NOS token holders
    * Uses a single RPC call to fetch all accounts holding the NOS token
-   * 
+   *
    * @param options - Optional configuration
    * @param options.includeZeroBalance - Whether to include accounts with zero balance (default: false)
    * @param options.excludePdaAccounts - Whether to exclude PDA (Program Derived Address) accounts owned by smart contracts (default: false)
@@ -76,8 +76,17 @@ export class NosService {
       this.sdk.logger.info(`Found ${accounts.length} NOS token accounts`);
 
       // Parse the response
-      const allAccounts = accounts.map((accountInfo: any) => {
-        const parsed = accountInfo.account.data.parsed.info;
+      const allAccounts = (
+        accounts as Array<{
+          account: { data: { parsed: { info: Record<string, unknown> } } };
+          pubkey: Address;
+        }>
+      ).map((accountInfo) => {
+        const parsed = accountInfo.account.data.parsed.info as {
+          owner: Address;
+          mint: Address;
+          tokenAmount: { amount: string; decimals: number; uiAmount: number | null };
+        };
         return {
           pubkey: accountInfo.pubkey,
           owner: parsed.owner,
@@ -96,13 +105,13 @@ export class NosService {
 
       // Filter out zero balance accounts unless explicitly included
       if (!includeZeroBalance) {
-        filteredAccounts = filteredAccounts.filter(account => account.uiAmount > 0);
+        filteredAccounts = filteredAccounts.filter((account) => account.uiAmount > 0);
       }
 
       // Filter out PDA accounts (where token account equals owner, indicating smart contract ownership)
       if (excludePdaAccounts) {
         const beforePdaFilter = filteredAccounts.length;
-        filteredAccounts = filteredAccounts.filter(account => account.pubkey !== account.owner);
+        filteredAccounts = filteredAccounts.filter((account) => account.pubkey !== account.owner);
         const pdaCount = beforePdaFilter - filteredAccounts.length;
         this.sdk.logger.debug(`Filtered out ${pdaCount} PDA accounts`);
       }
@@ -112,28 +121,24 @@ export class NosService {
       if (excludePdaAccounts) filterInfo.push('excluding PDA accounts');
       const filterText = filterInfo.length > 0 ? ` (${filterInfo.join(', ')})` : '';
 
-      this.sdk.logger.info(
-        `Returning ${filteredAccounts.length} NOS token holders${filterText}`
-      );
+      this.sdk.logger.info(`Returning ${filteredAccounts.length} NOS token holders${filterText}`);
 
       return filteredAccounts;
     } catch (error) {
       this.sdk.logger.error(`Failed to fetch NOS token holders: ${error}`);
-      throw new NosanaError(
-        'Failed to fetch NOS token holders',
-        ErrorCodes.RPC_ERROR,
-        error
-      );
+      throw new NosanaError('Failed to fetch NOS token holders', ErrorCodes.RPC_ERROR, error);
     }
   }
 
   /**
    * Retrieve the NOS token account for a specific owner address
-   * 
+   *
    * @param owner - The owner address to query
    * @returns The token account with balance, or null if no account exists
    */
-  async getTokenAccountForAddress(owner: string | Address): Promise<TokenAccountWithBalance | null> {
+  async getTokenAccountForAddress(
+    owner: string | Address
+  ): Promise<TokenAccountWithBalance | null> {
     try {
       const ownerAddr = typeof owner === 'string' ? address(owner) : owner;
       const nosMint = this.getNosTokenMint();
@@ -142,11 +147,7 @@ export class NosService {
 
       // Use getTokenAccountsByOwner to fetch token accounts for this owner filtered by NOS mint
       const response = await this.sdk.solana.rpc
-        .getTokenAccountsByOwner(
-          ownerAddr,
-          { mint: nosMint },
-          { encoding: 'jsonParsed' }
-        )
+        .getTokenAccountsByOwner(ownerAddr, { mint: nosMint }, { encoding: 'jsonParsed' })
         .send();
 
       if (response.value.length === 0) {
@@ -172,18 +173,14 @@ export class NosService {
       };
     } catch (error) {
       this.sdk.logger.error(`Failed to fetch NOS token account for owner: ${error}`);
-      throw new NosanaError(
-        'Failed to fetch NOS token account',
-        ErrorCodes.RPC_ERROR,
-        error
-      );
+      throw new NosanaError('Failed to fetch NOS token account', ErrorCodes.RPC_ERROR, error);
     }
   }
 
   /**
    * Get the NOS token balance for a specific owner address
    * Convenience method that returns just the balance
-   * 
+   *
    * @param owner - The owner address to query
    * @returns The token balance as a UI amount (with decimals), or 0 if no account exists
    */
@@ -192,4 +189,3 @@ export class NosService {
     return account ? account.uiAmount : 0;
   }
 }
-

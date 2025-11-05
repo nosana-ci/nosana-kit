@@ -76,4 +76,4 @@ export class Logger {
   public disable(): void {
     this.enabled = false;
   }
-} 
+}

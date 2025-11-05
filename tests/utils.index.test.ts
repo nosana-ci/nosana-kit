@@ -60,5 +60,3 @@ describe('utils/index type helpers', () => {
     }>();
   });
 });
-
-

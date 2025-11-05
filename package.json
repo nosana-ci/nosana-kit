@@ -1,6 +1,6 @@
 {
   "name": "@nosana/kit",
-  "version": "0.1.6",
+  "version": "0.0.0",
   "description": "Nosana KIT",
   "type": "module",
   "main": "dist/index.js",
@@ -10,9 +10,11 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "generate-clients": "ts-node scripts/generate-clients.ts",
-    "lint": "eslint . --ext .ts",
+    "generate-clients": "npx tsx scripts/generate-clients.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.ts\"",
+    "prettier": "prettier --check \"**/*.ts\"",
     "publish:public": "npm version patch && npm run build && npm publish --access public"
   },
   "keywords": [

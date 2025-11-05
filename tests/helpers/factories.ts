@@ -1,6 +1,6 @@
 /**
  * Test Data Factories
- * 
+ *
  * Centralized factories for creating test data with sensible defaults.
  * Makes tests more maintainable and easier to read.
  */
@@ -10,6 +10,7 @@ import { address, type Address, type Account } from 'gill';
 import bs58 from 'bs58';
 import type { NosanaClient } from '../../src/index.js';
 import * as programClient from '../../src/generated_clients/jobs/index.js';
+import * as stakingClient from '../../src/generated_clients/staking/index.js';
 import { JobState, MarketQueueType } from '../../src/programs/JobsProgram.js';
 
 /**
@@ -137,9 +138,7 @@ export class SdkFactory {
    */
   static createWithMockPda(): NosanaClient {
     const valid = AddressFactory.createValid();
-    const pda = vi.fn()
-      .mockResolvedValueOnce(valid)
-      .mockResolvedValueOnce(valid);
+    const pda = vi.fn().mockResolvedValueOnce(valid).mockResolvedValueOnce(valid);
     const sdk = {
       solana: { pda },
       config: {
@@ -203,14 +202,18 @@ export class JobAccountFactory {
   /**
    * Create a queued job
    */
-  static createQueued(overrides?: Parameters<typeof JobAccountFactory.create>[0]): Account<programClient.JobAccount> {
+  static createQueued(
+    overrides?: Parameters<typeof JobAccountFactory.create>[0]
+  ): Account<programClient.JobAccount> {
     return JobAccountFactory.create({ ...overrides, state: JobState.QUEUED });
   }
 
   /**
    * Create a running job
    */
-  static createRunning(overrides?: Parameters<typeof JobAccountFactory.create>[0]): Account<programClient.JobAccount> {
+  static createRunning(
+    overrides?: Parameters<typeof JobAccountFactory.create>[0]
+  ): Account<programClient.JobAccount> {
     return JobAccountFactory.create({
       ...overrides,
       state: JobState.RUNNING,
@@ -221,7 +224,9 @@ export class JobAccountFactory {
   /**
    * Create a completed job
    */
-  static createCompleted(overrides?: Parameters<typeof JobAccountFactory.create>[0]): Account<programClient.JobAccount> {
+  static createCompleted(
+    overrides?: Parameters<typeof JobAccountFactory.create>[0]
+  ): Account<programClient.JobAccount> {
     const now = BigInt(Date.now() / 1000);
     return JobAccountFactory.create({
       ...overrides,
@@ -235,9 +240,7 @@ export class JobAccountFactory {
    * Create multiple jobs
    */
   static createMany(count: number, state?: JobState): Account<programClient.JobAccount>[] {
-    return Array.from({ length: count }, () =>
-      JobAccountFactory.create({ state })
-    );
+    return Array.from({ length: count }, () => JobAccountFactory.create({ state }));
   }
 }
 
@@ -273,7 +276,10 @@ export class RunAccountFactory {
   /**
    * Create a run for a specific job
    */
-  static createForJob(jobAddress: Address, overrides?: Parameters<typeof RunAccountFactory.create>[0]): Account<programClient.RunAccount> {
+  static createForJob(
+    jobAddress: Address,
+    overrides?: Parameters<typeof RunAccountFactory.create>[0]
+  ): Account<programClient.RunAccount> {
     return RunAccountFactory.create({ ...overrides, job: jobAddress });
   }
 
@@ -281,9 +287,7 @@ export class RunAccountFactory {
    * Create multiple runs
    */
   static createMany(count: number, jobAddress?: Address): Account<programClient.RunAccount>[] {
-    return Array.from({ length: count }, () =>
-      RunAccountFactory.create({ job: jobAddress })
-    );
+    return Array.from({ length: count }, () => RunAccountFactory.create({ job: jobAddress }));
   }
 }
 
@@ -327,14 +331,18 @@ export class MarketAccountFactory {
   /**
    * Create a job queue market
    */
-  static createJobQueue(overrides?: Parameters<typeof MarketAccountFactory.create>[0]): Account<programClient.MarketAccount> {
+  static createJobQueue(
+    overrides?: Parameters<typeof MarketAccountFactory.create>[0]
+  ): Account<programClient.MarketAccount> {
     return MarketAccountFactory.create({ ...overrides, queueType: MarketQueueType.JOB_QUEUE });
   }
 
   /**
    * Create a node queue market
    */
-  static createNodeQueue(overrides?: Parameters<typeof MarketAccountFactory.create>[0]): Account<programClient.MarketAccount> {
+  static createNodeQueue(
+    overrides?: Parameters<typeof MarketAccountFactory.create>[0]
+  ): Account<programClient.MarketAccount> {
     return MarketAccountFactory.create({ ...overrides, queueType: MarketQueueType.NODE_QUEUE });
   }
 
@@ -388,11 +396,7 @@ export class ConfigFactory {
   /**
    * Create IPFS config
    */
-  static createIpfsConfig(overrides?: {
-    api?: string;
-    jwt?: string;
-    gateway?: string;
-  }) {
+  static createIpfsConfig(overrides?: { api?: string; jwt?: string; gateway?: string }) {
     return {
       api: overrides?.api ?? 'https://api.pinata.cloud',
       jwt: overrides?.jwt ?? 'test-jwt-token',
@@ -403,10 +407,7 @@ export class ConfigFactory {
   /**
    * Create Solana config
    */
-  static createSolanaConfig(overrides?: {
-    rpcEndpoint?: string;
-    cluster?: string;
-  }) {
+  static createSolanaConfig(overrides?: { rpcEndpoint?: string; cluster?: string }) {
     return {
       rpcEndpoint: overrides?.rpcEndpoint ?? 'https://api.mainnet-beta.solana.com',
       cluster: overrides?.cluster ?? 'mainnet-beta',
@@ -500,3 +501,74 @@ export class ScenarioBuilder {
   }
 }
 
+/**
+ * Stake Account Factory
+ * Creates stake account test data
+ */
+export class StakeAccountFactory {
+  /**
+   * Create a stake account with defaults
+   */
+  static create(overrides?: {
+    address?: Address;
+    amount?: bigint;
+    authority?: Address;
+    duration?: bigint;
+    timeUnstake?: bigint;
+    vault?: Address;
+    vaultBump?: number;
+    xnos?: bigint;
+  }): Account<stakingClient.StakeAccount> {
+    return {
+      address: overrides?.address ?? AddressFactory.create(),
+      data: {
+        discriminator: new Uint8Array(8),
+        amount: overrides?.amount ?? BigInt(1000),
+        authority: overrides?.authority ?? AddressFactory.create(),
+        duration: overrides?.duration ?? BigInt(2592000), // 30 days in seconds
+        timeUnstake: overrides?.timeUnstake ?? BigInt(0),
+        vault: overrides?.vault ?? AddressFactory.create(),
+        vaultBump: overrides?.vaultBump ?? 255,
+        xnos: overrides?.xnos ?? BigInt(1000),
+      },
+    } as any;
+  }
+
+  /**
+   * Create a stake account with specific amount
+   */
+  static createWithAmount(
+    amount: bigint | number,
+    overrides?: Parameters<typeof StakeAccountFactory.create>[0]
+  ): Account<stakingClient.StakeAccount> {
+    return StakeAccountFactory.create({
+      ...overrides,
+      amount: typeof amount === 'bigint' ? amount : BigInt(amount),
+    });
+  }
+
+  /**
+   * Create a stake account with unstaking time set
+   */
+  static createUnstaking(
+    overrides?: Parameters<typeof StakeAccountFactory.create>[0]
+  ): Account<stakingClient.StakeAccount> {
+    const now = BigInt(Math.floor(Date.now() / 1000));
+    return StakeAccountFactory.create({
+      ...overrides,
+      timeUnstake: now + BigInt(86400), // Unstaking in 24 hours
+    });
+  }
+
+  /**
+   * Create multiple stake accounts
+   */
+  static createMany(count: number, authority?: Address): Account<stakingClient.StakeAccount>[] {
+    return Array.from({ length: count }, (_, i) =>
+      StakeAccountFactory.create({
+        authority,
+        amount: BigInt((i + 1) * 1000),
+      })
+    );
+  }
+}

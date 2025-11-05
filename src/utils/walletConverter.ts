@@ -11,7 +11,9 @@ import bs58 from 'bs58';
  * @returns A KeyPairSigner instance
  * @throws NosanaError if conversion fails
  */
-export async function convertWalletConfigToKeyPairSigner(wallet: WalletConfig): Promise<KeyPairSigner> {
+export async function convertWalletConfigToKeyPairSigner(
+  wallet: WalletConfig
+): Promise<KeyPairSigner> {
   const logger = Logger.getInstance();
 
   try {
@@ -21,23 +23,32 @@ export async function convertWalletConfigToKeyPairSigner(wallet: WalletConfig): 
     }
 
     // Check if it's a browser wallet adapter (has publicKey and signTransaction/signMessage)
-    if (wallet && typeof wallet === 'object' && 'publicKey' in wallet && ('signTransaction' in wallet || 'signMessage' in wallet)) {
+    if (
+      wallet &&
+      typeof wallet === 'object' &&
+      'publicKey' in wallet &&
+      ('signTransaction' in wallet || 'signMessage' in wallet)
+    ) {
       // Convert browser wallet adapter to KeyPairSigner-like interface
-      const browserWallet = wallet as any;
+      const browserWallet = wallet as {
+        publicKey: { toString: () => string };
+        signMessage?: (msg: Uint8Array) => Promise<Uint8Array>;
+        signTransaction?: (tx: unknown) => Promise<unknown>;
+      };
       wallet = {
         address: browserWallet.publicKey.toString(),
         signMessages: async (messages: Uint8Array[]) => {
           if (browserWallet.signMessage) {
-            return Promise.all(messages.map(msg => browserWallet.signMessage(msg)));
+            return Promise.all(messages.map((msg) => browserWallet.signMessage!(msg)));
           }
           throw new Error('Browser wallet does not support message signing');
         },
-        signTransactions: async (transactions: any[]) => {
+        signTransactions: async (transactions: unknown[]) => {
           if (browserWallet.signTransaction) {
-            return Promise.all(transactions.map(tx => browserWallet.signTransaction(tx)));
+            return Promise.all(transactions.map((tx) => browserWallet.signTransaction!(tx)));
           }
           throw new Error('Browser wallet does not support transaction signing');
-        }
+        },
       } as unknown as KeyPairSigner;
       return wallet;
     }
@@ -49,7 +60,11 @@ export async function convertWalletConfigToKeyPairSigner(wallet: WalletConfig): 
         try {
           // Use string concatenation to avoid bundler resolving this import at build time
           const nodeModule = 'gill' + '/node';
-          const { loadKeypairSignerFromFile, loadKeypairSignerFromEnvironment, loadKeypairSignerFromEnvironmentBase58 } = await import(nodeModule);
+          const {
+            loadKeypairSignerFromFile,
+            loadKeypairSignerFromEnvironment,
+            loadKeypairSignerFromEnvironmentBase58,
+          } = await import(nodeModule);
 
           // Try to load from file path
           if (await isValidFilePath(wallet)) {
@@ -114,7 +129,6 @@ export async function convertWalletConfigToKeyPairSigner(wallet: WalletConfig): 
 
     // If we get here, none of the conversion methods worked
     throw new Error('Unable to convert wallet to KeyPairSigner using any available method');
-
   } catch (error) {
     throw new NosanaError(
       `Failed to convert wallet to KeyPairSigner: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -136,10 +150,7 @@ async function isValidFilePath(filePath: string): Promise<boolean> {
   }
 
   try {
-    const [fs, path] = await Promise.all([
-      import('fs'),
-      import('path')
-    ]);
+    const [fs, path] = await Promise.all([import('fs'), import('path')]);
 
     if (!path.isAbsolute(filePath) && !filePath.startsWith('./') && !filePath.startsWith('../')) {
       return false;
@@ -149,4 +160,4 @@ async function isValidFilePath(filePath: string): Promise<boolean> {
   } catch {
     return false;
   }
-} 
+}

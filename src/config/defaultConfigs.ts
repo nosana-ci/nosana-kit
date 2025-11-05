@@ -1,5 +1,5 @@
-import { address } from "gill";
-import { ClientConfig, NosanaLogLevel, NosanaNetwork } from "./types";
+import { address } from 'gill';
+import { ClientConfig, NosanaLogLevel, NosanaNetwork } from './types';
 
 export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
   mainnet: {
@@ -43,5 +43,3 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
     logLevel: NosanaLogLevel.DEBUG,
   },
 };
-
-

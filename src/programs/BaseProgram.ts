@@ -2,11 +2,11 @@ import { Address } from 'gill';
 import { NosanaClient } from '../index.js';
 
 export type staticAccounts = {
-  rewardsReflection: Address,
-  rewardsVault: Address,
-  rewardsProgram: Address,
-  jobsProgram: Address,
-}
+  rewardsReflection: Address;
+  rewardsVault: Address;
+  rewardsProgram: Address;
+  jobsProgram: Address;
+};
 
 export abstract class BaseProgram {
   private _staticAccounts: staticAccounts | undefined;
@@ -37,14 +37,16 @@ export abstract class BaseProgram {
 
   private async initializeStaticAccounts(): Promise<staticAccounts> {
     return {
-      rewardsReflection: await this.sdk.solana.pda([
-        'reflection',
-      ], this.sdk.config.programs.rewardsAddress),
-      rewardsVault: await this.sdk.solana.pda([
-        this.sdk.config.programs.nosTokenAddress,
-      ], this.sdk.config.programs.rewardsAddress),
+      rewardsReflection: await this.sdk.solana.pda(
+        ['reflection'],
+        this.sdk.config.programs.rewardsAddress
+      ),
+      rewardsVault: await this.sdk.solana.pda(
+        [this.sdk.config.programs.nosTokenAddress],
+        this.sdk.config.programs.rewardsAddress
+      ),
       rewardsProgram: this.sdk.config.programs.rewardsAddress,
-      jobsProgram: this.sdk.config.programs.jobsAddress
+      jobsProgram: this.sdk.config.programs.jobsAddress,
     };
   }
   protected readonly sdk: NosanaClient;
@@ -54,4 +56,4 @@ export abstract class BaseProgram {
   }
 
   protected abstract getProgramId(): Address;
-} 
+}

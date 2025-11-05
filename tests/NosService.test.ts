@@ -6,7 +6,7 @@ import { address } from 'gill';
 // Note: This must be inline (not imported) due to vitest hoisting
 vi.mock('gill', async (importOriginal) => {
   const actual = await importOriginal<typeof import('gill')>();
-  
+
   return {
     ...actual,
     createSolanaClient: () => {
@@ -14,17 +14,17 @@ vi.mock('gill', async (importOriginal) => {
       const mockGetTokenAccountsByOwner = vi.fn();
       const mockGetBalance = vi.fn();
       const mockGetLatestBlockhash = vi.fn();
-      
+
       const rpc = {
         getProgramAccounts: mockGetProgramAccounts,
         getTokenAccountsByOwner: mockGetTokenAccountsByOwner,
         getBalance: mockGetBalance,
         getLatestBlockhash: mockGetLatestBlockhash,
       } as any;
-      
+
       const rpcSubscriptions = {} as any;
       const sendAndConfirmTransaction = vi.fn();
-      
+
       return { rpc, rpcSubscriptions, sendAndConfirmTransaction };
     },
   };
@@ -42,7 +42,7 @@ describe('NosService', () => {
   beforeEach(() => {
     client = new NosanaClient(NosanaNetwork.DEVNET);
     nosService = client.nos;
-    
+
     // Reset all mocks before each test
     vi.clearAllMocks();
   });
@@ -270,7 +270,7 @@ describe('NosService', () => {
       expect(holders[0].pubkey).not.toBe(holders[0].owner);
       expect(holders[1].pubkey).not.toBe(holders[1].owner);
       // PDA account should not be in results
-      expect(holders.find(h => h.pubkey === pdaAddress)).toBeUndefined();
+      expect(holders.find((h) => h.pubkey === pdaAddress)).toBeUndefined();
     });
 
     it('should apply both filters when both options are set', async () => {
@@ -340,7 +340,7 @@ describe('NosService', () => {
 
       const holders = await nosService.getAllTokenHolders({
         includeZeroBalance: false,
-        excludePdaAccounts: true 
+        excludePdaAccounts: true,
       });
 
       // Should return only 1 account (excluding both zero balance and PDA)
@@ -547,4 +547,3 @@ describe('NosService', () => {
     });
   });
 });
-
