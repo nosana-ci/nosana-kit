@@ -3,6 +3,9 @@ import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
 import { NosanaClient } from '../index.js';
 import { TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 
+// Standard SPL token account size
+const TOKEN_ACCOUNT_SIZE = 165;
+
 // Offset of mint address in token account data structure
 const MINT_OFFSET = 0;
 
@@ -54,6 +57,9 @@ export class NosService {
         .getProgramAccounts(TOKEN_PROGRAM_ADDRESS, {
           encoding: 'jsonParsed',
           filters: [
+            {
+              dataSize: BigInt(TOKEN_ACCOUNT_SIZE),
+            },
             {
               memcmp: {
                 offset: BigInt(MINT_OFFSET),
