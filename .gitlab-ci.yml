@@ -36,6 +36,11 @@ npm test:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+release:
+  stage: deploy
+  extends: .release
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 npm publish prod:
   stage: deploy
