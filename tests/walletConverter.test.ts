@@ -128,5 +128,30 @@ describe('walletConverter', () => {
       await expect(convertWalletConfigToKeyPairSigner('not-a-valid-key-format'))
         .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
     });
+
+    it('rejects null input', async () => {
+      await expect(convertWalletConfigToKeyPairSigner(null as any))
+        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
+    });
+
+    it('rejects undefined input', async () => {
+      await expect(convertWalletConfigToKeyPairSigner(undefined as any))
+        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
+    });
+
+    it('rejects empty array', async () => {
+      await expect(convertWalletConfigToKeyPairSigner([] as any))
+        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
+    });
+
+    it('rejects empty string', async () => {
+      await expect(convertWalletConfigToKeyPairSigner(''))
+        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
+    });
+
+    it('rejects non-existent file path', async () => {
+      await expect(convertWalletConfigToKeyPairSigner('/non/existent/file.json'))
+        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
+    });
   });
 });
