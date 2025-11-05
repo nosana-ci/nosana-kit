@@ -80,6 +80,7 @@ Main entry point for SDK interactions.
 - `config: ClientConfig` - Active configuration
 - `jobs: JobsProgram` - Jobs program interface
 - `solana: SolanaService` - Solana RPC and transaction utilities
+- `nos: NosService` - NOS token account operations
 - `ipfs: IPFS` - IPFS operations and utilities
 - `logger: Logger` - Logging instance
 - `wallet?: KeyPairSigner` - Active wallet (if set)
@@ -460,6 +461,109 @@ const cid = await client.ipfs.pin({
 
 // Retrieve job results
 const results = await client.ipfs.retrieve(job.ipfsResult);
+```
+
+## NOS Token Service
+
+The NosService provides methods to interact with NOS token accounts on Solana.
+
+### Get All Token Holders
+
+Fetch all accounts holding NOS tokens using a single RPC call:
+
+```typescript
+// Get all holders (excludes zero balance accounts by default)
+const holders = await client.nos.getAllTokenHolders();
+
+console.log(`Found ${holders.length} NOS token holders`);
+
+holders.forEach(holder => {
+  console.log(`${holder.owner}: ${holder.uiAmount} NOS`);
+});
+
+// Include accounts with zero balance
+const allAccounts = await client.nos.getAllTokenHolders({ includeZeroBalance: true });
+console.log(`Total accounts: ${allAccounts.length}`);
+
+// Exclude PDA accounts (smart contract-owned token accounts)
+const userAccounts = await client.nos.getAllTokenHolders({ excludePdaAccounts: true });
+console.log(`User-owned accounts: ${userAccounts.length}`);
+
+// Combine filters
+const activeUsers = await client.nos.getAllTokenHolders({ 
+  includeZeroBalance: false,
+  excludePdaAccounts: true 
+});
+console.log(`Active user accounts: ${activeUsers.length}`);
+```
+
+### Get Token Account for Address
+
+Retrieve the NOS token account for a specific owner:
+
+```typescript
+const account = await client.nos.getTokenAccountForAddress('owner-address');
+
+if (account) {
+  console.log('Token Account:', account.pubkey);
+  console.log('Owner:', account.owner);
+  console.log('Balance:', account.uiAmount, 'NOS');
+  console.log('Raw Amount:', account.amount.toString());
+  console.log('Decimals:', account.decimals);
+} else {
+  console.log('No NOS token account found');
+}
+```
+
+### Get Balance
+
+Convenience method to get just the NOS balance for an address:
+
+```typescript
+const balance = await client.nos.getBalance('owner-address');
+console.log(`Balance: ${balance} NOS`);
+// Returns 0 if no token account exists
+```
+
+### Type Definitions
+
+```typescript
+interface TokenAccount {
+  pubkey: Address;
+  owner: Address;
+  mint: Address;
+  amount: bigint;
+  decimals: number;
+}
+
+interface TokenAccountWithBalance extends TokenAccount {
+  uiAmount: number;  // Balance with decimals applied
+}
+```
+
+### Use Cases
+
+- **Analytics**: Analyze token distribution and holder statistics
+- **Airdrops**: Get list of all token holders for campaigns
+- **Balance Checks**: Check NOS balances for specific addresses
+- **Leaderboards**: Create holder rankings sorted by balance
+- **Monitoring**: Track large holder movements
+
+### Example: Filter Large Holders
+
+```typescript
+const holders = await client.nos.getAllTokenHolders();
+
+// Find holders with at least 1000 NOS
+const largeHolders = holders.filter(h => h.uiAmount >= 1000);
+
+// Sort by balance descending
+largeHolders.sort((a, b) => b.uiAmount - a.uiAmount);
+
+// Display top 10
+largeHolders.slice(0, 10).forEach((holder, i) => {
+  console.log(`${i + 1}. ${holder.owner}: ${holder.uiAmount.toLocaleString()} NOS`);
+});
 ```
 
 ## Error Handling

@@ -6,7 +6,8 @@
   "scripts": {
     "retrieve": "tsx retrieve.ts",
     "monitor": "tsx monitor.ts",
-    "set-wallet": "tsx set-wallet.ts"
+    "set-wallet": "tsx set-wallet.ts",
+    "nos-service": "tsx nos-service.ts"
   },
   "dependencies": {
     "@nosana/kit": "file:../.."
