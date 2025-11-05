@@ -1,7 +1,7 @@
 import { ClientConfig, getNosanaConfig, NosanaNetwork, PartialClientConfig, WalletConfig } from './config/index.js';
 import { Logger } from './logger/Logger.js';
 import { JobsProgram } from './programs/JobsProgram.js';
-import { SolanaUtils } from './solana/SolanaUtils.js';
+import { SolanaService } from './solana/SolanaService.js';
 import { IPFS } from './ipfs/IPFS.js';
 import { KeyPairSigner } from 'gill';
 import { convertWalletConfigToKeyPairSigner } from './utils/walletConverter.js';
@@ -9,7 +9,7 @@ import { convertWalletConfigToKeyPairSigner } from './utils/walletConverter.js';
 export class NosanaClient {
   public readonly config: ClientConfig;
   public readonly jobs: JobsProgram;
-  public readonly solana: SolanaUtils;
+  public readonly solana: SolanaService;
   public readonly ipfs: IPFS;
   public readonly logger: Logger;
   public wallet: KeyPairSigner | undefined;
@@ -21,7 +21,7 @@ export class NosanaClient {
     }
     this.jobs = new JobsProgram(this);
     this.logger = Logger.getInstance();
-    this.solana = new SolanaUtils(this);
+    this.solana = new SolanaService(this);
     this.ipfs = new IPFS(this.config.ipfs);
   }
   public async setWallet(wallet: WalletConfig): Promise<KeyPairSigner | undefined> {
