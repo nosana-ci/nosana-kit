@@ -18,6 +18,15 @@ npm prettier:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+npm lint:
+  stage: test
+  script:
+    - npm ci
+    - npm run lint
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 npm test:
   stage: test
   script:
