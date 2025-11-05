@@ -2,7 +2,7 @@ import { createSolanaClient, address, Address, SolanaClient, getProgramDerivedAd
 import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
 import { NosanaClient } from '../index.js';
 
-export class SolanaUtils {
+export class SolanaService {
   private readonly sdk: NosanaClient;
   public readonly rpc: SolanaClient["rpc"];
   public readonly rpcSubscriptions: SolanaClient["rpcSubscriptions"];
@@ -144,4 +144,6 @@ export class SolanaUtils {
       throw new Error(errorMessage);
     }
   }
-} 
+}
+
+

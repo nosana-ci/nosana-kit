@@ -15,7 +15,7 @@ export abstract class BaseProgram {
   /**
    * Gets the static accounts, initializing them if needed.
    */
-  protected async getStaticAccounts(): Promise<staticAccounts> {
+  public async getStaticAccounts(): Promise<staticAccounts> {
     if (this._staticAccounts) {
       return this._staticAccounts;
     }

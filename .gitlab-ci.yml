@@ -8,6 +8,12 @@ image: node:22.8.0
 include:
   - local: 'examples/browser/.gitlab-ci.yml'    
 
+test:
+  stage: test
+  script:
+    - npm ci
+    - npm test -- --run
+
 npm-publish:
   stage: build
   allow_failure: true
