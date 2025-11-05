@@ -23,7 +23,6 @@ const makeJobAccount = (state: number, addr?: Address) =>
 const makeRunAccount = (job: Address, time: number, node?: Address) =>
   RunAccountFactory.create({ job, time: BigInt(time), node });
 const makeMarketAccount = () => MarketAccountFactory.create();
-const validAddr = newAddr;
 const makeMonitorSdk = () => SdkFactory.createWithSubscriptions();
 
 describe('JobsProgram', () => {
@@ -66,13 +65,11 @@ describe('JobsProgram', () => {
 
   describe('methods', () => {
     let sdk: ReturnType<typeof SdkFactory.createWithRpc>['sdk'];
-    let sentArgs: ReturnType<typeof SdkFactory.createWithRpc>['sentArgs'];
     let jobs: JobsProgram;
 
     beforeEach(() => {
       const ctx = SdkFactory.createWithRpc();
       sdk = ctx.sdk;
-      sentArgs = ctx.sentArgs;
       jobs = new JobsProgram(sdk);
     });
 

@@ -76,8 +76,17 @@ export class NosService {
       this.sdk.logger.info(`Found ${accounts.length} NOS token accounts`);
 
       // Parse the response
-      const allAccounts = accounts.map((accountInfo: any) => {
-        const parsed = accountInfo.account.data.parsed.info;
+      const allAccounts = (
+        accounts as Array<{
+          account: { data: { parsed: { info: Record<string, unknown> } } };
+          pubkey: Address;
+        }>
+      ).map((accountInfo) => {
+        const parsed = accountInfo.account.data.parsed.info as {
+          owner: Address;
+          mint: Address;
+          tokenAmount: { amount: string; decimals: number; uiAmount: number | null };
+        };
         return {
           pubkey: accountInfo.pubkey,
           owner: parsed.owner,

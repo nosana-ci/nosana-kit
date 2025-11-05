@@ -70,10 +70,10 @@ export class StakeProgram extends BaseProgram {
         .send();
 
       const stakes: Stake[] = getProgramAccountsResponse
-        .map((result: any) => {
+        .map((result: { pubkey: Address; account: unknown }) => {
           try {
             const stakeAccount = programClient.decodeStakeAccount(
-              parseBase64RpcAccount(result.pubkey, result.account)
+              parseBase64RpcAccount(result.pubkey, result.account as never)
             );
             return this.transformStakeAccount(stakeAccount);
           } catch (err) {

@@ -1,12 +1,7 @@
 import { BaseProgram } from './BaseProgram.js';
 import {
   Address,
-  createTransaction,
-  signTransactionMessageWithSigners,
-  getExplorerLink,
-  getSignatureFromTransaction,
   generateKeyPairSigner,
-  Signature,
   EncodedAccount,
   parseBase64RpcAccount,
   Account,
@@ -497,7 +492,9 @@ export class JobsProgram extends BaseProgram {
   /**
    * Set up WebSocket subscription for program notifications
    */
-  private async setupSubscription(abortController: AbortController): Promise<AsyncIterable<any>> {
+  private async setupSubscription(
+    abortController: AbortController
+  ): Promise<AsyncIterable<unknown>> {
     try {
       // Set up the subscription using the correct API pattern
       const subscriptionIterable = await this.sdk.solana.rpcSubscriptions
@@ -514,7 +511,7 @@ export class JobsProgram extends BaseProgram {
    * Process subscription notifications
    */
   private async processSubscriptionNotifications(
-    notificationIterable: AsyncIterable<any>,
+    notificationIterable: AsyncIterable<unknown>,
     options: {
       onJobAccount?: (jobAccount: Job) => Promise<void> | void;
       onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
@@ -532,7 +529,12 @@ export class JobsProgram extends BaseProgram {
         }
 
         try {
-          const { value } = notification;
+          const { value } = notification as {
+            value: {
+              account: unknown;
+              pubkey: Address;
+            };
+          };
           await this.handleAccountUpdate(value, options, isMonitoring);
         } catch (error) {
           this.sdk.logger.error(`Error handling account update notification: ${error}`);
@@ -590,7 +592,10 @@ export class JobsProgram extends BaseProgram {
    * Handle account update using callback functions
    */
   private async handleAccountUpdate(
-    accountData: any,
+    accountData: {
+      account: unknown;
+      pubkey: Address;
+    },
     options: {
       onJobAccount?: (jobAccount: Job) => Promise<void> | void;
       onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
@@ -601,7 +606,7 @@ export class JobsProgram extends BaseProgram {
   ): Promise<void> {
     try {
       const { account, pubkey } = accountData;
-      const encodedAccount: EncodedAccount = parseBase64RpcAccount(pubkey, account);
+      const encodedAccount: EncodedAccount = parseBase64RpcAccount(pubkey, account as never);
       const accountType = programClient.identifyNosanaJobsAccount(encodedAccount);
       switch (accountType) {
         case programClient.NosanaJobsAccount.JobAccount:

@@ -7,7 +7,6 @@ import type {
   TransactionMessageWithBlockhashLifetime,
   FullySignedTransaction,
   TransactionWithBlockhashLifetime,
-  Address,
   KeyPairSigner,
 } from 'gill';
 import { SdkFactory, AddressFactory } from './helpers/index.js';

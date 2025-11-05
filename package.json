@@ -11,7 +11,8 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "generate-clients": "npx tsx scripts/generate-clients.ts",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.ts\"",
     "prettier": "prettier --check \"**/*.ts\"",
     "publish:public": "npm version patch && npm run build && npm publish --access public"

@@ -5,17 +5,14 @@ import {
   SolanaClient,
   getProgramDerivedAddress,
   getAddressEncoder,
-  generateKeyPairSigner,
   createTransaction,
   signTransactionMessageWithSigners,
   getExplorerLink,
   getSignatureFromTransaction,
   Signature,
   IInstruction,
-  ITransactionMessageWithFeePayerSigner,
   TransactionMessageWithBlockhashLifetime,
   CompilableTransactionMessage,
-  isTransactionMessageWithBlockhashLifetime,
   FullySignedTransaction,
   TransactionWithBlockhashLifetime,
 } from 'gill';
@@ -76,20 +73,32 @@ export class SolanaService {
    * Type guard to check if the input is a transaction
    */
   private isTransaction(
-    input: any
+    input: unknown
   ): input is
     | (CompilableTransactionMessage & TransactionMessageWithBlockhashLifetime)
     | (FullySignedTransaction & TransactionWithBlockhashLifetime) {
-    return 'instructions' in input && 'version' in input && !('programAddress' in input);
+    return (
+      typeof input === 'object' &&
+      input !== null &&
+      'instructions' in input &&
+      'version' in input &&
+      !('programAddress' in input)
+    );
   }
 
   /**
    * Type guard to check if the input is a signed transaction
    */
   private isSignedTransaction(
-    input: any
+    input: unknown
   ): input is FullySignedTransaction & TransactionWithBlockhashLifetime {
-    return 'signatures' in input && input.signatures && input.signatures.length > 0;
+    return (
+      typeof input === 'object' &&
+      input !== null &&
+      'signatures' in input &&
+      Array.isArray((input as { signatures?: unknown[] }).signatures) &&
+      (input as { signatures: unknown[] }).signatures.length > 0
+    );
   }
 
   /**

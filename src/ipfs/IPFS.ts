@@ -4,7 +4,9 @@ import { ReadonlyUint8Array } from 'gill';
 import type { IpfsConfig } from '../config/types.js';
 
 // Import form-data dynamically for Node.js environments
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let FormData: any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let fs: any;
 
 // Dynamically import Node.js-specific modules
@@ -89,6 +91,7 @@ export class IPFS {
    * @param options Additional axios request options
    * @returns The retrieved data
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async retrieve(hash: string | Array<number>, options: AxiosRequestConfig = {}): Promise<any> {
     if (typeof hash !== 'string') {
       const convertedHash = IPFS.solHashToIpfsHash(hash);

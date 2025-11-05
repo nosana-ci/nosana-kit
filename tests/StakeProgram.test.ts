@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { StakeProgram } from '../src/programs/StakeProgram.js';
 import * as stakingClient from '../src/generated_clients/staking/index.js';
-import { type Address, parseBase64RpcAccount } from 'gill';
+import { type Address } from 'gill';
 import { AddressFactory, SdkFactory, StakeAccountFactory } from './helpers/index.js';
 
 // Legacy aliases for backward compatibility
@@ -89,13 +89,11 @@ describe('StakeProgram', () => {
 
   describe('methods', () => {
     let sdk: ReturnType<typeof SdkFactory.createWithRpc>['sdk'];
-    let sentArgs: ReturnType<typeof SdkFactory.createWithRpc>['sentArgs'];
     let stake: StakeProgram;
 
     beforeEach(() => {
       const ctx = SdkFactory.createWithRpc();
       sdk = ctx.sdk;
-      sentArgs = ctx.sentArgs;
       stake = new StakeProgram(sdk);
     });
 

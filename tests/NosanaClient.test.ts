@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { KeyPairSigner, NosanaClient, NosanaNetwork } from '../src/index.js';
+import { NosanaClient, NosanaNetwork } from '../src/index.js';
 import { DEFAULT_CONFIGS } from '../src/config/defaultConfigs.js';
 import { ErrorCodes, NosanaError } from '../src/errors/NosanaError.js';
 import { NosanaLogLevel } from '../src/config/types.js';

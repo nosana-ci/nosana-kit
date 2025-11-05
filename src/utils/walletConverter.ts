@@ -30,18 +30,22 @@ export async function convertWalletConfigToKeyPairSigner(
       ('signTransaction' in wallet || 'signMessage' in wallet)
     ) {
       // Convert browser wallet adapter to KeyPairSigner-like interface
-      const browserWallet = wallet as any;
+      const browserWallet = wallet as {
+        publicKey: { toString: () => string };
+        signMessage?: (msg: Uint8Array) => Promise<Uint8Array>;
+        signTransaction?: (tx: unknown) => Promise<unknown>;
+      };
       wallet = {
         address: browserWallet.publicKey.toString(),
         signMessages: async (messages: Uint8Array[]) => {
           if (browserWallet.signMessage) {
-            return Promise.all(messages.map((msg) => browserWallet.signMessage(msg)));
+            return Promise.all(messages.map((msg) => browserWallet.signMessage!(msg)));
           }
           throw new Error('Browser wallet does not support message signing');
         },
-        signTransactions: async (transactions: any[]) => {
+        signTransactions: async (transactions: unknown[]) => {
           if (browserWallet.signTransaction) {
-            return Promise.all(transactions.map((tx) => browserWallet.signTransaction(tx)));
+            return Promise.all(transactions.map((tx) => browserWallet.signTransaction!(tx)));
           }
           throw new Error('Browser wallet does not support transaction signing');
         },
