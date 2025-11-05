@@ -76,6 +76,21 @@ function marketAccount(): Account<programClient.MarketAccount> {
   } as any;
 }
 
+// Helper for tests that need rpcSubscriptions
+function makeMonitorSdk(): NosanaClient {
+  const sdk = baseSdk();
+  (sdk as any).solana.rpcSubscriptions = {
+    programNotifications: vi.fn()
+  };
+  return sdk;
+}
+
+// Aliases for consistency with existing tests
+const makeJobAccount = jobAccount;
+const makeRunAccount = runAccount;
+const makeMarketAccount = marketAccount;
+const validAddr = newAddr;
+
 describe('JobsProgram', () => {
   describe('transforms', () => {
     let jobs: JobsProgram;
@@ -293,6 +308,101 @@ describe('JobsProgram', () => {
         (sdk as any).solana.rpc.getProgramAccounts = vi.fn().mockReturnValue({ send: vi.fn().mockRejectedValue(new Error('Network error')) });
         await expect(jobs.all()).rejects.toThrow('Network error');
       });
+    });
+  });
+
+  describe('monitor', () => {
+    it('returns a stop function and sets up program notifications subscription', async () => {
+      const sdk = makeMonitorSdk();
+      const jobs = new JobsProgram(sdk);
+
+      // Mock WebSocket subscription with immediate completion
+      const mockIterable = {
+        [Symbol.asyncIterator]() {
+          return {
+            next: vi.fn().mockResolvedValue({ done: true, value: undefined }),
+            return: vi.fn().mockResolvedValue({ done: true, value: undefined }),
+          };
+        }
+      };
+
+      const mockSubscribe = vi.fn().mockResolvedValue(mockIterable);
+      const mockProgramNotifications = vi.fn().mockReturnValue({ subscribe: mockSubscribe });
+
+      (sdk as any).solana.rpcSubscriptions = {
+        programNotifications: mockProgramNotifications
+      };
+
+      const stopMonitoring = await jobs.monitor();
+
+      expect(typeof stopMonitoring).toBe('function');
+      expect(mockProgramNotifications).toHaveBeenCalledWith(
+        sdk.config.programs.jobsAddress,
+        { encoding: 'base64' }
+      );
+
+      // Stop monitoring to clean up
+      stopMonitoring();
+      await new Promise(resolve => setTimeout(resolve, 10));
+    });
+
+    it('accepts callback options for job, market, run accounts, and error handling', async () => {
+      const sdk = makeMonitorSdk();
+      const jobs = new JobsProgram(sdk);
+
+      const onJobAccount = vi.fn();
+      const onMarketAccount = vi.fn();
+      const onRunAccount = vi.fn();
+      const onError = vi.fn();
+
+      const mockIterable = {
+        [Symbol.asyncIterator]() {
+          return {
+            next: vi.fn().mockResolvedValue({ done: true, value: undefined }),
+            return: vi.fn().mockResolvedValue({ done: true, value: undefined }),
+          };
+        }
+      };
+
+      const mockSubscribe = vi.fn().mockResolvedValue(mockIterable);
+      const mockProgramNotifications = vi.fn().mockReturnValue({ subscribe: mockSubscribe });
+
+      (sdk as any).solana.rpcSubscriptions = {
+        programNotifications: mockProgramNotifications
+      };
+
+      const stopMonitoring = await jobs.monitor({
+        onJobAccount,
+        onMarketAccount,
+        onRunAccount,
+        onError
+      });
+
+      expect(typeof stopMonitoring).toBe('function');
+
+      stopMonitoring();
+      await new Promise(resolve => setTimeout(resolve, 10));
+    });
+
+    it('handles subscription setup errors gracefully', async () => {
+      const sdk = makeMonitorSdk();
+      const jobs = new JobsProgram(sdk);
+
+      // Mock subscription to throw error
+      const mockSubscribe = vi.fn().mockRejectedValue(new Error('Subscription failed'));
+      const mockProgramNotifications = vi.fn().mockReturnValue({ subscribe: mockSubscribe });
+
+      (sdk as any).solana.rpcSubscriptions = {
+        programNotifications: mockProgramNotifications
+      };
+
+      // Should not throw immediately since error handling is internal with retry logic
+      const stopMonitoring = await jobs.monitor();
+
+      expect(typeof stopMonitoring).toBe('function');
+
+      stopMonitoring();
+      await new Promise(resolve => setTimeout(resolve, 10));
     });
   });
 });
