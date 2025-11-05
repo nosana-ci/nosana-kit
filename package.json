@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "generate-clients": "ts-node scripts/generate-clients.ts",
+    "generate-clients": "npx tsx scripts/generate-clients.ts",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.ts\"",
     "publish:public": "npm version patch && npm run build && npm publish --access public"
