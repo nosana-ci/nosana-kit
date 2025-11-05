@@ -77,12 +77,90 @@ describe('IPFS', () => {
 });
 
 describe('IPFS API', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  // Note: retrieve() uses axios.get directly which is complex to mock reliably
-  // Skipping retrieve tests for now - can be added later with better axios mocking strategy
+  describe('retrieve', () => {
+    it('retrieves data from gateway using string hash', async () => {
+      const mockData = { result: 'test data' };
+      (axios.default.get as any).mockResolvedValueOnce({ data: mockData });
+
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const hash = 'QmTestHash123';
+      const result = await ipfs.retrieve(hash);
+
+      expect(result).toEqual(mockData);
+      expect(axios.default.get).toHaveBeenCalledWith('https://gateway.example/ipfs/QmTestHash123', {});
+    });
+
+    it('retrieves data using byte array hash', async () => {
+      const mockData = { result: 'test data from bytes' };
+      (axios.default.get as any).mockResolvedValueOnce({ data: mockData });
+
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const bytes = Array.from({ length: 32 }, (_, i) => i + 1); // Non-zero to avoid null hash
+      const result = await ipfs.retrieve(bytes);
+
+      expect(result).toEqual(mockData);
+      expect(axios.default.get).toHaveBeenCalled();
+      const callArgs = (axios.default.get as any).mock.calls[0];
+      expect(callArgs[0]).toContain('https://gateway.example/ipfs/');
+    });
+
+    it('passes custom axios options', async () => {
+      const mockData = { custom: 'response' };
+      (axios.default.get as any).mockResolvedValueOnce({ data: mockData });
+
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const options = { timeout: 5000, headers: { 'Custom-Header': 'value' } };
+      const result = await ipfs.retrieve('QmTestHash', options);
+
+      expect(result).toEqual(mockData);
+      expect(axios.default.get).toHaveBeenCalledWith('https://gateway.example/ipfs/QmTestHash', options);
+    });
+
+    it('throws error for invalid byte array hash', async () => {
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const emptyHash = Array.from(new Uint8Array(32).fill(0)); // This converts to null hash
+
+      await expect(ipfs.retrieve(emptyHash)).rejects.toThrow('Invalid hash provided');
+    });
+
+    it('propagates axios errors', async () => {
+      const axiosError = new Error('Network error');
+      (axios.default.get as any).mockRejectedValueOnce(axiosError);
+
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+
+      await expect(ipfs.retrieve('QmTestHash')).rejects.toThrow('Network error');
+    });
+
+    it('handles different data types in response', async () => {
+      const stringData = 'plain text response';
+      (axios.default.get as any).mockResolvedValueOnce({ data: stringData });
+
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const result = await ipfs.retrieve('QmStringHash');
+
+      expect(result).toBe(stringData);
+    });
+
+    it('uses default gateway from config', async () => {
+      const mockData = { test: 'data' };
+      (axios.default.get as any).mockResolvedValueOnce({ data: mockData });
+
+      const customGateway = 'https://my-custom-gateway.com/';
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: customGateway });
+      await ipfs.retrieve('QmTestHash');
+
+      expect(axios.default.get).toHaveBeenCalledWith('https://my-custom-gateway.com/QmTestHash', {});
+    });
+  });
 
   describe('pin', () => {
     it('posts JSON to pinJSONToIPFS and returns IpfsHash', async () => {
