@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { SolanaService } from '../src/solana/SolanaService.js';
+import { SolanaService } from '../src/services/SolanaService.js';
 import type { SolanaClient, IInstruction, CompilableTransactionMessage, TransactionMessageWithBlockhashLifetime, FullySignedTransaction, TransactionWithBlockhashLifetime, Address, KeyPairSigner } from 'gill';
 import { SdkFactory, AddressFactory } from './helpers/index.js';
 

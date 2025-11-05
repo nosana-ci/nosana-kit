@@ -196,6 +196,53 @@ const largeHolders = holders.filter(holder => holder.uiAmount >= 1000);
 - **Leaderboards**: Create holder leaderboards sorted by balance
 - **Monitoring**: Track large holder movements
 
+## Stake Program Example
+
+The `stake-program.ts` example demonstrates how to interact with Nosana staking accounts using the StakeProgram.
+
+### Features
+
+1. **Get all stake accounts** - Fetch all staking accounts on-chain
+2. **Get single stake** - Fetch details of a specific stake account
+3. **Get multiple stakes** - Fetch multiple stake accounts by address
+4. **Analyze distribution** - Calculate staking statistics (total, average, largest)
+
+### Running the Example
+
+```bash
+# Navigate to the examples/node directory
+cd examples/node
+
+# Install dependencies
+npm install
+
+# Run the stake-program example
+npm run stake-program
+```
+
+### Example Usage
+
+```typescript
+import { NosanaClient, NosanaNetwork } from '@nosana/kit';
+
+const client = new NosanaClient(NosanaNetwork.MAINNET);
+
+// Get all stake accounts
+const allStakes = await client.stake.all();
+console.log(`Found ${allStakes.length} stake accounts`);
+
+// Get single stake account
+const stake = await client.stake.get('stake-account-address');
+console.log(`Staked amount: ${stake.amount}`);
+console.log(`xNOS tokens: ${stake.xnos}`);
+
+// Analyze staking distribution
+const totalStaked = allStakes.reduce((sum, s) => sum + s.amount, 0);
+const averageStake = totalStaked / allStakes.length;
+console.log(`Total staked: ${totalStaked.toLocaleString()}`);
+console.log(`Average stake: ${averageStake.toLocaleString()}`);
+```
+
 ## Other Examples
 
 - `retrieve.ts` - Example of retrieving job data

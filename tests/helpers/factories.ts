@@ -10,6 +10,7 @@ import { address, type Address, type Account } from 'gill';
 import bs58 from 'bs58';
 import type { NosanaClient } from '../../src/index.js';
 import * as programClient from '../../src/generated_clients/jobs/index.js';
+import * as stakingClient from '../../src/generated_clients/staking/index.js';
 import { JobState, MarketQueueType } from '../../src/programs/JobsProgram.js';
 
 /**
@@ -497,6 +498,73 @@ export class ScenarioBuilder {
     const runs = RunAccountFactory.createMany(runCount, job.address);
 
     return { job, runs };
+  }
+}
+
+/**
+ * Stake Account Factory
+ * Creates stake account test data
+ */
+export class StakeAccountFactory {
+  /**
+   * Create a stake account with defaults
+   */
+  static create(overrides?: {
+    address?: Address;
+    amount?: bigint;
+    authority?: Address;
+    duration?: bigint;
+    timeUnstake?: bigint;
+    vault?: Address;
+    vaultBump?: number;
+    xnos?: bigint;
+  }): Account<stakingClient.StakeAccount> {
+    return {
+      address: overrides?.address ?? AddressFactory.create(),
+      data: {
+        discriminator: new Uint8Array(8),
+        amount: overrides?.amount ?? BigInt(1000),
+        authority: overrides?.authority ?? AddressFactory.create(),
+        duration: overrides?.duration ?? BigInt(2592000), // 30 days in seconds
+        timeUnstake: overrides?.timeUnstake ?? BigInt(0),
+        vault: overrides?.vault ?? AddressFactory.create(),
+        vaultBump: overrides?.vaultBump ?? 255,
+        xnos: overrides?.xnos ?? BigInt(1000),
+      },
+    } as any;
+  }
+
+  /**
+   * Create a stake account with specific amount
+   */
+  static createWithAmount(amount: bigint | number, overrides?: Parameters<typeof StakeAccountFactory.create>[0]): Account<stakingClient.StakeAccount> {
+    return StakeAccountFactory.create({
+      ...overrides,
+      amount: typeof amount === 'bigint' ? amount : BigInt(amount)
+    });
+  }
+
+  /**
+   * Create a stake account with unstaking time set
+   */
+  static createUnstaking(overrides?: Parameters<typeof StakeAccountFactory.create>[0]): Account<stakingClient.StakeAccount> {
+    const now = BigInt(Math.floor(Date.now() / 1000));
+    return StakeAccountFactory.create({
+      ...overrides,
+      timeUnstake: now + BigInt(86400), // Unstaking in 24 hours
+    });
+  }
+
+  /**
+   * Create multiple stake accounts
+   */
+  static createMany(count: number, authority?: Address): Account<stakingClient.StakeAccount>[] {
+    return Array.from({ length: count }, (_, i) =>
+      StakeAccountFactory.create({
+        authority,
+        amount: BigInt((i + 1) * 1000),
+      })
+    );
   }
 }
 

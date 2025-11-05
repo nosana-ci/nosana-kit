@@ -1,8 +1,9 @@
 import { ClientConfig, getNosanaConfig, NosanaNetwork, PartialClientConfig, WalletConfig } from './config/index.js';
 import { Logger } from './logger/Logger.js';
 import { JobsProgram } from './programs/JobsProgram.js';
-import { SolanaService } from './solana/SolanaService.js';
-import { NosService } from './solana/NosService.js';
+import { StakeProgram } from './programs/StakeProgram.js';
+import { SolanaService } from './services/SolanaService.js';
+import { NosService } from './services/NosService.js';
 import { IPFS } from './ipfs/IPFS.js';
 import { KeyPairSigner } from 'gill';
 import { convertWalletConfigToKeyPairSigner } from './utils/walletConverter.js';
@@ -10,6 +11,7 @@ import { convertWalletConfigToKeyPairSigner } from './utils/walletConverter.js';
 export class NosanaClient {
   public readonly config: ClientConfig;
   public readonly jobs: JobsProgram;
+  public readonly stake: StakeProgram;
   public readonly solana: SolanaService;
   public readonly nos: NosService;
   public readonly ipfs: IPFS;
@@ -22,6 +24,7 @@ export class NosanaClient {
       this.setWallet(this.config.wallet);
     }
     this.jobs = new JobsProgram(this);
+    this.stake = new StakeProgram(this);
     this.logger = Logger.getInstance();
     this.solana = new SolanaService(this);
     this.nos = new NosService(this);
@@ -42,15 +45,20 @@ export * from './logger/Logger.js';
 export { JobsProgram, JobState, MarketQueueType } from './programs/JobsProgram.js';
 export type { Job, Market, Run } from './programs/JobsProgram.js';
 
+// Export StakeProgram and related types
+export { StakeProgram } from './programs/StakeProgram.js';
+export type { Stake } from './programs/StakeProgram.js';
+
 // Export IPFS utilities
 export * from './ipfs/IPFS.js';
 
 // Export NOS token service
-export { NosService } from './solana/NosService.js';
-export type { TokenAccount, TokenAccountWithBalance } from './solana/NosService.js';
+export { NosService } from './services/NosService.js';
+export type { TokenAccount, TokenAccountWithBalance } from './services/NosService.js';
 
-// Export all generated client types and functions
-export * from './generated_clients/jobs/index.js';
+// Export generated clients under namespaces to avoid naming conflicts
+export * as JobsClient from './generated_clients/jobs/index.js';
+export * as StakingClient from './generated_clients/staking/index.js';
 
 // Export dependencies 
 export * from 'gill';
