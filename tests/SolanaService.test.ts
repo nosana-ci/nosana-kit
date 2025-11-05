@@ -6,7 +6,8 @@ type CryptoKeyPair = { publicKey?: unknown; privateKey?: unknown };
 import type { NosanaClient } from '../src/index.js';
 
 // Mock gill module used by SolanaService
-vi.mock('gill', () => {
+vi.mock('gill', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('gill')>();
   const latestBlockhashValue = { blockhash: 'mock-blockhash', lastValidBlockHeight: 123 };
   const getLatestBlockhash = vi.fn(() => ({
     send: vi.fn().mockResolvedValue({ value: latestBlockhashValue })
@@ -24,26 +25,25 @@ vi.mock('gill', () => {
   const createTransaction = vi.fn((args: any) => ({ ...args, created: true }));
   const signTransactionMessageWithSigners = vi.fn(async (txOrMsg: any) => ({
     ...txOrMsg,
-    signatures: [{ address: txOrMsg?.feePayer?.address ?? addressFn('unknown'), signature: new Uint8Array([1]) }]
+    signatures: [{ address: txOrMsg?.feePayer?.address ?? actual.address('11111111111111111111111111111111'), signature: new Uint8Array([1]) }]
   }));
   const getSignatureFromTransaction = vi.fn(() => 'mock-signature');
   const getExplorerLink = vi.fn(() => 'https://explorer/tx/mock-signature');
-  const addressFn = vi.fn((s: string) => s as unknown as Address);
   const generateKeyPairSigner = vi.fn(async () => ({
-    address: addressFn('feePayer'),
+    address: actual.address('11111111111111111111111111111112'),
     signMessages: async () => [],
     signTransactions: async () => [],
     keyPair: {} as any,
   }));
 
-  // re-export minimal surface used by SolanaService
+  // re-export with actual implementations for functions we don't mock
   return {
+    ...actual,
     createSolanaClient,
     createTransaction,
     signTransactionMessageWithSigners,
     getSignatureFromTransaction,
     getExplorerLink,
-    address: addressFn,
     generateKeyPairSigner,
   };
 });
@@ -70,8 +70,10 @@ function makeSdk(overrides: Partial<NosanaClient> = {}) {
   } as unknown as NosanaClient;
 }
 
+const validAddress = '11111111111111111111111111111111';
+
 function makeInstruction(): IInstruction {
-  return { programAddress: address('prog'), accounts: [], data: new Uint8Array([1, 2, 3]) };
+  return { programAddress: address(validAddress), accounts: [], data: new Uint8Array([1, 2, 3]) };
 }
 
 async function makeWallet(): Promise<KeyPairSigner> {
@@ -83,90 +85,137 @@ describe('SolanaService', () => {
     vi.restoreAllMocks();
   });
 
-  it('throws when no wallet is set', async () => {
-    const sdk = makeSdk({ wallet: undefined });
-    const service = new SolanaService(sdk);
-    await expect(service.send(makeInstruction())).rejects.toMatchObject({ code: 'NO_WALLET' });
+  describe('send', () => {
+    it('throws when no wallet is set', async () => {
+      const sdk = makeSdk({ wallet: undefined });
+      const service = new SolanaService(sdk);
+      await expect(service.send(makeInstruction())).rejects.toMatchObject({ code: 'NO_WALLET' });
+    });
+
+    it('sends a single instruction', async () => {
+      const sdk = makeSdk({ wallet: await makeWallet() });
+      const service = new SolanaService(sdk);
+
+      const sig = await service.send(makeInstruction());
+
+      expect(sig).toBe('mock-signature');
+      expect(gillMock.createTransaction).toHaveBeenCalled();
+      expect(gillMock.signTransactionMessageWithSigners).toHaveBeenCalled();
+      expect(gillMock.getSignatureFromTransaction).toHaveBeenCalled();
+      expect(gillMock.getExplorerLink).toHaveBeenCalled();
+      expect(service.sendAndConfirmTransaction).toHaveBeenCalled();
+      expect((await import('gill'))).toBeTruthy();
+
+      // signer/feePayer checks
+      const calledTx = gillMock.signTransactionMessageWithSigners.mock.calls.at(-1)![0];
+      expect(calledTx.feePayer).toBe(sdk.wallet);
+      const signedTx = await gillMock.signTransactionMessageWithSigners.mock.results.at(-1)!.value;
+      expect(signedTx.signatures?.[0]?.address).toBe(sdk.wallet!.address);
+    });
+
+    it('sends an array of instructions', async () => {
+      const sdk = makeSdk({ wallet: await makeWallet() });
+      const service = new SolanaService(sdk);
+
+      const sig = await service.send([makeInstruction(), makeInstruction()]);
+
+      expect(sig).toBe('mock-signature');
+      expect(gillMock.createTransaction).toHaveBeenCalled();
+      expect(service.sendAndConfirmTransaction).toHaveBeenCalled();
+    });
+
+    it('uses a pre-signed transaction without re-signing', async () => {
+      const sdk = makeSdk({ wallet: await makeWallet() });
+      const service = new SolanaService(sdk);
+
+      const preSignedTx = {
+        instructions: [makeInstruction()],
+        version: 0,
+        signatures: [{ address: address(validAddress), signature: new Uint8Array([1]) }],
+      } as unknown as FullySignedTransaction & TransactionWithBlockhashLifetime;
+
+      const sig = await service.send(preSignedTx);
+
+      expect(sig).toBe('mock-signature');
+      expect(gillMock.signTransactionMessageWithSigners).not.toHaveBeenCalled();
+    });
+
+    it('signs an unsigned transaction object', async () => {
+      const sdk = makeSdk({ wallet: await makeWallet() });
+      const service = new SolanaService(sdk);
+
+      const unsignedTx = {
+        instructions: [makeInstruction()],
+        version: 0,
+      } as unknown as CompilableTransactionMessage & TransactionMessageWithBlockhashLifetime;
+
+      const sig = await service.send(unsignedTx);
+      expect(sig).toBe('mock-signature');
+      expect(gillMock.signTransactionMessageWithSigners).toHaveBeenCalledWith(unsignedTx);
+    });
+
+    it('propagates transaction creation errors', async () => {
+      const sdk = makeSdk({ wallet: await makeWallet() });
+      const service = new SolanaService(sdk);
+
+      gillMock.createTransaction.mockImplementationOnce(() => { throw new Error('create failed'); });
+
+      await expect(service.send(makeInstruction())).rejects.toThrow('Failed to send transaction: create failed');
+    });
+
+    it('propagates signing errors', async () => {
+      const sdk = makeSdk({ wallet: await makeWallet() });
+      const service = new SolanaService(sdk);
+
+      gillMock.signTransactionMessageWithSigners.mockRejectedValueOnce(new Error('sign failed'));
+
+      await expect(service.send(makeInstruction())).rejects.toThrow('Failed to send transaction: sign failed');
+    });
   });
 
-  it('sends a single instruction', async () => {
-    const sdk = makeSdk({ wallet: await makeWallet() });
-    const service = new SolanaService(sdk);
+  describe('getBalance', () => {
+    it('returns balance for valid address', async () => {
+      const sdk = makeSdk();
+      const service = new SolanaService(sdk);
+      const balance = await service.getBalance('11111111111111111111111111111111');
+      expect(balance).toBe(BigInt(1000));
+    });
 
-    const sig = await service.send(makeInstruction());
-
-    expect(sig).toBe('mock-signature');
-    expect(gillMock.createTransaction).toHaveBeenCalled();
-    expect(gillMock.signTransactionMessageWithSigners).toHaveBeenCalled();
-    expect(gillMock.getSignatureFromTransaction).toHaveBeenCalled();
-    expect(gillMock.getExplorerLink).toHaveBeenCalled();
-    expect(service.sendAndConfirmTransaction).toHaveBeenCalled();
-    expect((await import('gill'))).toBeTruthy();
-
-    // signer/feePayer checks
-    const calledTx = gillMock.signTransactionMessageWithSigners.mock.calls.at(-1)![0];
-    expect(calledTx.feePayer).toBe(sdk.wallet);
-    const signedTx = await gillMock.signTransactionMessageWithSigners.mock.results.at(-1)!.value;
-    expect(signedTx.signatures?.[0]?.address).toBe(sdk.wallet!.address);
+    it('throws NosanaError on RPC failure', async () => {
+      const sdk = makeSdk();
+      const service = new SolanaService(sdk);
+      const mockGetBalance = vi.fn(() => ({ send: vi.fn().mockRejectedValue(new Error('rpc error')) }));
+      service.rpc.getBalance = mockGetBalance as any;
+      await expect(service.getBalance('invalid')).rejects.toMatchObject({ code: 'RPC_ERROR' });
+    });
   });
 
-  it('sends an array of instructions', async () => {
-    const sdk = makeSdk({ wallet: await makeWallet() });
-    const service = new SolanaService(sdk);
+  describe('getLatestBlockhash', () => {
+    it('returns blockhash and last valid block height', async () => {
+      const sdk = makeSdk();
+      const service = new SolanaService(sdk);
+      const blockhash = await service.getLatestBlockhash();
+      expect(blockhash).toEqual({ blockhash: 'mock-blockhash', lastValidBlockHeight: 123 });
+    });
 
-    const sig = await service.send([makeInstruction(), makeInstruction()]);
-
-    expect(sig).toBe('mock-signature');
-    expect(gillMock.createTransaction).toHaveBeenCalled();
-    expect(service.sendAndConfirmTransaction).toHaveBeenCalled();
+    it('throws NosanaError on RPC failure', async () => {
+      const sdk = makeSdk();
+      const service = new SolanaService(sdk);
+      const mockGetLatestBlockhash = vi.fn(() => ({ send: vi.fn().mockRejectedValue(new Error('rpc error')) }));
+      service.rpc.getLatestBlockhash = mockGetLatestBlockhash as any;
+      await expect(service.getLatestBlockhash()).rejects.toMatchObject({ code: 'RPC_ERROR' });
+    });
   });
 
-  it('uses a pre-signed transaction without re-signing', async () => {
-    const sdk = makeSdk({ wallet: await makeWallet() });
-    const service = new SolanaService(sdk);
-
-    const preSignedTx = {
-      instructions: [makeInstruction()],
-      version: 0,
-      signatures: [{ address: address('feePayer'), signature: new Uint8Array([1]) }],
-    } as unknown as FullySignedTransaction & TransactionWithBlockhashLifetime;
-
-    const sig = await service.send(preSignedTx);
-
-    expect(sig).toBe('mock-signature');
-    expect(gillMock.signTransactionMessageWithSigners).not.toHaveBeenCalled();
-  });
-
-  it('signs an unsigned transaction object', async () => {
-    const sdk = makeSdk({ wallet: await makeWallet() });
-    const service = new SolanaService(sdk);
-
-    const unsignedTx = {
-      instructions: [makeInstruction()],
-      version: 0,
-    } as unknown as CompilableTransactionMessage & TransactionMessageWithBlockhashLifetime;
-
-    const sig = await service.send(unsignedTx);
-    expect(sig).toBe('mock-signature');
-    expect(gillMock.signTransactionMessageWithSigners).toHaveBeenCalledWith(unsignedTx);
-  });
-
-  it('propagates transaction creation errors', async () => {
-    const sdk = makeSdk({ wallet: await makeWallet() });
-    const service = new SolanaService(sdk);
-
-    gillMock.createTransaction.mockImplementationOnce(() => { throw new Error('create failed'); });
-
-    await expect(service.send(makeInstruction())).rejects.toThrow('Failed to send transaction: create failed');
-  });
-
-  it('propagates signing errors', async () => {
-    const sdk = makeSdk({ wallet: await makeWallet() });
-    const service = new SolanaService(sdk);
-
-    gillMock.signTransactionMessageWithSigners.mockRejectedValueOnce(new Error('sign failed'));
-
-    await expect(service.send(makeInstruction())).rejects.toThrow('Failed to send transaction: sign failed');
+  describe('pda', () => {
+    it('derives PDA from seeds and program ID', async () => {
+      const sdk = makeSdk();
+      const service = new SolanaService(sdk);
+      // Call pda and verify it returns an address
+      const pda = await service.pda(['seed1', address(validAddress)], address(validAddress));
+      expect(typeof pda).toBe('string');
+      expect(pda.length).toBeGreaterThan(0);
+    });
   });
 });
 

@@ -2,15 +2,21 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { IPFS } from '../src/ipfs/IPFS.js';
 import bs58 from 'bs58';
 
-vi.mock('axios', async (importOriginal) => {
-  const actual: any = await importOriginal();
+vi.mock('axios', () => {
   const get = vi.fn().mockResolvedValue({ data: { ok: true } });
   const create = vi.fn(() => ({ post: vi.fn().mockResolvedValue({ data: { IpfsHash: 'QmPinnedHash' } }) }));
-  const axios = { ...actual.default, get, create };
-  return { ...actual, default: axios, get, create } as any;
+  class MockAxiosHeaders {
+    set() { return this; }
+  }
+  return {
+    default: { get, create },
+    get,
+    create,
+    AxiosHeaders: MockAxiosHeaders,
+  };
 });
 
-const axiosModule = await import('axios');
+const axios = await import('axios');
 
 describe('IPFS utils', () => {
   beforeEach(() => {
@@ -38,15 +44,18 @@ describe('IPFS API', () => {
     vi.restoreAllMocks();
   });
 
-  // Note: retrieve uses axios.get directly; keep it simple to avoid long-running I/O flakiness
+  // Note: retrieve() uses axios.get directly which is complex to mock reliably
+  // Skipping retrieve tests for now - can be added later with better axios mocking strategy
 
-  it('pin posts JSON to pinJSONToIPFS and returns IpfsHash', async () => {
-    const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gw/' });
-    const hash = await ipfs.pin({ a: 1 });
-    expect(hash).toBe('QmPinnedHash');
-    expect((axiosModule as any).default.create).toHaveBeenCalled();
-    const api = (axiosModule as any).default.create.mock.results[0].value;
-    expect(api.post).toHaveBeenCalledWith('/pinning/pinJSONToIPFS', { a: 1 });
+  describe('pin', () => {
+    it('posts JSON to pinJSONToIPFS and returns IpfsHash', async () => {
+      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gw/' });
+      const hash = await ipfs.pin({ a: 1 });
+      expect(hash).toBe('QmPinnedHash');
+      expect(axios.default.create).toHaveBeenCalled();
+      const api = (axios.default.create as any).mock.results[0].value;
+      expect(api.post).toHaveBeenCalledWith('/pinning/pinJSONToIPFS', { a: 1 });
+    });
   });
 });
 

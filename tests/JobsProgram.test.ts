@@ -138,6 +138,25 @@ describe('JobsProgram', () => {
       sdk = ctx.sdk; jobs = new JobsProgram(sdk);
     });
 
+    describe('get, run, market', () => {
+      it('run fetches and transforms single run account', async () => {
+        const addr = newAddr(100);
+        vi.spyOn(programClient, 'fetchRunAccount' as any).mockResolvedValue(runAccount(addr, 888));
+        const out = await jobs.run(addr);
+        expect(out.address).toBeDefined();
+        expect(out.time).toBe(888);
+      });
+
+      it('market fetches and transforms single market account', async () => {
+        const addr = newAddr(101);
+        vi.spyOn(programClient, 'fetchMarketAccount' as any).mockResolvedValue(marketAccount());
+        const out = await jobs.market(addr);
+        expect(out.address).toBeDefined();
+        expect(out.jobPrice).toBe(10);
+        expect(out.queueType).toBe(MarketQueueType.NODE_QUEUE);
+      });
+    });
+
     describe('get and multiple (checkRuns)', () => {
       it('get does not call runs when checkRun is false', async () => {
         const addr = newAddr(60);
