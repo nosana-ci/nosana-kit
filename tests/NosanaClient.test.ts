@@ -99,6 +99,41 @@ describe('NosanaClient', () => {
       expect(sdk.wallet).toBeUndefined();
     });
   });
+
+  describe('multiple instances', () => {
+    it('two clients have independent configs and services', () => {
+      const sdkA = new NosanaClient(NosanaNetwork.MAINNET);
+      const sdkB = new NosanaClient(NosanaNetwork.DEVNET, { solana: { rpcEndpoint: 'https://custom-devnet.example' } });
+
+      // different instances
+      expect(sdkA).not.toBe(sdkB);
+
+      // configs are independent objects
+      expect(sdkA.config).not.toBe(sdkB.config);
+      expect(sdkA.config.solana.cluster).toBe('mainnet-beta');
+      expect(sdkB.config.solana.cluster).toBe('devnet');
+      expect(sdkB.config.solana.rpcEndpoint).toBe('https://custom-devnet.example');
+
+      // sub-services are separate
+      expect(sdkA.jobs).not.toBe(sdkB.jobs);
+      expect(sdkA.solana).not.toBe(sdkB.solana);
+      expect(sdkA.ipfs).not.toBe(sdkB.ipfs);
+    });
+
+    it('setting wallet on one client does not affect the other', async () => {
+      const sdkA = new NosanaClient(NosanaNetwork.MAINNET);
+      const sdkB = new NosanaClient(NosanaNetwork.MAINNET);
+
+      const walletA = await sdkA.setWallet(keyArray);
+
+      expect(walletA).toBeDefined();
+      expect(sdkA.wallet).toBeDefined();
+      expect(sdkB.wallet).toBeUndefined();
+    });
+
+    // Note: Logger is a singleton; configs may share references if mutated post-construction.
+    // We verify independence via constructor overrides and wallet state in other tests.
+  });
 });
 
 
