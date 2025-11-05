@@ -2,6 +2,7 @@ import { ClientConfig, getNosanaConfig, NosanaNetwork, PartialClientConfig, Wall
 import { Logger } from './logger/Logger.js';
 import { JobsProgram } from './programs/JobsProgram.js';
 import { SolanaService } from './solana/SolanaService.js';
+import { NosService } from './solana/NosService.js';
 import { IPFS } from './ipfs/IPFS.js';
 import { KeyPairSigner } from 'gill';
 import { convertWalletConfigToKeyPairSigner } from './utils/walletConverter.js';
@@ -10,6 +11,7 @@ export class NosanaClient {
   public readonly config: ClientConfig;
   public readonly jobs: JobsProgram;
   public readonly solana: SolanaService;
+  public readonly nos: NosService;
   public readonly ipfs: IPFS;
   public readonly logger: Logger;
   public wallet: KeyPairSigner | undefined;
@@ -22,6 +24,7 @@ export class NosanaClient {
     this.jobs = new JobsProgram(this);
     this.logger = Logger.getInstance();
     this.solana = new SolanaService(this);
+    this.nos = new NosService(this);
     this.ipfs = new IPFS(this.config.ipfs);
   }
   public async setWallet(wallet: WalletConfig): Promise<KeyPairSigner | undefined> {
@@ -41,6 +44,11 @@ export type { Job, Market, Run } from './programs/JobsProgram.js';
 
 // Export IPFS utilities
 export * from './ipfs/IPFS.js';
+
+// Export NOS token service
+export { NosService } from './solana/NosService.js';
+export type { TokenAccount, TokenAccountWithBalance } from './solana/NosService.js';
+
 // Export all generated client types and functions
 export * from './generated_clients/jobs/index.js';
 

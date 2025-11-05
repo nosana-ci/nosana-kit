@@ -128,6 +128,74 @@ Comprehensive unit tests have been created in `src/__tests__/setWallet.test.ts` 
 
 **Note**: Due to Jest/TypeScript configuration complexities with the `gill/dist/node` imports, running the tests may require additional setup. The functionality works correctly at runtime.
 
+## NOS Token Service Example
+
+The `nos-service.ts` example demonstrates how to interact with NOS token accounts using the NosService.
+
+### Features
+
+1. **Get all NOS token holders** - Fetch all token accounts holding NOS tokens (excludes zero balances by default)
+2. **Include zero balance accounts** - Optional flag to include accounts with zero balance
+3. **Exclude PDA accounts** - Filter out smart contract-owned token accounts (PDAs)
+4. **Get token account for address** - Retrieve token account details for a specific owner
+5. **Get balance** - Convenience method to get just the NOS balance
+6. **Batch queries** - Fetch balances for multiple addresses
+7. **Filter and analyze** - Find large holders and analyze token distribution
+
+### Running the Example
+
+```bash
+# Navigate to the examples/node directory
+cd examples/node
+
+# Install dependencies
+npm install
+
+# Run the nos-service example
+npm run nos-service
+```
+
+### Example Usage
+
+```typescript
+import { NosanaClient, NosanaNetwork } from '@nosana/kit';
+
+const client = new NosanaClient(NosanaNetwork.MAINNET);
+
+// Get all token holders (single RPC call, excludes zero balances by default)
+const holders = await client.nos.getAllTokenHolders();
+console.log(`Found ${holders.length} NOS token holders`);
+
+// Include accounts with zero balance
+const allAccounts = await client.nos.getAllTokenHolders({ includeZeroBalance: true });
+console.log(`Total accounts: ${allAccounts.length}`);
+
+// Exclude PDA accounts (smart contract-owned accounts)
+const userAccounts = await client.nos.getAllTokenHolders({ excludePdaAccounts: true });
+console.log(`User-owned accounts: ${userAccounts.length}`);
+
+// Get token account for specific address
+const account = await client.nos.getTokenAccountForAddress('owner-address');
+if (account) {
+  console.log(`Balance: ${account.uiAmount} NOS`);
+}
+
+// Get just the balance (convenience method)
+const balance = await client.nos.getBalance('owner-address');
+console.log(`Balance: ${balance} NOS`);
+
+// Filter holders by minimum balance
+const largeHolders = holders.filter(holder => holder.uiAmount >= 1000);
+```
+
+### Use Cases
+
+- **Analytics**: Analyze token distribution and holder statistics
+- **Airdrops**: Get list of all token holders for airdrop campaigns
+- **Balance checks**: Check NOS balances for specific addresses
+- **Leaderboards**: Create holder leaderboards sorted by balance
+- **Monitoring**: Track large holder movements
+
 ## Other Examples
 
 - `retrieve.ts` - Example of retrieving job data
