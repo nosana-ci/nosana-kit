@@ -2,32 +2,12 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { BaseProgram } from '../src/programs/BaseProgram.js';
 import { address, type Address } from 'gill';
 import type { NosanaClient } from '../src/index.js';
+import { SdkFactory } from './helpers/index.js';
 
 class TestProgram extends BaseProgram {
   protected getProgramId(): Address {
     return address('test-program');
   }
-}
-
-function makeSdk(): NosanaClient {
-  const valid = '11111111111111111111111111111111';
-  const pda = vi.fn()
-    .mockResolvedValueOnce(address(valid))
-    .mockResolvedValueOnce(address(valid));
-  const sdk = {
-    solana: { pda },
-    config: {
-      programs: {
-        rewardsAddress: address(valid),
-        jobsAddress: address(valid),
-        nosTokenAddress: address(valid),
-        stakeAddress: address(valid),
-        poolsAddress: address(valid),
-      },
-    },
-    logger: { info: vi.fn(), error: vi.fn(), debug: vi.fn() },
-  } as unknown as NosanaClient;
-  return sdk;
 }
 
 describe('BaseProgram', () => {
@@ -37,7 +17,7 @@ describe('BaseProgram', () => {
 
     beforeEach(() => {
       vi.restoreAllMocks();
-      sdk = makeSdk();
+      sdk = SdkFactory.createWithMockPda();
       program = new TestProgram(sdk);
     });
 
