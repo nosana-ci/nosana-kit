@@ -40,9 +40,7 @@ export default [
     // More lenient rules for test files
     files: ['tests/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': 'warn',
-      'no-console': 'off',
+      '@typescript-eslint/no-explicit-any': 'off'
     },
   },
 ];
