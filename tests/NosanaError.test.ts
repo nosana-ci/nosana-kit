@@ -13,7 +13,7 @@ describe('NosanaError', () => {
 
   it('is an instance of Error', () => {
     const err = new NosanaError('oops', ErrorCodes.PROGRAM_ERROR);
-    expect(err instanceof Error).toBe(true);
+    expect(err).toBeInstanceOf(Error);
   });
 
   it('exposes known error codes', () => {

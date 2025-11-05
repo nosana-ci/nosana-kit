@@ -42,7 +42,7 @@ describe('JobsProgram', () => {
       expect(out.timeEnd).toBe(0);
       expect(out.timeout).toBe(0);
       expect(out.state).toBe(JobState.COMPLETED);
-      expect(typeof out.ipfsJob).toBe('string');
+      expect(out.ipfsJob).toBeTypeOf('string');
       expect((out.ipfsJob as string).length).toBeGreaterThan(40);
     });
 
@@ -121,6 +121,7 @@ describe('JobsProgram', () => {
         const out = await jobs.multiple([a, b], false);
         expect(runsSpy).not.toHaveBeenCalled();
         expect(out.every(j => j.state === JobState.QUEUED)).toBe(true);
+        expect(out).toHaveLength(2);
       });
       it('get sets RUNNING and timeStart when checkRun is true and a run exists', async () => {
         const addr = newAddr(10);
@@ -209,19 +210,25 @@ describe('JobsProgram', () => {
     });
 
     describe('error handling', () => {
-      it('get propagates fetch errors', async () => {
-        vi.spyOn(programClient, 'fetchJobAccount' as any).mockRejectedValue(new Error('RPC error'));
-        await expect(jobs.get(newAddr(90))).rejects.toThrow('RPC error');
-      });
-
-      it('run propagates fetch errors', async () => {
-        vi.spyOn(programClient, 'fetchRunAccount' as any).mockRejectedValue(new Error('RPC error'));
-        await expect(jobs.run(newAddr(91))).rejects.toThrow('RPC error');
-      });
-
-      it('market propagates fetch errors', async () => {
-        vi.spyOn(programClient, 'fetchMarketAccount' as any).mockRejectedValue(new Error('RPC error'));
-        await expect(jobs.market(newAddr(92))).rejects.toThrow('RPC error');
+      it.each([
+        {
+          method: 'get' as const,
+          mockFn: 'fetchJobAccount',
+          description: 'get',
+        },
+        {
+          method: 'run' as const,
+          mockFn: 'fetchRunAccount',
+          description: 'run',
+        },
+        {
+          method: 'market' as const,
+          mockFn: 'fetchMarketAccount',
+          description: 'market',
+        },
+      ])('$description propagates fetch errors', async ({ method, mockFn }) => {
+        vi.spyOn(programClient, mockFn as any).mockRejectedValue(new Error('RPC error'));
+        await expect(jobs[method](newAddr(90))).rejects.toThrow('RPC error');
       });
 
       it('all propagates getProgramAccounts errors', async () => {
@@ -257,7 +264,7 @@ describe('JobsProgram', () => {
 
       const stopMonitoring = await jobs.monitor();
 
-      expect(typeof stopMonitoring).toBe('function');
+      expect(stopMonitoring).toBeInstanceOf(Function);
       expect(mockProgramNotifications).toHaveBeenCalledWith(
         sdk.config.programs.jobsAddress,
         { encoding: 'base64' }
@@ -300,7 +307,7 @@ describe('JobsProgram', () => {
         onError
       });
 
-      expect(typeof stopMonitoring).toBe('function');
+      expect(stopMonitoring).toBeInstanceOf(Function);
 
       stopMonitoring();
       await new Promise(resolve => setTimeout(resolve, 10));
@@ -321,7 +328,7 @@ describe('JobsProgram', () => {
       // Should not throw immediately since error handling is internal with retry logic
       const stopMonitoring = await jobs.monitor();
 
-      expect(typeof stopMonitoring).toBe('function');
+      expect(stopMonitoring).toBeInstanceOf(Function);
 
       stopMonitoring();
       await new Promise(resolve => setTimeout(resolve, 10));

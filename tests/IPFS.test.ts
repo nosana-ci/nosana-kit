@@ -51,7 +51,7 @@ describe('IPFS', () => {
         const bytes: ReadonlyUint8Array = new Uint8Array(32).fill(5) as ReadonlyUint8Array;
         const hash = IPFS.solHashToIpfsHash(bytes);
         expect(hash).toBeTruthy();
-        expect(typeof hash).toBe('string');
+        expect(hash).toBeTypeOf('string');
       });
     });
 

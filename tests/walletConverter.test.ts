@@ -114,43 +114,17 @@ describe('walletConverter', () => {
   });
 
   describe('invalid inputs', () => {
-    it('rejects too-short number array', async () => {
-      await expect(convertWalletConfigToKeyPairSigner([1, 2, 3] as any))
-        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
-    });
-
-    it('rejects malformed JSON array string', async () => {
-      await expect(convertWalletConfigToKeyPairSigner('[1, 2, invalid]'))
-        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
-    });
-
-    it('rejects an arbitrary string that is not JSON or base58', async () => {
-      await expect(convertWalletConfigToKeyPairSigner('not-a-valid-key-format'))
-        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
-    });
-
-    it('rejects null input', async () => {
-      await expect(convertWalletConfigToKeyPairSigner(null as any))
-        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
-    });
-
-    it('rejects undefined input', async () => {
-      await expect(convertWalletConfigToKeyPairSigner(undefined as any))
-        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
-    });
-
-    it('rejects empty array', async () => {
-      await expect(convertWalletConfigToKeyPairSigner([] as any))
-        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
-    });
-
-    it('rejects empty string', async () => {
-      await expect(convertWalletConfigToKeyPairSigner(''))
-        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
-    });
-
-    it('rejects non-existent file path', async () => {
-      await expect(convertWalletConfigToKeyPairSigner('/non/existent/file.json'))
+    it.each([
+      { input: [1, 2, 3] as any, description: 'too-short number array' },
+      { input: '[1, 2, invalid]', description: 'malformed JSON array string' },
+      { input: 'not-a-valid-key-format', description: 'arbitrary string (not JSON or base58)' },
+      { input: null as any, description: 'null' },
+      { input: undefined as any, description: 'undefined' },
+      { input: [] as any, description: 'empty array' },
+      { input: '', description: 'empty string' },
+      { input: '/non/existent/file.json', description: 'non-existent file path' },
+    ])('rejects $description', async ({ input }) => {
+      await expect(convertWalletConfigToKeyPairSigner(input))
         .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
     });
   });

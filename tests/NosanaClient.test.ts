@@ -76,8 +76,10 @@ describe('NosanaClient', () => {
 
       const wallet = await sdk.setWallet(keyArray);
 
-      expect(wallet).toBeDefined();
+      expect(wallet).toBeTruthy();
       expect(wallet?.address).toBe(expectedAddress);
+      expect(wallet?.signMessages).toBeInstanceOf(Function);
+      expect(wallet?.signTransactions).toBeInstanceOf(Function);
       expect(sdk.wallet).toBe(wallet);
     });
 
@@ -87,7 +89,8 @@ describe('NosanaClient', () => {
       const sdk = new NosanaClient(NosanaNetwork.MAINNET, { wallet: JSON.stringify(keyArray) });
 
       expect(setWalletSpy).toHaveBeenCalledWith(JSON.stringify(keyArray));
-      expect(sdk.jobs).toBeDefined();
+      expect(setWalletSpy).toHaveBeenCalledTimes(1);
+      expect(sdk.jobs).toBeTruthy();
 
       setWalletSpy.mockRestore();
     });
@@ -126,8 +129,9 @@ describe('NosanaClient', () => {
 
       const walletA = await sdkA.setWallet(keyArray);
 
-      expect(walletA).toBeDefined();
-      expect(sdkA.wallet).toBeDefined();
+      expect(walletA).toBeTruthy();
+      expect(walletA?.address).toBe(expectedAddress);
+      expect(sdkA.wallet).toBe(walletA);
       expect(sdkB.wallet).toBeUndefined();
     });
 

@@ -199,7 +199,7 @@ describe('SolanaService', () => {
       // Call pda and verify it returns an address
       const programId = AddressFactory.createValid();
       const pda = await service.pda(['seed1', 'seed2'], programId);
-      expect(typeof pda).toBe('string');
+      expect(pda).toBeTypeOf('string');
       expect(pda.length).toBeGreaterThan(0);
     });
   });
