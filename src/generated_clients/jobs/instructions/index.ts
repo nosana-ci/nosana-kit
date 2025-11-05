@@ -6,6 +6,7 @@
  * @see https://github.com/codama-idl/codama
  */
 
+export * from './assign';
 export * from './claim';
 export * from './clean';
 export * from './cleanAdmin';

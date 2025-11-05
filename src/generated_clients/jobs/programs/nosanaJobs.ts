@@ -14,6 +14,7 @@ import {
   type ReadonlyUint8Array,
 } from '@solana/kit';
 import {
+  type ParsedAssignInstruction,
   type ParsedClaimInstruction,
   type ParsedCleanAdminInstruction,
   type ParsedCleanInstruction,
@@ -90,6 +91,7 @@ export enum NosanaJobsInstruction {
   Update,
   Close,
   CloseAdmin,
+  Assign,
   List,
   Delist,
   Recover,
@@ -153,6 +155,17 @@ export function identifyNosanaJobsInstruction(
     )
   ) {
     return NosanaJobsInstruction.CloseAdmin;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([73, 66, 125, 203, 81, 41, 64, 135])
+      ),
+      0
+    )
+  ) {
+    return NosanaJobsInstruction.Assign;
   }
   if (
     containsBytes(
@@ -328,6 +341,9 @@ export type ParsedNosanaJobsInstruction<
   | ({
       instructionType: NosanaJobsInstruction.CloseAdmin;
     } & ParsedCloseAdminInstruction<TProgram>)
+  | ({
+      instructionType: NosanaJobsInstruction.Assign;
+    } & ParsedAssignInstruction<TProgram>)
   | ({
       instructionType: NosanaJobsInstruction.List;
     } & ParsedListInstruction<TProgram>)

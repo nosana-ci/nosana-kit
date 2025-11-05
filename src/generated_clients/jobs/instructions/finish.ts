@@ -49,8 +49,8 @@ export type FinishInstruction<
   TAccountVault extends string | IAccountMeta<string> = string,
   TAccountDeposit extends string | IAccountMeta<string> = string,
   TAccountUser extends string | IAccountMeta<string> = string,
-  TAccountPayer extends string | IAccountMeta<string> = string,
-  TAccountProject extends string | IAccountMeta<string> = string,
+  TAccountPayerRun extends string | IAccountMeta<string> = string,
+  TAccountPayerJob extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
@@ -74,12 +74,12 @@ export type FinishInstruction<
       TAccountUser extends string
         ? WritableAccount<TAccountUser>
         : TAccountUser,
-      TAccountPayer extends string
-        ? WritableAccount<TAccountPayer>
-        : TAccountPayer,
-      TAccountProject extends string
-        ? WritableAccount<TAccountProject>
-        : TAccountProject,
+      TAccountPayerRun extends string
+        ? WritableAccount<TAccountPayerRun>
+        : TAccountPayerRun,
+      TAccountPayerJob extends string
+        ? WritableAccount<TAccountPayerJob>
+        : TAccountPayerJob,
       TAccountAuthority extends string
         ? ReadonlySignerAccount<TAccountAuthority> &
             IAccountSignerMeta<TAccountAuthority>
@@ -132,8 +132,8 @@ export type FinishInput<
   TAccountVault extends string = string,
   TAccountDeposit extends string = string,
   TAccountUser extends string = string,
-  TAccountPayer extends string = string,
-  TAccountProject extends string = string,
+  TAccountPayerRun extends string = string,
+  TAccountPayerJob extends string = string,
   TAccountAuthority extends string = string,
   TAccountTokenProgram extends string = string,
 > = {
@@ -143,8 +143,8 @@ export type FinishInput<
   vault: Address<TAccountVault>;
   deposit: Address<TAccountDeposit>;
   user: Address<TAccountUser>;
-  payer: Address<TAccountPayer>;
-  project: Address<TAccountProject>;
+  payerRun: Address<TAccountPayerRun>;
+  payerJob: Address<TAccountPayerJob>;
   authority: TransactionSigner<TAccountAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
   ipfsResult: FinishInstructionDataArgs['ipfsResult'];
@@ -157,8 +157,8 @@ export function getFinishInstruction<
   TAccountVault extends string,
   TAccountDeposit extends string,
   TAccountUser extends string,
-  TAccountPayer extends string,
-  TAccountProject extends string,
+  TAccountPayerRun extends string,
+  TAccountPayerJob extends string,
   TAccountAuthority extends string,
   TAccountTokenProgram extends string,
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
@@ -170,8 +170,8 @@ export function getFinishInstruction<
     TAccountVault,
     TAccountDeposit,
     TAccountUser,
-    TAccountPayer,
-    TAccountProject,
+    TAccountPayerRun,
+    TAccountPayerJob,
     TAccountAuthority,
     TAccountTokenProgram
   >,
@@ -184,8 +184,8 @@ export function getFinishInstruction<
   TAccountVault,
   TAccountDeposit,
   TAccountUser,
-  TAccountPayer,
-  TAccountProject,
+  TAccountPayerRun,
+  TAccountPayerJob,
   TAccountAuthority,
   TAccountTokenProgram
 > {
@@ -200,8 +200,8 @@ export function getFinishInstruction<
     vault: { value: input.vault ?? null, isWritable: true },
     deposit: { value: input.deposit ?? null, isWritable: true },
     user: { value: input.user ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    project: { value: input.project ?? null, isWritable: true },
+    payerRun: { value: input.payerRun ?? null, isWritable: true },
+    payerJob: { value: input.payerJob ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
@@ -228,8 +228,8 @@ export function getFinishInstruction<
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.deposit),
       getAccountMeta(accounts.user),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.project),
+      getAccountMeta(accounts.payerRun),
+      getAccountMeta(accounts.payerJob),
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.tokenProgram),
     ],
@@ -245,8 +245,8 @@ export function getFinishInstruction<
     TAccountVault,
     TAccountDeposit,
     TAccountUser,
-    TAccountPayer,
-    TAccountProject,
+    TAccountPayerRun,
+    TAccountPayerJob,
     TAccountAuthority,
     TAccountTokenProgram
   >;
@@ -266,8 +266,8 @@ export type ParsedFinishInstruction<
     vault: TAccountMetas[3];
     deposit: TAccountMetas[4];
     user: TAccountMetas[5];
-    payer: TAccountMetas[6];
-    project: TAccountMetas[7];
+    payerRun: TAccountMetas[6];
+    payerJob: TAccountMetas[7];
     authority: TAccountMetas[8];
     tokenProgram: TAccountMetas[9];
   };
@@ -301,8 +301,8 @@ export function parseFinishInstruction<
       vault: getNextAccount(),
       deposit: getNextAccount(),
       user: getNextAccount(),
-      payer: getNextAccount(),
-      project: getNextAccount(),
+      payerRun: getNextAccount(),
+      payerJob: getNextAccount(),
       authority: getNextAccount(),
       tokenProgram: getNextAccount(),
     },

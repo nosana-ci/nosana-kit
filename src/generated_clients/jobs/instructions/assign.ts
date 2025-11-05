@@ -31,47 +31,65 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
+  type WritableSignerAccount,
 } from '@solana/kit';
 import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
-export const EXTEND_DISCRIMINATOR = new Uint8Array([
-  228, 127, 0, 1, 227, 154, 54, 168,
+export const ASSIGN_DISCRIMINATOR = new Uint8Array([
+  73, 66, 125, 203, 81, 41, 64, 135,
 ]);
 
-export function getExtendDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(EXTEND_DISCRIMINATOR);
+export function getAssignDiscriminatorBytes() {
+  return fixEncoderSize(getBytesEncoder(), 8).encode(ASSIGN_DISCRIMINATOR);
 }
 
-export type ExtendInstruction<
+export type AssignInstruction<
   TProgram extends string = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
   TAccountJob extends string | IAccountMeta<string> = string,
   TAccountMarket extends string | IAccountMeta<string> = string,
+  TAccountRun extends string | IAccountMeta<string> = string,
+  TAccountNode extends string | IAccountMeta<string> = string,
   TAccountUser extends string | IAccountMeta<string> = string,
   TAccountVault extends string | IAccountMeta<string> = string,
+  TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountRewardsReflection extends string | IAccountMeta<string> = string,
   TAccountRewardsVault extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
-  TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountRewardsProgram extends string | IAccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
     | IAccountMeta<string> = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+  TAccountSystemProgram extends
+    | string
+    | IAccountMeta<string> = '11111111111111111111111111111111',
   TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
     [
-      TAccountJob extends string ? WritableAccount<TAccountJob> : TAccountJob,
+      TAccountJob extends string
+        ? WritableSignerAccount<TAccountJob> & IAccountSignerMeta<TAccountJob>
+        : TAccountJob,
       TAccountMarket extends string
-        ? ReadonlyAccount<TAccountMarket>
+        ? WritableAccount<TAccountMarket>
         : TAccountMarket,
+      TAccountRun extends string
+        ? WritableSignerAccount<TAccountRun> & IAccountSignerMeta<TAccountRun>
+        : TAccountRun,
+      TAccountNode extends string
+        ? ReadonlyAccount<TAccountNode>
+        : TAccountNode,
       TAccountUser extends string
         ? WritableAccount<TAccountUser>
         : TAccountUser,
       TAccountVault extends string
         ? WritableAccount<TAccountVault>
         : TAccountVault,
+      TAccountPayer extends string
+        ? WritableSignerAccount<TAccountPayer> &
+            IAccountSignerMeta<TAccountPayer>
+        : TAccountPayer,
       TAccountRewardsReflection extends string
         ? WritableAccount<TAccountRewardsReflection>
         : TAccountRewardsReflection,
@@ -82,117 +100,138 @@ export type ExtendInstruction<
         ? ReadonlySignerAccount<TAccountAuthority> &
             IAccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
-      TAccountPayer extends string
-        ? ReadonlySignerAccount<TAccountPayer> &
-            IAccountSignerMeta<TAccountPayer>
-        : TAccountPayer,
       TAccountRewardsProgram extends string
         ? ReadonlyAccount<TAccountRewardsProgram>
         : TAccountRewardsProgram,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
+      TAccountSystemProgram extends string
+        ? ReadonlyAccount<TAccountSystemProgram>
+        : TAccountSystemProgram,
       ...TRemainingAccounts,
     ]
   >;
 
-export type ExtendInstructionData = {
+export type AssignInstructionData = {
   discriminator: ReadonlyUint8Array;
+  ipfsJob: ReadonlyUint8Array;
   timeout: bigint;
 };
 
-export type ExtendInstructionDataArgs = { timeout: number | bigint };
+export type AssignInstructionDataArgs = {
+  ipfsJob: ReadonlyUint8Array;
+  timeout: number | bigint;
+};
 
-export function getExtendInstructionDataEncoder(): Encoder<ExtendInstructionDataArgs> {
+export function getAssignInstructionDataEncoder(): Encoder<AssignInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
+      ['ipfsJob', fixEncoderSize(getBytesEncoder(), 32)],
       ['timeout', getI64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: EXTEND_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: ASSIGN_DISCRIMINATOR })
   );
 }
 
-export function getExtendInstructionDataDecoder(): Decoder<ExtendInstructionData> {
+export function getAssignInstructionDataDecoder(): Decoder<AssignInstructionData> {
   return getStructDecoder([
     ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
+    ['ipfsJob', fixDecoderSize(getBytesDecoder(), 32)],
     ['timeout', getI64Decoder()],
   ]);
 }
 
-export function getExtendInstructionDataCodec(): Codec<
-  ExtendInstructionDataArgs,
-  ExtendInstructionData
+export function getAssignInstructionDataCodec(): Codec<
+  AssignInstructionDataArgs,
+  AssignInstructionData
 > {
   return combineCodec(
-    getExtendInstructionDataEncoder(),
-    getExtendInstructionDataDecoder()
+    getAssignInstructionDataEncoder(),
+    getAssignInstructionDataDecoder()
   );
 }
 
-export type ExtendInput<
+export type AssignInput<
   TAccountJob extends string = string,
   TAccountMarket extends string = string,
+  TAccountRun extends string = string,
+  TAccountNode extends string = string,
   TAccountUser extends string = string,
   TAccountVault extends string = string,
+  TAccountPayer extends string = string,
   TAccountRewardsReflection extends string = string,
   TAccountRewardsVault extends string = string,
   TAccountAuthority extends string = string,
-  TAccountPayer extends string = string,
   TAccountRewardsProgram extends string = string,
   TAccountTokenProgram extends string = string,
+  TAccountSystemProgram extends string = string,
 > = {
-  job: Address<TAccountJob>;
+  job: TransactionSigner<TAccountJob>;
   market: Address<TAccountMarket>;
+  run: TransactionSigner<TAccountRun>;
+  node: Address<TAccountNode>;
   user: Address<TAccountUser>;
   vault: Address<TAccountVault>;
+  payer: TransactionSigner<TAccountPayer>;
   rewardsReflection: Address<TAccountRewardsReflection>;
   rewardsVault: Address<TAccountRewardsVault>;
   authority: TransactionSigner<TAccountAuthority>;
-  payer: TransactionSigner<TAccountPayer>;
   rewardsProgram: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  timeout: ExtendInstructionDataArgs['timeout'];
+  systemProgram?: Address<TAccountSystemProgram>;
+  ipfsJob: AssignInstructionDataArgs['ipfsJob'];
+  timeout: AssignInstructionDataArgs['timeout'];
 };
 
-export function getExtendInstruction<
+export function getAssignInstruction<
   TAccountJob extends string,
   TAccountMarket extends string,
+  TAccountRun extends string,
+  TAccountNode extends string,
   TAccountUser extends string,
   TAccountVault extends string,
+  TAccountPayer extends string,
   TAccountRewardsReflection extends string,
   TAccountRewardsVault extends string,
   TAccountAuthority extends string,
-  TAccountPayer extends string,
   TAccountRewardsProgram extends string,
   TAccountTokenProgram extends string,
+  TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
-  input: ExtendInput<
+  input: AssignInput<
     TAccountJob,
     TAccountMarket,
+    TAccountRun,
+    TAccountNode,
     TAccountUser,
     TAccountVault,
+    TAccountPayer,
     TAccountRewardsReflection,
     TAccountRewardsVault,
     TAccountAuthority,
-    TAccountPayer,
     TAccountRewardsProgram,
-    TAccountTokenProgram
+    TAccountTokenProgram,
+    TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress }
-): ExtendInstruction<
+): AssignInstruction<
   TProgramAddress,
   TAccountJob,
   TAccountMarket,
+  TAccountRun,
+  TAccountNode,
   TAccountUser,
   TAccountVault,
+  TAccountPayer,
   TAccountRewardsReflection,
   TAccountRewardsVault,
   TAccountAuthority,
-  TAccountPayer,
   TAccountRewardsProgram,
-  TAccountTokenProgram
+  TAccountTokenProgram,
+  TAccountSystemProgram
 > {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
@@ -200,18 +239,21 @@ export function getExtendInstruction<
   // Original accounts.
   const originalAccounts = {
     job: { value: input.job ?? null, isWritable: true },
-    market: { value: input.market ?? null, isWritable: false },
+    market: { value: input.market ?? null, isWritable: true },
+    run: { value: input.run ?? null, isWritable: true },
+    node: { value: input.node ?? null, isWritable: false },
     user: { value: input.user ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
     rewardsReflection: {
       value: input.rewardsReflection ?? null,
       isWritable: true,
     },
     rewardsVault: { value: input.rewardsVault ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: false },
     rewardsProgram: { value: input.rewardsProgram ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -226,43 +268,53 @@ export function getExtendInstruction<
     accounts.tokenProgram.value =
       'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
   }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
   const instruction = {
     accounts: [
       getAccountMeta(accounts.job),
       getAccountMeta(accounts.market),
+      getAccountMeta(accounts.run),
+      getAccountMeta(accounts.node),
       getAccountMeta(accounts.user),
       getAccountMeta(accounts.vault),
+      getAccountMeta(accounts.payer),
       getAccountMeta(accounts.rewardsReflection),
       getAccountMeta(accounts.rewardsVault),
       getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.payer),
       getAccountMeta(accounts.rewardsProgram),
       getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.systemProgram),
     ],
     programAddress,
-    data: getExtendInstructionDataEncoder().encode(
-      args as ExtendInstructionDataArgs
+    data: getAssignInstructionDataEncoder().encode(
+      args as AssignInstructionDataArgs
     ),
-  } as ExtendInstruction<
+  } as AssignInstruction<
     TProgramAddress,
     TAccountJob,
     TAccountMarket,
+    TAccountRun,
+    TAccountNode,
     TAccountUser,
     TAccountVault,
+    TAccountPayer,
     TAccountRewardsReflection,
     TAccountRewardsVault,
     TAccountAuthority,
-    TAccountPayer,
     TAccountRewardsProgram,
-    TAccountTokenProgram
+    TAccountTokenProgram,
+    TAccountSystemProgram
   >;
 
   return instruction;
 }
 
-export type ParsedExtendInstruction<
+export type ParsedAssignInstruction<
   TProgram extends string = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
@@ -270,27 +322,30 @@ export type ParsedExtendInstruction<
   accounts: {
     job: TAccountMetas[0];
     market: TAccountMetas[1];
-    user: TAccountMetas[2];
-    vault: TAccountMetas[3];
-    rewardsReflection: TAccountMetas[4];
-    rewardsVault: TAccountMetas[5];
-    authority: TAccountMetas[6];
-    payer: TAccountMetas[7];
-    rewardsProgram: TAccountMetas[8];
-    tokenProgram: TAccountMetas[9];
+    run: TAccountMetas[2];
+    node: TAccountMetas[3];
+    user: TAccountMetas[4];
+    vault: TAccountMetas[5];
+    payer: TAccountMetas[6];
+    rewardsReflection: TAccountMetas[7];
+    rewardsVault: TAccountMetas[8];
+    authority: TAccountMetas[9];
+    rewardsProgram: TAccountMetas[10];
+    tokenProgram: TAccountMetas[11];
+    systemProgram: TAccountMetas[12];
   };
-  data: ExtendInstructionData;
+  data: AssignInstructionData;
 };
 
-export function parseExtendInstruction<
+export function parseAssignInstruction<
   TProgram extends string,
   TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &
     IInstructionWithData<Uint8Array>
-): ParsedExtendInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 10) {
+): ParsedAssignInstruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 13) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -305,15 +360,18 @@ export function parseExtendInstruction<
     accounts: {
       job: getNextAccount(),
       market: getNextAccount(),
+      run: getNextAccount(),
+      node: getNextAccount(),
       user: getNextAccount(),
       vault: getNextAccount(),
+      payer: getNextAccount(),
       rewardsReflection: getNextAccount(),
       rewardsVault: getNextAccount(),
       authority: getNextAccount(),
-      payer: getNextAccount(),
       rewardsProgram: getNextAccount(),
       tokenProgram: getNextAccount(),
+      systemProgram: getNextAccount(),
     },
-    data: getExtendInstructionDataDecoder().decode(instruction.data),
+    data: getAssignInstructionDataDecoder().decode(instruction.data),
   };
 }
