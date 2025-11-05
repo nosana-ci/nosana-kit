@@ -1,6 +1,6 @@
-import { ErrorCodes, NosanaError } from "../errors/NosanaError.js";
-import { DEFAULT_CONFIGS } from "./defaultConfigs.js";
-import { ClientConfig, NosanaNetwork, PartialClientConfig } from "./types.js";
+import { ErrorCodes, NosanaError } from '../errors/NosanaError.js';
+import { DEFAULT_CONFIGS } from './defaultConfigs.js';
+import { ClientConfig, NosanaNetwork, PartialClientConfig } from './types.js';
 
 export const mergeConfigs = (
   defaultConfig: ClientConfig,
@@ -20,9 +20,12 @@ export const mergeConfigs = (
       ...customConfig.ipfs,
     },
   };
-}
+};
 
-export const getNosanaConfig = (network: NosanaNetwork = NosanaNetwork.MAINNET, config?: PartialClientConfig): ClientConfig => {
+export const getNosanaConfig = (
+  network: NosanaNetwork = NosanaNetwork.MAINNET,
+  config?: PartialClientConfig
+): ClientConfig => {
   const defaultConfig = DEFAULT_CONFIGS[network];
   if (!defaultConfig) {
     throw new NosanaError(`Unsupported Nosana network: ${network}`, ErrorCodes.INVALID_NETWORK);
@@ -33,8 +36,8 @@ export const getNosanaConfig = (network: NosanaNetwork = NosanaNetwork.MAINNET, 
 // Example: Initialize with default (Mainnet) or specific network, or custom config
 // const defaultConfig = getNosanaConfig();
 // const devConfig = getNosanaConfig(NosanaNetwork.DEVNET);
-// const customConfig = getNosanaConfig(NosanaNetwork.MAINNET, { 
-//   solana: {  
+// const customConfig = getNosanaConfig(NosanaNetwork.MAINNET, {
+//   solana: {
 //     rpcEndpoint: 'your-custom-rpc-endpoint-url',
 //   },
 //   ipfs: {
@@ -43,4 +46,3 @@ export const getNosanaConfig = (network: NosanaNetwork = NosanaNetwork.MAINNET, 
 //   },
 //   logLevel: NosanaLogLevel.DEBUG,
 // });
-

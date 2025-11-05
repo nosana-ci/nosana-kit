@@ -14,7 +14,7 @@ export enum NosanaLogLevel {
 }
 
 export interface SolanaConfig {
-  cluster: SolanaClusterMoniker | "mainnet-beta" | "localhost";
+  cluster: SolanaClusterMoniker | 'mainnet-beta' | 'localhost';
   rpcEndpoint: string;
   wsEndpoint?: string; // Optional WebSocket endpoint, if different from HTTP
   commitment?: 'processed' | 'confirmed' | 'finalized';
@@ -39,7 +39,7 @@ export interface ClientConfig {
     rewardsAddress: Address;
     stakeAddress: Address;
     poolsAddress: Address;
-  }
+  };
 }
 
 export interface PartialClientConfig {

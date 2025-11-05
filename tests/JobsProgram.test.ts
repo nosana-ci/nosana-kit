@@ -18,7 +18,8 @@ vi.mock('@solana-program/token', () => ({
 // Legacy aliases for backward compatibility (to be gradually replaced)
 const baseSdk = () => SdkFactory.createBasic();
 const newAddr = (seed?: number) => AddressFactory.create(seed);
-const makeJobAccount = (state: number, addr?: Address) => JobAccountFactory.create({ state, address: addr });
+const makeJobAccount = (state: number, addr?: Address) =>
+  JobAccountFactory.create({ state, address: addr });
 const makeRunAccount = (job: Address, time: number, node?: Address) =>
   RunAccountFactory.create({ job, time: BigInt(time), node });
 const makeMarketAccount = () => MarketAccountFactory.create();
@@ -78,7 +79,9 @@ describe('JobsProgram', () => {
     describe('get, run, market', () => {
       it('run fetches and transforms single run account', async () => {
         const addr = newAddr(100);
-        vi.spyOn(programClient, 'fetchRunAccount' as any).mockResolvedValue(makeRunAccount(addr, 888));
+        vi.spyOn(programClient, 'fetchRunAccount' as any).mockResolvedValue(
+          makeRunAccount(addr, 888)
+        );
         const out = await jobs.run(addr);
         expect(out.address).toBeDefined();
         expect(out.time).toBe(888);
@@ -97,7 +100,9 @@ describe('JobsProgram', () => {
     describe('get and multiple (checkRuns)', () => {
       it('get does not call runs when checkRun is false', async () => {
         const addr = newAddr(60);
-        vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(makeJobAccount(JobState.QUEUED, addr));
+        vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(
+          makeJobAccount(JobState.QUEUED, addr)
+        );
         const runsSpy = vi.spyOn(jobs, 'runs').mockResolvedValue([] as any);
         const out = await jobs.get(addr, false);
         expect(runsSpy).not.toHaveBeenCalled();
@@ -106,7 +111,9 @@ describe('JobsProgram', () => {
 
       it('get leaves non-queued jobs unchanged', async () => {
         const addr = newAddr(61);
-        vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(makeJobAccount(JobState.COMPLETED, addr));
+        vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(
+          makeJobAccount(JobState.COMPLETED, addr)
+        );
         const runsSpy = vi.spyOn(jobs, 'runs').mockResolvedValue([] as any);
         const out = await jobs.get(addr, true);
         expect(runsSpy).not.toHaveBeenCalled();
@@ -116,17 +123,26 @@ describe('JobsProgram', () => {
       it('multiple does not call runs when checkRuns is false', async () => {
         const a = newAddr(62);
         const b = newAddr(63);
-        vi.spyOn(programClient, 'fetchAllJobAccount' as any).mockResolvedValue([makeJobAccount(JobState.QUEUED, a), makeJobAccount(JobState.QUEUED, b)]);
+        vi.spyOn(programClient, 'fetchAllJobAccount' as any).mockResolvedValue([
+          makeJobAccount(JobState.QUEUED, a),
+          makeJobAccount(JobState.QUEUED, b),
+        ]);
         const runsSpy = vi.spyOn(jobs, 'runs').mockResolvedValue([] as any);
         const out = await jobs.multiple([a, b], false);
         expect(runsSpy).not.toHaveBeenCalled();
-        expect(out.every(j => j.state === JobState.QUEUED)).toBe(true);
+        expect(out.every((j) => j.state === JobState.QUEUED)).toBe(true);
         expect(out).toHaveLength(2);
       });
       it('get sets RUNNING and timeStart when checkRun is true and a run exists', async () => {
         const addr = newAddr(10);
-        vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(makeJobAccount(JobState.QUEUED, addr));
-        const runsSpy = vi.spyOn(jobs, 'runs').mockResolvedValue([{ address: newAddr(25), job: addr, node: newAddr(26), time: 555 }] as any);
+        vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(
+          makeJobAccount(JobState.QUEUED, addr)
+        );
+        const runsSpy = vi
+          .spyOn(jobs, 'runs')
+          .mockResolvedValue([
+            { address: newAddr(25), job: addr, node: newAddr(26), time: 555 },
+          ] as any);
 
         const out = await jobs.get(addr, true);
         expect(runsSpy).toHaveBeenCalledWith({ job: addr });
@@ -137,12 +153,17 @@ describe('JobsProgram', () => {
       it('multiple applies runs mapping only to queued jobs when checkRuns is true', async () => {
         const a = newAddr(11);
         const b = newAddr(12);
-        vi.spyOn(programClient, 'fetchAllJobAccount' as any).mockResolvedValue([makeJobAccount(JobState.QUEUED, a), makeJobAccount(JobState.COMPLETED, b)]);
-        vi.spyOn(jobs, 'runs').mockResolvedValue([{ address: newAddr(30), job: a, node: newAddr(31), time: 777 }] as any);
+        vi.spyOn(programClient, 'fetchAllJobAccount' as any).mockResolvedValue([
+          makeJobAccount(JobState.QUEUED, a),
+          makeJobAccount(JobState.COMPLETED, b),
+        ]);
+        vi.spyOn(jobs, 'runs').mockResolvedValue([
+          { address: newAddr(30), job: a, node: newAddr(31), time: 777 },
+        ] as any);
 
         const out = await jobs.multiple([a, b], true);
-        const first = out.find(j => j.address === a)!;
-        const second = out.find(j => j.address === b)!;
+        const first = out.find((j) => j.address === a)!;
+        const second = out.find((j) => j.address === b)!;
         expect(first.state).toBe(JobState.RUNNING);
         expect(first.timeStart).toBe(777);
         expect(second.state).toBe(JobState.COMPLETED);
@@ -152,8 +173,14 @@ describe('JobsProgram', () => {
     describe('GPA filters', () => {
       it('all() builds discriminator and expected offset filters', async () => {
         const ctx = SdkFactory.createWithRpc();
-        sdk = ctx.sdk; jobs = new JobsProgram(sdk);
-        const filters = { state: JobState.RUNNING, project: newAddr(40), node: newAddr(41), market: newAddr(42) } as any;
+        sdk = ctx.sdk;
+        jobs = new JobsProgram(sdk);
+        const filters = {
+          state: JobState.RUNNING,
+          project: newAddr(40),
+          node: newAddr(41),
+          market: newAddr(42),
+        } as any;
         await jobs.all(filters);
         const call = (sdk as any).solana.rpc.getProgramAccounts.mock.calls[0][1];
         const memcmps = call.filters.map((f: any) => f.memcmp).filter(Boolean);
@@ -166,7 +193,9 @@ describe('JobsProgram', () => {
       });
 
       it('runs() includes RUN discriminator (offset 0)', async () => {
-        const ctx = SdkFactory.createWithRpc(); sdk = ctx.sdk; jobs = new JobsProgram(sdk);
+        const ctx = SdkFactory.createWithRpc();
+        sdk = ctx.sdk;
+        jobs = new JobsProgram(sdk);
         await jobs.runs({ job: newAddr(50), node: newAddr(51) });
         const call = (sdk as any).solana.rpc.getProgramAccounts.mock.calls[0][1];
         const memcmps = call.filters.map((f: any) => f.memcmp).filter(Boolean);
@@ -174,7 +203,9 @@ describe('JobsProgram', () => {
       });
 
       it('markets() includes MARKET discriminator (offset 0)', async () => {
-        const ctx = SdkFactory.createWithRpc(); sdk = ctx.sdk; jobs = new JobsProgram(sdk);
+        const ctx = SdkFactory.createWithRpc();
+        sdk = ctx.sdk;
+        jobs = new JobsProgram(sdk);
         await jobs.markets();
         const call = (sdk as any).solana.rpc.getProgramAccounts.mock.calls[0][1];
         const memcmps = call.filters.map((f: any) => f.memcmp).filter(Boolean);
@@ -185,7 +216,11 @@ describe('JobsProgram', () => {
     describe('post', () => {
       it('creates list instruction with decoded ipfsJob and PDAs', async () => {
         // Arrange wallet and mocks
-        const wallet = { address: newAddr(70), signMessages: async () => [], signTransactions: async () => [] } as any;
+        const wallet = {
+          address: newAddr(70),
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
         (sdk as any).wallet = wallet;
         // mock PDA helper used for vault
         (sdk as any).solana.pda = vi.fn(async () => newAddr(80));
@@ -193,7 +228,11 @@ describe('JobsProgram', () => {
         const token = await import('@solana-program/token');
         vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([newAddr(72)]);
         // spy on client.getListInstruction
-        const listSpy = vi.spyOn(programClient, 'getListInstruction' as any).mockReturnValue({ programAddress: newAddr(73), accounts: [], data: new Uint8Array([1]) });
+        const listSpy = vi.spyOn(programClient, 'getListInstruction' as any).mockReturnValue({
+          programAddress: newAddr(73),
+          accounts: [],
+          data: new Uint8Array([1]),
+        });
 
         const ipfsBytes = Array.from({ length: 32 }, (_, i) => i);
         const ipfsCid = (await import('../src/ipfs/IPFS.js')).IPFS.solHashToIpfsHash(ipfsBytes)!;
@@ -233,8 +272,11 @@ describe('JobsProgram', () => {
 
       it('all propagates getProgramAccounts errors', async () => {
         const ctx = SdkFactory.createWithRpc();
-        sdk = ctx.sdk; jobs = new JobsProgram(sdk);
-        (sdk as any).solana.rpc.getProgramAccounts = vi.fn().mockReturnValue({ send: vi.fn().mockRejectedValue(new Error('Network error')) });
+        sdk = ctx.sdk;
+        jobs = new JobsProgram(sdk);
+        (sdk as any).solana.rpc.getProgramAccounts = vi
+          .fn()
+          .mockReturnValue({ send: vi.fn().mockRejectedValue(new Error('Network error')) });
         await expect(jobs.all()).rejects.toThrow('Network error');
       });
     });
@@ -252,27 +294,26 @@ describe('JobsProgram', () => {
             next: vi.fn().mockResolvedValue({ done: true, value: undefined }),
             return: vi.fn().mockResolvedValue({ done: true, value: undefined }),
           };
-        }
+        },
       };
 
       const mockSubscribe = vi.fn().mockResolvedValue(mockIterable);
       const mockProgramNotifications = vi.fn().mockReturnValue({ subscribe: mockSubscribe });
 
       (sdk as any).solana.rpcSubscriptions = {
-        programNotifications: mockProgramNotifications
+        programNotifications: mockProgramNotifications,
       };
 
       const stopMonitoring = await jobs.monitor();
 
       expect(stopMonitoring).toBeInstanceOf(Function);
-      expect(mockProgramNotifications).toHaveBeenCalledWith(
-        sdk.config.programs.jobsAddress,
-        { encoding: 'base64' }
-      );
+      expect(mockProgramNotifications).toHaveBeenCalledWith(sdk.config.programs.jobsAddress, {
+        encoding: 'base64',
+      });
 
       // Stop monitoring to clean up
       stopMonitoring();
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
     });
 
     it('accepts callback options for job, market, run accounts, and error handling', async () => {
@@ -290,27 +331,27 @@ describe('JobsProgram', () => {
             next: vi.fn().mockResolvedValue({ done: true, value: undefined }),
             return: vi.fn().mockResolvedValue({ done: true, value: undefined }),
           };
-        }
+        },
       };
 
       const mockSubscribe = vi.fn().mockResolvedValue(mockIterable);
       const mockProgramNotifications = vi.fn().mockReturnValue({ subscribe: mockSubscribe });
 
       (sdk as any).solana.rpcSubscriptions = {
-        programNotifications: mockProgramNotifications
+        programNotifications: mockProgramNotifications,
       };
 
       const stopMonitoring = await jobs.monitor({
         onJobAccount,
         onMarketAccount,
         onRunAccount,
-        onError
+        onError,
       });
 
       expect(stopMonitoring).toBeInstanceOf(Function);
 
       stopMonitoring();
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
     });
 
     it('handles subscription setup errors gracefully', async () => {
@@ -322,7 +363,7 @@ describe('JobsProgram', () => {
       const mockProgramNotifications = vi.fn().mockReturnValue({ subscribe: mockSubscribe });
 
       (sdk as any).solana.rpcSubscriptions = {
-        programNotifications: mockProgramNotifications
+        programNotifications: mockProgramNotifications,
       };
 
       // Should not throw immediately since error handling is internal with retry logic
@@ -331,9 +372,7 @@ describe('JobsProgram', () => {
       expect(stopMonitoring).toBeInstanceOf(Function);
 
       stopMonitoring();
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
     });
   });
 });
-
-

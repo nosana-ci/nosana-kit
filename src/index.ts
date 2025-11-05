@@ -1,4 +1,10 @@
-import { ClientConfig, getNosanaConfig, NosanaNetwork, PartialClientConfig, WalletConfig } from './config/index.js';
+import {
+  ClientConfig,
+  getNosanaConfig,
+  NosanaNetwork,
+  PartialClientConfig,
+  WalletConfig,
+} from './config/index.js';
 import { Logger } from './logger/Logger.js';
 import { JobsProgram } from './programs/JobsProgram.js';
 import { StakeProgram } from './programs/StakeProgram.js';
@@ -60,5 +66,5 @@ export type { TokenAccount, TokenAccountWithBalance } from './services/NosServic
 export * as JobsClient from './generated_clients/jobs/index.js';
 export * as StakingClient from './generated_clients/staking/index.js';
 
-// Export dependencies 
+// Export dependencies
 export * from 'gill';

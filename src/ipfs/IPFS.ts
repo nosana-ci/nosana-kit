@@ -89,10 +89,7 @@ export class IPFS {
    * @param options Additional axios request options
    * @returns The retrieved data
    */
-  async retrieve(
-    hash: string | Array<number>,
-    options: AxiosRequestConfig = {},
-  ): Promise<any> {
+  async retrieve(hash: string | Array<number>, options: AxiosRequestConfig = {}): Promise<any> {
     if (typeof hash !== 'string') {
       const convertedHash = IPFS.solHashToIpfsHash(hash);
       if (!convertedHash) {

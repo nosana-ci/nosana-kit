@@ -32,14 +32,23 @@ describe('walletConverter', () => {
 
       const browserWallet: any = {
         publicKey: { toString: () => expectedAddress },
-        signMessage: async (msg: Uint8Array) => { signMessageCalls += 1; return msg; },
-        signTransaction: async (tx: any) => { signTransactionCalls += 1; return tx; },
+        signMessage: async (msg: Uint8Array) => {
+          signMessageCalls += 1;
+          return msg;
+        },
+        signTransaction: async (tx: any) => {
+          signTransactionCalls += 1;
+          return tx;
+        },
       };
 
       const signer = await convertWalletConfigToKeyPairSigner(browserWallet);
       expect(signer.address).toBe(expectedAddress);
 
-      await (signer as KeyPairSigner).signMessages([new Uint8Array([1]), new Uint8Array([2]) as any] as any);
+      await (signer as KeyPairSigner).signMessages([
+        new Uint8Array([1]),
+        new Uint8Array([2]) as any,
+      ] as any);
       await (signer as KeyPairSigner).signTransactions([{ a: 1 }, { b: 2 }] as any);
       expect(signMessageCalls).toBe(2);
       expect(signTransactionCalls).toBe(2);
@@ -55,15 +64,17 @@ describe('walletConverter', () => {
       const signer = await convertWalletConfigToKeyPairSigner(browserWallet);
       expect(signer.address).toBe(expectedAddress);
 
-      await expect((signer as KeyPairSigner).signTransactions([{ a: 1 }] as any))
-        .rejects.toThrow('Browser wallet does not support transaction signing');
+      await expect((signer as KeyPairSigner).signTransactions([{ a: 1 }] as any)).rejects.toThrow(
+        'Browser wallet does not support transaction signing'
+      );
     });
 
     it('browser-like object without signMessage/signTransaction is rejected', async () => {
       const badBrowserWallet: any = { publicKey: { toString: () => expectedAddress } };
 
-      await expect(convertWalletConfigToKeyPairSigner(badBrowserWallet))
-        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
+      await expect(convertWalletConfigToKeyPairSigner(badBrowserWallet)).rejects.toMatchObject({
+        code: 'WALLET_CONVERSION_ERROR',
+      });
     });
   });
 
@@ -124,8 +135,9 @@ describe('walletConverter', () => {
       { input: '', description: 'empty string' },
       { input: '/non/existent/file.json', description: 'non-existent file path' },
     ])('rejects $description', async ({ input }) => {
-      await expect(convertWalletConfigToKeyPairSigner(input))
-        .rejects.toMatchObject({ code: 'WALLET_CONVERSION_ERROR' });
+      await expect(convertWalletConfigToKeyPairSigner(input)).rejects.toMatchObject({
+        code: 'WALLET_CONVERSION_ERROR',
+      });
     });
   });
 });

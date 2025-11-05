@@ -5,9 +5,13 @@ import type { ReadonlyUint8Array } from 'gill';
 
 vi.mock('axios', () => {
   const get = vi.fn().mockResolvedValue({ data: { ok: true } });
-  const create = vi.fn(() => ({ post: vi.fn().mockResolvedValue({ data: { IpfsHash: 'QmPinnedHash' } }) }));
+  const create = vi.fn(() => ({
+    post: vi.fn().mockResolvedValue({ data: { IpfsHash: 'QmPinnedHash' } }),
+  }));
   class MockAxiosHeaders {
-    set() { return this; }
+    set() {
+      return this;
+    }
   }
   return {
     default: { get, create },
@@ -90,19 +94,30 @@ describe('IPFS API', () => {
       const mockData = { result: 'test data' };
       (axios.default.get as any).mockResolvedValueOnce({ data: mockData });
 
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 't',
+        gateway: 'https://gateway.example/ipfs/',
+      });
       const hash = 'QmTestHash123';
       const result = await ipfs.retrieve(hash);
 
       expect(result).toEqual(mockData);
-      expect(axios.default.get).toHaveBeenCalledWith('https://gateway.example/ipfs/QmTestHash123', {});
+      expect(axios.default.get).toHaveBeenCalledWith(
+        'https://gateway.example/ipfs/QmTestHash123',
+        {}
+      );
     });
 
     it('retrieves data using byte array hash', async () => {
       const mockData = { result: 'test data from bytes' };
       (axios.default.get as any).mockResolvedValueOnce({ data: mockData });
 
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 't',
+        gateway: 'https://gateway.example/ipfs/',
+      });
       const bytes = Array.from({ length: 32 }, (_, i) => i + 1); // Non-zero to avoid null hash
       const result = await ipfs.retrieve(bytes);
 
@@ -116,16 +131,27 @@ describe('IPFS API', () => {
       const mockData = { custom: 'response' };
       (axios.default.get as any).mockResolvedValueOnce({ data: mockData });
 
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 't',
+        gateway: 'https://gateway.example/ipfs/',
+      });
       const options = { timeout: 5000, headers: { 'Custom-Header': 'value' } };
       const result = await ipfs.retrieve('QmTestHash', options);
 
       expect(result).toEqual(mockData);
-      expect(axios.default.get).toHaveBeenCalledWith('https://gateway.example/ipfs/QmTestHash', options);
+      expect(axios.default.get).toHaveBeenCalledWith(
+        'https://gateway.example/ipfs/QmTestHash',
+        options
+      );
     });
 
     it('throws error for invalid byte array hash', async () => {
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 't',
+        gateway: 'https://gateway.example/ipfs/',
+      });
       const emptyHash = Array.from(new Uint8Array(32).fill(0)); // This converts to null hash
 
       await expect(ipfs.retrieve(emptyHash)).rejects.toThrow('Invalid hash provided');
@@ -135,7 +161,11 @@ describe('IPFS API', () => {
       const axiosError = new Error('Network error');
       (axios.default.get as any).mockRejectedValueOnce(axiosError);
 
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 't',
+        gateway: 'https://gateway.example/ipfs/',
+      });
 
       await expect(ipfs.retrieve('QmTestHash')).rejects.toThrow('Network error');
     });
@@ -144,7 +174,11 @@ describe('IPFS API', () => {
       const stringData = 'plain text response';
       (axios.default.get as any).mockResolvedValueOnce({ data: stringData });
 
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: 'https://gateway.example/ipfs/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 't',
+        gateway: 'https://gateway.example/ipfs/',
+      });
       const result = await ipfs.retrieve('QmStringHash');
 
       expect(result).toBe(stringData);
@@ -158,7 +192,10 @@ describe('IPFS API', () => {
       const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 't', gateway: customGateway });
       await ipfs.retrieve('QmTestHash');
 
-      expect(axios.default.get).toHaveBeenCalledWith('https://my-custom-gateway.com/QmTestHash', {});
+      expect(axios.default.get).toHaveBeenCalledWith(
+        'https://my-custom-gateway.com/QmTestHash',
+        {}
+      );
     });
   });
 
@@ -175,7 +212,11 @@ describe('IPFS API', () => {
 
   describe('pinFile', () => {
     it('pins file from path to Pinata (integration-style)', async () => {
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 'test-jwt', gateway: 'https://gw/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 'test-jwt',
+        gateway: 'https://gw/',
+      });
 
       // Create a temporary test file
       const fs = await import('fs');
@@ -196,8 +237,8 @@ describe('IPFS API', () => {
           expect.objectContaining({
             headers: expect.objectContaining({
               'Content-Type': expect.stringContaining('multipart/form-data'),
-              'Authorization': 'Bearer test-jwt'
-            })
+              Authorization: 'Bearer test-jwt',
+            }),
           })
         );
       } finally {
@@ -211,7 +252,11 @@ describe('IPFS API', () => {
 
   describe('pinFileFromBuffer', () => {
     it('pins file from Buffer to Pinata', async () => {
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 'test-jwt', gateway: 'https://gw/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 'test-jwt',
+        gateway: 'https://gw/',
+      });
 
       const fileBuffer = Buffer.from('test file content');
       const fileName = 'test-file.txt';
@@ -227,14 +272,18 @@ describe('IPFS API', () => {
         expect.objectContaining({
           headers: expect.objectContaining({
             'Content-Type': expect.stringContaining('multipart/form-data'),
-            'Authorization': 'Bearer test-jwt'
-          })
+            Authorization: 'Bearer test-jwt',
+          }),
         })
       );
     });
 
     it('pins file from stream-like Buffer to Pinata', async () => {
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 'test-jwt', gateway: 'https://gw/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 'test-jwt',
+        gateway: 'https://gw/',
+      });
 
       // Create a Buffer that can be used by form-data
       const { Readable } = await import('stream');
@@ -253,14 +302,18 @@ describe('IPFS API', () => {
         expect.any(Object),
         expect.objectContaining({
           headers: expect.objectContaining({
-            'Authorization': 'Bearer test-jwt'
-          })
+            Authorization: 'Bearer test-jwt',
+          }),
         })
       );
     });
 
     it('handles different file types', async () => {
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 'test-jwt', gateway: 'https://gw/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 'test-jwt',
+        gateway: 'https://gw/',
+      });
 
       const { Readable } = await import('stream');
       const imageBuffer = Buffer.from('fake-image-data');
@@ -271,7 +324,11 @@ describe('IPFS API', () => {
     });
 
     it('propagates API errors', async () => {
-      const ipfs = new IPFS({ api: 'https://api.pinata.cloud', jwt: 'test-jwt', gateway: 'https://gw/' });
+      const ipfs = new IPFS({
+        api: 'https://api.pinata.cloud',
+        jwt: 'test-jwt',
+        gateway: 'https://gw/',
+      });
 
       // Make the next post call fail
       const api = (axios.default.create as any).mock.results[0].value;
@@ -281,9 +338,9 @@ describe('IPFS API', () => {
       const buffer = Buffer.from('test');
       const stream = Readable.from(buffer);
 
-      await expect(ipfs.pinFileFromBuffer(stream as any, 'test.txt')).rejects.toThrow('Pinata API error');
+      await expect(ipfs.pinFileFromBuffer(stream as any, 'test.txt')).rejects.toThrow(
+        'Pinata API error'
+      );
     });
   });
 });
-
-

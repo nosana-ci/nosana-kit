@@ -1,7 +1,7 @@
 import { BaseProgram } from './BaseProgram.js';
 import { Address, Account, parseBase64RpcAccount, Base58EncodedBytes } from 'gill';
 import { NosanaClient } from '../index.js';
-import * as programClient from "../generated_clients/staking/index.js";
+import * as programClient from '../generated_clients/staking/index.js';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../utils/index.js';
 import bs58 from 'bs58';
 
@@ -39,7 +39,7 @@ export class StakeProgram extends BaseProgram {
   async multiple(addresses: Address[]): Promise<Stake[]> {
     try {
       const stakeAccounts = await this.client.fetchAllStakeAccount(this.sdk.solana.rpc, addresses);
-      const stakes = stakeAccounts.map(stakeAccount => (this.transformStakeAccount(stakeAccount)));
+      const stakes = stakeAccounts.map((stakeAccount) => this.transformStakeAccount(stakeAccount));
       return stakes;
     } catch (err) {
       this.sdk.logger.error(`Failed to fetch stakes ${err}`);
@@ -54,13 +54,15 @@ export class StakeProgram extends BaseProgram {
     try {
       const getProgramAccountsResponse = await this.sdk.solana.rpc
         .getProgramAccounts(this.getProgramId(), {
-          encoding: "base64",
+          encoding: 'base64',
           filters: [
             {
               memcmp: {
                 offset: BigInt(0),
-                bytes: bs58.encode(Buffer.from(this.client.STAKE_ACCOUNT_DISCRIMINATOR)) as Base58EncodedBytes,
-                encoding: "base58",
+                bytes: bs58.encode(
+                  Buffer.from(this.client.STAKE_ACCOUNT_DISCRIMINATOR)
+                ) as Base58EncodedBytes,
+                encoding: 'base58',
               },
             },
           ],
@@ -70,7 +72,9 @@ export class StakeProgram extends BaseProgram {
       const stakes: Stake[] = getProgramAccountsResponse
         .map((result: any) => {
           try {
-            const stakeAccount = programClient.decodeStakeAccount(parseBase64RpcAccount(result.pubkey, result.account));
+            const stakeAccount = programClient.decodeStakeAccount(
+              parseBase64RpcAccount(result.pubkey, result.account)
+            );
             return this.transformStakeAccount(stakeAccount);
           } catch (err) {
             this.sdk.logger.error(`Failed to decode stake ${err}`);
@@ -89,13 +93,12 @@ export class StakeProgram extends BaseProgram {
    * Transform stake account to include address and convert BigInt to numbers
    */
   public transformStakeAccount(stakeAccount: Account<programClient.StakeAccount>): Stake {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { discriminator: _, ...stakeAccountData } = stakeAccount.data;
 
     return {
       address: stakeAccount.address,
       ...convertBigIntToNumber(stakeAccountData),
-    }
+    };
   }
 }
-

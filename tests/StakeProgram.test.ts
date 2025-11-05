@@ -2,11 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { StakeProgram } from '../src/programs/StakeProgram.js';
 import * as stakingClient from '../src/generated_clients/staking/index.js';
 import { type Address, parseBase64RpcAccount } from 'gill';
-import {
-  AddressFactory,
-  SdkFactory,
-  StakeAccountFactory,
-} from './helpers/index.js';
+import { AddressFactory, SdkFactory, StakeAccountFactory } from './helpers/index.js';
 
 // Legacy aliases for backward compatibility
 const baseSdk = () => SdkFactory.createBasic();
@@ -125,7 +121,9 @@ describe('StakeProgram', () => {
         vi.spyOn(stakingClient, 'fetchStakeAccount' as any).mockRejectedValue(error);
 
         await expect(stake.get(addr)).rejects.toThrow('Account not found');
-        expect(sdk.logger.error).toHaveBeenCalledWith(expect.stringContaining('Failed to fetch stake'));
+        expect(sdk.logger.error).toHaveBeenCalledWith(
+          expect.stringContaining('Failed to fetch stake')
+        );
       });
     });
 
@@ -163,7 +161,9 @@ describe('StakeProgram', () => {
         vi.spyOn(stakingClient, 'fetchAllStakeAccount' as any).mockRejectedValue(error);
 
         await expect(stake.multiple(addresses)).rejects.toThrow('RPC error');
-        expect(sdk.logger.error).toHaveBeenCalledWith(expect.stringContaining('Failed to fetch stakes'));
+        expect(sdk.logger.error).toHaveBeenCalledWith(
+          expect.stringContaining('Failed to fetch stakes')
+        );
       });
     });
 
@@ -172,7 +172,7 @@ describe('StakeProgram', () => {
         const mockStakes = StakeAccountFactory.createMany(5);
 
         // Mock getProgramAccounts to return properly structured response
-        const mockResponse = mockStakes.map(stake => ({
+        const mockResponse = mockStakes.map((stake) => ({
           pubkey: stake.address,
           account: {
             data: Buffer.from('mock-data').toString('base64'),
@@ -185,7 +185,7 @@ describe('StakeProgram', () => {
 
         vi.spyOn(stakingClient, 'decodeStakeAccount').mockImplementation((account: any) => {
           // Find the matching mock stake by address
-          const matchingStake = mockStakes.find(s => s.address === account.address);
+          const matchingStake = mockStakes.find((s) => s.address === account.address);
           return matchingStake || mockStakes[0];
         });
 
@@ -239,7 +239,7 @@ describe('StakeProgram', () => {
       it('should filter out failed decodes', async () => {
         const mockStakes = StakeAccountFactory.createMany(3);
 
-        const mockResponse = mockStakes.map(stake => ({
+        const mockResponse = mockStakes.map((stake) => ({
           pubkey: stake.address,
           account: {
             data: Buffer.from('mock-data').toString('base64'),
@@ -267,7 +267,9 @@ describe('StakeProgram', () => {
 
         // Should have 2 results (3 total - 1 failed decode)
         expect(result).toHaveLength(2);
-        expect(sdk.logger.error).toHaveBeenCalledWith(expect.stringContaining('Failed to decode stake'));
+        expect(sdk.logger.error).toHaveBeenCalledWith(
+          expect.stringContaining('Failed to decode stake')
+        );
       });
 
       it('should handle RPC errors', async () => {
@@ -278,7 +280,9 @@ describe('StakeProgram', () => {
         })) as any;
 
         await expect(stake.all()).rejects.toThrow('RPC connection failed');
-        expect(sdk.logger.error).toHaveBeenCalledWith(expect.stringContaining('Failed to fetch all stakes'));
+        expect(sdk.logger.error).toHaveBeenCalledWith(
+          expect.stringContaining('Failed to fetch all stakes')
+        );
       });
     });
   });
@@ -302,7 +306,7 @@ describe('StakeProgram', () => {
 
       vi.spyOn(stakingClient, 'fetchAllStakeAccount' as any).mockResolvedValue(stakes);
 
-      const result = await stake.multiple(stakes.map(s => s.address));
+      const result = await stake.multiple(stakes.map((s) => s.address));
 
       expect(result[0].amount).toBe(100);
       expect(result[1].amount).toBe(10000);
@@ -335,4 +339,3 @@ describe('StakeProgram', () => {
     });
   });
 });
-

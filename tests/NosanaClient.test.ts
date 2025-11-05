@@ -48,7 +48,7 @@ describe('NosanaClient', () => {
     it('merges custom config overrides', () => {
       const rpcEndpoint = 'https://test-rpc.example';
       const sdk = new NosanaClient(NosanaNetwork.MAINNET, {
-        solana: { rpcEndpoint }
+        solana: { rpcEndpoint },
       });
       expect(sdk.config.solana.rpcEndpoint).toBe(rpcEndpoint);
       expect(sdk.config.solana.cluster).toBe(DEFAULT_CONFIGS[NosanaNetwork.MAINNET].solana.cluster);
@@ -56,7 +56,7 @@ describe('NosanaClient', () => {
 
     it('merges IPFS overrides', () => {
       const sdk = new NosanaClient(NosanaNetwork.MAINNET, {
-        ipfs: { api: 'https://ipfs.example', gateway: 'https://gw.example/ipfs/' }
+        ipfs: { api: 'https://ipfs.example', gateway: 'https://gw.example/ipfs/' },
       });
       expect(sdk.config.ipfs.api).toBe('https://ipfs.example');
       expect(sdk.config.ipfs.gateway).toBe('https://gw.example/ipfs/');
@@ -98,7 +98,9 @@ describe('NosanaClient', () => {
     it('setWallet rejects on invalid keypair data with proper error code', async () => {
       const sdk = new NosanaClient(NosanaNetwork.MAINNET);
 
-      await expect(sdk.setWallet([1, 2, 3] as any)).rejects.toMatchObject({ code: ErrorCodes.WALLET_CONVERSION_ERROR });
+      await expect(sdk.setWallet([1, 2, 3] as any)).rejects.toMatchObject({
+        code: ErrorCodes.WALLET_CONVERSION_ERROR,
+      });
       expect(sdk.wallet).toBeUndefined();
     });
   });
@@ -106,7 +108,9 @@ describe('NosanaClient', () => {
   describe('multiple instances', () => {
     it('two clients have independent configs and services', () => {
       const sdkA = new NosanaClient(NosanaNetwork.MAINNET);
-      const sdkB = new NosanaClient(NosanaNetwork.DEVNET, { solana: { rpcEndpoint: 'https://custom-devnet.example' } });
+      const sdkB = new NosanaClient(NosanaNetwork.DEVNET, {
+        solana: { rpcEndpoint: 'https://custom-devnet.example' },
+      });
 
       // different instances
       expect(sdkA).not.toBe(sdkB);
@@ -151,7 +155,7 @@ describe('NosanaClient', () => {
     it('solana service uses SDK config for RPC endpoint', () => {
       const customRpc = 'https://my-custom-rpc.example';
       const sdk = new NosanaClient(NosanaNetwork.MAINNET, {
-        solana: { rpcEndpoint: customRpc }
+        solana: { rpcEndpoint: customRpc },
       });
 
       expect(sdk.config.solana.rpcEndpoint).toBe(customRpc);
@@ -163,7 +167,7 @@ describe('NosanaClient', () => {
       const customGateway = 'https://my-gateway.example/ipfs/';
       const customApi = 'https://my-api.example';
       const sdk = new NosanaClient(NosanaNetwork.MAINNET, {
-        ipfs: { gateway: customGateway, api: customApi }
+        ipfs: { gateway: customGateway, api: customApi },
       });
 
       expect(sdk.ipfs.config.gateway).toBe(customGateway);
@@ -172,7 +176,7 @@ describe('NosanaClient', () => {
 
     it('logger configuration is respected across all components', () => {
       const sdk = new NosanaClient(NosanaNetwork.MAINNET, {
-        logLevel: NosanaLogLevel.ERROR
+        logLevel: NosanaLogLevel.ERROR,
       });
 
       expect(sdk.config.logLevel).toBe(NosanaLogLevel.ERROR);
@@ -192,5 +196,3 @@ describe('NosanaClient', () => {
     });
   });
 });
-
-

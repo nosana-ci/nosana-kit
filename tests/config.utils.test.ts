@@ -1,7 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { mergeConfigs, getNosanaConfig } from '../src/config/utils.js';
 import { DEFAULT_CONFIGS } from '../src/config/defaultConfigs.js';
-import { NosanaNetwork, NosanaLogLevel, type ClientConfig, type PartialClientConfig } from '../src/config/types.js';
+import {
+  NosanaNetwork,
+  NosanaLogLevel,
+  type ClientConfig,
+  type PartialClientConfig,
+} from '../src/config/types.js';
 import { NosanaError, ErrorCodes } from '../src/errors/NosanaError.js';
 
 describe('config/utils', () => {
@@ -48,7 +53,9 @@ describe('config/utils', () => {
     });
 
     it('applies overrides via second argument', () => {
-      const cfg = getNosanaConfig(NosanaNetwork.MAINNET, { solana: { rpcEndpoint: 'https://override' } });
+      const cfg = getNosanaConfig(NosanaNetwork.MAINNET, {
+        solana: { rpcEndpoint: 'https://override' },
+      });
       expect(cfg.solana.rpcEndpoint).toBe('https://override');
       expect(cfg.solana.cluster).toBe(DEFAULT_CONFIGS[NosanaNetwork.MAINNET].solana.cluster);
     });
@@ -63,5 +70,3 @@ describe('config/utils', () => {
     });
   });
 });
-
-

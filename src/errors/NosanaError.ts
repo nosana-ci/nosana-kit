@@ -21,4 +21,4 @@ export const ErrorCodes = {
   WALLET_CONVERSION_ERROR: 'WALLET_CONVERSION_ERROR',
 } as const;
 
-export type ErrorCode = typeof ErrorCodes[keyof typeof ErrorCodes]; 
+export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];

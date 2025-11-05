@@ -13,6 +13,7 @@
     "generate-clients": "npx tsx scripts/generate-clients.ts",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.ts\"",
+    "prettier": "prettier --check \"**/*.ts\"",
     "publish:public": "npm version patch && npm run build && npm publish --access public"
   },
   "keywords": [

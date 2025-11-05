@@ -1,32 +1,51 @@
-import { createSolanaClient, address, Address, SolanaClient, getProgramDerivedAddress, getAddressEncoder, generateKeyPairSigner, createTransaction, signTransactionMessageWithSigners, getExplorerLink, getSignatureFromTransaction, Signature, IInstruction, ITransactionMessageWithFeePayerSigner, TransactionMessageWithBlockhashLifetime, CompilableTransactionMessage, isTransactionMessageWithBlockhashLifetime, FullySignedTransaction, TransactionWithBlockhashLifetime } from 'gill';
+import {
+  createSolanaClient,
+  address,
+  Address,
+  SolanaClient,
+  getProgramDerivedAddress,
+  getAddressEncoder,
+  generateKeyPairSigner,
+  createTransaction,
+  signTransactionMessageWithSigners,
+  getExplorerLink,
+  getSignatureFromTransaction,
+  Signature,
+  IInstruction,
+  ITransactionMessageWithFeePayerSigner,
+  TransactionMessageWithBlockhashLifetime,
+  CompilableTransactionMessage,
+  isTransactionMessageWithBlockhashLifetime,
+  FullySignedTransaction,
+  TransactionWithBlockhashLifetime,
+} from 'gill';
 import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
 import { NosanaClient } from '../index.js';
 
 export class SolanaService {
   private readonly sdk: NosanaClient;
-  public readonly rpc: SolanaClient["rpc"];
-  public readonly rpcSubscriptions: SolanaClient["rpcSubscriptions"];
-  public readonly sendAndConfirmTransaction: SolanaClient["sendAndConfirmTransaction"];
+  public readonly rpc: SolanaClient['rpc'];
+  public readonly rpcSubscriptions: SolanaClient['rpcSubscriptions'];
+  public readonly sendAndConfirmTransaction: SolanaClient['sendAndConfirmTransaction'];
 
   constructor(sdk: NosanaClient) {
     this.sdk = sdk;
     const rpcEndpoint = this.sdk.config.solana.rpcEndpoint;
     if (!rpcEndpoint) throw new NosanaError('RPC URL is required', ErrorCodes.INVALID_CONFIG);
-    const { rpc, rpcSubscriptions, sendAndConfirmTransaction } = createSolanaClient({ urlOrMoniker: rpcEndpoint });
+    const { rpc, rpcSubscriptions, sendAndConfirmTransaction } = createSolanaClient({
+      urlOrMoniker: rpcEndpoint,
+    });
 
     this.rpc = rpc;
     this.rpcSubscriptions = rpcSubscriptions;
     this.sendAndConfirmTransaction = sendAndConfirmTransaction;
   }
 
-  public async pda(
-    seeds: Array<Address | string>,
-    programId: Address,
-  ): Promise<Address> {
+  public async pda(seeds: Array<Address | string>, programId: Address): Promise<Address> {
     const addressEncoder = getAddressEncoder();
     const [pda] = await getProgramDerivedAddress({
       programAddress: programId,
-      seeds: seeds.map(seed => typeof seed !== 'string' ? addressEncoder.encode(seed) : seed),
+      seeds: seeds.map((seed) => (typeof seed !== 'string' ? addressEncoder.encode(seed) : seed)),
     });
     return pda;
   }
@@ -39,11 +58,7 @@ export class SolanaService {
       return balance.value;
     } catch (error) {
       this.sdk.logger.error(`Failed to get balance: ${error}`);
-      throw new NosanaError(
-        'Failed to get balance',
-        ErrorCodes.RPC_ERROR,
-        error
-      );
+      throw new NosanaError('Failed to get balance', ErrorCodes.RPC_ERROR, error);
     }
   }
 
@@ -53,11 +68,7 @@ export class SolanaService {
       return blockhash;
     } catch (error) {
       this.sdk.logger.error(`Failed to get latest blockhash: ${error}`);
-      throw new NosanaError(
-        'Failed to get latest blockhash',
-        ErrorCodes.RPC_ERROR,
-        error
-      );
+      throw new NosanaError('Failed to get latest blockhash', ErrorCodes.RPC_ERROR, error);
     }
   }
 
@@ -66,7 +77,9 @@ export class SolanaService {
    */
   private isTransaction(
     input: any
-  ): input is CompilableTransactionMessage & TransactionMessageWithBlockhashLifetime | FullySignedTransaction & TransactionWithBlockhashLifetime {
+  ): input is
+    | (CompilableTransactionMessage & TransactionMessageWithBlockhashLifetime)
+    | (FullySignedTransaction & TransactionWithBlockhashLifetime) {
     return 'instructions' in input && 'version' in input && !('programAddress' in input);
   }
 
@@ -85,7 +98,11 @@ export class SolanaService {
    * @returns The transaction signature
    */
   public async send(
-    instructionsOrTransaction: IInstruction | IInstruction[] | CompilableTransactionMessage & TransactionMessageWithBlockhashLifetime | FullySignedTransaction & TransactionWithBlockhashLifetime
+    instructionsOrTransaction:
+      | IInstruction
+      | IInstruction[]
+      | (CompilableTransactionMessage & TransactionMessageWithBlockhashLifetime)
+      | (FullySignedTransaction & TransactionWithBlockhashLifetime)
   ): Promise<Signature> {
     if (!this.sdk.wallet) {
       throw new NosanaError('No wallet found', ErrorCodes.NO_WALLET);
@@ -107,7 +124,7 @@ export class SolanaService {
       } else {
         // It's instructions, create and sign a transaction
         const instructions: IInstruction[] = Array.isArray(instructionsOrTransaction)
-          ? instructionsOrTransaction as IInstruction[]
+          ? (instructionsOrTransaction as IInstruction[])
           : [instructionsOrTransaction as IInstruction];
 
         const transaction = createTransaction({
@@ -127,7 +144,7 @@ export class SolanaService {
       // Log the transaction explorer link
       const explorerLink = getExplorerLink({
         cluster: this.sdk.config.solana.cluster,
-        transaction: signature
+        transaction: signature,
       });
 
       this.sdk.logger.info(`Sending transaction: ${explorerLink}`);
@@ -145,5 +162,3 @@ export class SolanaService {
     }
   }
 }
-
-

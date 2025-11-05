@@ -1,0 +1,17 @@
+# Generated code
+src/generated_clients/
+
+# Examples
+examples/
+
+# Build output
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Coverage
+coverage/
+.nyc_output/
+

@@ -26,7 +26,7 @@ describe('BaseProgram', () => {
       const second = await program.getStaticAccounts();
 
       expect(first).toBe(second); // same object instance
-      expect((sdk.solana.pda as any)).toHaveBeenCalledTimes(2); // reflection + vault
+      expect(sdk.solana.pda as any).toHaveBeenCalledTimes(2); // reflection + vault
     });
 
     it('handles concurrent calls sharing initialization', async () => {
@@ -37,7 +37,7 @@ describe('BaseProgram', () => {
       ]);
       expect(a).toBe(b);
       expect(b).toBe(c);
-      expect((sdk.solana.pda as any)).toHaveBeenCalledTimes(2);
+      expect(sdk.solana.pda as any).toHaveBeenCalledTimes(2);
     });
 
     it('uses correct PDA seeds and programs', async () => {
@@ -52,5 +52,3 @@ describe('BaseProgram', () => {
     });
   });
 });
-
-
