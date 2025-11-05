@@ -1,12 +1,7 @@
 import { Address, address, Base58EncodedBytes } from 'gill';
 import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
 import { NosanaClient } from '../index.js';
-
-// Token Program ID (SPL Token Program)
-const TOKEN_PROGRAM_ID = address('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
-
-// Standard SPL token account size
-const TOKEN_ACCOUNT_SIZE = 165;
+import { TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 
 // Offset of mint address in token account data structure
 const MINT_OFFSET = 0;
@@ -56,12 +51,9 @@ export class NosService {
 
       // Use getProgramAccounts to fetch all token accounts for the NOS mint
       const accounts = await this.sdk.solana.rpc
-        .getProgramAccounts(TOKEN_PROGRAM_ID, {
+        .getProgramAccounts(TOKEN_PROGRAM_ADDRESS, {
           encoding: 'jsonParsed',
           filters: [
-            {
-              dataSize: BigInt(TOKEN_ACCOUNT_SIZE),
-            },
             {
               memcmp: {
                 offset: BigInt(MINT_OFFSET),
