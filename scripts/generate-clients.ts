@@ -22,8 +22,12 @@ codamaStaking.accept(
   renderJavaScriptVisitor(path.join(__dirname, '..', 'src', 'generated_clients', 'staking'))
 );
 
-const codamaMerkleDistributor = createFromRoot(rootNodeFromAnchor(merkleDistributorIdl as AnchorIdl));
+const codamaMerkleDistributor = createFromRoot(
+  rootNodeFromAnchor(merkleDistributorIdl as AnchorIdl)
+);
 
 codamaMerkleDistributor.accept(
-  renderJavaScriptVisitor(path.join(__dirname, '..', 'src', 'generated_clients', 'merkle_distributor'))
+  renderJavaScriptVisitor(
+    path.join(__dirname, '..', 'src', 'generated_clients', 'merkle_distributor')
+  )
 );

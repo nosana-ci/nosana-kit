@@ -60,9 +60,7 @@ export class MerkleDistributorProgram extends BaseProgram {
       claimantAddress = claimant;
     } else {
       if (!this.sdk.wallet) {
-        throw new Error(
-          'Wallet not set. Please set a wallet or provide a claimant address.'
-        );
+        throw new Error('Wallet not set. Please set a wallet or provide a claimant address.');
       }
       claimantAddress = this.sdk.wallet.address;
     }
@@ -125,8 +123,7 @@ export class MerkleDistributorProgram extends BaseProgram {
           }
         })
         .filter(
-          (account: MerkleDistributor | null): account is MerkleDistributor =>
-            account !== null
+          (account: MerkleDistributor | null): account is MerkleDistributor => account !== null
         );
       return distributors;
     } catch (err) {
@@ -140,10 +137,7 @@ export class MerkleDistributorProgram extends BaseProgram {
    */
   async getClaimStatus(addr: Address): Promise<ClaimStatus> {
     try {
-      const maybeClaimStatus = await this.client.fetchMaybeClaimStatus(
-        this.sdk.solana.rpc,
-        addr
-      );
+      const maybeClaimStatus = await this.client.fetchMaybeClaimStatus(this.sdk.solana.rpc, addr);
 
       // If account doesn't exist, throw a specific error
       if (!maybeClaimStatus.exists) {
@@ -167,7 +161,10 @@ export class MerkleDistributorProgram extends BaseProgram {
    * @returns The claim status if it exists, null otherwise
    * @throws Error if wallet is not set and claimant is not provided
    */
-  async getClaimStatusForDistributor(distributor: Address, claimant?: Address): Promise<ClaimStatus | null> {
+  async getClaimStatusForDistributor(
+    distributor: Address,
+    claimant?: Address
+  ): Promise<ClaimStatus | null> {
     try {
       // Derive ClaimStatus PDA
       const claimStatusPda = await this.getClaimStatusPda(distributor, claimant);
@@ -222,9 +219,7 @@ export class MerkleDistributorProgram extends BaseProgram {
             return null;
           }
         })
-        .filter(
-          (account: ClaimStatus | null): account is ClaimStatus => account !== null
-        );
+        .filter((account: ClaimStatus | null): account is ClaimStatus => account !== null);
       return claimStatuses;
     } catch (err) {
       this.sdk.logger.error(`Failed to fetch all claim statuses ${err}`);
@@ -239,8 +234,14 @@ export class MerkleDistributorProgram extends BaseProgram {
     distributorAccount: Account<programClient.MerkleDistributor>
   ): MerkleDistributor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { discriminator: _, root, buffer0, buffer1, buffer2, ...distributorAccountData } =
-      distributorAccount.data;
+    const {
+      discriminator: _,
+      root,
+      buffer0,
+      buffer1,
+      buffer2,
+      ...distributorAccountData
+    } = distributorAccount.data;
 
     const converted = convertBigIntToNumber(distributorAccountData);
     return {
@@ -350,4 +351,3 @@ export class MerkleDistributorProgram extends BaseProgram {
     }
   }
 }
-

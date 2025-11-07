@@ -2,7 +2,12 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MerkleDistributorProgram } from '../src/programs/MerkleDistributorProgram.js';
 import * as merkleDistributorClient from '../src/generated_clients/merkle_distributor/index.js';
 import { type Address } from 'gill';
-import { AddressFactory, SdkFactory, MerkleDistributorAccountFactory, ClaimStatusAccountFactory } from './helpers/index.js';
+import {
+  AddressFactory,
+  SdkFactory,
+  MerkleDistributorAccountFactory,
+  ClaimStatusAccountFactory,
+} from './helpers/index.js';
 import bs58 from 'bs58';
 
 vi.mock('@solana-program/token', () => ({
@@ -13,7 +18,8 @@ vi.mock('@solana-program/token', () => ({
 // Legacy aliases for backward compatibility
 const baseSdk = () => SdkFactory.createBasic();
 const newAddr = (seed?: number) => AddressFactory.create(seed);
-const makeDistributor = (addr?: Address) => MerkleDistributorAccountFactory.create({ address: addr });
+const makeDistributor = (addr?: Address) =>
+  MerkleDistributorAccountFactory.create({ address: addr });
 const makeClaimStatus = (addr?: Address) => ClaimStatusAccountFactory.create({ address: addr });
 
 describe('MerkleDistributorProgram', () => {
@@ -210,14 +216,19 @@ describe('MerkleDistributorProgram', () => {
         const addr = newAddr(500);
         const mockDistributor = makeDistributor(addr);
 
-        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(mockDistributor);
+        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(
+          mockDistributor
+        );
 
         const result = await program.get(addr);
 
         expect(result.address).toBe(addr);
         expect(result.maxTotalClaim).toBe(1000000);
         expect(result.maxNumNodes).toBe(1000);
-        expect(merkleDistributorClient.fetchMerkleDistributor).toHaveBeenCalledWith(sdk.solana.rpc, addr);
+        expect(merkleDistributorClient.fetchMerkleDistributor).toHaveBeenCalledWith(
+          sdk.solana.rpc,
+          addr
+        );
       });
 
       it('should handle errors when fetching distributor', async () => {
@@ -249,11 +260,13 @@ describe('MerkleDistributorProgram', () => {
           },
         }));
 
-        vi.spyOn(merkleDistributorClient, 'decodeMerkleDistributor').mockImplementation((account: any) => {
-          // Find the matching mock distributor by address
-          const matchingDistributor = mockDistributors.find((d) => d.address === account.address);
-          return matchingDistributor || mockDistributors[0];
-        });
+        vi.spyOn(merkleDistributorClient, 'decodeMerkleDistributor').mockImplementation(
+          (account: any) => {
+            // Find the matching mock distributor by address
+            const matchingDistributor = mockDistributors.find((d) => d.address === account.address);
+            return matchingDistributor || mockDistributors[0];
+          }
+        );
 
         sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
           send: vi.fn().mockResolvedValue(mockResponse),
@@ -367,7 +380,10 @@ describe('MerkleDistributorProgram', () => {
         expect(result.address).toBe(addr);
         expect(result.unlockedAmount).toBe(10000);
         expect(result.lockedAmount).toBe(5000);
-        expect(merkleDistributorClient.fetchMaybeClaimStatus).toHaveBeenCalledWith(sdk.solana.rpc, addr);
+        expect(merkleDistributorClient.fetchMaybeClaimStatus).toHaveBeenCalledWith(
+          sdk.solana.rpc,
+          addr
+        );
       });
 
       it('should throw error when claim status does not exist', async () => {
@@ -539,9 +555,9 @@ describe('MerkleDistributorProgram', () => {
         } as any;
         const programWithoutWallet = new MerkleDistributorProgram(sdkWithoutWallet);
 
-        await expect(programWithoutWallet.getClaimStatusForDistributor(newAddr(754))).rejects.toThrow(
-          'Wallet not set'
-        );
+        await expect(
+          programWithoutWallet.getClaimStatusForDistributor(newAddr(754))
+        ).rejects.toThrow('Wallet not set');
       });
 
       it('should handle errors when fetching claim status', async () => {
@@ -576,7 +592,10 @@ describe('MerkleDistributorProgram', () => {
           ...mockClaimStatus,
         });
 
-        const result = await walletProgram.getClaimStatusForDistributor(distributorAddr, claimantAddr);
+        const result = await walletProgram.getClaimStatusForDistributor(
+          distributorAddr,
+          claimantAddr
+        );
 
         expect(result).not.toBeNull();
         expect(result!.address).toBe(claimStatusPda);
@@ -610,7 +629,10 @@ describe('MerkleDistributorProgram', () => {
           ...mockClaimStatus,
         });
 
-        const result = await programWithoutWallet.getClaimStatusForDistributor(distributorAddr, claimantAddr);
+        const result = await programWithoutWallet.getClaimStatusForDistributor(
+          distributorAddr,
+          claimantAddr
+        );
 
         expect(result).not.toBeNull();
         expect(result!.claimant).toBe(claimantAddr);
@@ -633,11 +655,15 @@ describe('MerkleDistributorProgram', () => {
           },
         }));
 
-        vi.spyOn(merkleDistributorClient, 'decodeClaimStatus').mockImplementation((account: any) => {
-          // Find the matching mock claim status by address
-          const matchingClaimStatus = mockClaimStatuses.find((c) => c.address === account.address);
-          return matchingClaimStatus || mockClaimStatuses[0];
-        });
+        vi.spyOn(merkleDistributorClient, 'decodeClaimStatus').mockImplementation(
+          (account: any) => {
+            // Find the matching mock claim status by address
+            const matchingClaimStatus = mockClaimStatuses.find(
+              (c) => c.address === account.address
+            );
+            return matchingClaimStatus || mockClaimStatuses[0];
+          }
+        );
 
         sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
           send: vi.fn().mockResolvedValue(mockResponse),
@@ -760,7 +786,9 @@ describe('MerkleDistributorProgram', () => {
         const claimantAta = newAddr(804);
         const proof = [new Uint8Array(32).fill(1), new Uint8Array(32).fill(2)];
 
-        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(distributorAccount);
+        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(
+          distributorAccount
+        );
         vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
         vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
           exists: false,
@@ -772,7 +800,9 @@ describe('MerkleDistributorProgram', () => {
           accounts: [],
           data: Buffer.from('test'),
         };
-        vi.spyOn(merkleDistributorClient, 'getNewClaimInstruction' as any).mockReturnValue(mockInstruction);
+        vi.spyOn(merkleDistributorClient, 'getNewClaimInstruction' as any).mockReturnValue(
+          mockInstruction
+        );
 
         const result = await walletProgram.claim({
           distributor: distributorAddr,
@@ -833,7 +863,9 @@ describe('MerkleDistributorProgram', () => {
         });
         const claimStatusPda = newAddr(902);
 
-        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(distributorAccount);
+        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(
+          distributorAccount
+        );
         vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
         vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
           exists: true,
@@ -861,7 +893,9 @@ describe('MerkleDistributorProgram', () => {
         const customTransferHookProgram = newAddr(908);
         const proof = [new Uint8Array(32).fill(3)];
 
-        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(distributorAccount);
+        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(
+          distributorAccount
+        );
         vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
         vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
           exists: false,
@@ -873,7 +907,9 @@ describe('MerkleDistributorProgram', () => {
           accounts: [],
           data: Buffer.from('test'),
         };
-        vi.spyOn(merkleDistributorClient, 'getNewClaimInstruction' as any).mockReturnValue(mockInstruction);
+        vi.spyOn(merkleDistributorClient, 'getNewClaimInstruction' as any).mockReturnValue(
+          mockInstruction
+        );
 
         await walletProgram.claim({
           distributor: distributorAddr,
@@ -920,7 +956,9 @@ describe('MerkleDistributorProgram', () => {
         const claimStatusPda = newAddr(913);
         const claimantAta = newAddr(914);
 
-        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(distributorAccount);
+        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(
+          distributorAccount
+        );
         vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
         vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
           exists: false,
@@ -932,7 +970,9 @@ describe('MerkleDistributorProgram', () => {
           accounts: [],
           data: Buffer.from('test'),
         };
-        vi.spyOn(merkleDistributorClient, 'getNewClaimInstruction' as any).mockReturnValue(mockInstruction);
+        vi.spyOn(merkleDistributorClient, 'getNewClaimInstruction' as any).mockReturnValue(
+          mockInstruction
+        );
 
         await walletProgram.claim({
           distributor: distributorAddr,
@@ -991,10 +1031,12 @@ describe('MerkleDistributorProgram', () => {
         },
       }));
 
-      vi.spyOn(merkleDistributorClient, 'decodeMerkleDistributor').mockImplementation((account: any) => {
-        const matchingDistributor = distributors.find((d) => d.address === account.address);
-        return matchingDistributor || distributors[0];
-      });
+      vi.spyOn(merkleDistributorClient, 'decodeMerkleDistributor').mockImplementation(
+        (account: any) => {
+          const matchingDistributor = distributors.find((d) => d.address === account.address);
+          return matchingDistributor || distributors[0];
+        }
+      );
 
       sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
         send: vi.fn().mockResolvedValue(mockResponse),
@@ -1058,4 +1100,3 @@ describe('MerkleDistributorProgram', () => {
     });
   });
 });
-
