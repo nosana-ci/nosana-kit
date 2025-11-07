@@ -357,26 +357,263 @@ describe('MerkleDistributorProgram', () => {
         const addr = newAddr(600);
         const mockClaimStatus = makeClaimStatus(addr);
 
-        vi.spyOn(merkleDistributorClient, 'fetchClaimStatus' as any).mockResolvedValue(mockClaimStatus);
+        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
+          exists: true,
+          ...mockClaimStatus,
+        });
 
         const result = await program.getClaimStatus(addr);
 
         expect(result.address).toBe(addr);
         expect(result.unlockedAmount).toBe(10000);
         expect(result.lockedAmount).toBe(5000);
-        expect(merkleDistributorClient.fetchClaimStatus).toHaveBeenCalledWith(sdk.solana.rpc, addr);
+        expect(merkleDistributorClient.fetchMaybeClaimStatus).toHaveBeenCalledWith(sdk.solana.rpc, addr);
       });
 
-      it('should handle errors when fetching claim status', async () => {
+      it('should throw error when claim status does not exist', async () => {
         const addr = newAddr(601);
-        const error = new Error('Account not found');
 
-        vi.spyOn(merkleDistributorClient, 'fetchClaimStatus' as any).mockRejectedValue(error);
+        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
+          exists: false,
+        });
 
-        await expect(program.getClaimStatus(addr)).rejects.toThrow('Account not found');
+        await expect(program.getClaimStatus(addr)).rejects.toThrow('not found');
         expect(sdk.logger.error).toHaveBeenCalledWith(
           expect.stringContaining('Failed to fetch claim status')
         );
+      });
+
+      it('should handle errors when fetching claim status', async () => {
+        const addr = newAddr(602);
+        const error = new Error('RPC connection failed');
+
+        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockRejectedValue(error);
+
+        await expect(program.getClaimStatus(addr)).rejects.toThrow('RPC connection failed');
+        expect(sdk.logger.error).toHaveBeenCalledWith(
+          expect.stringContaining('Failed to fetch claim status')
+        );
+      });
+    });
+
+    describe('getClaimStatusPda', () => {
+      let walletSdk: ReturnType<typeof SdkFactory.createWithWallet>;
+      let walletProgram: MerkleDistributorProgram;
+
+      beforeEach(() => {
+        walletSdk = SdkFactory.createWithWallet();
+        walletSdk.solana = {
+          rpc: {} as any,
+          pda: vi.fn().mockResolvedValue(newAddr(700)),
+        } as any;
+        walletProgram = new MerkleDistributorProgram(walletSdk);
+      });
+
+      it('should derive claim status PDA using wallet address when claimant is not provided', async () => {
+        const distributorAddr = newAddr(760);
+        const claimStatusPda = newAddr(761);
+
+        vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
+
+        const result = await walletProgram.getClaimStatusPda(distributorAddr);
+
+        expect(result).toBe(claimStatusPda);
+        expect(walletSdk.solana.pda).toHaveBeenCalledWith(
+          ['ClaimStatus', walletSdk.wallet!.address, distributorAddr],
+          walletSdk.config.programs.merkleDistributorAddress
+        );
+      });
+
+      it('should derive claim status PDA using provided claimant address', async () => {
+        const distributorAddr = newAddr(762);
+        const claimantAddr = newAddr(763);
+        const claimStatusPda = newAddr(764);
+
+        vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
+
+        const result = await walletProgram.getClaimStatusPda(distributorAddr, claimantAddr);
+
+        expect(result).toBe(claimStatusPda);
+        expect(walletSdk.solana.pda).toHaveBeenCalledWith(
+          ['ClaimStatus', claimantAddr, distributorAddr],
+          walletSdk.config.programs.merkleDistributorAddress
+        );
+      });
+
+      it('should throw error when wallet is not set and claimant is not provided', async () => {
+        const sdkWithoutWallet = SdkFactory.createBasic();
+        sdkWithoutWallet.solana = {
+          rpc: {} as any,
+          pda: vi.fn(),
+        } as any;
+        const programWithoutWallet = new MerkleDistributorProgram(sdkWithoutWallet);
+
+        await expect(programWithoutWallet.getClaimStatusPda(newAddr(765))).rejects.toThrow(
+          'Wallet not set'
+        );
+      });
+
+      it('should work without wallet when claimant is provided', async () => {
+        const sdkWithoutWallet = SdkFactory.createBasic();
+        const distributorAddr = newAddr(766);
+        const claimantAddr = newAddr(767);
+        const claimStatusPda = newAddr(768);
+
+        sdkWithoutWallet.solana = {
+          rpc: {} as any,
+          pda: vi.fn().mockResolvedValue(claimStatusPda),
+        } as any;
+        const programWithoutWallet = new MerkleDistributorProgram(sdkWithoutWallet);
+
+        const result = await programWithoutWallet.getClaimStatusPda(distributorAddr, claimantAddr);
+
+        expect(result).toBe(claimStatusPda);
+        expect(sdkWithoutWallet.solana.pda).toHaveBeenCalledWith(
+          ['ClaimStatus', claimantAddr, distributorAddr],
+          sdkWithoutWallet.config.programs.merkleDistributorAddress
+        );
+      });
+    });
+
+    describe('getClaimStatusForDistributor', () => {
+      let walletSdk: ReturnType<typeof SdkFactory.createWithWallet>;
+      let walletProgram: MerkleDistributorProgram;
+
+      beforeEach(() => {
+        walletSdk = SdkFactory.createWithWallet();
+        walletSdk.solana = {
+          rpc: {} as any,
+          pda: vi.fn().mockResolvedValue(newAddr(700)),
+        } as any;
+        walletProgram = new MerkleDistributorProgram(walletSdk);
+      });
+
+      it('should fetch and return claim status when it exists', async () => {
+        const distributorAddr = newAddr(750);
+        const claimStatusPda = newAddr(751);
+        const mockClaimStatus = ClaimStatusAccountFactory.create({
+          address: claimStatusPda,
+          claimant: walletSdk.wallet!.address,
+          distributor: distributorAddr,
+        });
+
+        vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
+        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
+          exists: true,
+          ...mockClaimStatus,
+        });
+
+        const result = await walletProgram.getClaimStatusForDistributor(distributorAddr);
+
+        expect(result).not.toBeNull();
+        expect(result!.address).toBe(claimStatusPda);
+        expect(result!.claimant).toBe(walletSdk.wallet!.address);
+        expect(result!.distributor).toBe(distributorAddr);
+        expect(result!.unlockedAmount).toBe(10000);
+        expect(result!.lockedAmount).toBe(5000);
+        expect(merkleDistributorClient.fetchMaybeClaimStatus).toHaveBeenCalledWith(
+          walletSdk.solana.rpc,
+          claimStatusPda
+        );
+      });
+
+      it('should return null when claim status does not exist', async () => {
+        const distributorAddr = newAddr(752);
+        const claimStatusPda = newAddr(753);
+
+        vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
+        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
+          exists: false,
+        });
+
+        const result = await walletProgram.getClaimStatusForDistributor(distributorAddr);
+
+        expect(result).toBeNull();
+      });
+
+      it('should throw error when wallet is not set', async () => {
+        const sdkWithoutWallet = SdkFactory.createBasic();
+        sdkWithoutWallet.solana = {
+          rpc: {} as any,
+          pda: vi.fn(),
+        } as any;
+        const programWithoutWallet = new MerkleDistributorProgram(sdkWithoutWallet);
+
+        await expect(programWithoutWallet.getClaimStatusForDistributor(newAddr(754))).rejects.toThrow(
+          'Wallet not set'
+        );
+      });
+
+      it('should handle errors when fetching claim status', async () => {
+        const distributorAddr = newAddr(755);
+        const claimStatusPda = newAddr(756);
+        const error = new Error('RPC connection failed');
+
+        vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
+        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockRejectedValue(error);
+
+        await expect(walletProgram.getClaimStatusForDistributor(distributorAddr)).rejects.toThrow(
+          'RPC connection failed'
+        );
+        expect(walletSdk.logger.error).toHaveBeenCalledWith(
+          expect.stringContaining('Failed to fetch claim status')
+        );
+      });
+
+      it('should fetch claim status for a provided claimant address', async () => {
+        const distributorAddr = newAddr(757);
+        const claimantAddr = newAddr(758);
+        const claimStatusPda = newAddr(759);
+        const mockClaimStatus = ClaimStatusAccountFactory.create({
+          address: claimStatusPda,
+          claimant: claimantAddr,
+          distributor: distributorAddr,
+        });
+
+        vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
+        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
+          exists: true,
+          ...mockClaimStatus,
+        });
+
+        const result = await walletProgram.getClaimStatusForDistributor(distributorAddr, claimantAddr);
+
+        expect(result).not.toBeNull();
+        expect(result!.address).toBe(claimStatusPda);
+        expect(result!.claimant).toBe(claimantAddr);
+        expect(result!.distributor).toBe(distributorAddr);
+        expect(walletSdk.solana.pda).toHaveBeenCalledWith(
+          ['ClaimStatus', claimantAddr, distributorAddr],
+          walletSdk.config.programs.merkleDistributorAddress
+        );
+      });
+
+      it('should work without wallet when claimant is provided', async () => {
+        const sdkWithoutWallet = SdkFactory.createBasic();
+        const distributorAddr = newAddr(760);
+        const claimantAddr = newAddr(761);
+        const claimStatusPda = newAddr(762);
+        const mockClaimStatus = ClaimStatusAccountFactory.create({
+          address: claimStatusPda,
+          claimant: claimantAddr,
+          distributor: distributorAddr,
+        });
+
+        sdkWithoutWallet.solana = {
+          rpc: {} as any,
+          pda: vi.fn().mockResolvedValue(claimStatusPda),
+        } as any;
+        const programWithoutWallet = new MerkleDistributorProgram(sdkWithoutWallet);
+
+        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
+          exists: true,
+          ...mockClaimStatus,
+        });
+
+        const result = await programWithoutWallet.getClaimStatusForDistributor(distributorAddr, claimantAddr);
+
+        expect(result).not.toBeNull();
+        expect(result!.claimant).toBe(claimantAddr);
       });
     });
 

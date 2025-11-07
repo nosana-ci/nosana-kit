@@ -22,6 +22,16 @@ export type ClaimStatus = ConvertTypesForDb<programClient.ClaimStatusArgs> & {
   address: Address;
 };
 
+/**
+ * Error thrown when a claim status account is not found
+ */
+export class ClaimStatusNotFoundError extends Error {
+  constructor(address: Address) {
+    super(`Claim status account not found at address ${address}`);
+    this.name = 'ClaimStatusNotFoundError';
+  }
+}
+
 export class MerkleDistributorProgram extends BaseProgram {
   public readonly client: typeof programClient;
 
@@ -32,6 +42,35 @@ export class MerkleDistributorProgram extends BaseProgram {
 
   protected getProgramId(): Address {
     return this.sdk.config.programs.merkleDistributorAddress;
+  }
+
+  /**
+   * Derive the ClaimStatus PDA address for a given distributor and optional claimant.
+   * If claimant is not provided, uses the wallet's address.
+   *
+   * @param distributor The address of the merkle distributor
+   * @param claimant Optional claimant address. If not provided, uses the wallet's address.
+   * @returns The ClaimStatus PDA address
+   * @throws Error if wallet is not set and claimant is not provided
+   */
+  async getClaimStatusPda(distributor: Address, claimant?: Address): Promise<Address> {
+    let claimantAddress: Address;
+
+    if (claimant) {
+      claimantAddress = claimant;
+    } else {
+      if (!this.sdk.wallet) {
+        throw new Error(
+          'Wallet not set. Please set a wallet or provide a claimant address.'
+        );
+      }
+      claimantAddress = this.sdk.wallet.address;
+    }
+
+    return await this.sdk.solana.pda(
+      ['ClaimStatus', claimantAddress, distributor],
+      this.getProgramId()
+    );
   }
 
   /**
@@ -101,12 +140,18 @@ export class MerkleDistributorProgram extends BaseProgram {
    */
   async getClaimStatus(addr: Address): Promise<ClaimStatus> {
     try {
-      const claimStatusAccount = await this.client.fetchClaimStatus(
+      const maybeClaimStatus = await this.client.fetchMaybeClaimStatus(
         this.sdk.solana.rpc,
         addr
       );
-      const claimStatus = this.transformClaimStatusAccount(claimStatusAccount);
-      return claimStatus;
+
+      // If account doesn't exist, throw a specific error
+      if (!maybeClaimStatus.exists) {
+        throw new ClaimStatusNotFoundError(addr);
+      }
+
+      // Transform and return the claim status
+      return this.transformClaimStatusAccount(maybeClaimStatus);
     } catch (err) {
       this.sdk.logger.error(`Failed to fetch claim status ${err}`);
       throw err;
@@ -114,7 +159,37 @@ export class MerkleDistributorProgram extends BaseProgram {
   }
 
   /**
+   * Fetch claim status for a specific distributor and optional claimant.
+   * Derives the ClaimStatus PDA using the claimant address (or wallet's address if not provided) and the distributor address.
+   *
+   * @param distributor The address of the merkle distributor
+   * @param claimant Optional claimant address. If not provided, uses the wallet's address.
+   * @returns The claim status if it exists, null otherwise
+   * @throws Error if wallet is not set and claimant is not provided
+   */
+  async getClaimStatusForDistributor(distributor: Address, claimant?: Address): Promise<ClaimStatus | null> {
+    try {
+      // Derive ClaimStatus PDA
+      const claimStatusPda = await this.getClaimStatusPda(distributor, claimant);
+
+      // Reuse getClaimStatus to fetch and transform the claim status
+      // If the account doesn't exist, it will throw, so we catch and return null
+      return await this.getClaimStatus(claimStatusPda);
+    } catch (err) {
+      // If the account doesn't exist, return null instead of throwing
+      // Check if it's the specific ClaimStatusNotFoundError from getClaimStatus
+      if (err instanceof ClaimStatusNotFoundError) {
+        return null;
+      }
+      // For other errors, log and rethrow
+      this.sdk.logger.error(`Failed to fetch claim status ${err}`);
+      throw err;
+    }
+  }
+
+  /**
    * Fetch all claim status accounts
+   * TODO: add filter for claimant and distributor
    */
   async allClaimStatus(): Promise<ClaimStatus[]> {
     try {
@@ -222,10 +297,7 @@ export class MerkleDistributorProgram extends BaseProgram {
       );
 
       // Derive ClaimStatus PDA
-      const claimStatusPda = await this.sdk.solana.pda(
-        ['ClaimStatus', claimant, params.distributor],
-        this.getProgramId()
-      );
+      const claimStatusPda = await this.getClaimStatusPda(params.distributor);
 
       // Check if ClaimStatus account exists
       const maybeClaimStatus = await this.client.fetchMaybeClaimStatus(
