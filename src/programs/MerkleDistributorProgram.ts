@@ -233,8 +233,8 @@ export class MerkleDistributorProgram extends BaseProgram {
   public transformMerkleDistributorAccount(
     distributorAccount: Account<programClient.MerkleDistributor>
   ): MerkleDistributor {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       discriminator: _,
       root,
       buffer0,
