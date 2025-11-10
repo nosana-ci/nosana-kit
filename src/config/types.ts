@@ -39,6 +39,7 @@ export interface ClientConfig {
     rewardsAddress: Address;
     stakeAddress: Address;
     poolsAddress: Address;
+    merkleDistributorAddress: Address;
   };
 }
 

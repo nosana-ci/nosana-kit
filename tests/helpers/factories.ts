@@ -11,6 +11,7 @@ import bs58 from 'bs58';
 import type { NosanaClient } from '../../src/index.js';
 import * as programClient from '../../src/generated_clients/jobs/index.js';
 import * as stakingClient from '../../src/generated_clients/staking/index.js';
+import * as merkleDistributorClient from '../../src/generated_clients/merkle_distributor/index.js';
 import { JobState, MarketQueueType } from '../../src/programs/JobsProgram.js';
 
 /**
@@ -63,6 +64,7 @@ export class SdkFactory {
           jobsAddress: validAddr,
           nosTokenAddress: validAddr,
           rewardsAddress: validAddr,
+          merkleDistributorAddress: validAddr,
         },
       },
       logger: {
@@ -148,6 +150,7 @@ export class SdkFactory {
           nosTokenAddress: valid,
           stakeAddress: valid,
           poolsAddress: valid,
+          merkleDistributorAddress: valid,
         },
       },
       logger: { info: vi.fn(), error: vi.fn(), debug: vi.fn() },
@@ -568,6 +571,147 @@ export class StakeAccountFactory {
       StakeAccountFactory.create({
         authority,
         amount: BigInt((i + 1) * 1000),
+      })
+    );
+  }
+}
+
+/**
+ * Merkle Distributor Account Factory
+ * Creates merkle distributor account test data
+ */
+export class MerkleDistributorAccountFactory {
+  /**
+   * Create a merkle distributor account with defaults
+   */
+  static create(overrides?: {
+    address?: Address;
+    bump?: number;
+    version?: bigint;
+    root?: ReadonlyUint8Array;
+    mint?: Address;
+    tokenVault?: Address;
+    maxTotalClaim?: bigint;
+    maxNumNodes?: bigint;
+    totalAmountClaimed?: bigint;
+    totalAmountForgone?: bigint;
+    numNodesClaimed?: bigint;
+    startTs?: bigint;
+    endTs?: bigint;
+    clawbackStartTs?: bigint;
+    clawbackReceiver?: Address;
+    admin?: Address;
+    clawedBack?: boolean;
+    enableSlot?: bigint;
+    closable?: boolean;
+    buffer0?: ReadonlyUint8Array;
+    buffer1?: ReadonlyUint8Array;
+    buffer2?: ReadonlyUint8Array;
+  }): Account<merkleDistributorClient.MerkleDistributor> {
+    const rootBytes = new Uint8Array(32).fill(1);
+    const bufferBytes = new Uint8Array(32).fill(0);
+
+    return {
+      address: overrides?.address ?? AddressFactory.create(),
+      data: {
+        discriminator: new Uint8Array(8),
+        bump: overrides?.bump ?? 255,
+        version: overrides?.version ?? BigInt(1),
+        root: overrides?.root ?? rootBytes,
+        mint: overrides?.mint ?? AddressFactory.create(),
+        tokenVault: overrides?.tokenVault ?? AddressFactory.create(),
+        maxTotalClaim: overrides?.maxTotalClaim ?? BigInt(1000000),
+        maxNumNodes: overrides?.maxNumNodes ?? BigInt(1000),
+        totalAmountClaimed: overrides?.totalAmountClaimed ?? BigInt(0),
+        totalAmountForgone: overrides?.totalAmountForgone ?? BigInt(0),
+        numNodesClaimed: overrides?.numNodesClaimed ?? BigInt(0),
+        startTs: overrides?.startTs ?? BigInt(0),
+        endTs: overrides?.endTs ?? BigInt(0),
+        clawbackStartTs: overrides?.clawbackStartTs ?? BigInt(0),
+        clawbackReceiver: overrides?.clawbackReceiver ?? AddressFactory.create(),
+        admin: overrides?.admin ?? AddressFactory.create(),
+        clawedBack: overrides?.clawedBack ?? false,
+        enableSlot: overrides?.enableSlot ?? BigInt(0),
+        closable: overrides?.closable ?? false,
+        buffer0: overrides?.buffer0 ?? bufferBytes,
+        buffer1: overrides?.buffer1 ?? bufferBytes,
+        buffer2: overrides?.buffer2 ?? bufferBytes,
+      },
+    } as any;
+  }
+
+  /**
+   * Create multiple merkle distributor accounts
+   */
+  static createMany(count: number): Account<merkleDistributorClient.MerkleDistributor>[] {
+    return Array.from({ length: count }, (_, i) =>
+      MerkleDistributorAccountFactory.create({
+        maxTotalClaim: BigInt((i + 1) * 1000000),
+      })
+    );
+  }
+}
+
+/**
+ * Claim Status Account Factory
+ * Creates claim status account test data
+ */
+export class ClaimStatusAccountFactory {
+  /**
+   * Create a claim status account with defaults
+   */
+  static create(overrides?: {
+    address?: Address;
+    claimant?: Address;
+    lockedAmount?: bigint;
+    lockedAmountWithdrawn?: bigint;
+    unlockedAmount?: bigint;
+    unlockedAmountClaimed?: bigint;
+    closable?: boolean;
+    distributor?: Address;
+  }): Account<merkleDistributorClient.ClaimStatus> {
+    return {
+      address: overrides?.address ?? AddressFactory.create(),
+      data: {
+        discriminator: new Uint8Array(8),
+        claimant: overrides?.claimant ?? AddressFactory.create(),
+        lockedAmount: overrides?.lockedAmount ?? BigInt(5000),
+        lockedAmountWithdrawn: overrides?.lockedAmountWithdrawn ?? BigInt(0),
+        unlockedAmount: overrides?.unlockedAmount ?? BigInt(10000),
+        unlockedAmountClaimed: overrides?.unlockedAmountClaimed ?? BigInt(0),
+        closable: overrides?.closable ?? false,
+        distributor: overrides?.distributor ?? AddressFactory.create(),
+      },
+    } as any;
+  }
+
+  /**
+   * Create a claim status with specific amounts
+   */
+  static createWithAmounts(
+    unlockedAmount: bigint | number,
+    lockedAmount: bigint | number,
+    overrides?: Parameters<typeof ClaimStatusAccountFactory.create>[0]
+  ): Account<merkleDistributorClient.ClaimStatus> {
+    return ClaimStatusAccountFactory.create({
+      ...overrides,
+      unlockedAmount: typeof unlockedAmount === 'bigint' ? unlockedAmount : BigInt(unlockedAmount),
+      lockedAmount: typeof lockedAmount === 'bigint' ? lockedAmount : BigInt(lockedAmount),
+    });
+  }
+
+  /**
+   * Create multiple claim status accounts
+   */
+  static createMany(
+    count: number,
+    distributor?: Address
+  ): Account<merkleDistributorClient.ClaimStatus>[] {
+    return Array.from({ length: count }, (_, i) =>
+      ClaimStatusAccountFactory.create({
+        distributor,
+        unlockedAmount: BigInt((i + 1) * 10000),
+        lockedAmount: BigInt((i + 1) * 5000),
       })
     );
   }

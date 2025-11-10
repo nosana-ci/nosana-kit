@@ -9,11 +9,11 @@ include:
   - project: nosana-ci/tools/cicd/gitlab-ci
     file: templates/semver.yml
 
-npm prettier:
+npm format:
   stage: test
   script:
     - npm ci
-    - npm run prettier
+    - npm run format
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
