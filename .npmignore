@@ -1,7 +1,13 @@
+# NOTE: The primary method for controlling what gets published is the "files" field in package.json.
+# This .npmignore file is kept as a backup/documentation of what should be excluded.
+# The "files" field takes precedence, so only files explicitly listed there will be published.
+
 # Source files
 src/
 tests/
 __tests__/
+examples/
+scripts/
 
 # Configuration files
 .eslintrc.js

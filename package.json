@@ -51,5 +51,10 @@
   },
   "engines": {
     "node": ">=20.18.0"
-  }
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ]
 }
