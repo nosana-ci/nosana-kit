@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   MerkleDistributorProgram,
   ALLOWED_RECEIVE_ADDRESSES,
+  ClaimTarget,
 } from '../src/programs/MerkleDistributorProgram.js';
 import * as merkleDistributorClient from '../src/generated_clients/merkle_distributor/index.js';
 import { type Address } from 'gill';
@@ -813,7 +814,7 @@ describe('MerkleDistributorProgram', () => {
           amountUnlocked: 10000,
           amountLocked: 5000,
           proof,
-          target: 'YES',
+          target: ClaimTarget.YES,
         });
 
         expect(result).toBe(mockInstruction);
@@ -828,7 +829,7 @@ describe('MerkleDistributorProgram', () => {
         // Verify findAssociatedTokenPda was called with the YES address, not the claimant's address
         expect(token.findAssociatedTokenPda).toHaveBeenCalledWith({
           mint: distributorAccount.data.mint,
-          owner: ALLOWED_RECEIVE_ADDRESSES.YES,
+          owner: ALLOWED_RECEIVE_ADDRESSES[ClaimTarget.YES],
           tokenProgram: 'TokenProg',
         });
         expect(merkleDistributorClient.getNewClaimInstruction).toHaveBeenCalledWith(
@@ -862,7 +863,7 @@ describe('MerkleDistributorProgram', () => {
             amountUnlocked: 10000,
             amountLocked: 5000,
             proof: [],
-            target: 'YES',
+            target: ClaimTarget.YES,
           })
         ).rejects.toThrow('Wallet not set');
       });
@@ -888,7 +889,7 @@ describe('MerkleDistributorProgram', () => {
             amountUnlocked: 10000,
             amountLocked: 5000,
             proof: [],
-            target: 'YES',
+            target: ClaimTarget.YES,
           })
         ).rejects.toThrow('Tokens have already been claimed');
       });
@@ -928,14 +929,14 @@ describe('MerkleDistributorProgram', () => {
           amountUnlocked: 20000,
           amountLocked: 10000,
           proof,
-          target: 'NO',
+          target: ClaimTarget.NO,
         });
 
         expect(result).toBe(mockInstruction);
         // Verify findAssociatedTokenPda was called with the NO address
         expect(token.findAssociatedTokenPda).toHaveBeenCalledWith({
           mint: distributorAccount.data.mint,
-          owner: ALLOWED_RECEIVE_ADDRESSES.NO,
+          owner: ALLOWED_RECEIVE_ADDRESSES[ClaimTarget.NO],
           tokenProgram: 'TokenProg',
         });
         expect(merkleDistributorClient.getNewClaimInstruction).toHaveBeenCalledWith(
@@ -958,7 +959,7 @@ describe('MerkleDistributorProgram', () => {
             amountUnlocked: 10000,
             amountLocked: 5000,
             proof: [],
-            target: 'YES',
+            target: ClaimTarget.YES,
           })
         ).rejects.toThrow('RPC error');
         expect(walletSdk.logger.error).toHaveBeenCalledWith(
@@ -999,7 +1000,7 @@ describe('MerkleDistributorProgram', () => {
           amountUnlocked: BigInt(30000),
           amountLocked: BigInt(15000),
           proof: [],
-          target: 'YES',
+          target: ClaimTarget.YES,
         });
 
         expect(merkleDistributorClient.getNewClaimInstruction).toHaveBeenCalledWith(

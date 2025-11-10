@@ -15,15 +15,22 @@ import bs58 from 'bs58';
 import { SYSTEM_PROGRAM_ADDRESS } from 'gill/programs';
 
 /**
+ * Claim target enum for merkle distributor.
+ * Determines which address receives the claimed tokens.
+ */
+export enum ClaimTarget {
+  YES = 'YES',
+  NO = 'NO',
+}
+
+/**
  * Allowed addresses for receiving claimed tokens from merkle distributor.
  * The `to` account must be the ATA of one of these addresses.
  */
 export const ALLOWED_RECEIVE_ADDRESSES = {
-  YES: address('YessuvqUauj9yW4B3eERcyRLWmQtWpFc2ERKmaedmCE'),
-  NO: address('NopXntmRdXhYNkoZaNTMUMShJ3aVG5RvwpiyPdd4bMh'),
+  [ClaimTarget.YES]: address('YessuvqUauj9yW4B3eERcyRLWmQtWpFc2ERKmaedmCE'),
+  [ClaimTarget.NO]: address('NopXntmRdXhYNkoZaNTMUMShJ3aVG5RvwpiyPdd4bMh'),
 } as const;
-
-export type ClaimTarget = keyof typeof ALLOWED_RECEIVE_ADDRESSES;
 
 export type MerkleDistributor = ConvertTypesForDb<programClient.MerkleDistributorArgs> & {
   address: Address;

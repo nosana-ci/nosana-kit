@@ -59,12 +59,8 @@ export { StakeProgram } from './programs/StakeProgram.js';
 export type { Stake } from './programs/StakeProgram.js';
 
 // Export MerkleDistributorProgram and related types
-export { MerkleDistributorProgram } from './programs/MerkleDistributorProgram.js';
-export type {
-  MerkleDistributor,
-  ClaimStatus,
-  ClaimTarget,
-} from './programs/MerkleDistributorProgram.js';
+export { MerkleDistributorProgram, ClaimTarget } from './programs/MerkleDistributorProgram.js';
+export type { MerkleDistributor, ClaimStatus } from './programs/MerkleDistributorProgram.js';
 
 // Export IPFS utilities
 export * from './ipfs/IPFS.js';
