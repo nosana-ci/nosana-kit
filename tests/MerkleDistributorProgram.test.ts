@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { MerkleDistributorProgram } from '../src/programs/MerkleDistributorProgram.js';
+import {
+  MerkleDistributorProgram,
+  ALLOWED_RECEIVE_ADDRESSES,
+} from '../src/programs/MerkleDistributorProgram.js';
 import * as merkleDistributorClient from '../src/generated_clients/merkle_distributor/index.js';
 import { type Address } from 'gill';
 import {
@@ -775,7 +778,7 @@ describe('MerkleDistributorProgram', () => {
         walletProgram = new MerkleDistributorProgram(walletSdk);
       });
 
-      it('should create a newClaim instruction with correct parameters', async () => {
+      it('should create a newClaim instruction with correct parameters (YES target)', async () => {
         const distributorAddr = newAddr(800);
         const distributorAccount = MerkleDistributorAccountFactory.create({
           address: distributorAddr,
@@ -783,7 +786,7 @@ describe('MerkleDistributorProgram', () => {
           tokenVault: newAddr(802),
         });
         const claimStatusPda = newAddr(803);
-        const claimantAta = newAddr(804);
+        const targetAta = newAddr(804); // ATA of YES address
         const proof = [new Uint8Array(32).fill(1), new Uint8Array(32).fill(2)];
 
         vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(
@@ -794,7 +797,8 @@ describe('MerkleDistributorProgram', () => {
           exists: false,
         });
         const token = await import('@solana-program/token');
-        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([claimantAta]);
+        // Mock findAssociatedTokenPda to return the ATA of the YES address
+        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([targetAta]);
 
         const mockInstruction = {
           accounts: [],
@@ -809,6 +813,7 @@ describe('MerkleDistributorProgram', () => {
           amountUnlocked: 10000,
           amountLocked: 5000,
           proof,
+          target: 'YES',
         });
 
         expect(result).toBe(mockInstruction);
@@ -820,12 +825,18 @@ describe('MerkleDistributorProgram', () => {
           ['ClaimStatus', walletSdk.wallet!.address, distributorAddr],
           walletSdk.config.programs.merkleDistributorAddress
         );
+        // Verify findAssociatedTokenPda was called with the YES address, not the claimant's address
+        expect(token.findAssociatedTokenPda).toHaveBeenCalledWith({
+          mint: distributorAccount.data.mint,
+          owner: ALLOWED_RECEIVE_ADDRESSES.YES,
+          tokenProgram: 'TokenProg',
+        });
         expect(merkleDistributorClient.getNewClaimInstruction).toHaveBeenCalledWith(
           expect.objectContaining({
             distributor: distributorAddr,
             claimStatus: claimStatusPda,
             from: distributorAccount.data.tokenVault,
-            to: claimantAta,
+            to: targetAta, // Should be ATA of YES address, not claimant's ATA
             claimant: walletSdk.wallet,
             amountUnlocked: 10000,
             amountLocked: 5000,
@@ -851,6 +862,7 @@ describe('MerkleDistributorProgram', () => {
             amountUnlocked: 10000,
             amountLocked: 5000,
             proof: [],
+            target: 'YES',
           })
         ).rejects.toThrow('Wallet not set');
       });
@@ -876,8 +888,62 @@ describe('MerkleDistributorProgram', () => {
             amountUnlocked: 10000,
             amountLocked: 5000,
             proof: [],
+            target: 'YES',
           })
         ).rejects.toThrow('Tokens have already been claimed');
+      });
+
+      it('should create a newClaim instruction with NO target', async () => {
+        const distributorAddr = newAddr(950);
+        const distributorAccount = MerkleDistributorAccountFactory.create({
+          address: distributorAddr,
+          mint: newAddr(951),
+          tokenVault: newAddr(952),
+        });
+        const claimStatusPda = newAddr(953);
+        const targetAta = newAddr(954); // ATA of NO address
+        const proof = [new Uint8Array(32).fill(3)];
+
+        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(
+          distributorAccount
+        );
+        vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
+        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
+          exists: false,
+        });
+        const token = await import('@solana-program/token');
+        // Mock findAssociatedTokenPda to return the ATA of the NO address
+        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([targetAta]);
+
+        const mockInstruction = {
+          accounts: [],
+          data: Buffer.from('test'),
+        };
+        vi.spyOn(merkleDistributorClient, 'getNewClaimInstruction' as any).mockReturnValue(
+          mockInstruction
+        );
+
+        const result = await walletProgram.claim({
+          distributor: distributorAddr,
+          amountUnlocked: 20000,
+          amountLocked: 10000,
+          proof,
+          target: 'NO',
+        });
+
+        expect(result).toBe(mockInstruction);
+        // Verify findAssociatedTokenPda was called with the NO address
+        expect(token.findAssociatedTokenPda).toHaveBeenCalledWith({
+          mint: distributorAccount.data.mint,
+          owner: ALLOWED_RECEIVE_ADDRESSES.NO,
+          tokenProgram: 'TokenProg',
+        });
+        expect(merkleDistributorClient.getNewClaimInstruction).toHaveBeenCalledWith(
+          expect.objectContaining({
+            to: targetAta, // Should be ATA of NO address
+          }),
+          expect.any(Object)
+        );
       });
 
 
@@ -893,6 +959,7 @@ describe('MerkleDistributorProgram', () => {
             amountUnlocked: 10000,
             amountLocked: 5000,
             proof: [],
+            target: 'YES',
           })
         ).rejects.toThrow('RPC error');
         expect(walletSdk.logger.error).toHaveBeenCalledWith(
@@ -933,6 +1000,7 @@ describe('MerkleDistributorProgram', () => {
           amountUnlocked: BigInt(30000),
           amountLocked: BigInt(15000),
           proof: [],
+          target: 'YES',
         });
 
         expect(merkleDistributorClient.getNewClaimInstruction).toHaveBeenCalledWith(

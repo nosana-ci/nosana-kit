@@ -5,6 +5,7 @@ import {
   parseBase64RpcAccount,
   Base58EncodedBytes,
   ReadonlyUint8Array,
+  address,
 } from 'gill';
 import { NosanaClient, NosanaError, ErrorCodes } from '../index.js';
 import * as programClient from '../generated_clients/merkle_distributor/index.js';
@@ -12,6 +13,17 @@ import { convertBigIntToNumber, ConvertTypesForDb } from '../utils/index.js';
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import bs58 from 'bs58';
 import { SYSTEM_PROGRAM_ADDRESS } from 'gill/programs';
+
+/**
+ * Allowed addresses for receiving claimed tokens from merkle distributor.
+ * The `to` account must be the ATA of one of these addresses.
+ */
+export const ALLOWED_RECEIVE_ADDRESSES = {
+  YES: address('YessuvqUauj9yW4B3eERcyRLWmQtWpFc2ERKmaedmCE'),
+  NO: address('NopXntmRdXhYNkoZaNTMUMShJ3aVG5RvwpiyPdd4bMh'),
+} as const;
+
+export type ClaimTarget = keyof typeof ALLOWED_RECEIVE_ADDRESSES;
 
 export type MerkleDistributor = ConvertTypesForDb<programClient.MerkleDistributorArgs> & {
   address: Address;
@@ -281,14 +293,13 @@ export class MerkleDistributorProgram extends BaseProgram {
     amountUnlocked: number | bigint;
     amountLocked: number | bigint;
     proof: Array<ReadonlyUint8Array>;
+    target: ClaimTarget; // 'YES' or 'NO' - determines which address receives the tokens
   }): Promise<ReturnType<typeof programClient.getNewClaimInstruction>> {
     if (!this.sdk.wallet) {
       throw new Error('Wallet not set. Please set a wallet before claiming tokens.');
     }
 
     try {
-      const claimant = this.sdk.wallet.address;
-
       // Get the distributor account to find mint and tokenVault
       const distributorAccount = await this.client.fetchMerkleDistributor(
         this.sdk.solana.rpc,
@@ -312,20 +323,24 @@ export class MerkleDistributorProgram extends BaseProgram {
         );
       }
 
-      // Find claimant's associated token account
-      const [claimantAta] = await findAssociatedTokenPda({
+      // Get the target address for receiving tokens (YES or NO)
+      const targetAddress = ALLOWED_RECEIVE_ADDRESSES[params.target];
+
+      // Find the ATA of the target address (where tokens will be sent)
+      const [targetAta] = await findAssociatedTokenPda({
         mint: distributorAccount.data.mint,
-        owner: claimant,
+        owner: targetAddress,
         tokenProgram: TOKEN_PROGRAM_ADDRESS,
       });
 
       // Create newClaim instruction which creates the account and claims the tokens
+      // Note: tokens go to the ATA of the target address (YES or NO), not the claimant's ATA
       const newClaimInstruction = programClient.getNewClaimInstruction(
         {
           distributor: params.distributor,
           claimStatus: claimStatusPda,
           from: distributorAccount.data.tokenVault,
-          to: claimantAta,
+          to: targetAta, // ATA of YES or NO address, not claimant's ATA
           claimant: this.sdk.wallet,
           tokenProgram: TOKEN_PROGRAM_ADDRESS,
           systemProgram: SYSTEM_PROGRAM_ADDRESS,
