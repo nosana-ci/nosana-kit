@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "name": "merkle_distributor",
   "instructions": [
     {
@@ -42,6 +42,7 @@
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "Mint",
                 "path": "mint"
               },
               {
@@ -73,7 +74,8 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Token vault"
+            "Token vault",
+            "Should create previously"
           ]
         },
         {
@@ -338,19 +340,6 @@
           ]
         },
         {
-          "name": "transferHookProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "The mint to distribute."
-          ]
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -365,11 +354,6 @@
           "docs": [
             "The [System] program."
           ]
-        },
-        {
-          "name": "clock",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -975,8 +959,8 @@
     },
     {
       "code": 6021,
-      "name": "InvalidTokenProgram",
-      "msg": "Invalid token program"
+      "name": "InvalidVote",
+      "msg": "Can only claim to vote address"
     }
   ]
 }

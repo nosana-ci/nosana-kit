@@ -52,15 +52,12 @@ export type NewClaimInstruction<
   TAccountFrom extends string | IAccountMeta<string> = string,
   TAccountTo extends string | IAccountMeta<string> = string,
   TAccountClaimant extends string | IAccountMeta<string> = string,
-  TAccountTransferHookProgram extends string | IAccountMeta<string> = string,
-  TAccountMint extends string | IAccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
     | IAccountMeta<string> = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TAccountClock extends string | IAccountMeta<string> = string,
   TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
@@ -80,21 +77,12 @@ export type NewClaimInstruction<
         ? WritableSignerAccount<TAccountClaimant> &
             IAccountSignerMeta<TAccountClaimant>
         : TAccountClaimant,
-      TAccountTransferHookProgram extends string
-        ? ReadonlyAccount<TAccountTransferHookProgram>
-        : TAccountTransferHookProgram,
-      TAccountMint extends string
-        ? ReadonlyAccount<TAccountMint>
-        : TAccountMint,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      TAccountClock extends string
-        ? ReadonlyAccount<TAccountClock>
-        : TAccountClock,
       ...TRemainingAccounts,
     ]
   >;
@@ -149,11 +137,8 @@ export type NewClaimInput<
   TAccountFrom extends string = string,
   TAccountTo extends string = string,
   TAccountClaimant extends string = string,
-  TAccountTransferHookProgram extends string = string,
-  TAccountMint extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
-  TAccountClock extends string = string,
 > = {
   /** The [MerkleDistributor]. */
   distributor: Address<TAccountDistributor>;
@@ -165,14 +150,10 @@ export type NewClaimInput<
   to: Address<TAccountTo>;
   /** Who is claiming the tokens. */
   claimant: TransactionSigner<TAccountClaimant>;
-  transferHookProgram: Address<TAccountTransferHookProgram>;
-  /** The mint to distribute. */
-  mint: Address<TAccountMint>;
   /** SPL [Token] program. */
   tokenProgram?: Address<TAccountTokenProgram>;
   /** The [System] program. */
   systemProgram?: Address<TAccountSystemProgram>;
-  clock: Address<TAccountClock>;
   amountUnlocked: NewClaimInstructionDataArgs['amountUnlocked'];
   amountLocked: NewClaimInstructionDataArgs['amountLocked'];
   proof: NewClaimInstructionDataArgs['proof'];
@@ -184,11 +165,8 @@ export function getNewClaimInstruction<
   TAccountFrom extends string,
   TAccountTo extends string,
   TAccountClaimant extends string,
-  TAccountTransferHookProgram extends string,
-  TAccountMint extends string,
   TAccountTokenProgram extends string,
   TAccountSystemProgram extends string,
-  TAccountClock extends string,
   TProgramAddress extends Address = typeof MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS,
 >(
   input: NewClaimInput<
@@ -197,11 +175,8 @@ export function getNewClaimInstruction<
     TAccountFrom,
     TAccountTo,
     TAccountClaimant,
-    TAccountTransferHookProgram,
-    TAccountMint,
     TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountClock
+    TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress }
 ): NewClaimInstruction<
@@ -211,11 +186,8 @@ export function getNewClaimInstruction<
   TAccountFrom,
   TAccountTo,
   TAccountClaimant,
-  TAccountTransferHookProgram,
-  TAccountMint,
   TAccountTokenProgram,
-  TAccountSystemProgram,
-  TAccountClock
+  TAccountSystemProgram
 > {
   // Program address.
   const programAddress =
@@ -228,14 +200,8 @@ export function getNewClaimInstruction<
     from: { value: input.from ?? null, isWritable: true },
     to: { value: input.to ?? null, isWritable: true },
     claimant: { value: input.claimant ?? null, isWritable: true },
-    transferHookProgram: {
-      value: input.transferHookProgram ?? null,
-      isWritable: false,
-    },
-    mint: { value: input.mint ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    clock: { value: input.clock ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -263,11 +229,8 @@ export function getNewClaimInstruction<
       getAccountMeta(accounts.from),
       getAccountMeta(accounts.to),
       getAccountMeta(accounts.claimant),
-      getAccountMeta(accounts.transferHookProgram),
-      getAccountMeta(accounts.mint),
       getAccountMeta(accounts.tokenProgram),
       getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.clock),
     ],
     programAddress,
     data: getNewClaimInstructionDataEncoder().encode(
@@ -280,11 +243,8 @@ export function getNewClaimInstruction<
     TAccountFrom,
     TAccountTo,
     TAccountClaimant,
-    TAccountTransferHookProgram,
-    TAccountMint,
     TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountClock
+    TAccountSystemProgram
   >;
 
   return instruction;
@@ -306,14 +266,10 @@ export type ParsedNewClaimInstruction<
     to: TAccountMetas[3];
     /** Who is claiming the tokens. */
     claimant: TAccountMetas[4];
-    transferHookProgram: TAccountMetas[5];
-    /** The mint to distribute. */
-    mint: TAccountMetas[6];
     /** SPL [Token] program. */
-    tokenProgram: TAccountMetas[7];
+    tokenProgram: TAccountMetas[5];
     /** The [System] program. */
-    systemProgram: TAccountMetas[8];
-    clock: TAccountMetas[9];
+    systemProgram: TAccountMetas[6];
   };
   data: NewClaimInstructionData;
 };
@@ -326,7 +282,7 @@ export function parseNewClaimInstruction<
     IInstructionWithAccounts<TAccountMetas> &
     IInstructionWithData<Uint8Array>
 ): ParsedNewClaimInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 10) {
+  if (instruction.accounts.length < 7) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -344,11 +300,8 @@ export function parseNewClaimInstruction<
       from: getNextAccount(),
       to: getNextAccount(),
       claimant: getNextAccount(),
-      transferHookProgram: getNextAccount(),
-      mint: getNextAccount(),
       tokenProgram: getNextAccount(),
       systemProgram: getNextAccount(),
-      clock: getNextAccount(),
     },
     data: getNewClaimInstructionDataDecoder().decode(instruction.data),
   };

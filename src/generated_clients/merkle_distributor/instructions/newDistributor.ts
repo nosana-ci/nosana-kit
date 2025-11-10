@@ -181,7 +181,10 @@ export type NewDistributorInput<
   clawbackReceiver: Address<TAccountClawbackReceiver>;
   /** The mint to distribute. */
   mint: Address<TAccountMint>;
-  /** Token vault */
+  /**
+   * Token vault
+   * Should create previously
+   */
   tokenVault: Address<TAccountTokenVault>;
   /**
    * Admin wallet, responsible for creating the distributor and paying for the transaction.
@@ -320,7 +323,11 @@ export type ParsedNewDistributorInstruction<
     clawbackReceiver: TAccountMetas[1];
     /** The mint to distribute. */
     mint: TAccountMetas[2];
-    /** Token vault */
+    /**
+     * Token vault
+     * Should create previously
+     */
+
     tokenVault: TAccountMetas[3];
     /**
      * Admin wallet, responsible for creating the distributor and paying for the transaction.

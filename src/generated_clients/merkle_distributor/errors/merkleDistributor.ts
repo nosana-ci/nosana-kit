@@ -56,8 +56,8 @@ export const MERKLE_DISTRIBUTOR_ERROR__CLAIMING_IS_NOT_STARTED = 0x1782; // 6018
 export const MERKLE_DISTRIBUTOR_ERROR__CANNOT_CLOSE_DISTRIBUTOR = 0x1783; // 6019
 /** CannotCloseClaimStatus: Cannot close claim status */
 export const MERKLE_DISTRIBUTOR_ERROR__CANNOT_CLOSE_CLAIM_STATUS = 0x1784; // 6020
-/** InvalidTokenProgram: Invalid token program */
-export const MERKLE_DISTRIBUTOR_ERROR__INVALID_TOKEN_PROGRAM = 0x1785; // 6021
+/** InvalidVote: Can only claim to vote address */
+export const MERKLE_DISTRIBUTOR_ERROR__INVALID_VOTE = 0x1785; // 6021
 
 export type MerkleDistributorError =
   | typeof MERKLE_DISTRIBUTOR_ERROR__ARITHMETIC_ERROR
@@ -72,8 +72,8 @@ export type MerkleDistributorError =
   | typeof MERKLE_DISTRIBUTOR_ERROR__INSUFFICIENT_CLAWBACK_DELAY
   | typeof MERKLE_DISTRIBUTOR_ERROR__INSUFFICIENT_UNLOCKED_TOKENS
   | typeof MERKLE_DISTRIBUTOR_ERROR__INVALID_PROOF
-  | typeof MERKLE_DISTRIBUTOR_ERROR__INVALID_TOKEN_PROGRAM
   | typeof MERKLE_DISTRIBUTOR_ERROR__INVALID_VERSION
+  | typeof MERKLE_DISTRIBUTOR_ERROR__INVALID_VOTE
   | typeof MERKLE_DISTRIBUTOR_ERROR__MAX_NODES_EXCEEDED
   | typeof MERKLE_DISTRIBUTOR_ERROR__OWNER_MISMATCH
   | typeof MERKLE_DISTRIBUTOR_ERROR__SAME_ADMIN
@@ -100,8 +100,8 @@ if (process.env.NODE_ENV !== 'production') {
     [MERKLE_DISTRIBUTOR_ERROR__INSUFFICIENT_CLAWBACK_DELAY]: `Clawback start must be at least one day after vesting end`,
     [MERKLE_DISTRIBUTOR_ERROR__INSUFFICIENT_UNLOCKED_TOKENS]: `Insufficient unlocked tokens`,
     [MERKLE_DISTRIBUTOR_ERROR__INVALID_PROOF]: `Invalid Merkle proof.`,
-    [MERKLE_DISTRIBUTOR_ERROR__INVALID_TOKEN_PROGRAM]: `Invalid token program`,
     [MERKLE_DISTRIBUTOR_ERROR__INVALID_VERSION]: `Airdrop Version Mismatch`,
+    [MERKLE_DISTRIBUTOR_ERROR__INVALID_VOTE]: `Can only claim to vote address`,
     [MERKLE_DISTRIBUTOR_ERROR__MAX_NODES_EXCEEDED]: `Exceeded maximum node count`,
     [MERKLE_DISTRIBUTOR_ERROR__OWNER_MISMATCH]: `Token account owner did not match intended owner`,
     [MERKLE_DISTRIBUTOR_ERROR__SAME_ADMIN]: `New and old admin are identical`,
