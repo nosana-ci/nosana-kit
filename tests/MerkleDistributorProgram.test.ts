@@ -5,7 +5,7 @@ import {
   ClaimTarget,
 } from '../src/programs/MerkleDistributorProgram.js';
 import * as merkleDistributorClient from '../src/generated_clients/merkle_distributor/index.js';
-import { type Address } from 'gill';
+import { type Address, generateKeyPairSigner } from 'gill';
 import {
   AddressFactory,
   SdkFactory,
@@ -1010,6 +1010,82 @@ describe('MerkleDistributorProgram', () => {
           }),
           expect.any(Object)
         );
+      });
+
+      it('should use provided claimant signer instead of wallet', async () => {
+        const distributorAddr = newAddr(920);
+        const distributorAccount = MerkleDistributorAccountFactory.create({
+          address: distributorAddr,
+          mint: newAddr(921),
+          tokenVault: newAddr(922),
+        });
+        const claimStatusPda = newAddr(923);
+        const targetAta = newAddr(924);
+        const proof = [new Uint8Array(32).fill(4)];
+
+        // Create a separate claimant signer (different from wallet)
+        const claimantSigner = await generateKeyPairSigner();
+
+        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(
+          distributorAccount
+        );
+        // Mock PDA to return different address when called with claimant's address
+        vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
+        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
+          exists: false,
+        });
+        const token = await import('@solana-program/token');
+        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([targetAta]);
+
+        const mockInstruction = {
+          accounts: [],
+          data: Buffer.from('test'),
+        };
+        vi.spyOn(merkleDistributorClient, 'getNewClaimInstruction' as any).mockReturnValue(
+          mockInstruction
+        );
+
+        const result = await walletProgram.claim({
+          distributor: distributorAddr,
+          amountUnlocked: 15000,
+          amountLocked: 7500,
+          proof,
+          target: ClaimTarget.NO,
+          claimant: claimantSigner,
+        });
+
+        expect(result).toBe(mockInstruction);
+        // Verify PDA was derived using claimant's address, not wallet's address
+        expect(walletSdk.solana.pda).toHaveBeenCalledWith(
+          ['ClaimStatus', claimantSigner.address, distributorAddr],
+          walletSdk.config.programs.merkleDistributorAddress
+        );
+        // Verify instruction uses the claimant signer
+        expect(merkleDistributorClient.getNewClaimInstruction).toHaveBeenCalledWith(
+          expect.objectContaining({
+            claimant: claimantSigner,
+          }),
+          expect.any(Object)
+        );
+      });
+
+      it('should throw error when wallet is not set and claimant is not provided', async () => {
+        const sdkWithoutWallet = SdkFactory.createBasic();
+        sdkWithoutWallet.solana = {
+          rpc: {} as any,
+          pda: vi.fn(),
+        } as any;
+        const programWithoutWallet = new MerkleDistributorProgram(sdkWithoutWallet);
+
+        await expect(
+          programWithoutWallet.claim({
+            distributor: newAddr(925),
+            amountUnlocked: 10000,
+            amountLocked: 5000,
+            proof: [],
+            target: ClaimTarget.YES,
+          })
+        ).rejects.toThrow('Wallet not set');
       });
     });
   });

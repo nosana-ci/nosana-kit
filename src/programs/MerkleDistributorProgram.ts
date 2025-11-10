@@ -6,6 +6,7 @@ import {
   Base58EncodedBytes,
   ReadonlyUint8Array,
   address,
+  KeyPairSigner,
 } from 'gill';
 import { NosanaClient, NosanaError, ErrorCodes } from '../index.js';
 import * as programClient from '../generated_clients/merkle_distributor/index.js';
@@ -292,8 +293,10 @@ export class MerkleDistributorProgram extends BaseProgram {
    * This function creates a new ClaimStatus account and claims the tokens in a single instruction.
    *
    * @param params Parameters for claiming tokens
+   * @param params.claimant Optional claimant signer. If not provided, uses the wallet.
    * @returns The newClaim instruction
    * @throws NosanaError if tokens have already been claimed
+   * @throws Error if wallet is not set and claimant is not provided
    */
   async claim(params: {
     distributor: Address;
@@ -301,9 +304,21 @@ export class MerkleDistributorProgram extends BaseProgram {
     amountLocked: number | bigint;
     proof: Array<ReadonlyUint8Array>;
     target: ClaimTarget; // 'YES' or 'NO' - determines which address receives the tokens
+    claimant?: KeyPairSigner; // Optional claimant signer. If not provided, uses the wallet.
   }): Promise<ReturnType<typeof programClient.getNewClaimInstruction>> {
-    if (!this.sdk.wallet) {
-      throw new Error('Wallet not set. Please set a wallet before claiming tokens.');
+    // Determine claimant signer and address
+    let claimantSigner: KeyPairSigner;
+    let claimantAddress: Address;
+
+    if (params.claimant) {
+      claimantSigner = params.claimant;
+      claimantAddress = params.claimant.address;
+    } else {
+      if (!this.sdk.wallet) {
+        throw new Error('Wallet not set. Please set a wallet or provide a claimant signer.');
+      }
+      claimantSigner = this.sdk.wallet;
+      claimantAddress = this.sdk.wallet.address;
     }
 
     try {
@@ -313,8 +328,8 @@ export class MerkleDistributorProgram extends BaseProgram {
         params.distributor
       );
 
-      // Derive ClaimStatus PDA
-      const claimStatusPda = await this.getClaimStatusPda(params.distributor);
+      // Derive ClaimStatus PDA using the claimant address
+      const claimStatusPda = await this.getClaimStatusPda(params.distributor, claimantAddress);
 
       // Check if ClaimStatus account exists
       const maybeClaimStatus = await this.client.fetchMaybeClaimStatus(
@@ -342,13 +357,14 @@ export class MerkleDistributorProgram extends BaseProgram {
 
       // Create newClaim instruction which creates the account and claims the tokens
       // Note: tokens go to the ATA of the target address (YES or NO), not the claimant's ATA
+      // The claimant in the instruction is the claimant signer (or wallet if not provided)
       const newClaimInstruction = programClient.getNewClaimInstruction(
         {
           distributor: params.distributor,
           claimStatus: claimStatusPda,
           from: distributorAccount.data.tokenVault,
           to: targetAta, // ATA of YES or NO address, not claimant's ATA
-          claimant: this.sdk.wallet,
+          claimant: claimantSigner, // Claimant signer (or wallet if not provided)
           tokenProgram: TOKEN_PROGRAM_ADDRESS,
           systemProgram: SYSTEM_PROGRAM_ADDRESS,
           amountUnlocked: params.amountUnlocked,
