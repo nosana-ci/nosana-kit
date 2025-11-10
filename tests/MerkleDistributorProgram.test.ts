@@ -946,7 +946,6 @@ describe('MerkleDistributorProgram', () => {
         );
       });
 
-
       it('should handle errors when creating claim instruction', async () => {
         const distributorAddr = newAddr(909);
         const error = new Error('RPC error');
