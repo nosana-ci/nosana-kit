@@ -6,7 +6,6 @@ import {
   Base58EncodedBytes,
   ReadonlyUint8Array,
 } from 'gill';
-import { SYSVAR_CLOCK_ADDRESS } from '@solana/sysvars';
 import { NosanaClient, NosanaError, ErrorCodes } from '../index.js';
 import * as programClient from '../generated_clients/merkle_distributor/index.js';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../utils/index.js';
@@ -282,7 +281,6 @@ export class MerkleDistributorProgram extends BaseProgram {
     amountUnlocked: number | bigint;
     amountLocked: number | bigint;
     proof: Array<ReadonlyUint8Array>;
-    transferHookProgram?: Address;
   }): Promise<ReturnType<typeof programClient.getNewClaimInstruction>> {
     if (!this.sdk.wallet) {
       throw new Error('Wallet not set. Please set a wallet before claiming tokens.');
@@ -321,9 +319,6 @@ export class MerkleDistributorProgram extends BaseProgram {
         tokenProgram: TOKEN_PROGRAM_ADDRESS,
       });
 
-      // Transfer hook program - use provided or default to token program
-      const transferHookProgram = params.transferHookProgram || TOKEN_PROGRAM_ADDRESS;
-
       // Create newClaim instruction which creates the account and claims the tokens
       const newClaimInstruction = programClient.getNewClaimInstruction(
         {
@@ -332,11 +327,8 @@ export class MerkleDistributorProgram extends BaseProgram {
           from: distributorAccount.data.tokenVault,
           to: claimantAta,
           claimant: this.sdk.wallet,
-          transferHookProgram: transferHookProgram,
-          mint: distributorAccount.data.mint,
           tokenProgram: TOKEN_PROGRAM_ADDRESS,
           systemProgram: SYSTEM_PROGRAM_ADDRESS,
-          clock: SYSVAR_CLOCK_ADDRESS,
           amountUnlocked: params.amountUnlocked,
           amountLocked: params.amountLocked,
           proof: params.proof,

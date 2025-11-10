@@ -827,7 +827,6 @@ describe('MerkleDistributorProgram', () => {
             from: distributorAccount.data.tokenVault,
             to: claimantAta,
             claimant: walletSdk.wallet,
-            mint: distributorAccount.data.mint,
             amountUnlocked: 10000,
             amountLocked: 5000,
             proof,
@@ -881,51 +880,6 @@ describe('MerkleDistributorProgram', () => {
         ).rejects.toThrow('Tokens have already been claimed');
       });
 
-      it('should use custom transfer hook program when provided', async () => {
-        const distributorAddr = newAddr(903);
-        const distributorAccount = MerkleDistributorAccountFactory.create({
-          address: distributorAddr,
-          mint: newAddr(904),
-          tokenVault: newAddr(905),
-        });
-        const claimStatusPda = newAddr(906);
-        const claimantAta = newAddr(907);
-        const customTransferHookProgram = newAddr(908);
-        const proof = [new Uint8Array(32).fill(3)];
-
-        vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(
-          distributorAccount
-        );
-        vi.spyOn(walletSdk.solana, 'pda').mockResolvedValue(claimStatusPda);
-        vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
-          exists: false,
-        });
-        const token = await import('@solana-program/token');
-        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([claimantAta]);
-
-        const mockInstruction = {
-          accounts: [],
-          data: Buffer.from('test'),
-        };
-        vi.spyOn(merkleDistributorClient, 'getNewClaimInstruction' as any).mockReturnValue(
-          mockInstruction
-        );
-
-        await walletProgram.claim({
-          distributor: distributorAddr,
-          amountUnlocked: 20000,
-          amountLocked: 10000,
-          proof,
-          transferHookProgram: customTransferHookProgram,
-        });
-
-        expect(merkleDistributorClient.getNewClaimInstruction).toHaveBeenCalledWith(
-          expect.objectContaining({
-            transferHookProgram: customTransferHookProgram,
-          }),
-          expect.any(Object)
-        );
-      });
 
       it('should handle errors when creating claim instruction', async () => {
         const distributorAddr = newAddr(909);
