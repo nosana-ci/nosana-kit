@@ -42,7 +42,28 @@ export class SolanaService {
     const addressEncoder = getAddressEncoder();
     const [pda] = await getProgramDerivedAddress({
       programAddress: programId,
-      seeds: seeds.map((seed) => (typeof seed !== 'string' ? addressEncoder.encode(seed) : seed)),
+      seeds: seeds.map((seed) => {
+        // Address is a branded string type, so typeof will return 'string'
+        // We need to encode Address types to bytes for PDA seeds
+        // Try to encode if it looks like an address (base58, 32-44 chars), otherwise pass as-is
+        if (typeof seed === 'string') {
+          // Check if it's likely an address (base58 encoded addresses are 32-44 chars)
+          // Short strings like 'ClaimStatus' should be passed as-is
+          if (seed.length >= 32 && seed.length <= 44) {
+            try {
+              // Try to encode as Address - if it's a valid address, this will work
+              return addressEncoder.encode(seed as Address);
+            } catch {
+              // If encoding fails, it's not a valid address, pass as-is (e.g., 'ClaimStatus')
+              return seed;
+            }
+          }
+          // Short strings pass as-is
+          return seed;
+        }
+        // Non-string types should be encoded
+        return addressEncoder.encode(seed);
+      }),
     });
     return pda;
   }

@@ -8,7 +8,8 @@
     "monitor": "tsx monitor.ts",
     "set-wallet": "tsx set-wallet.ts",
     "nos-service": "tsx nos-service.ts",
-    "stake-program": "tsx stake-program.ts"
+    "stake-program": "tsx stake-program.ts",
+    "get-claim-status": "tsx get-claim-status.ts"
   },
   "dependencies": {
     "@nosana/kit": "file:../.."
