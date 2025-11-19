@@ -66,7 +66,9 @@ export function createNosanaClient(
   customConfig?: PartialClientConfig
 ): NosanaClient {
   const config = getNosanaConfig(network, customConfig);
-  const logger = Logger.getInstance();
+
+  const logger = Logger.getInstance({ level: config.logLevel });
+
   let signer: Signer | undefined = config.signer;
 
   // Create signer getter

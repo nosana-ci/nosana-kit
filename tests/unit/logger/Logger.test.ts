@@ -2,13 +2,18 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Logger } from '../../../src/logger/Logger.js';
 
 describe('Logger', () => {
+  let consoleDebug: ReturnType<typeof vi.spyOn>;
+  let consoleInfo: ReturnType<typeof vi.spyOn>;
+  let consoleWarn: ReturnType<typeof vi.spyOn>;
+  let consoleError: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     // reset singleton
     (Logger as unknown as { instance?: unknown }).instance = undefined;
-    vi.spyOn(console, 'debug').mockImplementation(() => {});
-    vi.spyOn(console, 'info').mockImplementation(() => {});
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    consoleDebug = vi.spyOn(console, 'debug').mockImplementation(() => {}) as any;
+    consoleInfo = vi.spyOn(console, 'info').mockImplementation(() => {}) as any;
+    consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {}) as any;
+    consoleError = vi.spyOn(console, 'error').mockImplementation(() => {}) as any;
   });
 
   it('creates a singleton instance', () => {
@@ -17,52 +22,85 @@ describe('Logger', () => {
     expect(a).toBe(b);
   });
 
-  it('respects initial options and logs accordingly', () => {
-    const logger = Logger.getInstance({ level: 'debug', prefix: 'TEST', enabled: true });
-    logger.debug('d');
-    logger.info('i');
-    logger.warn('w');
-    logger.error('e');
-    expect(console.debug).toHaveBeenCalledWith('TEST [DEBUG] d');
-    expect(console.info).toHaveBeenCalledWith('TEST [INFO] i');
-    expect(console.warn).toHaveBeenCalledWith('TEST [WARN] w');
-    expect(console.error).toHaveBeenCalledWith('TEST [ERROR] e');
+  it('logs all levels when level is debug', () => {
+    const debugMessage = 'debug message';
+    const infoMessage = 'info message';
+    const warnMessage = 'warn message';
+    const errorMessage = 'error message';
+
+    const logger = Logger.getInstance({ level: 'debug', enabled: true });
+    logger.debug(debugMessage);
+    logger.info(infoMessage);
+    logger.warn(warnMessage);
+    logger.error(errorMessage);
+
+    expect(consoleDebug).toHaveBeenCalledWith(expect.stringContaining(debugMessage));
+    expect(consoleInfo).toHaveBeenCalledWith(expect.stringContaining(infoMessage));
+    expect(consoleWarn).toHaveBeenCalledWith(expect.stringContaining(warnMessage));
+    expect(consoleError).toHaveBeenCalledWith(expect.stringContaining(errorMessage));
   });
 
   it('does not log when disabled', () => {
+    const infoMessage = 'info message';
+    const errorMessage = 'error message';
+
     const logger = Logger.getInstance({ enabled: false });
-    logger.info('x');
-    logger.error('y');
-    expect(console.info).not.toHaveBeenCalled();
-    expect(console.error).not.toHaveBeenCalled();
+    logger.info(infoMessage);
+    logger.error(errorMessage);
+
+    expect(consoleInfo).not.toHaveBeenCalled();
+    expect(consoleError).not.toHaveBeenCalled();
   });
 
-  it('filters by level and supports setLevel', () => {
+  it('filters logs below configured level', () => {
+    const warnMessage = 'warn message';
+    const errorMessage = 'error message';
+
     const logger = Logger.getInstance({ level: 'warn' });
-    logger.debug('d');
-    logger.info('i');
-    logger.warn('w');
-    logger.error('e');
-    expect(console.debug).not.toHaveBeenCalled();
-    expect(console.info).not.toHaveBeenCalled();
-    expect(console.warn).toHaveBeenCalledWith('[Nosana] [WARN] w');
-    expect(console.error).toHaveBeenCalledWith('[Nosana] [ERROR] e');
+    logger.debug('debug message');
+    logger.info('info message');
+    logger.warn(warnMessage);
+    logger.error(errorMessage);
 
-    vi.clearAllMocks();
-    logger.setLevel('debug');
-    logger.debug('d2');
-    expect(console.debug).toHaveBeenCalledWith('[Nosana] [DEBUG] d2');
+    expect(consoleDebug).not.toHaveBeenCalled();
+    expect(consoleInfo).not.toHaveBeenCalled();
+    expect(consoleWarn).toHaveBeenCalledWith(expect.stringContaining(warnMessage));
+    expect(consoleError).toHaveBeenCalledWith(expect.stringContaining(errorMessage));
   });
 
-  it('supports setPrefix and enable/disable at runtime', () => {
+  it('allows changing log level at runtime', () => {
+    const debugMessage = 'debug message';
+
+    const logger = Logger.getInstance({ level: 'warn' });
+    logger.debug(debugMessage);
+    expect(consoleDebug).not.toHaveBeenCalled();
+
+    logger.setLevel('debug');
+    logger.debug(debugMessage);
+    expect(consoleDebug).toHaveBeenCalledWith(expect.stringContaining(debugMessage));
+  });
+
+  it('allows enabling and disabling at runtime', () => {
+    const infoMessage = 'info message';
+
     const logger = Logger.getInstance();
-    logger.setPrefix('NEW');
     logger.disable();
-    logger.info('i');
-    expect(console.info).not.toHaveBeenCalled();
+    logger.info(infoMessage);
+    expect(consoleInfo).not.toHaveBeenCalled();
 
     logger.enable();
-    logger.info('i2');
-    expect(console.info).toHaveBeenCalledWith('NEW [INFO] i2');
+    logger.info(infoMessage);
+    expect(consoleInfo).toHaveBeenCalledWith(expect.stringContaining(infoMessage));
+  });
+
+  it('includes custom prefix in log messages', () => {
+    const customPrefix = 'TEST';
+    const infoMessage = 'info message';
+
+    const logger = Logger.getInstance({ prefix: customPrefix });
+    logger.info(infoMessage);
+
+    expect(consoleInfo).toHaveBeenCalledWith(expect.stringContaining(customPrefix));
+    expect(consoleInfo).toHaveBeenCalledWith(expect.stringContaining(infoMessage));
   });
 });

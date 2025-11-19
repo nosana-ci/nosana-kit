@@ -182,10 +182,11 @@ export class ClientFactory {
 }
 
 /**
- * SDK Factory
+ * Mock Client Factory
  * Creates mock NosanaClient instances for testing
+ * Use ClientFactory for real client instances
  */
-export class SdkFactory {
+export class MockClientFactory {
   /**
    * Create a basic SDK with minimal configuration
    * Returns a mock that can be used as both NosanaClient and ProgramDeps
@@ -243,7 +244,7 @@ export class SdkFactory {
       })),
     };
     const validAddr = AddressFactory.createValid();
-    const sdk = SdkFactory.createBasic({
+    const sdk = MockClientFactory.createBasic({
       solana: {
         rpc,
         rpcSubscriptions: {},
@@ -261,7 +262,7 @@ export class SdkFactory {
    * Create an SDK with WebSocket subscription support
    */
   static createWithSubscriptions(): NosanaClient {
-    const sdk = SdkFactory.createBasic();
+    const sdk = MockClientFactory.createBasic();
     (sdk as any).solana.rpcSubscriptions = {
       programNotifications: vi.fn(),
     };
@@ -271,11 +272,11 @@ export class SdkFactory {
   /**
    * Create an SDK with a wallet
    *
-   * Note: This uses a mock signer because SdkFactory creates mock SDKs.
+   * Note: This uses a mock signer because MockClientFactory creates mock clients.
    * For real client instances, use ClientFactory.createWithSigner() instead.
    */
   static createWithWallet(walletAddress?: Address): NosanaClient {
-    const sdk = SdkFactory.createBasic();
+    const sdk = MockClientFactory.createBasic();
     (sdk as any).signer = SignerFactory.createMockSigner(walletAddress);
     return sdk;
   }

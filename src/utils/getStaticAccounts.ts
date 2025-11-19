@@ -9,6 +9,11 @@ export type StaticAccounts = {
   jobsProgram: Address;
 };
 
+export type StaticAccountsCache = {
+  value?: StaticAccounts;
+  promise?: Promise<StaticAccounts>;
+};
+
 /**
  * Gets the static accounts, initializing them if needed.
  * This function caches the result to avoid redundant PDA lookups.
@@ -21,7 +26,7 @@ export type StaticAccounts = {
 export async function getStaticAccounts(
   config: ClientConfig,
   solana: SolanaService,
-  cache?: { value?: StaticAccounts; promise?: Promise<StaticAccounts> }
+  cache?: StaticAccountsCache
 ): Promise<StaticAccounts> {
   // Return cached value if available
   if (cache?.value) {

@@ -1,5 +1,6 @@
 import { address } from '@solana/kit';
-import { ClientConfig, NosanaLogLevel, NosanaNetwork } from './types';
+import { ClientConfig, NosanaNetwork } from './types';
+import type { LogLevel } from '../logger/Logger.js';
 
 export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
   mainnet: {
@@ -21,7 +22,7 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
       poolsAddress: address('nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD'),
       merkleDistributorAddress: address('merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425'),
     },
-    logLevel: NosanaLogLevel.ERROR,
+    logLevel: 'error' as LogLevel,
   },
   devnet: {
     solana: {
@@ -42,6 +43,6 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
       poolsAddress: address('nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD'),
       merkleDistributorAddress: address('merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425'),
     },
-    logLevel: NosanaLogLevel.DEBUG,
+    logLevel: 'debug' as LogLevel,
   },
 };

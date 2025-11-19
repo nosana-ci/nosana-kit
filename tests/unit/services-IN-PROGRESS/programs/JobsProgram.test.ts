@@ -4,17 +4,17 @@ import {
   type JobsProgram,
   JobState,
   MarketQueueType,
-} from '../../../src/services/programs/JobsProgram.js';
-import * as programClient from '../../../src/generated_clients/jobs/index.js';
+} from '../../../../src/services/programs/JobsProgram.js';
+import * as programClient from '../../../../src/generated_clients/jobs/index.js';
 import { type Address } from '@solana/kit';
 import {
   AddressFactory,
-  SdkFactory,
+  MockClientFactory,
   JobAccountFactory,
   RunAccountFactory,
   MarketAccountFactory,
   sdkToProgramDeps,
-} from '../helpers/index.js';
+} from '../../helpers/index.js';
 
 vi.mock('@solana-program/token', () => ({
   findAssociatedTokenPda: vi.fn(async () => ['ata']),
@@ -22,14 +22,14 @@ vi.mock('@solana-program/token', () => ({
 }));
 
 // Legacy aliases for backward compatibility (to be gradually replaced)
-const baseSdk = () => SdkFactory.createBasic();
+const baseSdk = () => MockClientFactory.createBasic();
 const newAddr = (seed?: number) => AddressFactory.create(seed);
 const makeJobAccount = (state: number, addr?: Address) =>
   JobAccountFactory.create({ state, address: addr });
 const makeRunAccount = (job: Address, time: number, node?: Address) =>
   RunAccountFactory.create({ job, time: BigInt(time), node });
 const makeMarketAccount = () => MarketAccountFactory.create();
-const makeMonitorSdk = () => SdkFactory.createWithSubscriptions();
+const makeMonitorSdk = () => MockClientFactory.createWithSubscriptions();
 
 describe('JobsProgram', () => {
   describe('transforms', () => {
@@ -83,11 +83,11 @@ describe('JobsProgram', () => {
   });
 
   describe('methods', () => {
-    let sdk: ReturnType<typeof SdkFactory.createWithRpc>['sdk'];
+    let sdk: ReturnType<typeof MockClientFactory.createWithRpc>['sdk'];
     let jobs: JobsProgram;
 
     beforeEach(() => {
-      const ctx = SdkFactory.createWithRpc();
+      const ctx = MockClientFactory.createWithRpc();
       sdk = ctx.sdk;
       jobs = createJobsProgram(sdkToProgramDeps(sdk));
     });
@@ -188,7 +188,7 @@ describe('JobsProgram', () => {
 
     describe('GPA filters', () => {
       it('all() builds discriminator and expected offset filters', async () => {
-        const ctx = SdkFactory.createWithRpc();
+        const ctx = MockClientFactory.createWithRpc();
         sdk = ctx.sdk;
         jobs = createJobsProgram(sdkToProgramDeps(sdk));
         const filters = {
@@ -209,7 +209,7 @@ describe('JobsProgram', () => {
       });
 
       it('runs() includes RUN discriminator (offset 0)', async () => {
-        const ctx = SdkFactory.createWithRpc();
+        const ctx = MockClientFactory.createWithRpc();
         sdk = ctx.sdk;
         jobs = createJobsProgram(sdkToProgramDeps(sdk));
         await jobs.runs({ job: newAddr(50), node: newAddr(51) });
@@ -219,7 +219,7 @@ describe('JobsProgram', () => {
       });
 
       it('markets() includes MARKET discriminator (offset 0)', async () => {
-        const ctx = SdkFactory.createWithRpc();
+        const ctx = MockClientFactory.createWithRpc();
         sdk = ctx.sdk;
         jobs = createJobsProgram(sdkToProgramDeps(sdk));
         await jobs.markets();
@@ -251,7 +251,7 @@ describe('JobsProgram', () => {
         });
 
         const ipfsBytes = Array.from({ length: 32 }, (_, i) => i);
-        const ipfsCid = (await import('../../../src/ipfs/IPFS.js')).IPFS.solHashToIpfsHash(
+        const ipfsCid = (await import('../../../../src/ipfs/IPFS.js')).IPFS.solHashToIpfsHash(
           ipfsBytes
         )!;
 
@@ -289,7 +289,7 @@ describe('JobsProgram', () => {
       });
 
       it('all propagates getProgramAccounts errors', async () => {
-        const ctx = SdkFactory.createWithRpc();
+        const ctx = MockClientFactory.createWithRpc();
         sdk = ctx.sdk;
         jobs = createJobsProgram(sdkToProgramDeps(sdk));
         (sdk as any).solana.rpc.getProgramAccounts = vi

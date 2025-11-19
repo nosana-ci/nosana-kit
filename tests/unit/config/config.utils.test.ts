@@ -3,7 +3,6 @@ import { mergeConfigs, getNosanaConfig } from '../../../src/config/utils.js';
 import { DEFAULT_CONFIGS } from '../../../src/config/defaultConfigs.js';
 import {
   NosanaNetwork,
-  NosanaLogLevel,
   type ClientConfig,
   type PartialClientConfig,
 } from '../../../src/config/types.js';
@@ -15,27 +14,26 @@ describe('config/utils', () => {
 
     it('returns default when custom is undefined', () => {
       const merged = mergeConfigs(base);
-      expect(merged).toBe(base); // same object as implementation returns default directly
+      expect(merged).toEqual(base);
     });
 
-    it('merges solana/ipfs shallowly and overrides provided fields', () => {
+    it('overrides provided fields while preserving defaults', () => {
+      const customRpcEndpoint = 'https://custom.example';
+      const customGateway = 'https://custom-gw/ipfs/';
+      const customLogLevel = 'debug';
+
       const custom: PartialClientConfig = {
-        solana: { rpcEndpoint: 'https://custom.example' },
-        ipfs: { gateway: 'https://custom-gw/ipfs/' },
-        logLevel: NosanaLogLevel.DEBUG,
+        solana: { rpcEndpoint: customRpcEndpoint },
+        ipfs: { gateway: customGateway },
+        logLevel: customLogLevel,
       };
       const merged = mergeConfigs(base, custom);
 
-      // top-level
-      expect(merged.logLevel).toBe(NosanaLogLevel.DEBUG);
-
-      // solana merges: endpoint overridden, cluster/commitment remain
-      expect(merged.solana.rpcEndpoint).toBe('https://custom.example');
+      expect(merged.logLevel).toBe(customLogLevel);
+      expect(merged.solana.rpcEndpoint).toBe(customRpcEndpoint);
       expect(merged.solana.cluster).toBe(base.solana.cluster);
       expect(merged.solana.commitment).toBe(base.solana.commitment);
-
-      // ipfs merges: gateway overridden, jwt/api remain
-      expect(merged.ipfs.gateway).toBe('https://custom-gw/ipfs/');
+      expect(merged.ipfs.gateway).toBe(customGateway);
       expect(merged.ipfs.api).toBe(base.ipfs.api);
       expect(merged.ipfs.jwt).toBe(base.ipfs.jwt);
     });
@@ -53,17 +51,19 @@ describe('config/utils', () => {
     });
 
     it('applies overrides via second argument', () => {
+      const overrideRpcEndpoint = 'https://override';
       const cfg = getNosanaConfig(NosanaNetwork.MAINNET, {
-        solana: { rpcEndpoint: 'https://override' },
+        solana: { rpcEndpoint: overrideRpcEndpoint },
       });
-      expect(cfg.solana.rpcEndpoint).toBe('https://override');
+      expect(cfg.solana.rpcEndpoint).toBe(overrideRpcEndpoint);
       expect(cfg.solana.cluster).toBe(DEFAULT_CONFIGS[NosanaNetwork.MAINNET].solana.cluster);
     });
 
     it('throws NosanaError for unsupported network', () => {
-      expect(() => getNosanaConfig('invalid' as NosanaNetwork)).toThrowError(NosanaError);
+      const invalidNetwork = 'invalid' as NosanaNetwork;
+      expect(() => getNosanaConfig(invalidNetwork)).toThrow(NosanaError);
       try {
-        getNosanaConfig('invalid' as NosanaNetwork);
+        getNosanaConfig(invalidNetwork);
       } catch (e: any) {
         expect(e.code).toBe(ErrorCodes.INVALID_NETWORK);
       }

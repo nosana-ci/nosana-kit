@@ -2,18 +2,18 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   createStakeProgram,
   type StakeProgram,
-} from '../../../src/services/programs/StakeProgram.js';
-import * as stakingClient from '../../../src/generated_clients/staking/index.js';
+} from '../../../../src/services/programs/StakeProgram.js';
+import * as stakingClient from '../../../../src/generated_clients/staking/index.js';
 import { type Address } from '@solana/kit';
 import {
   AddressFactory,
-  SdkFactory,
+  MockClientFactory,
   StakeAccountFactory,
   sdkToProgramDeps,
-} from '../helpers/index.js';
+} from '../../helpers/index.js';
 
 // Legacy aliases for backward compatibility
-const baseSdk = () => SdkFactory.createBasic();
+const baseSdk = () => MockClientFactory.createBasic();
 const newAddr = (seed?: number) => AddressFactory.create(seed);
 const makeStakeAccount = (amount?: number, addr?: Address) =>
   StakeAccountFactory.createWithAmount(amount ?? 1000, { address: addr });
@@ -137,11 +137,11 @@ describe('StakeProgram', () => {
   });
 
   describe('methods', () => {
-    let sdk: ReturnType<typeof SdkFactory.createWithRpc>['sdk'];
+    let sdk: ReturnType<typeof MockClientFactory.createWithRpc>['sdk'];
     let stake: StakeProgram;
 
     beforeEach(() => {
-      const ctx = SdkFactory.createWithRpc();
+      const ctx = MockClientFactory.createWithRpc();
       sdk = ctx.sdk;
       stake = createStakeProgram(sdkToProgramDeps(sdk));
     });
@@ -335,11 +335,11 @@ describe('StakeProgram', () => {
   });
 
   describe('integration scenarios', () => {
-    let sdk: ReturnType<typeof SdkFactory.createWithRpc>['sdk'];
+    let sdk: ReturnType<typeof MockClientFactory.createWithRpc>['sdk'];
     let stake: StakeProgram;
 
     beforeEach(() => {
-      const ctx = SdkFactory.createWithRpc();
+      const ctx = MockClientFactory.createWithRpc();
       sdk = ctx.sdk;
       stake = createStakeProgram(sdkToProgramDeps(sdk));
     });

@@ -18,7 +18,7 @@ Test factories provide:
 ```typescript
 import {
   AddressFactory,
-  SdkFactory,
+  MockClientFactory,
   JobAccountFactory,
   RunAccountFactory,
   MarketAccountFactory,
@@ -50,25 +50,26 @@ const validAddr = AddressFactory.createValid();
 AddressFactory.reset();
 ```
 
-### SdkFactory
+### MockClientFactory
 
-Creates mock NosanaClient instances.
+Creates mock NosanaClient instances for testing.
+Use ClientFactory for real client instances.
 
 ```typescript
-// Basic SDK
-const sdk = SdkFactory.createBasic();
+// Basic mock client
+const sdk = MockClientFactory.createBasic();
 
-// SDK with RPC mocking for testing getProgramAccounts
-const { sdk, sentArgs } = SdkFactory.createWithRpc();
+// Mock client with RPC mocking for testing getProgramAccounts
+const { sdk, sentArgs } = MockClientFactory.createWithRpc();
 await sdk.solana.rpc.getProgramAccounts(...);
 // Check what arguments were sent
 console.log(sentArgs);
 
-// SDK with WebSocket subscriptions
-const sdk = SdkFactory.createWithSubscriptions();
+// Mock client with WebSocket subscriptions
+const sdk = MockClientFactory.createWithSubscriptions();
 
-// SDK with wallet
-const sdk = SdkFactory.createWithWallet();
+// Mock client with wallet
+const sdk = MockClientFactory.createWithWallet();
 ```
 
 ### JobAccountFactory

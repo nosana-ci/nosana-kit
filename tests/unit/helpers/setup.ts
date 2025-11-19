@@ -7,18 +7,25 @@
 
 import { beforeEach, afterEach, vi } from 'vitest';
 
-// Mock @solana/kit to prevent WebSocket connections in tests
-// This is a boundary (external network dependency), so mocking is appropriate
+// Minimal global mock of @solana/kit to prevent WebSocket connections in tests
+// This is a boundary (external network dependency), so mocking is appropriate.
+// Test files that need specific mock behavior can override this mock.
 vi.mock('@solana/kit', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@solana/kit')>();
   const rpc = {
     getProgramAccounts: vi.fn(),
     getTokenAccountsByOwner: vi.fn(),
-    getBalance: vi.fn(),
-    getLatestBlockhash: vi.fn(),
+    getBalance: vi.fn(() => ({
+      send: vi.fn().mockResolvedValue({ value: BigInt(0) }),
+    })),
+    getLatestBlockhash: vi.fn(() => ({
+      send: vi.fn().mockResolvedValue({
+        value: { blockhash: 'mock-blockhash', lastValidBlockHeight: BigInt(0) },
+      }),
+    })),
   } as any;
   const rpcSubscriptions = {} as any;
-  const sendAndConfirmTransaction = vi.fn();
+  const sendAndConfirmTransaction = vi.fn().mockResolvedValue(undefined);
 
   return {
     ...actual,

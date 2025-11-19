@@ -4,16 +4,16 @@ import {
   type MerkleDistributorProgram,
   ALLOWED_RECEIVE_ADDRESSES,
   ClaimTarget,
-} from '../../../src/services/programs/MerkleDistributorProgram.js';
-import * as merkleDistributorClient from '../../../src/generated_clients/merkle_distributor/index.js';
+} from '../../../../src/services/programs/MerkleDistributorProgram.js';
+import * as merkleDistributorClient from '../../../../src/generated_clients/merkle_distributor/index.js';
 import { type Address, generateKeyPairSigner } from '@solana/kit';
 import {
   AddressFactory,
-  SdkFactory,
+  MockClientFactory,
   MerkleDistributorAccountFactory,
   ClaimStatusAccountFactory,
   sdkToProgramDeps,
-} from '../helpers/index.js';
+} from '../../helpers/index.js';
 import bs58 from 'bs58';
 
 vi.mock('@solana-program/token', () => ({
@@ -22,7 +22,7 @@ vi.mock('@solana-program/token', () => ({
 }));
 
 // Legacy aliases for backward compatibility
-const baseSdk = () => SdkFactory.createBasic();
+const baseSdk = () => MockClientFactory.createBasic();
 const newAddr = (seed?: number) => AddressFactory.create(seed);
 const makeDistributor = (addr?: Address) =>
   MerkleDistributorAccountFactory.create({ address: addr });
@@ -269,11 +269,11 @@ describe('MerkleDistributorProgram', () => {
   });
 
   describe('methods', () => {
-    let sdk: ReturnType<typeof SdkFactory.createWithRpc>['sdk'];
+    let sdk: ReturnType<typeof MockClientFactory.createWithRpc>['sdk'];
     let program: MerkleDistributorProgram;
 
     beforeEach(() => {
-      const ctx = SdkFactory.createWithRpc();
+      const ctx = MockClientFactory.createWithRpc();
       sdk = ctx.sdk;
       program = createMerkleDistributorProgram(sdkToProgramDeps(sdk));
     });
@@ -480,11 +480,11 @@ describe('MerkleDistributorProgram', () => {
     });
 
     describe('getClaimStatusPda', () => {
-      let walletSdk: ReturnType<typeof SdkFactory.createWithWallet>;
+      let walletSdk: ReturnType<typeof MockClientFactory.createWithWallet>;
       let walletProgram: MerkleDistributorProgram;
 
       beforeEach(() => {
-        walletSdk = SdkFactory.createWithWallet();
+        walletSdk = MockClientFactory.createWithWallet();
         walletSdk.solana = {
           rpc: {} as any,
           pda: vi.fn().mockResolvedValue(newAddr(700)),
@@ -524,7 +524,7 @@ describe('MerkleDistributorProgram', () => {
       });
 
       it('should throw error when signer is not set and claimant is not provided', async () => {
-        const sdkWithoutWallet = SdkFactory.createBasic();
+        const sdkWithoutWallet = MockClientFactory.createBasic();
         sdkWithoutWallet.solana = {
           rpc: {} as any,
           pda: vi.fn(),
@@ -539,7 +539,7 @@ describe('MerkleDistributorProgram', () => {
       });
 
       it('should work without wallet when claimant is provided', async () => {
-        const sdkWithoutWallet = SdkFactory.createBasic();
+        const sdkWithoutWallet = MockClientFactory.createBasic();
         const distributorAddr = newAddr(766);
         const claimantAddr = newAddr(767);
         const claimStatusPda = newAddr(768);
@@ -563,11 +563,11 @@ describe('MerkleDistributorProgram', () => {
     });
 
     describe('getClaimStatusForDistributor', () => {
-      let walletSdk: ReturnType<typeof SdkFactory.createWithWallet>;
+      let walletSdk: ReturnType<typeof MockClientFactory.createWithWallet>;
       let walletProgram: MerkleDistributorProgram;
 
       beforeEach(() => {
-        walletSdk = SdkFactory.createWithWallet();
+        walletSdk = MockClientFactory.createWithWallet();
         walletSdk.solana = {
           rpc: {} as any,
           pda: vi.fn().mockResolvedValue(newAddr(700)),
@@ -619,7 +619,7 @@ describe('MerkleDistributorProgram', () => {
       });
 
       it('should throw error when signer is not set', async () => {
-        const sdkWithoutWallet = SdkFactory.createBasic();
+        const sdkWithoutWallet = MockClientFactory.createBasic();
         sdkWithoutWallet.solana = {
           rpc: {} as any,
           pda: vi.fn(),
@@ -681,7 +681,7 @@ describe('MerkleDistributorProgram', () => {
       });
 
       it('should work without wallet when claimant is provided', async () => {
-        const sdkWithoutWallet = SdkFactory.createBasic();
+        const sdkWithoutWallet = MockClientFactory.createBasic();
         const distributorAddr = newAddr(760);
         const claimantAddr = newAddr(761);
         const claimStatusPda = newAddr(762);
@@ -838,11 +838,11 @@ describe('MerkleDistributorProgram', () => {
     });
 
     describe('claim', () => {
-      let walletSdk: ReturnType<typeof SdkFactory.createWithWallet>['sdk'];
+      let walletSdk: ReturnType<typeof MockClientFactory.createWithWallet>['sdk'];
       let walletProgram: MerkleDistributorProgram;
 
       beforeEach(() => {
-        walletSdk = SdkFactory.createWithWallet();
+        walletSdk = MockClientFactory.createWithWallet();
         walletSdk.solana = {
           rpc: {} as any,
           pda: vi.fn().mockResolvedValue(newAddr(700)),
@@ -921,7 +921,7 @@ describe('MerkleDistributorProgram', () => {
       });
 
       it('should throw error when signer is not set', async () => {
-        const sdkWithoutWallet = SdkFactory.createBasic();
+        const sdkWithoutWallet = MockClientFactory.createBasic();
         sdkWithoutWallet.solana = {
           rpc: {} as any,
           pda: vi.fn(),
@@ -1143,7 +1143,7 @@ describe('MerkleDistributorProgram', () => {
       });
 
       it('should throw error when signer is not set and claimant is not provided', async () => {
-        const sdkWithoutWallet = SdkFactory.createBasic();
+        const sdkWithoutWallet = MockClientFactory.createBasic();
         sdkWithoutWallet.solana = {
           rpc: {} as any,
           pda: vi.fn(),
@@ -1166,11 +1166,11 @@ describe('MerkleDistributorProgram', () => {
   });
 
   describe('integration scenarios', () => {
-    let sdk: ReturnType<typeof SdkFactory.createWithRpc>['sdk'];
+    let sdk: ReturnType<typeof MockClientFactory.createWithRpc>['sdk'];
     let program: MerkleDistributorProgram;
 
     beforeEach(() => {
-      const ctx = SdkFactory.createWithRpc();
+      const ctx = MockClientFactory.createWithRpc();
       sdk = ctx.sdk;
       program = createMerkleDistributorProgram(sdkToProgramDeps(sdk));
     });
