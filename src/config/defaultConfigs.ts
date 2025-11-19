@@ -1,4 +1,4 @@
-import { address } from 'gill';
+import { address } from '@solana/kit';
 import { ClientConfig, NosanaLogLevel, NosanaNetwork } from './types';
 
 export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {

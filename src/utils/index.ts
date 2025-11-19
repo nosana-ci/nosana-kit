@@ -1,4 +1,4 @@
-import { ReadonlyUint8Array } from 'gill';
+import { ReadonlyUint8Array } from '@solana/kit';
 
 /**
  * Type helper to convert bigint properties to number
@@ -35,5 +35,5 @@ export function convertBigIntToNumber<T extends Record<string, unknown>>(
   return result as ConvertBigIntToNumber<T>;
 }
 
-// Export wallet conversion utilities
-export * from './walletConverter.js';
+// Re-export getStaticAccounts utility
+export { getStaticAccounts, type StaticAccounts } from './getStaticAccounts.js';

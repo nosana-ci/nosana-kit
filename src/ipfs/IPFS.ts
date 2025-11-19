@@ -1,6 +1,6 @@
 import bs58 from 'bs58';
 import axios, { AxiosHeaders, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { ReadonlyUint8Array } from 'gill';
+import { ReadonlyUint8Array } from '@solana/kit';
 import type { IpfsConfig } from '../config/types.js';
 
 // Import form-data dynamically for Node.js environments

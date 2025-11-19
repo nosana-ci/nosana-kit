@@ -1,4 +1,5 @@
-import { Address, KeyPairSigner, SolanaClusterMoniker } from 'gill';
+import { Address } from '@solana/kit';
+import type { Signer } from '../types.js';
 
 export enum NosanaNetwork {
   MAINNET = 'mainnet',
@@ -13,14 +14,20 @@ export enum NosanaLogLevel {
   DEBUG = 4,
 }
 
+export type SolanaClusterMoniker =
+  | 'devnet'
+  | 'localnet'
+  | 'mainnet'
+  | 'testnet'
+  | 'mainnet-beta'
+  | 'localhost';
+
 export interface SolanaConfig {
-  cluster: SolanaClusterMoniker | 'mainnet-beta' | 'localhost';
+  cluster: SolanaClusterMoniker;
   rpcEndpoint: string;
   wsEndpoint?: string; // Optional WebSocket endpoint, if different from HTTP
   commitment?: 'processed' | 'confirmed' | 'finalized';
 }
-
-export type WalletConfig = KeyPairSigner | string | Iterable<number>;
 
 export interface IpfsConfig {
   api: string;
@@ -30,7 +37,7 @@ export interface IpfsConfig {
 
 export interface ClientConfig {
   solana: SolanaConfig;
-  wallet?: WalletConfig;
+  signer?: Signer;
   logLevel: NosanaLogLevel;
   ipfs: IpfsConfig;
   programs: {
@@ -45,7 +52,7 @@ export interface ClientConfig {
 
 export interface PartialClientConfig {
   solana?: Partial<SolanaConfig>;
-  wallet?: WalletConfig;
+  signer?: Signer;
   ipfs?: Partial<IpfsConfig>;
   logLevel?: NosanaLogLevel;
 }
