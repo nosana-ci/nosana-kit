@@ -78,19 +78,24 @@ export function createNosanaClient(
   const ipfs = new IPFS(config.ipfs);
 
   // Initialize SolanaService first (other services depend on it)
-  const solana = createSolanaService({
-    rpcEndpoint: config.solana.rpcEndpoint,
-    cluster: config.solana.cluster,
-    logger,
-    getWallet,
-  });
+  const solana = createSolanaService(
+    {
+      logger,
+      getWallet,
+    },
+    config.solana
+  );
 
   // Initialize NosService with minimal dependencies
-  const nos = createNosService({
-    nosTokenAddress: config.programs.nosTokenAddress,
-    logger,
-    solanaRpc: solana.rpc,
-  });
+  const nos = createNosService(
+    {
+      logger,
+      solanaRpc: solana.rpc,
+    },
+    {
+      nosTokenAddress: config.programs.nosTokenAddress,
+    }
+  );
 
   // Create program dependencies
   const programDeps: ProgramDeps = {

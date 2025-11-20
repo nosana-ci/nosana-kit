@@ -1,4 +1,4 @@
-import { Address } from '@solana/kit';
+import { Address, TransactionSigner } from '@solana/kit';
 import type { Wallet } from '../types.js';
 import type { LogLevel } from '../logger/Logger.js';
 
@@ -20,6 +20,7 @@ export interface SolanaConfig {
   rpcEndpoint: string;
   wsEndpoint?: string; // Optional WebSocket endpoint, if different from HTTP
   commitment?: 'processed' | 'confirmed' | 'finalized';
+  feePayer?: TransactionSigner; // Optional fee payer for transactions
 }
 
 export interface IpfsConfig {

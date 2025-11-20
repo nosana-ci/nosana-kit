@@ -95,6 +95,7 @@ type SolanaKitMock = {
   signTransactionMessageWithSigners: ReturnType<typeof vi.fn>;
   getSignatureFromTransaction: ReturnType<typeof vi.fn>;
   createSolanaRpc: ReturnType<typeof vi.fn>;
+  createSolanaRpcSubscriptions: ReturnType<typeof vi.fn>;
   sendAndConfirmTransactionFactory: ReturnType<typeof vi.fn>;
 };
 const solanaKitMock = solanaKit as unknown as SolanaKitMock;
@@ -115,12 +116,16 @@ describe('SolanaService', () => {
   const mockSignature = 'mock-signature';
 
   function createService(getWallet: () => Wallet | undefined) {
-    return createSolanaService({
-      rpcEndpoint,
-      cluster,
-      logger,
-      getWallet,
-    });
+    return createSolanaService(
+      {
+        logger,
+        getWallet,
+      },
+      {
+        rpcEndpoint,
+        cluster,
+      }
+    );
   }
 
   async function createWalletAndService() {
@@ -143,6 +148,81 @@ describe('SolanaService', () => {
     const transactionMessage = await createTransactionMessage(service, instruction);
     return await service.signTransaction(transactionMessage);
   }
+
+  describe('config', () => {
+    it('exposes config property', () => {
+      const service = createService(() => undefined);
+      expect(service.config).toBeDefined();
+      expect(service.config.rpcEndpoint).toBe(rpcEndpoint);
+      expect(service.config.cluster).toBe(cluster);
+    });
+
+    it('uses wsEndpoint when provided', () => {
+      const wsEndpoint = 'wss://ws.example';
+      const service = createSolanaService(
+        { logger, getWallet: () => undefined },
+        { rpcEndpoint, cluster, wsEndpoint }
+      );
+      expect(service.config.wsEndpoint).toBe(wsEndpoint);
+      expect(solanaKitMock.createSolanaRpcSubscriptions).toHaveBeenCalledWith(wsEndpoint);
+    });
+
+    it('falls back to rpcEndpoint when wsEndpoint not provided', () => {
+      createSolanaService({ logger, getWallet: () => undefined }, { rpcEndpoint, cluster });
+      expect(solanaKitMock.createSolanaRpcSubscriptions).toHaveBeenCalledWith(rpcEndpoint);
+    });
+  });
+
+  describe('feePayer', () => {
+    it('can be set on service', async () => {
+      const { service } = await createWalletAndService();
+      const customFeePayer = await SignerFactory.createRandomSigner();
+      service.feePayer = customFeePayer;
+
+      expect(service.feePayer).toBe(customFeePayer);
+    });
+
+    it('uses service feePayer as fallback when no options.feePayer provided', async () => {
+      const { service } = await createWalletAndService();
+      const serviceFeePayer = await SignerFactory.createRandomSigner();
+      service.feePayer = serviceFeePayer;
+      const instruction = makeInstruction();
+
+      const transactionMessage = await service.buildTransaction(instruction);
+
+      expect(transactionMessage).toBeDefined();
+      expect(String(transactionMessage.feePayer.address)).toBe(String(serviceFeePayer.address));
+    });
+
+    it('uses options.feePayer over service feePayer', async () => {
+      const { service } = await createWalletAndService();
+      const serviceFeePayer = await SignerFactory.createRandomSigner();
+      const optionsFeePayer = await SignerFactory.createRandomSigner();
+      service.feePayer = serviceFeePayer;
+      const instruction = makeInstruction();
+
+      const transactionMessage = await service.buildTransaction(instruction, {
+        feePayer: optionsFeePayer,
+      });
+
+      expect(transactionMessage).toBeDefined();
+      expect(String(transactionMessage.feePayer.address)).toBe(String(optionsFeePayer.address));
+    });
+
+    it('uses feePayer from config when creating service', async () => {
+      const configFeePayer = await SignerFactory.createRandomSigner();
+      const service = createSolanaService(
+        { logger, getWallet: () => undefined },
+        { rpcEndpoint, cluster, feePayer: configFeePayer }
+      );
+      const instruction = makeInstruction();
+
+      expect(service.feePayer).toBe(configFeePayer);
+
+      const transactionMessage = await service.buildTransaction(instruction);
+      expect(String(transactionMessage.feePayer.address)).toBe(String(configFeePayer.address));
+    });
+  });
 
   describe('buildTransaction', () => {
     it('throws when no wallet is set and no feePayer provided', async () => {
@@ -259,6 +339,47 @@ describe('SolanaService', () => {
       expect(signature).toBe(mockSignature);
       expect(service.sendAndConfirmTransaction).toHaveBeenCalledWith(expect.any(Object), {
         commitment,
+      });
+    });
+
+    it('uses commitment from config as fallback', async () => {
+      const configCommitment = 'finalized' as const;
+      const service = createSolanaService(
+        { logger, getWallet: () => undefined },
+        { rpcEndpoint, cluster, commitment: configCommitment }
+      );
+      const { wallet } = await createWalletAndService();
+      service.feePayer = wallet;
+      const instruction = makeInstruction();
+      const signedTransaction = await createSignedTransaction(service, instruction);
+
+      const signature = await service.sendTransaction(signedTransaction);
+
+      expect(signature).toBe(mockSignature);
+      expect(service.sendAndConfirmTransaction).toHaveBeenCalledWith(expect.any(Object), {
+        commitment: configCommitment,
+      });
+    });
+
+    it('uses options.commitment over config.commitment', async () => {
+      const configCommitment = 'finalized' as const;
+      const optionsCommitment = 'processed' as const;
+      const service = createSolanaService(
+        { logger, getWallet: () => undefined },
+        { rpcEndpoint, cluster, commitment: configCommitment }
+      );
+      const { wallet } = await createWalletAndService();
+      service.feePayer = wallet;
+      const instruction = makeInstruction();
+      const signedTransaction = await createSignedTransaction(service, instruction);
+
+      const signature = await service.sendTransaction(signedTransaction, {
+        commitment: optionsCommitment,
+      });
+
+      expect(signature).toBe(mockSignature);
+      expect(service.sendAndConfirmTransaction).toHaveBeenCalledWith(expect.any(Object), {
+        commitment: optionsCommitment,
       });
     });
 

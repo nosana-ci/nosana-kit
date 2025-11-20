@@ -25,9 +25,15 @@ export interface TokenAccountWithBalance extends TokenAccount {
  * Dependencies for NosService
  */
 export interface NosServiceDeps {
-  nosTokenAddress: Address;
   logger: Logger;
   solanaRpc: ReturnType<typeof import('@solana/kit').createSolanaRpc>;
+}
+
+/**
+ * Config for NosService
+ */
+export interface NosServiceConfig {
+  nosTokenAddress: Address;
 }
 
 /**
@@ -45,7 +51,7 @@ export interface NosService {
 /**
  * Creates a NosService instance.
  */
-export function createNosService(deps: NosServiceDeps): NosService {
+export function createNosService(deps: NosServiceDeps, config: NosServiceConfig): NosService {
   return {
     /**
      * Retrieve all token accounts for all NOS token holders
@@ -61,7 +67,7 @@ export function createNosService(deps: NosServiceDeps): NosService {
       excludePdaAccounts?: boolean;
     }): Promise<TokenAccountWithBalance[]> {
       try {
-        const nosMint = deps.nosTokenAddress;
+        const nosMint = config.nosTokenAddress;
         deps.logger.debug(`Fetching all NOS token holders for mint: ${nosMint}`);
 
         // Use getProgramAccounts to fetch all token accounts for the NOS mint
@@ -151,7 +157,7 @@ export function createNosService(deps: NosServiceDeps): NosService {
     ): Promise<TokenAccountWithBalance | null> {
       try {
         const ownerAddr = typeof owner === 'string' ? address(owner) : owner;
-        const nosMint = deps.nosTokenAddress;
+        const nosMint = config.nosTokenAddress;
 
         deps.logger.debug(`Fetching NOS token account for owner: ${ownerAddr}`);
 

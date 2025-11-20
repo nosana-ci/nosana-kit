@@ -33,6 +33,7 @@ import {
 import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
 import { Logger } from '../logger/Logger.js';
 import { Wallet } from '../types.js';
+import { SolanaConfig } from '../config/types.js';
 
 /**
  * Factory function to create an estimateAndSetComputeUnitLimit function
@@ -57,8 +58,6 @@ function estimateAndSetComputeUnitLimitFactory(
  * Dependencies for SolanaService
  */
 export interface SolanaServiceDeps {
-  rpcEndpoint: string;
-  cluster: string;
   logger: Logger;
   getWallet: () => Wallet | undefined;
 }
@@ -67,10 +66,16 @@ export interface SolanaServiceDeps {
  * Solana service interface
  */
 export interface SolanaService {
+  readonly config: SolanaConfig;
   readonly rpc: ReturnType<typeof createSolanaRpc>;
   readonly rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
   readonly sendAndConfirmTransaction: ReturnType<typeof sendAndConfirmTransactionFactory>;
   readonly estimateAndSetComputeUnitLimit: ReturnType<typeof estimateAndSetComputeUnitLimitFactory>;
+  /**
+   * Optional fee payer for transactions. If set, will be used as fallback when no feePayer is provided in options.
+   * Set this property directly to configure the fee payer.
+   */
+  feePayer: TransactionSigner | undefined;
   pda(seeds: Array<Address | string>, programId: Address): Promise<Address>;
   getBalance(addressStr?: string | Address): Promise<bigint>;
   buildTransaction(
@@ -100,13 +105,14 @@ export interface SolanaService {
 /**
  * Creates a Solana service instance.
  */
-export function createSolanaService(deps: SolanaServiceDeps): SolanaService {
-  if (!deps.rpcEndpoint) {
+export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfig): SolanaService {
+  if (!config.rpcEndpoint) {
     throw new NosanaError('RPC URL is required', ErrorCodes.INVALID_CONFIG);
   }
 
-  const rpc = createSolanaRpc(deps.rpcEndpoint);
-  const rpcSubscriptions = createSolanaRpcSubscriptions(deps.rpcEndpoint);
+  const rpc = createSolanaRpc(config.rpcEndpoint);
+  // Use wsEndpoint if provided, otherwise fall back to rpcEndpoint
+  const rpcSubscriptions = createSolanaRpcSubscriptions(config.wsEndpoint ?? config.rpcEndpoint);
   const sendAndConfirmTransaction = sendAndConfirmTransactionFactory({
     rpc,
     rpcSubscriptions,
@@ -115,11 +121,21 @@ export function createSolanaService(deps: SolanaServiceDeps): SolanaService {
   // Create a function to estimate and set the compute unit limit
   const estimateAndSetComputeUnitLimit = estimateAndSetComputeUnitLimitFactory({ rpc });
 
+  // Store feePayer in a mutable variable, initialized from config
+  let feePayer: TransactionSigner | undefined = config.feePayer;
+
   return {
+    config,
     rpc,
     rpcSubscriptions,
     sendAndConfirmTransaction,
     estimateAndSetComputeUnitLimit,
+    get feePayer() {
+      return feePayer;
+    },
+    set feePayer(value: TransactionSigner | undefined) {
+      feePayer = value;
+    },
 
     async pda(seeds: Array<Address | string>, programId: Address): Promise<Address> {
       const addressEncoder = getAddressEncoder();
@@ -180,14 +196,14 @@ export function createSolanaService(deps: SolanaServiceDeps): SolanaService {
     /**
      * Build a transaction message from instructions
      * This function creates a transaction message with:
-     * - Fee payer set to the provided feePayer or wallet (if no feePayer provided)
+     * - Fee payer set to the provided feePayer, service feePayer, or wallet (in that order)
      * - Latest blockhash for lifetime
      * - Provided instructions
      * - Estimated compute unit limit
      *
      * @param instructions Single instruction or array of instructions
      * @param options Optional configuration
-     * @param options.feePayer Optional custom fee payer. If not provided, uses the wallet.
+     * @param options.feePayer Optional custom fee payer. Takes precedence over service feePayer and wallet.
      * @returns An unsigned transaction message ready to be signed
      */
     async buildTransaction(
@@ -196,9 +212,9 @@ export function createSolanaService(deps: SolanaServiceDeps): SolanaService {
     ): Promise<
       TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithBlockhashLifetime
     > {
-      // Use custom feePayer if provided, otherwise use wallet
-      const feePayer = options?.feePayer ?? deps.getWallet();
-      if (!feePayer) {
+      // Priority: options.feePayer > service.feePayer > wallet
+      const transactionFeePayer = options?.feePayer ?? feePayer ?? deps.getWallet();
+      if (!transactionFeePayer) {
         throw new NosanaError('No wallet found and no feePayer provided', ErrorCodes.NO_WALLET);
       }
 
@@ -212,7 +228,7 @@ export function createSolanaService(deps: SolanaServiceDeps): SolanaService {
         // Build transaction message using pipe
         const transactionMessage = await pipe(
           createTransactionMessage({ version: 0 }),
-          (tx) => setTransactionMessageFeePayerSigner(feePayer, tx),
+          (tx) => setTransactionMessageFeePayerSigner(transactionFeePayer, tx),
           (tx) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx),
           (tx) => appendTransactionMessageInstructions(instructionsArray, tx),
           (tx) => estimateAndSetComputeUnitLimit(tx)
@@ -255,7 +271,7 @@ export function createSolanaService(deps: SolanaServiceDeps): SolanaService {
      *
      * @param transaction The signed transaction to send
      * @param options Optional configuration (same as sendAndConfirmTransaction)
-     * @param options.commitment Commitment level for confirmation (default: 'confirmed')
+     * @param options.commitment Commitment level for confirmation (takes precedence over config, then falls back to config.commitment, then 'confirmed')
      * @returns The transaction signature
      */
     async sendTransaction(
@@ -272,7 +288,8 @@ export function createSolanaService(deps: SolanaServiceDeps): SolanaService {
         deps.logger.info(`Sending transaction: ${signature}`);
 
         // Send and confirm the transaction with optional commitment level
-        const commitment = options?.commitment ?? 'confirmed';
+        // Priority: options.commitment > config.commitment > 'confirmed'
+        const commitment = options?.commitment ?? config.commitment ?? 'confirmed';
         await sendAndConfirmTransaction(transaction, { commitment });
 
         deps.logger.info(`Transaction ${signature} confirmed!`);
@@ -293,7 +310,7 @@ export function createSolanaService(deps: SolanaServiceDeps): SolanaService {
      * @param instructions Single instruction or array of instructions
      * @param options Optional configuration
      * @param options.feePayer Optional custom fee payer. If not provided, uses the wallet.
-     * @param options.commitment Commitment level for confirmation (default: 'confirmed')
+     * @param options.commitment Commitment level for confirmation (takes precedence over config, then falls back to config.commitment, then 'confirmed')
      * @returns The transaction signature
      */
     async buildSignAndSend(
