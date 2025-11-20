@@ -324,7 +324,6 @@ export class MockClientFactory {
  */
 export function sdkToProgramDeps(sdk: NosanaClient): import('../../../src/types.js').ProgramDeps {
   return {
-    config: sdk.config,
     logger: sdk.logger,
     solana: sdk.solana,
     getWallet: () => sdk.wallet,

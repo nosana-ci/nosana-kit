@@ -33,12 +33,11 @@ describe('MerkleDistributorProgram', () => {
     it('should initialize with SDK', () => {
       const sdk = baseSdk();
       const deps = {
-        config: sdk.config,
         logger: sdk.logger,
         solana: sdk.solana,
         getWallet: () => sdk.wallet,
       };
-      const program = createMerkleDistributorProgram(deps);
+      const program = createMerkleDistributorProgram(deps, sdk.config.programs);
 
       // Assert - observable behavior: all required methods are available
       expect(program).toBeDefined();
@@ -52,12 +51,11 @@ describe('MerkleDistributorProgram', () => {
     it('should use program ID from config when fetching all distributors', async () => {
       const sdk = baseSdk();
       const deps = {
-        config: sdk.config,
         logger: sdk.logger,
         solana: sdk.solana,
         getWallet: () => sdk.wallet,
       };
-      const program = createMerkleDistributorProgram(deps);
+      const program = createMerkleDistributorProgram(deps, sdk.config.programs);
 
       sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
         send: vi.fn().mockResolvedValue([]),
@@ -77,7 +75,8 @@ describe('MerkleDistributorProgram', () => {
     let program: MerkleDistributorProgram;
 
     beforeEach(() => {
-      program = createMerkleDistributorProgram(sdkToProgramDeps(baseSdk()));
+      const sdk = baseSdk();
+      program = createMerkleDistributorProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
 
     it('get converts bigint to numbers and includes address', async () => {
@@ -275,7 +274,7 @@ describe('MerkleDistributorProgram', () => {
     beforeEach(() => {
       const ctx = MockClientFactory.createWithRpc();
       sdk = ctx.sdk;
-      program = createMerkleDistributorProgram(sdkToProgramDeps(sdk));
+      program = createMerkleDistributorProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
 
     describe('get', () => {
@@ -489,7 +488,10 @@ describe('MerkleDistributorProgram', () => {
           rpc: {} as any,
           pda: vi.fn().mockResolvedValue(newAddr(700)),
         } as any;
-        walletProgram = createMerkleDistributorProgram(sdkToProgramDeps(walletSdk));
+        walletProgram = createMerkleDistributorProgram(
+          sdkToProgramDeps(walletSdk),
+          walletSdk.config.programs
+        );
       });
 
       it('should derive claim status PDA using wallet address when claimant is not provided', async () => {
@@ -530,7 +532,8 @@ describe('MerkleDistributorProgram', () => {
           pda: vi.fn(),
         } as any;
         const programWithoutWallet = createMerkleDistributorProgram(
-          sdkToProgramDeps(sdkWithoutWallet)
+          sdkToProgramDeps(sdkWithoutWallet),
+          sdkWithoutWallet.config.programs
         );
 
         await expect(programWithoutWallet.getClaimStatusPda(newAddr(765))).rejects.toThrow(
@@ -549,7 +552,8 @@ describe('MerkleDistributorProgram', () => {
           pda: vi.fn().mockResolvedValue(claimStatusPda),
         } as any;
         const programWithoutWallet = createMerkleDistributorProgram(
-          sdkToProgramDeps(sdkWithoutWallet)
+          sdkToProgramDeps(sdkWithoutWallet),
+          sdkWithoutWallet.config.programs
         );
 
         const result = await programWithoutWallet.getClaimStatusPda(distributorAddr, claimantAddr);
@@ -572,7 +576,10 @@ describe('MerkleDistributorProgram', () => {
           rpc: {} as any,
           pda: vi.fn().mockResolvedValue(newAddr(700)),
         } as any;
-        walletProgram = createMerkleDistributorProgram(sdkToProgramDeps(walletSdk));
+        walletProgram = createMerkleDistributorProgram(
+          sdkToProgramDeps(walletSdk),
+          walletSdk.config.programs
+        );
       });
 
       it('should fetch and return claim status when it exists', async () => {
@@ -625,7 +632,8 @@ describe('MerkleDistributorProgram', () => {
           pda: vi.fn(),
         } as any;
         const programWithoutWallet = createMerkleDistributorProgram(
-          sdkToProgramDeps(sdkWithoutWallet)
+          sdkToProgramDeps(sdkWithoutWallet),
+          sdkWithoutWallet.config.programs
         );
 
         await expect(
@@ -696,7 +704,8 @@ describe('MerkleDistributorProgram', () => {
           pda: vi.fn().mockResolvedValue(claimStatusPda),
         } as any;
         const programWithoutWallet = createMerkleDistributorProgram(
-          sdkToProgramDeps(sdkWithoutWallet)
+          sdkToProgramDeps(sdkWithoutWallet),
+          sdkWithoutWallet.config.programs
         );
 
         vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
@@ -847,7 +856,10 @@ describe('MerkleDistributorProgram', () => {
           rpc: {} as any,
           pda: vi.fn().mockResolvedValue(newAddr(700)),
         } as any;
-        walletProgram = createMerkleDistributorProgram(sdkToProgramDeps(walletSdk));
+        walletProgram = createMerkleDistributorProgram(
+          sdkToProgramDeps(walletSdk),
+          walletSdk.config.programs
+        );
       });
 
       it('should create a newClaim instruction with correct parameters (YES target)', async () => {
@@ -927,7 +939,8 @@ describe('MerkleDistributorProgram', () => {
           pda: vi.fn(),
         } as any;
         const programWithoutWallet = createMerkleDistributorProgram(
-          sdkToProgramDeps(sdkWithoutWallet)
+          sdkToProgramDeps(sdkWithoutWallet),
+          sdkWithoutWallet.config.programs
         );
 
         await expect(
@@ -1149,7 +1162,8 @@ describe('MerkleDistributorProgram', () => {
           pda: vi.fn(),
         } as any;
         const programWithoutWallet = createMerkleDistributorProgram(
-          sdkToProgramDeps(sdkWithoutWallet)
+          sdkToProgramDeps(sdkWithoutWallet),
+          sdkWithoutWallet.config.programs
         );
 
         await expect(
@@ -1172,7 +1186,7 @@ describe('MerkleDistributorProgram', () => {
     beforeEach(() => {
       const ctx = MockClientFactory.createWithRpc();
       sdk = ctx.sdk;
-      program = createMerkleDistributorProgram(sdkToProgramDeps(sdk));
+      program = createMerkleDistributorProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
 
     it('should handle multiple distributors with different configurations', async () => {

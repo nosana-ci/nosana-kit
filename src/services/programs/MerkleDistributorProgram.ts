@@ -121,8 +121,13 @@ export interface MerkleDistributorProgram {
  * const distributor = await merkleDistributor.get('distributor-address');
  * ```
  */
-export function createMerkleDistributorProgram(deps: ProgramDeps): MerkleDistributorProgram {
-  const programId = deps.config.programs.merkleDistributorAddress;
+import type { ProgramConfig } from '../../config/types.js';
+
+export function createMerkleDistributorProgram(
+  deps: ProgramDeps,
+  config: ProgramConfig
+): MerkleDistributorProgram {
+  const programId = config.merkleDistributorAddress;
   const client = programClient;
 
   /**

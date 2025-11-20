@@ -36,7 +36,8 @@ describe('JobsProgram', () => {
     let jobs: JobsProgram;
 
     beforeEach(() => {
-      jobs = createJobsProgram(sdkToProgramDeps(baseSdk()));
+      const sdk = baseSdk();
+      jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
 
     it('get converts bigint and ipfs bytes and casts state', async () => {
@@ -89,7 +90,7 @@ describe('JobsProgram', () => {
     beforeEach(() => {
       const ctx = MockClientFactory.createWithRpc();
       sdk = ctx.sdk;
-      jobs = createJobsProgram(sdkToProgramDeps(sdk));
+      jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
 
     describe('get, run, market', () => {
@@ -190,7 +191,7 @@ describe('JobsProgram', () => {
       it('all() builds discriminator and expected offset filters', async () => {
         const ctx = MockClientFactory.createWithRpc();
         sdk = ctx.sdk;
-        jobs = createJobsProgram(sdkToProgramDeps(sdk));
+        jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
         const filters = {
           state: JobState.RUNNING,
           project: newAddr(40),
@@ -211,7 +212,7 @@ describe('JobsProgram', () => {
       it('runs() includes RUN discriminator (offset 0)', async () => {
         const ctx = MockClientFactory.createWithRpc();
         sdk = ctx.sdk;
-        jobs = createJobsProgram(sdkToProgramDeps(sdk));
+        jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
         await jobs.runs({ job: newAddr(50), node: newAddr(51) });
         const call = (sdk as any).solana.rpc.getProgramAccounts.mock.calls[0][1];
         const memcmps = call.filters.map((f: any) => f.memcmp).filter(Boolean);
@@ -221,7 +222,7 @@ describe('JobsProgram', () => {
       it('markets() includes MARKET discriminator (offset 0)', async () => {
         const ctx = MockClientFactory.createWithRpc();
         sdk = ctx.sdk;
-        jobs = createJobsProgram(sdkToProgramDeps(sdk));
+        jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
         await jobs.markets();
         const call = (sdk as any).solana.rpc.getProgramAccounts.mock.calls[0][1];
         const memcmps = call.filters.map((f: any) => f.memcmp).filter(Boolean);
@@ -291,7 +292,7 @@ describe('JobsProgram', () => {
       it('all propagates getProgramAccounts errors', async () => {
         const ctx = MockClientFactory.createWithRpc();
         sdk = ctx.sdk;
-        jobs = createJobsProgram(sdkToProgramDeps(sdk));
+        jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
         (sdk as any).solana.rpc.getProgramAccounts = vi
           .fn()
           .mockReturnValue({ send: vi.fn().mockRejectedValue(new Error('Network error')) });
@@ -303,7 +304,7 @@ describe('JobsProgram', () => {
   describe('monitor', () => {
     it('returns a stop function and sets up program notifications subscription', async () => {
       const sdk = makeMonitorSdk();
-      const jobs = createJobsProgram(sdkToProgramDeps(sdk));
+      const jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
 
       // Mock WebSocket subscription with immediate completion
       const mockIterable = {
@@ -336,7 +337,7 @@ describe('JobsProgram', () => {
 
     it('accepts callback options for job, market, run accounts, and error handling', async () => {
       const sdk = makeMonitorSdk();
-      const jobs = createJobsProgram(sdkToProgramDeps(sdk));
+      const jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
 
       const onJobAccount = vi.fn();
       const onMarketAccount = vi.fn();
@@ -374,7 +375,7 @@ describe('JobsProgram', () => {
 
     it('handles subscription setup errors gracefully', async () => {
       const sdk = makeMonitorSdk();
-      const jobs = createJobsProgram(sdkToProgramDeps(sdk));
+      const jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
 
       // Mock subscription to throw error
       const mockSubscribe = vi.fn().mockRejectedValue(new Error('Subscription failed'));

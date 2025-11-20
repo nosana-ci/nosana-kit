@@ -99,16 +99,15 @@ export function createNosanaClient(
 
   // Create program dependencies
   const programDeps: ProgramDeps = {
-    config,
     logger,
     solana,
     getWallet,
   };
 
   // Initialize programs
-  const jobs = createJobsProgram(programDeps);
-  const stake = createStakeProgram(programDeps);
-  const merkleDistributor = createMerkleDistributorProgram(programDeps);
+  const jobs = createJobsProgram(programDeps, config.programs);
+  const stake = createStakeProgram(programDeps, config.programs);
+  const merkleDistributor = createMerkleDistributorProgram(programDeps, config.programs);
 
   // Build and return the client
   return {

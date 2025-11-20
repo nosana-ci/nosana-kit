@@ -128,8 +128,10 @@ export interface JobsProgram {
  * const job = await jobsProgram.get('job-address');
  * ```
  */
-export function createJobsProgram(deps: ProgramDeps): JobsProgram {
-  const programId = deps.config.programs.jobsAddress;
+import type { ProgramConfig } from '../../config/types.js';
+
+export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): JobsProgram {
+  const programId = config.jobsAddress;
   const client = programClient;
 
   // Cache for static accounts (memoization)
@@ -645,16 +647,12 @@ export function createJobsProgram(deps: ProgramDeps): JobsProgram {
       const runKey = await generateKeyPairSigner();
 
       const [associatedTokenAddress] = await findAssociatedTokenPda({
-        mint: deps.config.programs.nosTokenAddress,
+        mint: config.nosTokenAddress,
         owner: deps.getWallet()!.address,
         tokenProgram: TOKEN_PROGRAM_ADDRESS,
       });
       try {
-        const staticAccounts = await getStaticAccounts(
-          deps.config,
-          deps.solana,
-          staticAccountsCache
-        );
+        const staticAccounts = await getStaticAccounts(config, deps.solana, staticAccountsCache);
         // Create the list instruction
         const instruction = client.getListInstruction({
           job: jobKey,
@@ -662,7 +660,7 @@ export function createJobsProgram(deps: ProgramDeps): JobsProgram {
           run: runKey,
           user: associatedTokenAddress,
           vault: await deps.solana.pda(
-            [params.market, deps.config.programs.nosTokenAddress],
+            [params.market, config.nosTokenAddress],
             staticAccounts.jobsProgram
           ),
           payer: deps.getWallet()!,

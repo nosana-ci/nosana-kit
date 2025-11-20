@@ -18,7 +18,7 @@ describe('getStaticAccounts', () => {
   });
 
   it('returns static accounts with correct structure', async () => {
-    const accounts = await getStaticAccounts(config, solana);
+    const accounts = await getStaticAccounts(config.programs, solana);
 
     // observable behavior: returns all required static accounts
     expect(accounts.rewardsReflection).toBeDefined();
@@ -29,7 +29,7 @@ describe('getStaticAccounts', () => {
 
   it('derives reflection PDA with correct seeds', async () => {
     const reflectionSeed = ['reflection'];
-    const accounts = await getStaticAccounts(config, solana);
+    const accounts = await getStaticAccounts(config.programs, solana);
 
     // observable behavior: reflection PDA is derived correctly
     // We verify by checking the result is deterministic - same inputs = same output
@@ -38,7 +38,7 @@ describe('getStaticAccounts', () => {
   });
 
   it('derives vault PDA with correct seeds', async () => {
-    const accounts = await getStaticAccounts(config, solana);
+    const accounts = await getStaticAccounts(config.programs, solana);
 
     // observable behavior: vault PDA is derived correctly
     const vaultPda = await solana.pda(
@@ -52,10 +52,10 @@ describe('getStaticAccounts', () => {
     const cache: StaticAccountsCache = {};
 
     // first call
-    const first = await getStaticAccounts(config, solana, cache);
+    const first = await getStaticAccounts(config.programs, solana, cache);
 
     // second call
-    const second = await getStaticAccounts(config, solana, cache);
+    const second = await getStaticAccounts(config.programs, solana, cache);
 
     // observable behavior: cached value returned, same object instance
     expect(first).toBe(second);
@@ -68,9 +68,9 @@ describe('getStaticAccounts', () => {
 
     // multiple concurrent calls
     const [a, b, c] = await Promise.all([
-      getStaticAccounts(config, solana, cache),
-      getStaticAccounts(config, solana, cache),
-      getStaticAccounts(config, solana, cache),
+      getStaticAccounts(config.programs, solana, cache),
+      getStaticAccounts(config.programs, solana, cache),
+      getStaticAccounts(config.programs, solana, cache),
     ]);
 
     // observable behavior: all return same result (same object instance)
@@ -81,7 +81,7 @@ describe('getStaticAccounts', () => {
   });
 
   it('works without cache object', async () => {
-    const accounts = await getStaticAccounts(config, solana);
+    const accounts = await getStaticAccounts(config.programs, solana);
 
     // observable behavior: returns accounts even without cache
     expect(accounts.rewardsReflection).toBeDefined();

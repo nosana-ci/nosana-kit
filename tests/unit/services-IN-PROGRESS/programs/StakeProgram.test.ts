@@ -23,12 +23,11 @@ describe('StakeProgram', () => {
     it('should initialize with SDK and expose required methods', () => {
       const sdk = baseSdk();
       const deps = {
-        config: sdk.config,
         logger: sdk.logger,
         solana: sdk.solana,
         getWallet: () => sdk.wallet,
       };
-      const stake = createStakeProgram(deps);
+      const stake = createStakeProgram(deps, sdk.config.programs);
 
       // Assert - observable behavior: all required methods are available
       expect(stake).toBeDefined();
@@ -40,12 +39,11 @@ describe('StakeProgram', () => {
     it('should use program ID from config when fetching all stakes', async () => {
       const sdk = baseSdk();
       const deps = {
-        config: sdk.config,
         logger: sdk.logger,
         solana: sdk.solana,
         getWallet: () => sdk.wallet,
       };
-      const stake = createStakeProgram(deps);
+      const stake = createStakeProgram(deps, sdk.config.programs);
 
       sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
         send: vi.fn().mockResolvedValue([]),
@@ -67,12 +65,11 @@ describe('StakeProgram', () => {
     beforeEach(() => {
       const sdk = baseSdk();
       const deps = {
-        config: sdk.config,
         logger: sdk.logger,
         solana: sdk.solana,
         getWallet: () => sdk.wallet,
       };
-      stake = createStakeProgram(deps);
+      stake = createStakeProgram(deps, sdk.config.programs);
     });
 
     it('get converts bigint to numbers and includes address', async () => {
@@ -143,7 +140,7 @@ describe('StakeProgram', () => {
     beforeEach(() => {
       const ctx = MockClientFactory.createWithRpc();
       sdk = ctx.sdk;
-      stake = createStakeProgram(sdkToProgramDeps(sdk));
+      stake = createStakeProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
 
     describe('get', () => {
@@ -341,7 +338,7 @@ describe('StakeProgram', () => {
     beforeEach(() => {
       const ctx = MockClientFactory.createWithRpc();
       sdk = ctx.sdk;
-      stake = createStakeProgram(sdkToProgramDeps(sdk));
+      stake = createStakeProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
 
     it('should handle mixed stake amounts', async () => {

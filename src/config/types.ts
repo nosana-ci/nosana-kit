@@ -29,19 +29,21 @@ export interface IpfsConfig {
   gateway: string;
 }
 
+export interface ProgramConfig {
+  nosTokenAddress: Address;
+  jobsAddress: Address;
+  rewardsAddress: Address;
+  stakeAddress: Address;
+  poolsAddress: Address;
+  merkleDistributorAddress: Address;
+}
+
 export interface ClientConfig {
   solana: SolanaConfig;
   wallet?: Wallet;
   logLevel: LogLevel;
   ipfs: IpfsConfig;
-  programs: {
-    nosTokenAddress: Address;
-    jobsAddress: Address;
-    rewardsAddress: Address;
-    stakeAddress: Address;
-    poolsAddress: Address;
-    merkleDistributorAddress: Address;
-  };
+  programs: ProgramConfig;
 }
 
 export interface PartialClientConfig {

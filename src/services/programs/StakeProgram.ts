@@ -46,8 +46,10 @@ export interface StakeProgram {
  * const stake = await stakeProgram.get('stake-address');
  * ```
  */
-export function createStakeProgram(deps: ProgramDeps): StakeProgram {
-  const programId = deps.config.programs.stakeAddress;
+import type { ProgramConfig } from '../../config/types.js';
+
+export function createStakeProgram(deps: ProgramDeps, config: ProgramConfig): StakeProgram {
+  const programId = config.stakeAddress;
   const client = programClient;
 
   /**

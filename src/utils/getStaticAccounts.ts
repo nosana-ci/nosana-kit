@@ -1,6 +1,6 @@
 import { Address } from '@solana/kit';
 import type { SolanaService } from '../services/SolanaService.js';
-import { ClientConfig } from '../config/types.js';
+import type { ProgramConfig } from '../config/types.js';
 
 export type StaticAccounts = {
   rewardsReflection: Address;
@@ -18,13 +18,13 @@ export type StaticAccountsCache = {
  * Gets the static accounts, initializing them if needed.
  * This function caches the result to avoid redundant PDA lookups.
  *
- * @param config - Client configuration
+ * @param programsConfig - Programs configuration
  * @param solana - Solana service for PDA lookups
  * @param cache - Optional cache object to store the result (for memoization)
  * @returns Promise resolving to static accounts
  */
 export async function getStaticAccounts(
-  config: ClientConfig,
+  programsConfig: ProgramConfig,
   solana: SolanaService,
   cache?: StaticAccountsCache
 ): Promise<StaticAccounts> {
@@ -41,13 +41,13 @@ export async function getStaticAccounts(
   // Start initialization and store the promise
   const promise = (async () => {
     const staticAccounts: StaticAccounts = {
-      rewardsReflection: await solana.pda(['reflection'], config.programs.rewardsAddress),
+      rewardsReflection: await solana.pda(['reflection'], programsConfig.rewardsAddress),
       rewardsVault: await solana.pda(
-        [config.programs.nosTokenAddress],
-        config.programs.rewardsAddress
+        [programsConfig.nosTokenAddress],
+        programsConfig.rewardsAddress
       ),
-      rewardsProgram: config.programs.rewardsAddress,
-      jobsProgram: config.programs.jobsAddress,
+      rewardsProgram: programsConfig.rewardsAddress,
+      jobsProgram: programsConfig.jobsAddress,
     };
 
     // Cache the result

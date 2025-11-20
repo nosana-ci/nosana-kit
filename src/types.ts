@@ -1,6 +1,5 @@
 import { TransactionSigner, MessageSigner } from '@solana/kit';
 import type { SolanaService } from './services/SolanaService.js';
-import { ClientConfig } from './config/types.js';
 import { Logger } from './logger/Logger.js';
 
 /**
@@ -14,7 +13,6 @@ export type Wallet = MessageSigner & TransactionSigner;
  * Dependencies for program services
  */
 export interface ProgramDeps {
-  config: ClientConfig;
   logger: Logger;
   solana: SolanaService;
   getWallet: () => Wallet | undefined;
