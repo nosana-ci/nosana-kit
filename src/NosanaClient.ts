@@ -12,7 +12,7 @@ import {
   type MerkleDistributorProgram,
 } from './services/programs/MerkleDistributorProgram.js';
 import { createSolanaService, type SolanaService } from './services/SolanaService.js';
-import { createNosService, type NosService } from './services/NosService.js';
+import { createTokenService, type TokenService } from './services/TokenService.js';
 import { IPFS } from './ipfs/IPFS.js';
 import { Wallet } from './types.js';
 import type { ProgramDeps } from './types.js';
@@ -27,7 +27,7 @@ export interface NosanaClient {
   readonly stake: StakeProgram;
   readonly merkleDistributor: MerkleDistributorProgram;
   readonly solana: SolanaService;
-  readonly nos: NosService;
+  readonly nos: TokenService;
   readonly ipfs: IPFS;
   readonly logger: Logger;
   /**
@@ -86,14 +86,14 @@ export function createNosanaClient(
     config.solana
   );
 
-  // Initialize NosService with minimal dependencies
-  const nos = createNosService(
+  // Initialize TokenService with minimal dependencies
+  const nos = createTokenService(
     {
       logger,
-      solanaRpc: solana.rpc,
+      solana,
     },
     {
-      nosTokenAddress: config.programs.nosTokenAddress,
+      tokenAddress: config.programs.nosTokenAddress,
     }
   );
 

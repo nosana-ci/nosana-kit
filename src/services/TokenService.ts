@@ -21,25 +21,27 @@ export interface TokenAccountWithBalance extends TokenAccount {
   uiAmount: number;
 }
 
+import type { SolanaService } from './SolanaService.js';
+
 /**
- * Dependencies for NosService
+ * Dependencies for TokenService
  */
-export interface NosServiceDeps {
+export interface TokenServiceDeps {
   logger: Logger;
-  solanaRpc: ReturnType<typeof import('@solana/kit').createSolanaRpc>;
+  solana: SolanaService;
 }
 
 /**
- * Config for NosService
+ * Config for TokenService
  */
-export interface NosServiceConfig {
-  nosTokenAddress: Address;
+export interface TokenServiceConfig {
+  tokenAddress: Address;
 }
 
 /**
- * NosService interface
+ * TokenService interface
  */
-export interface NosService {
+export interface TokenService {
   getAllTokenHolders(options?: {
     includeZeroBalance?: boolean;
     excludePdaAccounts?: boolean;
@@ -49,13 +51,16 @@ export interface NosService {
 }
 
 /**
- * Creates a NosService instance.
+ * Creates a TokenService instance.
  */
-export function createNosService(deps: NosServiceDeps, config: NosServiceConfig): NosService {
+export function createTokenService(
+  deps: TokenServiceDeps,
+  config: TokenServiceConfig
+): TokenService {
   return {
     /**
-     * Retrieve all token accounts for all NOS token holders
-     * Uses a single RPC call to fetch all accounts holding the NOS token
+     * Retrieve all token accounts for all token holders
+     * Uses a single RPC call to fetch all accounts holding the token
      *
      * @param options - Optional configuration
      * @param options.includeZeroBalance - Whether to include accounts with zero balance (default: false)
@@ -67,11 +72,11 @@ export function createNosService(deps: NosServiceDeps, config: NosServiceConfig)
       excludePdaAccounts?: boolean;
     }): Promise<TokenAccountWithBalance[]> {
       try {
-        const nosMint = config.nosTokenAddress;
-        deps.logger.debug(`Fetching all NOS token holders for mint: ${nosMint}`);
+        const tokenMint = config.tokenAddress;
+        deps.logger.debug(`Fetching all token holders for mint: ${tokenMint}`);
 
-        // Use getProgramAccounts to fetch all token accounts for the NOS mint
-        const accounts = await deps.solanaRpc
+        // Use getProgramAccounts to fetch all token accounts for the token mint
+        const accounts = await deps.solana.rpc
           .getProgramAccounts(TOKEN_PROGRAM_ADDRESS, {
             encoding: 'jsonParsed',
             filters: [
@@ -81,7 +86,7 @@ export function createNosService(deps: NosServiceDeps, config: NosServiceConfig)
               {
                 memcmp: {
                   offset: BigInt(MINT_OFFSET),
-                  bytes: nosMint.toString() as Base58EncodedBytes,
+                  bytes: tokenMint.toString() as Base58EncodedBytes,
                   encoding: 'base58' as const,
                 },
               },
@@ -89,7 +94,7 @@ export function createNosService(deps: NosServiceDeps, config: NosServiceConfig)
           })
           .send();
 
-        deps.logger.info(`Found ${accounts.length} NOS token accounts`);
+        deps.logger.info(`Found ${accounts.length} token accounts`);
 
         // Parse the response
         const allAccounts = (
@@ -137,17 +142,17 @@ export function createNosService(deps: NosServiceDeps, config: NosServiceConfig)
         if (excludePdaAccounts) filterInfo.push('excluding PDA accounts');
         const filterText = filterInfo.length > 0 ? ` (${filterInfo.join(', ')})` : '';
 
-        deps.logger.info(`Returning ${filteredAccounts.length} NOS token holders${filterText}`);
+        deps.logger.info(`Returning ${filteredAccounts.length} token holders${filterText}`);
 
         return filteredAccounts;
       } catch (error) {
-        deps.logger.error(`Failed to fetch NOS token holders: ${error}`);
-        throw new NosanaError('Failed to fetch NOS token holders', ErrorCodes.RPC_ERROR, error);
+        deps.logger.error(`Failed to fetch token holders: ${error}`);
+        throw new NosanaError('Failed to fetch token holders', ErrorCodes.RPC_ERROR, error);
       }
     },
 
     /**
-     * Retrieve the NOS token account for a specific owner address
+     * Retrieve the token account for a specific owner address
      *
      * @param owner - The owner address to query
      * @returns The token account with balance, or null if no account exists
@@ -157,17 +162,17 @@ export function createNosService(deps: NosServiceDeps, config: NosServiceConfig)
     ): Promise<TokenAccountWithBalance | null> {
       try {
         const ownerAddr = typeof owner === 'string' ? address(owner) : owner;
-        const nosMint = config.nosTokenAddress;
+        const tokenMint = config.tokenAddress;
 
-        deps.logger.debug(`Fetching NOS token account for owner: ${ownerAddr}`);
+        deps.logger.debug(`Fetching token account for owner: ${ownerAddr}`);
 
-        // Use getTokenAccountsByOwner to fetch token accounts for this owner filtered by NOS mint
-        const response = await deps.solanaRpc
-          .getTokenAccountsByOwner(ownerAddr, { mint: nosMint }, { encoding: 'jsonParsed' })
+        // Use getTokenAccountsByOwner to fetch token accounts for this owner filtered by token mint
+        const response = await deps.solana.rpc
+          .getTokenAccountsByOwner(ownerAddr, { mint: tokenMint }, { encoding: 'jsonParsed' })
           .send();
 
         if (response.value.length === 0) {
-          deps.logger.debug(`No NOS token account found for owner: ${ownerAddr}`);
+          deps.logger.debug(`No token account found for owner: ${ownerAddr}`);
           return null;
         }
 
@@ -176,7 +181,7 @@ export function createNosService(deps: NosServiceDeps, config: NosServiceConfig)
         const parsed = accountInfo.account.data.parsed.info;
 
         deps.logger.info(
-          `Found NOS token account for owner ${ownerAddr}: balance = ${parsed.tokenAmount.uiAmount}`
+          `Found token account for owner ${ownerAddr}: balance = ${parsed.tokenAmount.uiAmount}`
         );
 
         return {
@@ -188,13 +193,13 @@ export function createNosService(deps: NosServiceDeps, config: NosServiceConfig)
           uiAmount: parsed.tokenAmount.uiAmount ?? 0,
         };
       } catch (error) {
-        deps.logger.error(`Failed to fetch NOS token account for owner: ${error}`);
-        throw new NosanaError('Failed to fetch NOS token account', ErrorCodes.RPC_ERROR, error);
+        deps.logger.error(`Failed to fetch token account for owner: ${error}`);
+        throw new NosanaError('Failed to fetch token account', ErrorCodes.RPC_ERROR, error);
       }
     },
 
     /**
-     * Get the NOS token balance for a specific owner address
+     * Get the token balance for a specific owner address
      * Convenience method that returns just the balance
      *
      * @param owner - The owner address to query

@@ -44,7 +44,7 @@ const completedJobs = await client.jobs.all({
 
 The SDK is organized into clear, purpose-driven modules:
 
-- **`services/`** - Utility services (SolanaService for RPC/transactions, NosService for NOS token operations)
+- **`services/`** - Utility services (SolanaService for RPC/transactions, TokenService for token operations)
 - **`programs/`** - On-chain program interfaces (JobsProgram, StakeProgram)
 - **`ipfs/`** - IPFS integration
 - **`config/`** - Network configurations
@@ -95,7 +95,7 @@ Main entry point for SDK interactions.
 - `jobs: JobsProgram` - Jobs program interface
 - `stake: StakeProgram` - Staking program interface
 - `solana: SolanaService` - General Solana utilities (RPC, transactions, PDAs)
-- `nos: NosService` - NOS token operations service
+- `nos: TokenService` - Token operations service (configured for NOS token)
 - `ipfs: IPFS` - IPFS operations and utilities
 - `logger: Logger` - Logging instance
 - `wallet?: KeyPairSigner` - Active wallet (if set)
@@ -566,9 +566,9 @@ console.log(`Largest Stake: ${largestStake.toLocaleString()} NOS`);
 console.log(`Number of Stakers: ${allStakes.length}`);
 ```
 
-## NOS Token Service
+## Token Service
 
-The NosService provides methods to interact with NOS token accounts on Solana.
+The TokenService provides methods to interact with token accounts on Solana. In the NosanaClient, it's configured for the NOS token and accessible via `client.nos`.
 
 ### Get All Token Holders
 

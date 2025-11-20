@@ -3,7 +3,7 @@ import {
   createNosanaClient,
   type NosanaClient,
   NosanaNetwork,
-  NosService,
+  TokenService,
 } from '../../../src/index.js';
 import { address } from '@solana/kit';
 
@@ -38,9 +38,9 @@ vi.mock('@solana/kit', async (importOriginal) => {
   };
 });
 
-describe('NosService', () => {
+describe('TokenService (nos)', () => {
   let client: NosanaClient;
-  let nosService: NosService;
+  let nosService: TokenService;
 
   beforeAll(async () => {
     // Wait for module resolution
@@ -53,7 +53,7 @@ describe('NosService', () => {
   });
 
   describe('initialization', () => {
-    it('should initialize NosService', () => {
+    it('should initialize TokenService', () => {
       expect(nosService).toBeDefined();
       expect(typeof nosService.getAllTokenHolders).toBe('function');
       expect(typeof nosService.getTokenAccountForAddress).toBe('function');
@@ -373,7 +373,7 @@ describe('NosService', () => {
       });
 
       await expect(nosService.getAllTokenHolders()).rejects.toThrow(
-        'Failed to fetch NOS token holders'
+        'Failed to fetch token holders'
       );
     });
   });
@@ -473,7 +473,7 @@ describe('NosService', () => {
       });
 
       await expect(nosService.getTokenAccountForAddress(ownerAddress)).rejects.toThrow(
-        'Failed to fetch NOS token account'
+        'Failed to fetch token account'
       );
     });
   });
@@ -530,7 +530,7 @@ describe('NosService', () => {
       });
 
       await expect(nosService.getBalance(ownerAddress)).rejects.toThrow(
-        'Failed to fetch NOS token account'
+        'Failed to fetch token account'
       );
     });
   });
@@ -539,7 +539,7 @@ describe('NosService', () => {
     it('should use mainnet NOS token address on mainnet', () => {
       const mainnetClient = createNosanaClient(NosanaNetwork.MAINNET);
 
-      // NosService is now functional, so we can't access private methods
+      // TokenService is now functional, so we can't access private methods
       // Instead, verify it uses the correct token address through its behavior
       expect(mainnetClient.config.programs.nosTokenAddress).toBe(
         address('nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7')

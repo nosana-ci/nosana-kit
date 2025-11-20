@@ -37,9 +37,9 @@ export { ClaimStatusNotFoundError } from './services/programs/MerkleDistributorP
 // Export IPFS utilities
 export * from './ipfs/IPFS.js';
 
-// Export NOS token service
-export { NosService } from './services/NosService.js';
-export type { TokenAccount, TokenAccountWithBalance } from './services/NosService.js';
+// Export token service
+export { createTokenService, type TokenService } from './services/TokenService.js';
+export type { TokenAccount, TokenAccountWithBalance } from './services/TokenService.js';
 
 // Export generated clients under namespaces to avoid naming conflicts
 export * as JobsClient from './generated_clients/jobs/index.js';
