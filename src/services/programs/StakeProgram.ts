@@ -1,5 +1,5 @@
 import { Address, Account, parseBase64RpcAccount, Base58EncodedBytes } from '@solana/kit';
-import type { ProgramDeps } from '../../../types.js';
+import type { ProgramDeps } from '../../types.js';
 import * as programClient from '../../generated_clients/staking/index.js';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../../utils/index.js';
 import bs58 from 'bs58';

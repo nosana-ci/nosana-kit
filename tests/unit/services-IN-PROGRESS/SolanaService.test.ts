@@ -25,7 +25,7 @@ vi.mock('@solana/kit', async (importOriginal) => {
     blockhash: mockBlockhash,
     lastValidBlockHeight: mockLastValidBlockHeight,
   };
-  
+
   // Create a factory function that returns a new RPC mock instance each time
   // This prevents test isolation issues when tests modify the RPC mock
   function createMockRpc() {
@@ -55,7 +55,7 @@ vi.mock('@solana/kit', async (importOriginal) => {
   const createSolanaRpc = vi.fn(() => createMockRpc());
   const createSolanaRpcSubscriptions = vi.fn(() => rpcSubscriptions);
   const sendAndConfirmTransactionFactory = vi.fn(() => sendAndConfirmTransaction);
-  
+
   // Store the mock so we can access it in tests
   (sendAndConfirmTransactionFactory as any).mockSendAndConfirm = sendAndConfirmTransaction;
 
@@ -265,12 +265,12 @@ describe('SolanaService', () => {
     it('throws NosanaError on RPC failure', async () => {
       const { wallet } = await createWalletAndService();
       const instruction = makeInstruction();
-      
+
       // Create a service with a mocked sendAndConfirmTransaction that rejects
       const rpcError = new Error('rpc error');
       const mockSendAndConfirm = vi.fn().mockRejectedValue(rpcError);
       solanaKitMock.sendAndConfirmTransactionFactory.mockReturnValueOnce(mockSendAndConfirm as any);
-      
+
       const service = createService(() => wallet);
       const signedTransaction = await createSignedTransaction(service, instruction);
 
