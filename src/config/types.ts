@@ -1,5 +1,5 @@
 import { Address } from '@solana/kit';
-import type { Signer } from '../types.js';
+import type { Wallet } from '../types.js';
 import type { LogLevel } from '../logger/Logger.js';
 
 export enum NosanaNetwork {
@@ -30,7 +30,7 @@ export interface IpfsConfig {
 
 export interface ClientConfig {
   solana: SolanaConfig;
-  signer?: Signer;
+  wallet?: Wallet;
   logLevel: LogLevel;
   ipfs: IpfsConfig;
   programs: {
@@ -45,7 +45,7 @@ export interface ClientConfig {
 
 export interface PartialClientConfig {
   solana?: Partial<SolanaConfig>;
-  signer?: Signer;
+  wallet?: Wallet;
   ipfs?: Partial<IpfsConfig>;
   logLevel?: LogLevel;
 }

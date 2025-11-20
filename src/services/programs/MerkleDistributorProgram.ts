@@ -8,7 +8,7 @@ import {
   TransactionSigner,
 } from '@solana/kit';
 import { NosanaError, ErrorCodes } from '../../errors/NosanaError.js';
-import type { ProgramDeps } from '../../../types.js';
+import type { ProgramDeps } from '../../types.js';
 import * as programClient from '../../generated_clients/merkle_distributor/index.js';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../../utils/index.js';
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
@@ -104,10 +104,7 @@ export interface MerkleDistributorProgram {
 /**
  * Creates a new MerkleDistributorProgram instance.
  *
- * This function follows a functional architecture pattern, avoiding classes
- * to prevent bundle bloat and dual-package hazard issues.
- *
- * @param deps - Program dependencies (config, logger, solana service, signer getter)
+ * @param deps - Program dependencies (config, logger, solana service, wallet getter)
  * @returns A MerkleDistributorProgram instance with methods to interact with the merkle distributor program
  *
  * @example
@@ -118,7 +115,7 @@ export interface MerkleDistributorProgram {
  *   config,
  *   logger,
  *   solana,
- *   getSigner,
+ *   getWallet,
  * });
  *
  * const distributor = await merkleDistributor.get('distributor-address');
@@ -173,12 +170,12 @@ export function createMerkleDistributorProgram(deps: ProgramDeps): MerkleDistrib
   return {
     /**
      * Derive the ClaimStatus PDA address for a given distributor and optional claimant.
-     * If claimant is not provided, uses the signer's address.
+     * If claimant is not provided, uses the wallet's address.
      *
      * @param distributor The address of the merkle distributor
-     * @param claimant Optional claimant address. If not provided, uses the signer's address.
+     * @param claimant Optional claimant address. If not provided, uses the wallet's address.
      * @returns The ClaimStatus PDA address
-     * @throws Error if signer is not set and claimant is not provided
+     * @throws Error if wallet is not set and claimant is not provided
      */
     async getClaimStatusPda(distributor: Address, claimant?: Address): Promise<Address> {
       let claimantAddress: Address;
@@ -186,11 +183,11 @@ export function createMerkleDistributorProgram(deps: ProgramDeps): MerkleDistrib
       if (claimant) {
         claimantAddress = claimant;
       } else {
-        const signer = deps.getSigner();
-        if (!signer) {
-          throw new Error('Signer not set. Please set a signer or provide a claimant address.');
+        const wallet = deps.getWallet();
+        if (!wallet) {
+          throw new Error('Wallet not set. Please set a wallet or provide a claimant address.');
         }
-        claimantAddress = signer.address;
+        claimantAddress = wallet.address;
       }
 
       return await deps.solana.pda(['ClaimStatus', claimantAddress, distributor], programId);
@@ -276,12 +273,12 @@ export function createMerkleDistributorProgram(deps: ProgramDeps): MerkleDistrib
 
     /**
      * Fetch claim status for a specific distributor and optional claimant.
-     * Derives the ClaimStatus PDA using the claimant address (or signer's address if not provided) and the distributor address.
+     * Derives the ClaimStatus PDA using the claimant address (or wallet's address if not provided) and the distributor address.
      *
      * @param distributor The address of the merkle distributor
-     * @param claimant Optional claimant address. If not provided, uses the signer's address.
+     * @param claimant Optional claimant address. If not provided, uses the wallet's address.
      * @returns The claim status if it exists, null otherwise
-     * @throws Error if signer is not set and claimant is not provided
+     * @throws Error if wallet is not set and claimant is not provided
      */
     async getClaimStatusForDistributor(
       distributor: Address,
@@ -354,10 +351,10 @@ export function createMerkleDistributorProgram(deps: ProgramDeps): MerkleDistrib
      * This function creates a new ClaimStatus account and claims the tokens in a single instruction.
      *
      * @param params Parameters for claiming tokens
-     * @param params.claimant Optional claimant signer. If not provided, uses the signer.
+     * @param params.claimant Optional claimant signer. If not provided, uses the wallet.
      * @returns The newClaim instruction
      * @throws NosanaError if tokens have already been claimed
-     * @throws Error if signer is not set and claimant is not provided
+     * @throws Error if wallet is not set and claimant is not provided
      */
     async claim(params: {
       distributor: Address;
@@ -375,12 +372,12 @@ export function createMerkleDistributorProgram(deps: ProgramDeps): MerkleDistrib
         claimantSigner = params.claimant;
         claimantAddress = params.claimant.address;
       } else {
-        const signer = deps.getSigner();
-        if (!signer) {
-          throw new Error('Signer not set. Please set a signer or provide a claimant signer.');
+        const wallet = deps.getWallet();
+        if (!wallet) {
+          throw new Error('Wallet not set. Please set a wallet or provide a claimant signer.');
         }
-        claimantSigner = signer;
-        claimantAddress = signer.address;
+        claimantSigner = wallet;
+        claimantAddress = wallet.address;
       }
 
       try {
@@ -417,16 +414,25 @@ export function createMerkleDistributorProgram(deps: ProgramDeps): MerkleDistrib
           tokenProgram: TOKEN_PROGRAM_ADDRESS,
         });
 
-        // Create newClaim instruction which creates the account and claims the tokens
+        programClient.getClawbackInstruction({
+          distributor: params.distributor,
+          from: distributorAccount.data.tokenVault,
+          to: distributorAccount.data.clawbackReceiver,
+          claimant: claimantSigner,
+          tokenProgram: TOKEN_PROGRAM_ADDRESS,
+          systemProgram: SYSTEM_PROGRAM_ADDRESS,
+        });
+
+        // Create newClaim in struction which creates the account and claims the tokens
         // Note: tokens go to the ATA of the target address (YES or NO), not the claimant's ATA
-        // The claimant in the instruction is the claimant signer (or signer if not provided)
+        // The claimant in the instruction is the claimant signer (or wallet if not provided)
         const newClaimInstruction = programClient.getNewClaimInstruction(
           {
             distributor: params.distributor,
             claimStatus: claimStatusPda,
             from: distributorAccount.data.tokenVault,
             to: targetAta, // ATA of YES or NO address, not claimant's ATA
-            claimant: claimantSigner, // Claimant signer (or signer if not provided)
+            claimant: claimantSigner, // Claimant signer (or wallet if not provided)
             tokenProgram: TOKEN_PROGRAM_ADDRESS,
             systemProgram: SYSTEM_PROGRAM_ADDRESS,
             amountUnlocked: params.amountUnlocked,

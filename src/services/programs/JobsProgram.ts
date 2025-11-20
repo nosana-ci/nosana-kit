@@ -8,7 +8,7 @@ import {
   GetProgramAccountsMemcmpFilter,
 } from '@solana/kit';
 import { ErrorCodes, NosanaError } from '../../errors/NosanaError.js';
-import type { ProgramDeps } from '../../../types.js';
+import type { ProgramDeps } from '../../types.js';
 import * as programClient from '../../generated_clients/jobs/index.js';
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import bs58 from 'bs58';
@@ -111,10 +111,7 @@ export interface JobsProgram {
 /**
  * Creates a new JobsProgram instance.
  *
- * This function follows a functional architecture pattern, avoiding classes
- * to prevent bundle bloat and dual-package hazard issues.
- *
- * @param deps - Program dependencies (config, logger, solana service, signer getter)
+ * @param deps - Program dependencies (config, logger, solana service, wallet getter)
  * @returns A JobsProgram instance with methods to interact with the jobs program
  *
  * @example
@@ -125,7 +122,7 @@ export interface JobsProgram {
  *   config,
  *   logger,
  *   solana,
- *   getSigner,
+ *   getWallet,
  * });
  *
  * const job = await jobsProgram.get('job-address');
@@ -649,7 +646,7 @@ export function createJobsProgram(deps: ProgramDeps): JobsProgram {
 
       const [associatedTokenAddress] = await findAssociatedTokenPda({
         mint: deps.config.programs.nosTokenAddress,
-        owner: deps.getSigner()!.address,
+        owner: deps.getWallet()!.address,
         tokenProgram: TOKEN_PROGRAM_ADDRESS,
       });
       try {
@@ -668,10 +665,10 @@ export function createJobsProgram(deps: ProgramDeps): JobsProgram {
             [params.market, deps.config.programs.nosTokenAddress],
             staticAccounts.jobsProgram
           ),
-          payer: deps.getSigner()!,
+          payer: deps.getWallet()!,
           rewardsReflection: staticAccounts.rewardsReflection,
           rewardsVault: staticAccounts.rewardsVault,
-          authority: deps.getSigner()!,
+          authority: deps.getWallet()!,
           rewardsProgram: staticAccounts.rewardsProgram,
           ipfsJob: bs58.decode(params.ipfsHash).subarray(2),
           timeout: params.timeout,

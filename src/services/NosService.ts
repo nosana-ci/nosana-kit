@@ -44,9 +44,6 @@ export interface NosService {
 
 /**
  * Creates a NosService instance.
- *
- * This function follows a functional architecture pattern, avoiding classes
- * to prevent bundle bloat and dual-package hazard issues.
  */
 export function createNosService(deps: NosServiceDeps): NosService {
   return {

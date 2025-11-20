@@ -26,7 +26,7 @@ describe('StakeProgram', () => {
         config: sdk.config,
         logger: sdk.logger,
         solana: sdk.solana,
-        getSigner: () => sdk.signer,
+        getWallet: () => sdk.wallet,
       };
       const stake = createStakeProgram(deps);
 
@@ -43,7 +43,7 @@ describe('StakeProgram', () => {
         config: sdk.config,
         logger: sdk.logger,
         solana: sdk.solana,
-        getSigner: () => sdk.signer,
+        getWallet: () => sdk.wallet,
       };
       const stake = createStakeProgram(deps);
 
@@ -70,7 +70,7 @@ describe('StakeProgram', () => {
         config: sdk.config,
         logger: sdk.logger,
         solana: sdk.solana,
-        getSigner: () => sdk.signer,
+        getWallet: () => sdk.wallet,
       };
       stake = createStakeProgram(deps);
     });

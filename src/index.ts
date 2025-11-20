@@ -2,7 +2,7 @@
 export { createNosanaClient, type NosanaClient } from './NosanaClient.js';
 
 // Export types
-export type { Signer } from './types.js';
+export type { Wallet } from './types.js';
 
 // Export types and configuration
 export * from './config/index.js';
@@ -45,6 +45,3 @@ export type { TokenAccount, TokenAccountWithBalance } from './services/NosServic
 export * as JobsClient from './generated_clients/jobs/index.js';
 export * as StakingClient from './generated_clients/staking/index.js';
 export * as MerkleDistributorClient from './generated_clients/merkle_distributor/index.js';
-
-// Export dependencies
-export * from '@solana/kit';

@@ -22,7 +22,7 @@ import {
   type NosanaClient,
   NosanaNetwork,
   type PartialClientConfig,
-  type Signer,
+  type Wallet,
 } from '../../../src/index.js';
 import * as programClient from '../../../src/generated_clients/jobs/index.js';
 import * as stakingClient from '../../../src/generated_clients/staking/index.js';
@@ -31,9 +31,9 @@ import { JobState, MarketQueueType } from '../../../src/services/programs/JobsPr
 
 /**
  * Signer Factory
- * Creates signers for testing
+ * Creates wallets (signers) for testing
  *
- * Prefer real signers over mocks when possible - creating a KeypairSigner from bytes
+ * Prefer real wallets over mocks when possible - creating a KeypairSigner from bytes
  * is fast, deterministic, and tests actual signing behavior.
  *
  * Use mocks only when you need to:
@@ -57,23 +57,23 @@ export class SignerFactory {
   }
 
   /**
-   * Create a test signer from the example key file
-   * This creates a deterministic signer for consistent testing.
-   * Use this when you need a predictable signer with a known address.
+   * Create a test wallet (signer) from the example key file
+   * This creates a deterministic wallet for consistent testing.
+   * Use this when you need a predictable wallet with a known address.
    */
-  static async createTestSigner(): Promise<Signer> {
+  static async createTestSigner(): Promise<Wallet> {
     const keyArray = SignerFactory.getKeyArray();
     return await createKeyPairSignerFromBytes(new Uint8Array(keyArray));
   }
 
   /**
-   * Create a real signer with a randomly generated keypair
-   * Use this when you need a signer with a different address than the test signer,
-   * or when you need multiple distinct signers in a test.
+   * Create a real wallet (signer) with a randomly generated keypair
+   * Use this when you need a wallet with a different address than the test wallet,
+   * or when you need multiple distinct wallets in a test.
    *
    * This creates a real KeypairSigner (not a mock), so it will actually sign messages/transactions.
    */
-  static async createRandomSigner(): Promise<Signer> {
+  static async createRandomSigner(): Promise<Wallet> {
     return await generateKeyPairSigner();
   }
 
@@ -85,22 +85,22 @@ export class SignerFactory {
   }
 
   /**
-   * Create a mock signer with a specific address
+   * Create a mock wallet (signer) with a specific address
    *
    * Use this only when you need to:
    * - Verify that signMessages/signTransactions were called
    * - Test error cases where signing fails
    * - Control the return value of signing methods
    *
-   * For most cases, prefer createTestSigner() or createRandomSigner() which create real signers.
+   * For most cases, prefer createTestSigner() or createRandomSigner() which create real wallets.
    */
-  static createMockSigner(addressOverride?: Address): Signer {
+  static createMockSigner(addressOverride?: Address): Wallet {
     const addr = addressOverride ?? SignerFactory.getExpectedAddress();
     return {
       address: addr,
       signMessages: vi.fn(),
       signTransactions: vi.fn(),
-    } as Signer;
+    } as Wallet;
   }
 }
 
@@ -158,14 +158,14 @@ export class ClientFactory {
   }
 
   /**
-   * Create a client with a test signer already configured
+   * Create a client with a test wallet already configured
    */
   static async createWithSigner(
     network: NosanaNetwork = NosanaNetwork.MAINNET,
     overrides?: PartialClientConfig
   ): Promise<NosanaClient> {
-    const signer = await SignerFactory.createTestSigner();
-    return createNosanaClient(network, { ...overrides, signer });
+    const wallet = await SignerFactory.createTestSigner();
+    return createNosanaClient(network, { ...overrides, wallet });
   }
 
   /**
@@ -218,13 +218,13 @@ export class MockClientFactory {
         rpc: {},
         pda: vi.fn().mockResolvedValue(validAddr),
       },
-      get signer() {
+      get wallet() {
         return wallet;
       },
-      set signer(value: any) {
+      set wallet(value: any) {
         wallet = value;
       },
-      getSigner: () => wallet,
+      getWallet: () => wallet,
       ...overrides,
     } as unknown as NosanaClient;
     return sdk;
@@ -277,7 +277,7 @@ export class MockClientFactory {
    */
   static createWithWallet(walletAddress?: Address): NosanaClient {
     const sdk = MockClientFactory.createBasic();
-    (sdk as any).signer = SignerFactory.createMockSigner(walletAddress);
+    (sdk as any).wallet = SignerFactory.createMockSigner(walletAddress);
     return sdk;
   }
 
@@ -285,13 +285,13 @@ export class MockClientFactory {
    * Create an SDK for SolanaService tests with RPC client and optional wallet
    * @deprecated Use createSolanaService directly in tests instead
    */
-  static createForSolana(overrides?: { signer?: Signer }): NosanaClient {
+  static createForSolana(overrides?: { wallet?: Wallet }): NosanaClient {
     return {
       config: {
         solana: { rpcEndpoint: 'https://rpc.example', cluster: 'devnet' },
       },
       logger: { info: vi.fn(), error: vi.fn(), debug: vi.fn() },
-      signer: overrides?.signer,
+      wallet: overrides?.wallet,
     } as unknown as NosanaClient;
   }
 
@@ -327,7 +327,7 @@ export function sdkToProgramDeps(sdk: NosanaClient): import('../../../src/types.
     config: sdk.config,
     logger: sdk.logger,
     solana: sdk.solana,
-    getSigner: () => sdk.signer,
+    getWallet: () => sdk.wallet,
   };
 }
 

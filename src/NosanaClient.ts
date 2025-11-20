@@ -14,7 +14,7 @@ import {
 import { createSolanaService, type SolanaService } from './services/SolanaService.js';
 import { createNosService, type NosService } from './services/NosService.js';
 import { IPFS } from './ipfs/IPFS.js';
-import { Signer } from './types.js';
+import { Wallet } from './types.js';
 import type { ProgramDeps } from './types.js';
 
 /**
@@ -31,18 +31,18 @@ export interface NosanaClient {
   readonly ipfs: IPFS;
   readonly logger: Logger;
   /**
-   * The signer. Must be a Signer (supports both message and transaction signing).
-   * Set this property directly to configure the signer.
+   * The wallet. Must be a Wallet (supports both message and transaction signing).
+   * Set this property directly to configure the wallet.
    *
    * @example
    * ```ts
    * import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
    *
    * const client = createNosanaClient(NosanaNetwork.MAINNET);
-   * client.signer = mySigner;
+   * client.wallet = myWallet;
    * ```
    */
-  signer: Signer | undefined;
+  wallet: Wallet | undefined;
 }
 
 /**
@@ -58,7 +58,7 @@ export interface NosanaClient {
  * import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
  *
  * const client = createNosanaClient(NosanaNetwork.MAINNET);
- * client.signer = mySigner;
+ * client.wallet = myWallet;
  * ```
  */
 export function createNosanaClient(
@@ -69,10 +69,10 @@ export function createNosanaClient(
 
   const logger = Logger.getInstance({ level: config.logLevel });
 
-  let signer: Signer | undefined = config.signer;
+  let wallet: Wallet | undefined = config.wallet;
 
-  // Create signer getter
-  const getSigner = () => signer;
+  // Create wallet getter
+  const getWallet = () => wallet;
 
   // Initialize IPFS
   const ipfs = new IPFS(config.ipfs);
@@ -82,7 +82,7 @@ export function createNosanaClient(
     rpcEndpoint: config.solana.rpcEndpoint,
     cluster: config.solana.cluster,
     logger,
-    getSigner,
+    getWallet,
   });
 
   // Initialize NosService with minimal dependencies
@@ -97,7 +97,7 @@ export function createNosanaClient(
     config,
     logger,
     solana,
-    getSigner,
+    getWallet,
   };
 
   // Initialize programs
@@ -109,11 +109,11 @@ export function createNosanaClient(
   return {
     config,
     logger,
-    get signer() {
-      return signer;
+    get wallet() {
+      return wallet;
     },
-    set signer(value: Signer | undefined) {
-      signer = value;
+    set wallet(value: Wallet | undefined) {
+      wallet = value;
     },
     ipfs,
     solana,

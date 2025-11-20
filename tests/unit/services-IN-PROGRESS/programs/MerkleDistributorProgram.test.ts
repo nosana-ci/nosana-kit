@@ -36,7 +36,7 @@ describe('MerkleDistributorProgram', () => {
         config: sdk.config,
         logger: sdk.logger,
         solana: sdk.solana,
-        getSigner: () => sdk.signer,
+        getWallet: () => sdk.wallet,
       };
       const program = createMerkleDistributorProgram(deps);
 
@@ -55,7 +55,7 @@ describe('MerkleDistributorProgram', () => {
         config: sdk.config,
         logger: sdk.logger,
         solana: sdk.solana,
-        getSigner: () => sdk.signer,
+        getWallet: () => sdk.wallet,
       };
       const program = createMerkleDistributorProgram(deps);
 
@@ -502,7 +502,7 @@ describe('MerkleDistributorProgram', () => {
 
         expect(result).toBe(claimStatusPda);
         expect(walletSdk.solana.pda).toHaveBeenCalledWith(
-          ['ClaimStatus', walletSdk.signer!.address, distributorAddr],
+          ['ClaimStatus', walletSdk.wallet!.address, distributorAddr],
           walletSdk.config.programs.merkleDistributorAddress
         );
       });
@@ -534,7 +534,7 @@ describe('MerkleDistributorProgram', () => {
         );
 
         await expect(programWithoutWallet.getClaimStatusPda(newAddr(765))).rejects.toThrow(
-          'Signer not set'
+          'Wallet not set'
         );
       });
 
@@ -580,7 +580,7 @@ describe('MerkleDistributorProgram', () => {
         const claimStatusPda = newAddr(751);
         const mockClaimStatus = ClaimStatusAccountFactory.create({
           address: claimStatusPda,
-          claimant: walletSdk.signer!.address,
+          claimant: walletSdk.wallet!.address,
           distributor: distributorAddr,
         });
 
@@ -594,7 +594,7 @@ describe('MerkleDistributorProgram', () => {
 
         expect(result).not.toBeNull();
         expect(result!.address).toBe(claimStatusPda);
-        expect(result!.claimant).toBe(walletSdk.signer!.address);
+        expect(result!.claimant).toBe(walletSdk.wallet!.address);
         expect(result!.distributor).toBe(distributorAddr);
         expect(result!.unlockedAmount).toBe(10000);
         expect(result!.lockedAmount).toBe(5000);
@@ -630,7 +630,7 @@ describe('MerkleDistributorProgram', () => {
 
         await expect(
           programWithoutWallet.getClaimStatusForDistributor(newAddr(754))
-        ).rejects.toThrow('Signer not set');
+        ).rejects.toThrow('Wallet not set');
       });
 
       it('should handle errors when fetching claim status', async () => {
@@ -894,7 +894,7 @@ describe('MerkleDistributorProgram', () => {
           distributorAddr
         );
         expect(walletSdk.solana.pda).toHaveBeenCalledWith(
-          ['ClaimStatus', walletSdk.signer!.address, distributorAddr],
+          ['ClaimStatus', walletSdk.wallet!.address, distributorAddr],
           walletSdk.config.programs.merkleDistributorAddress
         );
         // Verify findAssociatedTokenPda was called with the YES address, not the claimant's address
@@ -909,7 +909,7 @@ describe('MerkleDistributorProgram', () => {
             claimStatus: claimStatusPda,
             from: distributorAccount.data.tokenVault,
             to: targetAta, // Should be ATA of YES address, not claimant's ATA
-            claimant: walletSdk.signer,
+            claimant: walletSdk.wallet,
             amountUnlocked: 10000,
             amountLocked: 5000,
             proof,
@@ -938,7 +938,7 @@ describe('MerkleDistributorProgram', () => {
             proof: [],
             target: ClaimTarget.YES,
           })
-        ).rejects.toThrow('Signer not set');
+        ).rejects.toThrow('Wallet not set');
       });
 
       it('should throw error when tokens have already been claimed', async () => {
@@ -1160,7 +1160,7 @@ describe('MerkleDistributorProgram', () => {
             proof: [],
             target: ClaimTarget.YES,
           })
-        ).rejects.toThrow('Signer not set');
+        ).rejects.toThrow('Wallet not set');
       });
     });
   });

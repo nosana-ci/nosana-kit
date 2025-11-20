@@ -105,43 +105,43 @@ describe('NosanaClient', () => {
     });
   });
 
-  describe('signer management', () => {
-    it('allows setting signer after client creation', async () => {
+  describe('wallet management', () => {
+    it('allows setting wallet after client creation', async () => {
       const client = createNosanaClient(NosanaNetwork.MAINNET);
-      const signer = await SignerFactory.createTestSigner();
+      const wallet = await SignerFactory.createTestSigner();
       const expectedAddress = SignerFactory.getExpectedAddress();
 
-      client.signer = signer;
+      client.wallet = wallet;
 
-      // observable behavior: signer is stored and accessible
-      expect(client.signer).toBe(signer);
-      expect(client.signer?.address).toBe(expectedAddress);
+      // observable behavior: wallet is stored and accessible
+      expect(client.wallet).toBe(wallet);
+      expect(client.wallet?.address).toBe(expectedAddress);
     });
 
-    it('initializes with signer when provided in config', async () => {
-      const signer = await SignerFactory.createTestSigner();
+    it('initializes with wallet when provided in config', async () => {
+      const wallet = await SignerFactory.createTestSigner();
       const expectedAddress = SignerFactory.getExpectedAddress();
 
-      const client = createNosanaClient(NosanaNetwork.MAINNET, { signer });
+      const client = createNosanaClient(NosanaNetwork.MAINNET, { wallet });
 
-      expect(client.signer).toBe(signer);
-      expect(client.signer?.address).toBe(expectedAddress);
+      expect(client.wallet).toBe(wallet);
+      expect(client.wallet?.address).toBe(expectedAddress);
     });
 
-    it('starts without signer and allows setting and unsetting', async () => {
+    it('starts without wallet and allows setting and unsetting', async () => {
       const client = createNosanaClient(NosanaNetwork.MAINNET);
-      const signer = await SignerFactory.createTestSigner();
+      const wallet = await SignerFactory.createTestSigner();
 
       // initial state
-      expect(client.signer).toBeUndefined();
+      expect(client.wallet).toBeUndefined();
 
-      // set signer
-      client.signer = signer;
-      expect(client.signer).toBe(signer);
+      // set wallet
+      client.wallet = wallet;
+      expect(client.wallet).toBe(wallet);
 
-      // unset signer
-      client.signer = undefined;
-      expect(client.signer).toBeUndefined();
+      // unset wallet
+      client.wallet = undefined;
+      expect(client.wallet).toBeUndefined();
     });
   });
 
@@ -171,18 +171,18 @@ describe('NosanaClient', () => {
       expect(clientA.ipfs).not.toBe(clientB.ipfs);
     });
 
-    it('setting signer on one client does not affect other clients', async () => {
+    it('setting wallet on one client does not affect other clients', async () => {
       const clientA = createNosanaClient(NosanaNetwork.MAINNET);
       const clientB = createNosanaClient(NosanaNetwork.MAINNET);
-      const signerA = await SignerFactory.createTestSigner();
+      const walletA = await SignerFactory.createTestSigner();
       const expectedAddress = SignerFactory.getExpectedAddress();
 
-      clientA.signer = signerA;
+      clientA.wallet = walletA;
 
       // observable behavior: isolation
-      expect(clientA.signer).toBe(signerA);
-      expect(clientA.signer?.address).toBe(expectedAddress);
-      expect(clientB.signer).toBeUndefined();
+      expect(clientA.wallet).toBe(walletA);
+      expect(clientA.wallet?.address).toBe(expectedAddress);
+      expect(clientB.wallet).toBeUndefined();
     });
   });
 

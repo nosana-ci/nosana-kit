@@ -237,7 +237,7 @@ describe('JobsProgram', () => {
           signMessages: async () => [],
           signTransactions: async () => [],
         } as any;
-        (sdk as any).signer = wallet;
+        (sdk as any).wallet = wallet;
         // mock PDA helper used for vault
         (sdk as any).solana.pda = vi.fn(async () => newAddr(80));
         // mock ATA PDA

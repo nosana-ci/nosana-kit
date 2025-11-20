@@ -29,10 +29,7 @@ export interface StakeProgram {
 /**
  * Creates a new StakeProgram instance.
  *
- * This function follows a functional architecture pattern, avoiding classes
- * to prevent bundle bloat and dual-package hazard issues.
- *
- * @param deps - Program dependencies (config, logger, solana service, signer getter)
+ * @param deps - Program dependencies (config, logger, solana service, wallet getter)
  * @returns A StakeProgram instance with methods to interact with the stake program
  *
  * @example
@@ -43,7 +40,7 @@ export interface StakeProgram {
  *   config,
  *   logger,
  *   solana,
- *   getSigner,
+ *   getWallet,
  * });
  *
  * const stake = await stakeProgram.get('stake-address');
