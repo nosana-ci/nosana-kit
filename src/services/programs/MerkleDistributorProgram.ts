@@ -99,6 +99,13 @@ export interface MerkleDistributorProgram {
     target: ClaimTarget;
     claimant?: TransactionSigner;
   }): Promise<ReturnType<typeof programClient.getNewClaimInstruction>>;
+  /**
+   * Clawback tokens from a merkle distributor.
+   */
+  clawback(params: {
+    distributor: Address;
+    claimant?: TransactionSigner;
+  }): Promise<ReturnType<typeof programClient.getClawbackInstruction>>;
 }
 
 /**
@@ -450,6 +457,59 @@ export function createMerkleDistributorProgram(
         return newClaimInstruction;
       } catch (err) {
         deps.logger.error(`Failed to create claim instructions: ${err}`);
+        throw err;
+      }
+    },
+    /**
+     * Clawback tokens from a merkle distributor.
+     * This function creates a clawback instruction to transfer tokens from the distributor's token vault to the clawback receiver.
+     *
+     * @param params Parameters for clawback
+     * @param params.distributor The address of the merkle distributor
+     * @param params.claimant Optional claimant signer. If not provided, uses the wallet.
+     * @returns The clawback instruction
+     * @throws Error if wallet is not set and claimant is not provided
+     */
+    async clawback(params: {
+      distributor: Address;
+      claimant?: TransactionSigner; // Optional claimant signer. If not provided, uses the wallet.
+    }): Promise<ReturnType<typeof programClient.getClawbackInstruction>> {
+      // Determine claimant signer
+      let claimantSigner: TransactionSigner;
+
+      if (params.claimant) {
+        claimantSigner = params.claimant;
+      } else {
+        const wallet = deps.getWallet();
+        if (!wallet) {
+          throw new Error('Wallet not set. Please set a wallet or provide a claimant signer.');
+        }
+        claimantSigner = wallet;
+      }
+
+      try {
+        // Get the distributor account to find tokenVault and clawbackReceiver
+        const distributorAccount = await client.fetchMerkleDistributor(
+          deps.solana.rpc,
+          params.distributor
+        );
+
+        // Create clawback instruction
+        const clawbackInstruction = client.getClawbackInstruction(
+          {
+            distributor: params.distributor,
+            from: distributorAccount.data.tokenVault,
+            to: distributorAccount.data.clawbackReceiver,
+            claimant: claimantSigner,
+            tokenProgram: TOKEN_PROGRAM_ADDRESS,
+            systemProgram: SYSTEM_PROGRAM_ADDRESS,
+          },
+          { programAddress: programId }
+        );
+
+        return clawbackInstruction;
+      } catch (err) {
+        deps.logger.error(`Failed to create clawback instruction: ${err}`);
         throw err;
       }
     },
