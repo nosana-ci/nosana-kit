@@ -380,4 +380,57 @@ export class MerkleDistributorProgram extends BaseProgram {
       throw err;
     }
   }
+
+  /**
+   * Clawback tokens from a merkle distributor.
+   * This function creates a clawback instruction to transfer tokens from the distributor's token vault to the clawback receiver.
+   *
+   * @param params Parameters for clawback
+   * @param params.distributor The address of the merkle distributor
+   * @param params.claimant Optional claimant signer. If not provided, uses the wallet.
+   * @returns The clawback instruction
+   * @throws Error if wallet is not set and claimant is not provided
+   */
+  async clawback(params: {
+    distributor: Address;
+    claimant?: KeyPairSigner; // Optional claimant signer. If not provided, uses the wallet.
+  }): Promise<ReturnType<typeof programClient.getClawbackInstruction>> {
+    // Determine claimant signer
+    let claimantSigner: KeyPairSigner;
+
+    if (params.claimant) {
+      claimantSigner = params.claimant;
+    } else {
+      if (!this.sdk.wallet) {
+        throw new Error('Wallet not set. Please set a wallet or provide a claimant signer.');
+      }
+      claimantSigner = this.sdk.wallet;
+    }
+
+    try {
+      // Get the distributor account to find tokenVault and clawbackReceiver
+      const distributorAccount = await this.client.fetchMerkleDistributor(
+        this.sdk.solana.rpc,
+        params.distributor
+      );
+
+      // Create clawback instruction
+      const clawbackInstruction = this.client.getClawbackInstruction(
+        {
+          distributor: params.distributor,
+          from: distributorAccount.data.tokenVault,
+          to: distributorAccount.data.clawbackReceiver,
+          claimant: claimantSigner,
+          tokenProgram: TOKEN_PROGRAM_ADDRESS,
+          systemProgram: SYSTEM_PROGRAM_ADDRESS,
+        },
+        { programAddress: this.getProgramId() }
+      );
+
+      return clawbackInstruction;
+    } catch (err) {
+      this.sdk.logger.error(`Failed to create clawback instruction: ${err}`);
+      throw err;
+    }
+  }
 }
