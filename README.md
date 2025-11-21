@@ -16,13 +16,13 @@ npm install @nosana/kit
 ## Quick Start
 
 ```typescript
-import { NosanaClient, NosanaNetwork } from '@nosana/kit';
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 // Initialize with mainnet defaults
-const client = new NosanaClient();
+const client = createNosanaClient();
 
 // Or specify network and configuration
-const client = new NosanaClient(NosanaNetwork.DEVNET, {
+const client = createNosanaClient(NosanaNetwork.DEVNET, {
   solana: {
     rpcEndpoint: 'https://your-custom-rpc.com',
     commitment: 'confirmed'
@@ -42,17 +42,21 @@ const completedJobs = await client.jobs.all({
 
 ## Architecture
 
-The SDK is organized into clear, purpose-driven modules:
+The SDK is organized into clear, purpose-driven modules using a factory function pattern:
 
-- **`services/`** - Utility services (SolanaService for RPC/transactions, TokenService for token operations)
-- **`programs/`** - On-chain program interfaces (JobsProgram, StakeProgram)
-- **`ipfs/`** - IPFS integration
-- **`config/`** - Network configurations
-- **`utils/`** - Helper utilities
+- **`services/`** - Utility services and program interfaces
+  - **`SolanaService`** - Low-level Solana RPC operations, transactions, and PDA derivations
+  - **`TokenService`** - Token account operations (configured for NOS token)
+  - **`programs/`** - On-chain program interfaces
+    - **`JobsProgram`** - Jobs, runs, and markets management
+    - **`StakeProgram`** - Staking account operations
+    - **`MerkleDistributorProgram`** - Merkle distributor and claim operations
+- **`ipfs/`** - IPFS integration for pinning and retrieving data
+- **`config/`** - Network configurations and defaults
+- **`utils/`** - Helper utilities and type conversions
+- **`generated_clients/`** - Auto-generated Solana program clients (exported as namespaces)
 
-This structure makes it clear that:
-- **Services** = Helper services and utilities for common operations
-- **Programs** = Interfaces to on-chain Solana programs
+The SDK uses factory functions (`createNosanaClient`, `createJobsProgram`, etc.) to build instances with dependency injection, making the architecture modular and testable.
 
 ## Configuration
 
@@ -66,9 +70,9 @@ The SDK supports two networks:
 ### Configuration Options
 
 ```typescript
-import { NosanaClient, NosanaNetwork, NosanaLogLevel } from '@nosana/kit';
+import { createNosanaClient, NosanaNetwork, LogLevel } from '@nosana/kit';
 
-const client = new NosanaClient(NosanaNetwork.MAINNET, {
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   solana: {
     cluster: 'mainnet-beta',
     rpcEndpoint: 'https://api.mainnet-beta.solana.com',
@@ -79,8 +83,8 @@ const client = new NosanaClient(NosanaNetwork.MAINNET, {
     jwt: 'your-pinata-jwt-token',
     gateway: 'https://gateway.pinata.cloud/ipfs/'
   },
-  logLevel: NosanaLogLevel.DEBUG,
-  wallet: keypairArray  // Optional: Set wallet during initialization
+  logLevel: LogLevel.DEBUG,
+  wallet: myWallet  // Optional: Set wallet during initialization (must be a Wallet type)
 });
 ```
 
@@ -88,48 +92,43 @@ const client = new NosanaClient(NosanaNetwork.MAINNET, {
 
 ### NosanaClient
 
-Main entry point for SDK interactions.
+Main entry point for SDK interactions. Created using the `createNosanaClient()` factory function.
 
 **Properties:**
 - `config: ClientConfig` - Active configuration
 - `jobs: JobsProgram` - Jobs program interface
 - `stake: StakeProgram` - Staking program interface
+- `merkleDistributor: MerkleDistributorProgram` - Merkle distributor program interface
 - `solana: SolanaService` - General Solana utilities (RPC, transactions, PDAs)
 - `nos: TokenService` - Token operations service (configured for NOS token)
 - `ipfs: IPFS` - IPFS operations and utilities
 - `logger: Logger` - Logging instance
-- `wallet?: KeyPairSigner` - Active wallet (if set)
+- `wallet?: Wallet` - Active wallet (if set). Set this property directly to configure the wallet.
 
-**Methods:**
-- `setWallet(wallet: WalletConfig): Promise<KeyPairSigner>` - Set the signing wallet
+**Factory Function:**
+- `createNosanaClient(network?: NosanaNetwork, customConfig?: PartialClientConfig): NosanaClient` - Creates a new client instance
 
 ### Wallet Configuration
 
-The SDK supports multiple wallet input formats:
+The SDK uses a `Wallet` type that must support both message and transaction signing (`MessageSigner & TransactionSigner`). Set the wallet by directly assigning to the `wallet` property:
 
 ```typescript
-// Number array (raw keypair)
-await client.setWallet([1, 2, 3, ..., 64]);
+import { createNosanaClient } from '@nosana/kit';
+import type { Wallet } from '@nosana/kit';
 
-// JSON string
-await client.setWallet(JSON.stringify(keypairArray));
+// Create client
+const client = createNosanaClient();
 
-// Base58 string
-await client.setWallet('base58EncodedPrivateKey');
+// Set wallet directly (must be a Wallet type that supports both message and transaction signing)
+client.wallet = myWallet;
 
-// File path
-await client.setWallet('/path/to/keypair.json');
-
-// Environment variable (JSON array or base58)
-process.env.SOLANA_PRIVATE_KEY = JSON.stringify(keypairArray);
-await client.setWallet('env:SOLANA_PRIVATE_KEY');
-
-// Browser wallet adapter
-await client.setWallet(browserWalletAdapter);
-
-// Existing KeyPairSigner (passthrough)
-await client.setWallet(existingKeypairSigner);
+// The wallet can be set during initialization
+const clientWithWallet = createNosanaClient(NosanaNetwork.MAINNET, {
+  wallet: myWallet
+});
 ```
+
+The wallet must implement both `MessageSigner` and `TransactionSigner` interfaces from `@solana/kit`. This allows the SDK to use the wallet for both message signing (for authentication) and transaction signing (for on-chain operations).
 
 ## Jobs Program API
 
@@ -278,7 +277,7 @@ Create a list instruction for posting a job to a market. Returns an instruction 
 
 ```typescript
 // Set wallet first
-await client.setWallet(yourKeypair);
+client.wallet = yourWallet;
 
 // Create job instruction
 const instruction = await client.jobs.post({
@@ -477,6 +476,146 @@ const cid = await client.ipfs.pin({
 // Retrieve job results
 const results = await client.ipfs.retrieve(job.ipfsResult);
 ```
+
+## Merkle Distributor Program
+
+The MerkleDistributorProgram provides methods to interact with merkle distributor accounts and claim tokens from distributions.
+
+### Get a Single Distributor
+
+Fetch a merkle distributor account by its address:
+
+```typescript
+const distributor = await client.merkleDistributor.get('distributor-address');
+
+console.log('Distributor:', distributor.address);
+console.log('Admin:', distributor.admin);
+console.log('Mint:', distributor.mint);
+console.log('Root:', distributor.root);
+```
+
+### Get All Distributors
+
+Fetch all merkle distributor accounts:
+
+```typescript
+const distributors = await client.merkleDistributor.all();
+console.log(`Found ${distributors.length} distributors`);
+```
+
+### Get Claim Status
+
+Fetch claim status for a specific distributor and claimant:
+
+```typescript
+// Get claim status for the wallet's address
+const claimStatus = await client.merkleDistributor.getClaimStatusForDistributor(
+  'distributor-address'
+);
+
+// Or specify a claimant address
+const claimStatus = await client.merkleDistributor.getClaimStatusForDistributor(
+  'distributor-address',
+  'claimant-address'
+);
+
+if (claimStatus) {
+  console.log('Claimed:', claimStatus.claimed);
+  console.log('Amount Unlocked:', claimStatus.amountUnlocked);
+  console.log('Amount Locked:', claimStatus.amountLocked);
+} else {
+  console.log('No claim status found');
+}
+```
+
+### Get Claim Status PDA
+
+Derive the ClaimStatus PDA address:
+
+```typescript
+// Derive for wallet's address
+const pda = await client.merkleDistributor.getClaimStatusPda('distributor-address');
+
+// Or specify a claimant address
+const pda = await client.merkleDistributor.getClaimStatusPda(
+  'distributor-address',
+  'claimant-address'
+);
+```
+
+### Claim Tokens
+
+Claim tokens from a merkle distributor:
+
+```typescript
+// Set wallet first
+client.wallet = yourWallet;
+
+// Claim tokens
+const instruction = await client.merkleDistributor.claim({
+  distributor: 'distributor-address',
+  amountUnlocked: 1000000,  // Amount in smallest unit
+  amountLocked: 500000,
+  proof: [/* merkle proof array */],
+  target: ClaimTarget.YES  // or ClaimTarget.NO
+});
+
+// Submit the instruction
+await client.solana.send(instruction);
+```
+
+### Clawback Tokens
+
+Clawback tokens from a merkle distributor (admin only):
+
+```typescript
+// Set wallet first (must be admin)
+client.wallet = adminWallet;
+
+// Clawback tokens
+const instruction = await client.merkleDistributor.clawback({
+  distributor: 'distributor-address'
+});
+
+// Submit the instruction
+await client.solana.send(instruction);
+```
+
+### Type Definitions
+
+```typescript
+interface MerkleDistributor {
+  address: Address;
+  admin: Address;
+  mint: Address;
+  root: string;  // Base58 encoded merkle root
+  buffer0: string;
+  buffer1: string;
+  buffer2: string;
+  // ... additional fields
+}
+
+interface ClaimStatus {
+  address: Address;
+  distributor: Address;
+  claimant: Address;
+  claimed: boolean;
+  amountUnlocked: number;
+  amountLocked: number;
+}
+
+enum ClaimTarget {
+  YES = 'YES',
+  NO = 'NO'
+}
+```
+
+### Use Cases
+
+- **Airdrop Claims**: Allow users to claim tokens from merkle tree distributions
+- **Reward Distribution**: Distribute rewards to eligible addresses
+- **Token Vesting**: Manage locked and unlocked token distributions
+- **Governance**: Distribute governance tokens to eligible participants
 
 ## Staking Program
 
@@ -713,7 +852,7 @@ try {
         break;
       case ErrorCodes.NO_WALLET:
         console.error('Wallet not configured');
-        await client.setWallet(keypair);
+        client.wallet = myWallet;
         break;
       case ErrorCodes.TRANSACTION_ERROR:
         console.error('Transaction failed:', error.details);
@@ -734,7 +873,7 @@ The SDK includes a built-in singleton logger with configurable levels.
 ### Log Levels
 
 ```typescript
-enum NosanaLogLevel {
+enum LogLevel {
   DEBUG = 'debug',
   INFO = 'info',
   WARN = 'warn',
@@ -746,11 +885,11 @@ enum NosanaLogLevel {
 ### Configuration
 
 ```typescript
-import { NosanaClient, NosanaLogLevel } from '@nosana/kit';
+import { createNosanaClient, LogLevel } from '@nosana/kit';
 
 // Set log level during initialization
-const client = new NosanaClient(NosanaNetwork.MAINNET, {
-  logLevel: NosanaLogLevel.DEBUG
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  logLevel: LogLevel.DEBUG
 });
 
 // Access logger directly
@@ -801,9 +940,13 @@ import type {
   Market, 
   JobState,
   MarketQueueType,
+  Stake,
+  MerkleDistributor,
+  ClaimStatus,
+  ClaimTarget,
   ClientConfig,
   NosanaClient,
-  KeyPairSigner,
+  Wallet,
   Address
 } from '@nosana/kit';
 ```
@@ -811,11 +954,14 @@ import type {
 ## Dependencies
 
 Core dependencies:
-- `gill` ^0.9.0 - Solana web3 library
-- `@solana-program/token` ^0.5.1 - Token program utilities
+- `@solana/kit` ^5.0.0 - Solana web3 library
+- `@solana-program/token` ^0.8.0 - Token program utilities
+- `@solana-program/system` ^0.10.0 - System program utilities
+- `@solana-program/compute-budget` ^0.11.0 - Compute budget utilities
 - `axios` ^1.6.0 - HTTP client
 - `bs58` ^6.0.0 - Base58 encoding
 - `form-data` ^4.0.0 - Multipart form data
+- `buffer` ^6.0.3 - Buffer polyfill
 
 ## License
 
