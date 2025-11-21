@@ -247,17 +247,13 @@ const nodeRuns = await client.jobs.runs({ node: 'node-address' });
 #### Query All Markets
 
 ```typescript
-async markets(filters?: {
-  project?: Address
-}): Promise<Market[]>
+async markets(): Promise<Market[]>
 ```
 
-Fetch markets with optional project filtering.
+Fetch all market accounts.
 
 ```typescript
-const projectMarkets = await client.jobs.markets({ 
-  project: 'project-address' 
-});
+const markets = await client.jobs.markets();
 ```
 
 ### Creating Jobs
@@ -288,7 +284,7 @@ const instruction = await client.jobs.post({
 });
 
 // Submit the instruction
-await client.solana.send(instruction);
+await client.solana.buildSignAndSend(instruction);
 ```
 
 ### Real-time Monitoring
@@ -397,14 +393,34 @@ General Solana utility service for low-level RPC operations, transactions, and P
 ### Methods
 
 ```typescript
-// Send transaction (instruction, array, or transaction object)
-send(tx: IInstruction | IInstruction[] | Transaction): Promise<Signature>
+// Build, sign, and send transaction in one call (convenience method)
+buildSignAndSend(
+  instructions: Instruction | Instruction[],
+  options?: {
+    feePayer?: TransactionSigner;
+    commitment?: 'processed' | 'confirmed' | 'finalized';
+  }
+): Promise<Signature>
+
+// Build transaction from instructions
+buildTransaction(
+  instructions: Instruction | Instruction[],
+  options?: { feePayer?: TransactionSigner }
+): Promise<TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithBlockhashLifetime>
+
+// Sign a transaction message
+signTransaction(
+  transactionMessage: TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithBlockhashLifetime
+): Promise<SendableTransaction & Transaction & TransactionWithBlockhashLifetime>
+
+// Send and confirm a signed transaction
+sendTransaction(
+  transaction: SendableTransaction & Transaction & TransactionWithBlockhashLifetime,
+  options?: { commitment?: 'processed' | 'confirmed' | 'finalized' }
+): Promise<Signature>
 
 // Get account balance
-getBalance(address: Address | string): Promise<bigint>
-
-// Get latest blockhash
-getLatestBlockhash(): Promise<{ blockhash: string, lastValidBlockHeight: number }>
+getBalance(address?: Address | string): Promise<bigint>
 
 // Derive program derived address
 pda(seeds: Array<Address | string>, programId: Address): Promise<Address>
@@ -413,11 +429,16 @@ pda(seeds: Array<Address | string>, programId: Address): Promise<Address>
 ### Examples
 
 ```typescript
-// Send a single instruction
-const signature = await client.solana.send(instruction);
+// Send a single instruction (convenience method)
+const signature = await client.solana.buildSignAndSend(instruction);
 
 // Send multiple instructions atomically
-const signature = await client.solana.send([ix1, ix2, ix3]);
+const signature = await client.solana.buildSignAndSend([ix1, ix2, ix3]);
+
+// Or build, sign, and send separately for more control
+const transactionMessage = await client.solana.buildTransaction(instruction);
+const signedTransaction = await client.solana.signTransaction(transactionMessage);
+const signature = await client.solana.sendTransaction(signedTransaction);
 
 // Check account balance
 const balance = await client.solana.getBalance('address');
@@ -446,10 +467,10 @@ IPFS.IpfsHashToByteArray(ipfsHash: string): Uint8Array
 
 ```typescript
 // Pin JSON data to Pinata
-pin(data: object, name?: string): Promise<string>
+pin(data: object): Promise<string>
 
 // Pin file to Pinata
-pinFile(filePath: string, name?: string): Promise<string>
+pinFile(filePath: string): Promise<string>
 
 // Pin buffer/stream to Pinata
 pinFileFromBuffer(source: Buffer | Readable, filename: string): Promise<string>
@@ -471,7 +492,7 @@ const cid = await client.ipfs.pin({
   type: 'docker',
   image: 'ubuntu:latest',
   command: ['echo', 'hello']
-}, 'job-definition');
+});
 
 // Retrieve job results
 const results = await client.ipfs.retrieve(job.ipfsResult);
@@ -561,7 +582,7 @@ const instruction = await client.merkleDistributor.claim({
 });
 
 // Submit the instruction
-await client.solana.send(instruction);
+await client.solana.buildSignAndSend(instruction);
 ```
 
 ### Clawback Tokens
@@ -578,7 +599,7 @@ const instruction = await client.merkleDistributor.clawback({
 });
 
 // Submit the instruction
-await client.solana.send(instruction);
+await client.solana.buildSignAndSend(instruction);
 ```
 
 ### Type Definitions
@@ -946,9 +967,9 @@ import type {
   ClaimTarget,
   ClientConfig,
   NosanaClient,
-  Wallet,
-  Address
+  Wallet
 } from '@nosana/kit';
+import type { Address } from '@solana/kit';
 ```
 
 ## Dependencies
