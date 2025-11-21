@@ -233,7 +233,7 @@ export class MockClientFactory {
   /**
    * Create a mock SDK with RPC mocking capabilities for testing program methods
    * that use getProgramAccounts (like all(), runs(), markets(), etc.)
-   * 
+   *
    * Returns both the SDK and sentArgs array to inspect RPC call arguments in tests.
    */
   static createMockWithRpc(): { sdk: NosanaClient; sentArgs: any[] } {
@@ -340,7 +340,6 @@ export class JobAccountFactory {
     } as any;
   }
 
-
   /**
    * Create multiple jobs
    */
@@ -377,7 +376,6 @@ export class RunAccountFactory {
       },
     } as any;
   }
-
 
   /**
    * Create multiple runs
@@ -424,7 +422,6 @@ export class MarketAccountFactory {
     } as any;
   }
 
-
   /**
    * Create multiple markets
    */
@@ -432,7 +429,6 @@ export class MarketAccountFactory {
     return Array.from({ length: count }, () => MarketAccountFactory.create());
   }
 }
-
 
 /**
  * Stake Account Factory

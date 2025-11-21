@@ -133,7 +133,6 @@ describe('StakeProgram', () => {
       expect(out.vaultBump).toBe(CUSTOM_VAULT_BUMP);
       expect(out.xnos).toBe(CUSTOM_XNOS);
     });
-
   });
 
   describe('methods', () => {

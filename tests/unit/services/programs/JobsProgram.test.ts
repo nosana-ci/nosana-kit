@@ -133,7 +133,7 @@ describe('JobsProgram', () => {
         const addr = newAddr(60);
         const jobAccount = makeJobAccount(JobState.QUEUED, addr);
         vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(jobAccount);
-        
+
         // Mock RPC to ensure runs() would not be called
         const getProgramAccountsSpy = vi.fn(() => ({
           send: vi.fn().mockResolvedValue([]),
@@ -141,7 +141,7 @@ describe('JobsProgram', () => {
         sdk.solana.rpc.getProgramAccounts = getProgramAccountsSpy as any;
 
         const out = await jobs.get(addr, false);
-        
+
         // Verify behavior: job state remains QUEUED when checkRun is false
         expect(out.state).toBe(JobState.QUEUED);
         // Verify runs() was not called by checking RPC was not called
@@ -152,14 +152,14 @@ describe('JobsProgram', () => {
         const addr = newAddr(61);
         const jobAccount = makeJobAccount(JobState.COMPLETED, addr);
         vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(jobAccount);
-        
+
         const getProgramAccountsSpy = vi.fn(() => ({
           send: vi.fn().mockResolvedValue([]),
         }));
         sdk.solana.rpc.getProgramAccounts = getProgramAccountsSpy as any;
 
         const out = await jobs.get(addr, true);
-        
+
         // Verify behavior: completed jobs don't check for runs
         expect(out.state).toBe(JobState.COMPLETED);
         expect(getProgramAccountsSpy).not.toHaveBeenCalled();
@@ -172,14 +172,14 @@ describe('JobsProgram', () => {
           makeJobAccount(JobState.QUEUED, a),
           makeJobAccount(JobState.QUEUED, b),
         ]);
-        
+
         const getProgramAccountsSpy = vi.fn(() => ({
           send: vi.fn().mockResolvedValue([]),
         }));
         sdk.solana.rpc.getProgramAccounts = getProgramAccountsSpy as any;
 
         const out = await jobs.multiple([a, b], false);
-        
+
         // Verify behavior: all jobs remain QUEUED
         expect(out.every((j) => j.state === JobState.QUEUED)).toBe(true);
         expect(out).toHaveLength(2);
@@ -192,9 +192,9 @@ describe('JobsProgram', () => {
         const runAddr = newAddr(25);
         const jobAccount = makeJobAccount(JobState.QUEUED, addr);
         const runAccount = makeRunAccount(addr, RUN_TIME_555, nodeAddr);
-        
+
         vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(jobAccount);
-        
+
         // Mock RPC to return run account when runs() is called
         vi.spyOn(programClient, 'decodeRunAccount' as any).mockReturnValue(runAccount);
         const mockRpcResponse = [
@@ -214,7 +214,7 @@ describe('JobsProgram', () => {
         })) as any;
 
         const out = await jobs.get(addr, true);
-        
+
         // Verify behavior: job state changes to RUNNING when run exists
         expect(out.state).toBe(JobState.RUNNING);
         expect(out.timeStart).toBe(RUN_TIME_555);
@@ -227,12 +227,12 @@ describe('JobsProgram', () => {
         const runAddr = newAddr(30);
         const nodeAddr = newAddr(31);
         const runAccount = makeRunAccount(a, RUN_TIME_777, nodeAddr);
-        
+
         vi.spyOn(programClient, 'fetchAllJobAccount' as any).mockResolvedValue([
           makeJobAccount(JobState.QUEUED, a),
           makeJobAccount(JobState.COMPLETED, b),
         ]);
-        
+
         // Mock RPC to return run account
         vi.spyOn(programClient, 'decodeRunAccount' as any).mockReturnValue(runAccount);
         const mockRpcResponse = [
@@ -252,7 +252,7 @@ describe('JobsProgram', () => {
         })) as any;
 
         const out = await jobs.multiple([a, b], true);
-        
+
         // Verify behavior: queued job becomes RUNNING, completed job stays COMPLETED
         const first = out.find((j) => j.address === a)!;
         const second = out.find((j) => j.address === b)!;

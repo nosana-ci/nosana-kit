@@ -264,7 +264,6 @@ describe('MerkleDistributorProgram', () => {
       expect(out.unlockedAmountClaimed).toBe(CUSTOM_UNLOCKED_CLAIMED);
       expect(out.closable).toBe(true);
     });
-
   });
 
   describe('methods', () => {
