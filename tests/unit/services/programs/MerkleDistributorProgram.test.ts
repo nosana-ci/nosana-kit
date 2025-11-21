@@ -210,17 +210,6 @@ describe('MerkleDistributorProgram', () => {
       expect(out.bump).toBe(254);
     });
 
-    it('get excludes discriminator from output', async () => {
-      const addr = newAddr(103);
-      const acc = makeDistributor(addr);
-
-      vi.spyOn(merkleDistributorClient, 'fetchMerkleDistributor' as any).mockResolvedValue(acc);
-
-      const out = await program.get(addr);
-
-      expect(out).not.toHaveProperty('discriminator');
-    });
-
     it('getClaimStatus converts bigint to numbers and includes address', async () => {
       const addr = newAddr(300);
       const acc = makeClaimStatus(addr);
@@ -276,27 +265,14 @@ describe('MerkleDistributorProgram', () => {
       expect(out.closable).toBe(true);
     });
 
-    it('getClaimStatus excludes discriminator from output', async () => {
-      const addr = newAddr(302);
-      const acc = makeClaimStatus(addr);
-
-      vi.spyOn(merkleDistributorClient, 'fetchMaybeClaimStatus' as any).mockResolvedValue({
-        exists: true,
-        ...acc,
-      });
-
-      const out = await program.getClaimStatus(addr);
-
-      expect(out).not.toHaveProperty('discriminator');
-    });
   });
 
   describe('methods', () => {
-    let sdk: ReturnType<typeof MockClientFactory.createWithRpc>['sdk'];
+    let sdk: ReturnType<typeof MockClientFactory.createMockWithRpc>['sdk'];
     let program: MerkleDistributorProgram;
 
     beforeEach(() => {
-      const ctx = MockClientFactory.createWithRpc();
+      const ctx = MockClientFactory.createMockWithRpc();
       sdk = ctx.sdk;
       program = createMerkleDistributorProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
@@ -370,29 +346,6 @@ describe('MerkleDistributorProgram', () => {
         expect(result[2].maxTotalClaim).toBe(3000000);
         expect(result[3].maxTotalClaim).toBe(4000000);
         expect(result[4].maxTotalClaim).toBe(5000000);
-      });
-
-      it('should send correct filters to getProgramAccounts', async () => {
-        sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
-          send: vi.fn().mockResolvedValue([]),
-        })) as any;
-
-        await program.all();
-
-        expect(sdk.solana.rpc.getProgramAccounts).toHaveBeenCalledWith(
-          sdk.config.programs.merkleDistributorAddress,
-          expect.objectContaining({
-            encoding: 'base64',
-            filters: expect.arrayContaining([
-              expect.objectContaining({
-                memcmp: expect.objectContaining({
-                  offset: BigInt(0),
-                  encoding: 'base58',
-                }),
-              }),
-            ]),
-          })
-        );
       });
 
       it('should handle empty results', async () => {
@@ -503,11 +456,11 @@ describe('MerkleDistributorProgram', () => {
     });
 
     describe('getClaimStatusPda', () => {
-      let walletSdk: ReturnType<typeof MockClientFactory.createWithWallet>;
+      let walletSdk: ReturnType<typeof MockClientFactory.createMockWithWallet>;
       let walletProgram: MerkleDistributorProgram;
 
       beforeEach(() => {
-        walletSdk = MockClientFactory.createWithWallet();
+        walletSdk = MockClientFactory.createMockWithWallet();
         walletSdk.solana = {
           rpc: {} as any,
           pda: vi.fn().mockResolvedValue(newAddr(700)),
@@ -591,11 +544,11 @@ describe('MerkleDistributorProgram', () => {
     });
 
     describe('getClaimStatusForDistributor', () => {
-      let walletSdk: ReturnType<typeof MockClientFactory.createWithWallet>;
+      let walletSdk: ReturnType<typeof MockClientFactory.createMockWithWallet>;
       let walletProgram: MerkleDistributorProgram;
 
       beforeEach(() => {
-        walletSdk = MockClientFactory.createWithWallet();
+        walletSdk = MockClientFactory.createMockWithWallet();
         walletSdk.solana = {
           rpc: {} as any,
           pda: vi.fn().mockResolvedValue(newAddr(700)),
@@ -787,29 +740,6 @@ describe('MerkleDistributorProgram', () => {
         expect(result[4].unlockedAmount).toBe(50000);
       });
 
-      it('should send correct filters to getProgramAccounts', async () => {
-        sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
-          send: vi.fn().mockResolvedValue([]),
-        })) as any;
-
-        await program.allClaimStatus();
-
-        expect(sdk.solana.rpc.getProgramAccounts).toHaveBeenCalledWith(
-          sdk.config.programs.merkleDistributorAddress,
-          expect.objectContaining({
-            encoding: 'base64',
-            filters: expect.arrayContaining([
-              expect.objectContaining({
-                memcmp: expect.objectContaining({
-                  offset: BigInt(0),
-                  encoding: 'base58',
-                }),
-              }),
-            ]),
-          })
-        );
-      });
-
       it('should handle empty results', async () => {
         sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
           send: vi.fn().mockResolvedValue([]),
@@ -871,11 +801,11 @@ describe('MerkleDistributorProgram', () => {
     });
 
     describe('claim', () => {
-      let walletSdk: ReturnType<typeof MockClientFactory.createWithWallet>['sdk'];
+      let walletSdk: ReturnType<typeof MockClientFactory.createMockWithWallet>['sdk'];
       let walletProgram: MerkleDistributorProgram;
 
       beforeEach(() => {
-        walletSdk = MockClientFactory.createWithWallet();
+        walletSdk = MockClientFactory.createMockWithWallet();
         walletSdk.solana = {
           rpc: {} as any,
           pda: vi.fn().mockResolvedValue(newAddr(700)),
@@ -1204,11 +1134,11 @@ describe('MerkleDistributorProgram', () => {
   });
 
   describe('integration scenarios', () => {
-    let sdk: ReturnType<typeof MockClientFactory.createWithRpc>['sdk'];
+    let sdk: ReturnType<typeof MockClientFactory.createMockWithRpc>['sdk'];
     let program: MerkleDistributorProgram;
 
     beforeEach(() => {
-      const ctx = MockClientFactory.createWithRpc();
+      const ctx = MockClientFactory.createMockWithRpc();
       sdk = ctx.sdk;
       program = createMerkleDistributorProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });

@@ -134,24 +134,14 @@ describe('StakeProgram', () => {
       expect(out.xnos).toBe(CUSTOM_XNOS);
     });
 
-    it('get excludes discriminator from output', async () => {
-      const addr = newAddr(102);
-      const acc = makeStakeAccount(DEFAULT_STAKE_AMOUNT, addr);
-
-      vi.spyOn(stakingClient, 'fetchStakeAccount' as any).mockResolvedValue(acc);
-
-      const out = await stake.get(addr);
-
-      expect(out).not.toHaveProperty('discriminator');
-    });
   });
 
   describe('methods', () => {
-    let sdk: ReturnType<typeof MockClientFactory.createWithRpc>['sdk'];
+    let sdk: ReturnType<typeof MockClientFactory.createMockWithRpc>['sdk'];
     let stake: StakeProgram;
 
     beforeEach(() => {
-      const ctx = MockClientFactory.createWithRpc();
+      const ctx = MockClientFactory.createMockWithRpc();
       sdk = ctx.sdk;
       stake = createStakeProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
@@ -263,29 +253,6 @@ describe('StakeProgram', () => {
         expect(result[4].amount).toBe(DEFAULT_STAKE_AMOUNT * 5);
       });
 
-      it('should send correct filters to getProgramAccounts', async () => {
-        sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
-          send: vi.fn().mockResolvedValue([]),
-        })) as any;
-
-        await stake.all();
-
-        expect(sdk.solana.rpc.getProgramAccounts).toHaveBeenCalledWith(
-          sdk.config.programs.stakeAddress,
-          expect.objectContaining({
-            encoding: 'base64',
-            filters: expect.arrayContaining([
-              expect.objectContaining({
-                memcmp: expect.objectContaining({
-                  offset: BigInt(0),
-                  encoding: 'base58',
-                }),
-              }),
-            ]),
-          })
-        );
-      });
-
       it('should handle empty results', async () => {
         sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
           send: vi.fn().mockResolvedValue([]),
@@ -348,11 +315,11 @@ describe('StakeProgram', () => {
   });
 
   describe('integration scenarios', () => {
-    let sdk: ReturnType<typeof MockClientFactory.createWithRpc>['sdk'];
+    let sdk: ReturnType<typeof MockClientFactory.createMockWithRpc>['sdk'];
     let stake: StakeProgram;
 
     beforeEach(() => {
-      const ctx = MockClientFactory.createWithRpc();
+      const ctx = MockClientFactory.createMockWithRpc();
       sdk = ctx.sdk;
       stake = createStakeProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });

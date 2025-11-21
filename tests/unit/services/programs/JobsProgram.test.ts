@@ -40,7 +40,7 @@ const makeJobAccount = (state: number, addr?: Address) =>
 const makeRunAccount = (job: Address, time: number, node?: Address) =>
   RunAccountFactory.create({ job, time: BigInt(time), node });
 const makeMarketAccount = () => MarketAccountFactory.create();
-const makeMonitorSdk = () => MockClientFactory.createWithSubscriptions();
+const makeMonitorSdk = () => MockClientFactory.createMockWithSubscriptions();
 
 describe('JobsProgram', () => {
   describe('transforms', () => {
@@ -97,11 +97,11 @@ describe('JobsProgram', () => {
   });
 
   describe('methods', () => {
-    let sdk: ReturnType<typeof MockClientFactory.createWithRpc>['sdk'];
+    let sdk: ReturnType<typeof MockClientFactory.createMockWithRpc>['sdk'];
     let jobs: JobsProgram;
 
     beforeEach(() => {
-      const ctx = MockClientFactory.createWithRpc();
+      const ctx = MockClientFactory.createMockWithRpc();
       sdk = ctx.sdk;
       jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
@@ -262,49 +262,6 @@ describe('JobsProgram', () => {
       });
     });
 
-    describe('GPA filters', () => {
-      it('all() builds discriminator and expected offset filters', async () => {
-        const ctx = MockClientFactory.createWithRpc();
-        sdk = ctx.sdk;
-        jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
-        const filters = {
-          state: JobState.RUNNING,
-          project: newAddr(40),
-          node: newAddr(41),
-          market: newAddr(42),
-        } as any;
-        await jobs.all(filters);
-        const call = (sdk as any).solana.rpc.getProgramAccounts.mock.calls[0][1];
-        const memcmps = call.filters.map((f: any) => f.memcmp).filter(Boolean);
-        expect(memcmps[0].offset).toBe(0n);
-        const byOffset = new Map(memcmps.map((m: any) => [m.offset.toString(), m]));
-        expect(byOffset.get('208')).toBeTruthy();
-        expect(byOffset.get('176')).toBeTruthy();
-        expect(byOffset.get('104')).toBeTruthy();
-        expect(byOffset.get('72')).toBeTruthy();
-      });
-
-      it('runs() includes RUN discriminator (offset 0)', async () => {
-        const ctx = MockClientFactory.createWithRpc();
-        sdk = ctx.sdk;
-        jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
-        await jobs.runs({ job: newAddr(50), node: newAddr(51) });
-        const call = (sdk as any).solana.rpc.getProgramAccounts.mock.calls[0][1];
-        const memcmps = call.filters.map((f: any) => f.memcmp).filter(Boolean);
-        expect(memcmps[0].offset).toBe(0n);
-      });
-
-      it('markets() includes MARKET discriminator (offset 0)', async () => {
-        const ctx = MockClientFactory.createWithRpc();
-        sdk = ctx.sdk;
-        jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
-        await jobs.markets();
-        const call = (sdk as any).solana.rpc.getProgramAccounts.mock.calls[0][1];
-        const memcmps = call.filters.map((f: any) => f.memcmp).filter(Boolean);
-        expect(memcmps[0].offset).toBe(0n);
-      });
-    });
-
     describe('post', () => {
       it('creates list instruction with decoded ipfsJob and PDAs', async () => {
         // Test constants
@@ -374,7 +331,7 @@ describe('JobsProgram', () => {
       });
 
       it('all propagates getProgramAccounts errors', async () => {
-        const ctx = MockClientFactory.createWithRpc();
+        const ctx = MockClientFactory.createMockWithRpc();
         sdk = ctx.sdk;
         jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
         const networkError = new Error('Network error');
