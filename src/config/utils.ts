@@ -44,5 +44,5 @@ export const getNosanaConfig = (
 //     jwt: 'your-custom-jwt-token',
 //     gateway: 'https://your-custom-gateway.com/ipfs/',
 //   },
-//   logLevel: NosanaLogLevel.DEBUG,
+//   logLevel: 'debug',
 // });

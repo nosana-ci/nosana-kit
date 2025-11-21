@@ -31,7 +31,10 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { argsIgnorePattern: '^_' },
+        { 
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
       ],
       'no-console': ['warn', { allow: ['warn', 'error', 'debug', 'info'] }],
     },

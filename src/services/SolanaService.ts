@@ -1,194 +1,330 @@
 import {
-  createSolanaClient,
+  createSolanaRpc,
+  createSolanaRpcSubscriptions,
   address,
   Address,
-  SolanaClient,
   getProgramDerivedAddress,
   getAddressEncoder,
-  createTransaction,
+  createTransactionMessage,
   signTransactionMessageWithSigners,
-  getExplorerLink,
   getSignatureFromTransaction,
   Signature,
-  IInstruction,
+  Instruction,
   TransactionMessageWithBlockhashLifetime,
-  CompilableTransactionMessage,
-  FullySignedTransaction,
+  setTransactionMessageFeePayerSigner,
+  setTransactionMessageLifetimeUsingBlockhash,
+  sendAndConfirmTransactionFactory,
+  TransactionMessageWithFeePayer,
+  TransactionMessage,
+  SendableTransaction,
+  Transaction,
+  appendTransactionMessageInstructions,
+  BaseTransactionMessage,
+  pipe,
+  assertIsSendableTransaction,
+  TransactionSigner,
+  Commitment,
   TransactionWithBlockhashLifetime,
-} from 'gill';
+} from '@solana/kit';
+import {
+  estimateComputeUnitLimitFactory,
+  getSetComputeUnitLimitInstruction,
+} from '@solana-program/compute-budget';
 import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
-import { NosanaClient } from '../index.js';
+import { Logger } from '../logger/Logger.js';
+import { Wallet } from '../types.js';
+import { SolanaConfig } from '../config/types.js';
 
-export class SolanaService {
-  private readonly sdk: NosanaClient;
-  public readonly rpc: SolanaClient['rpc'];
-  public readonly rpcSubscriptions: SolanaClient['rpcSubscriptions'];
-  public readonly sendAndConfirmTransaction: SolanaClient['sendAndConfirmTransaction'];
+/**
+ * Factory function to create an estimateAndSetComputeUnitLimit function
+ * that estimates compute units and adds the set compute unit limit instruction
+ */
+function estimateAndSetComputeUnitLimitFactory(
+  ...params: Parameters<typeof estimateComputeUnitLimitFactory>
+) {
+  const estimateComputeUnitLimit = estimateComputeUnitLimitFactory(...params);
+  return async <T extends BaseTransactionMessage & TransactionMessageWithFeePayer>(
+    transactionMessage: T
+  ) => {
+    const computeUnitsEstimate = await estimateComputeUnitLimit(transactionMessage);
+    return appendTransactionMessageInstructions(
+      [getSetComputeUnitLimitInstruction({ units: computeUnitsEstimate })],
+      transactionMessage
+    );
+  };
+}
 
-  constructor(sdk: NosanaClient) {
-    this.sdk = sdk;
-    const rpcEndpoint = this.sdk.config.solana.rpcEndpoint;
-    if (!rpcEndpoint) throw new NosanaError('RPC URL is required', ErrorCodes.INVALID_CONFIG);
-    const { rpc, rpcSubscriptions, sendAndConfirmTransaction } = createSolanaClient({
-      urlOrMoniker: rpcEndpoint,
-    });
+/**
+ * Dependencies for SolanaService
+ */
+export interface SolanaServiceDeps {
+  logger: Logger;
+  getWallet: () => Wallet | undefined;
+}
 
-    this.rpc = rpc;
-    this.rpcSubscriptions = rpcSubscriptions;
-    this.sendAndConfirmTransaction = sendAndConfirmTransaction;
+/**
+ * Solana service interface
+ */
+export interface SolanaService {
+  readonly config: SolanaConfig;
+  readonly rpc: ReturnType<typeof createSolanaRpc>;
+  readonly rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
+  readonly sendAndConfirmTransaction: ReturnType<typeof sendAndConfirmTransactionFactory>;
+  readonly estimateAndSetComputeUnitLimit: ReturnType<typeof estimateAndSetComputeUnitLimitFactory>;
+  /**
+   * Optional fee payer for transactions. If set, will be used as fallback when no feePayer is provided in options.
+   * Set this property directly to configure the fee payer.
+   */
+  feePayer: TransactionSigner | undefined;
+  pda(seeds: Array<Address | string>, programId: Address): Promise<Address>;
+  getBalance(addressStr?: string | Address): Promise<bigint>;
+  buildTransaction(
+    instructions: Instruction | Instruction[],
+    options?: { feePayer?: TransactionSigner }
+  ): Promise<
+    TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithBlockhashLifetime
+  >;
+  signTransaction(
+    transactionMessage: TransactionMessage &
+      TransactionMessageWithFeePayer &
+      TransactionMessageWithBlockhashLifetime
+  ): Promise<SendableTransaction & Transaction & TransactionWithBlockhashLifetime>;
+  sendTransaction(
+    transaction: SendableTransaction & Transaction & TransactionWithBlockhashLifetime,
+    options?: { commitment?: 'processed' | 'confirmed' | 'finalized' }
+  ): Promise<Signature>;
+  buildSignAndSend(
+    instructions: Instruction | Instruction[],
+    options?: {
+      feePayer?: TransactionSigner;
+      commitment?: 'processed' | 'confirmed' | 'finalized';
+    }
+  ): Promise<Signature>;
+}
+
+/**
+ * Creates a Solana service instance.
+ */
+export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfig): SolanaService {
+  if (!config.rpcEndpoint) {
+    throw new NosanaError('RPC URL is required', ErrorCodes.INVALID_CONFIG);
   }
 
-  public async pda(seeds: Array<Address | string>, programId: Address): Promise<Address> {
-    const addressEncoder = getAddressEncoder();
-    const [pda] = await getProgramDerivedAddress({
-      programAddress: programId,
-      seeds: seeds.map((seed) => {
-        // Address is a branded string type, so typeof will return 'string'
-        // We need to encode Address types to bytes for PDA seeds
-        // Try to encode if it looks like an address (base58, 32-44 chars), otherwise pass as-is
-        if (typeof seed === 'string') {
-          // Check if it's likely an address (base58 encoded addresses are 32-44 chars)
-          // Short strings like 'ClaimStatus' should be passed as-is
-          if (seed.length >= 32 && seed.length <= 44) {
-            try {
-              // Try to encode as Address - if it's a valid address, this will work
-              return addressEncoder.encode(seed as Address);
-            } catch {
-              // If encoding fails, it's not a valid address, pass as-is (e.g., 'ClaimStatus')
-              return seed;
+  const rpc = createSolanaRpc(config.rpcEndpoint);
+  // Use wsEndpoint if provided, otherwise fall back to rpcEndpoint
+  const rpcSubscriptions = createSolanaRpcSubscriptions(config.wsEndpoint ?? config.rpcEndpoint);
+  const sendAndConfirmTransaction = sendAndConfirmTransactionFactory({
+    rpc,
+    rpcSubscriptions,
+  });
+
+  // Create a function to estimate and set the compute unit limit
+  const estimateAndSetComputeUnitLimit = estimateAndSetComputeUnitLimitFactory({ rpc });
+
+  // Store feePayer in a mutable variable, initialized from config
+  let feePayer: TransactionSigner | undefined = config.feePayer;
+
+  return {
+    config,
+    rpc,
+    rpcSubscriptions,
+    sendAndConfirmTransaction,
+    estimateAndSetComputeUnitLimit,
+    get feePayer() {
+      return feePayer;
+    },
+    set feePayer(value: TransactionSigner | undefined) {
+      feePayer = value;
+    },
+
+    async pda(seeds: Array<Address | string>, programId: Address): Promise<Address> {
+      const addressEncoder = getAddressEncoder();
+      const [pda] = await getProgramDerivedAddress({
+        programAddress: programId,
+        seeds: seeds.map((seed) => {
+          // Address is a branded string type, so typeof will return 'string'
+          // We need to encode Address types to bytes for PDA seeds
+          // Try to encode if it looks like an address (base58, 32-44 chars), otherwise pass as-is
+          if (typeof seed === 'string') {
+            // Check if it's likely an address (base58 encoded addresses are 32-44 chars)
+            // Short strings like 'ClaimStatus' should be passed as-is
+            if (seed.length >= 32 && seed.length <= 44) {
+              try {
+                // Try to encode as Address - if it's a valid address, this will work
+                return addressEncoder.encode(seed as Address);
+              } catch {
+                // If encoding fails, it's not a valid address, pass as-is (e.g., 'ClaimStatus')
+                return seed;
+              }
             }
+            // Short strings pass as-is
+            return seed;
           }
-          // Short strings pass as-is
-          return seed;
-        }
-        // Non-string types should be encoded
-        return addressEncoder.encode(seed);
-      }),
-    });
-    return pda;
-  }
+          // Non-string types should be encoded
+          return addressEncoder.encode(seed);
+        }),
+      });
+      return pda;
+    },
 
-  public async getBalance(addressStr: string | Address): Promise<bigint> {
-    try {
-      this.sdk.logger.debug(`Getting balance for address: ${addressStr}`);
-      const addr = address(addressStr);
-      const balance = await this.rpc.getBalance(addr).send();
-      return balance.value;
-    } catch (error) {
-      this.sdk.logger.error(`Failed to get balance: ${error}`);
-      throw new NosanaError('Failed to get balance', ErrorCodes.RPC_ERROR, error);
-    }
-  }
-
-  public async getLatestBlockhash() {
-    try {
-      const { value: blockhash } = await this.rpc.getLatestBlockhash().send();
-      return blockhash;
-    } catch (error) {
-      this.sdk.logger.error(`Failed to get latest blockhash: ${error}`);
-      throw new NosanaError('Failed to get latest blockhash', ErrorCodes.RPC_ERROR, error);
-    }
-  }
-
-  /**
-   * Type guard to check if the input is a transaction
-   */
-  private isTransaction(
-    input: unknown
-  ): input is
-    | (CompilableTransactionMessage & TransactionMessageWithBlockhashLifetime)
-    | (FullySignedTransaction & TransactionWithBlockhashLifetime) {
-    return (
-      typeof input === 'object' &&
-      input !== null &&
-      'instructions' in input &&
-      'version' in input &&
-      !('programAddress' in input)
-    );
-  }
-
-  /**
-   * Type guard to check if the input is a signed transaction
-   */
-  private isSignedTransaction(
-    input: unknown
-  ): input is FullySignedTransaction & TransactionWithBlockhashLifetime {
-    return (
-      typeof input === 'object' &&
-      input !== null &&
-      'signatures' in input &&
-      Array.isArray((input as { signatures?: unknown[] }).signatures) &&
-      (input as { signatures: unknown[] }).signatures.length > 0
-    );
-  }
-
-  /**
-   * Create, sign, and send a transaction with proper logging and error handling
-   * @param instructionsOrTransaction Single instruction, array of instructions, or pre-built transaction
-   * @returns The transaction signature
-   */
-  public async send(
-    instructionsOrTransaction:
-      | IInstruction
-      | IInstruction[]
-      | (CompilableTransactionMessage & TransactionMessageWithBlockhashLifetime)
-      | (FullySignedTransaction & TransactionWithBlockhashLifetime)
-  ): Promise<Signature> {
-    if (!this.sdk.wallet) {
-      throw new NosanaError('No wallet found', ErrorCodes.NO_WALLET);
-    }
-
-    try {
-      let signedTransaction: FullySignedTransaction & TransactionWithBlockhashLifetime;
-
-      // Check if it's already a transaction or if we need to create one from instructions
-      if (this.isTransaction(instructionsOrTransaction)) {
-        // Check if it's already signed
-        if (this.isSignedTransaction(instructionsOrTransaction)) {
-          // Already signed, use it directly
-          signedTransaction = instructionsOrTransaction;
+    async getBalance(addressStr?: string | Address): Promise<bigint> {
+      try {
+        // Use wallet address if no address is provided
+        let addr: Address;
+        if (addressStr) {
+          addr = address(addressStr);
         } else {
-          // Not signed yet, sign it
-          signedTransaction = await signTransactionMessageWithSigners(instructionsOrTransaction);
+          const wallet = deps.getWallet();
+          if (!wallet) {
+            throw new NosanaError('No wallet found and no address provided', ErrorCodes.NO_WALLET);
+          }
+          addr = wallet.address;
         }
-      } else {
-        // It's instructions, create and sign a transaction
-        const instructions: IInstruction[] = Array.isArray(instructionsOrTransaction)
-          ? (instructionsOrTransaction as IInstruction[])
-          : [instructionsOrTransaction as IInstruction];
 
-        const transaction = createTransaction({
-          instructions,
-          feePayer: this.sdk.wallet,
-          latestBlockhash: await this.getLatestBlockhash(),
-          version: 0,
-        });
+        deps.logger.debug(`Getting balance for address: ${addr}`);
+        const balance = await rpc.getBalance(addr).send();
+        return balance.value;
+      } catch (error) {
+        if (error instanceof NosanaError) {
+          throw error;
+        }
+        deps.logger.error(`Failed to get balance: ${error}`);
+        throw new NosanaError('Failed to get balance', ErrorCodes.RPC_ERROR, error);
+      }
+    },
 
-        // Sign the transaction with all required signers
-        signedTransaction = await signTransactionMessageWithSigners(transaction);
+    /**
+     * Build a transaction message from instructions
+     * This function creates a transaction message with:
+     * - Fee payer set to the provided feePayer, service feePayer, or wallet (in that order)
+     * - Latest blockhash for lifetime
+     * - Provided instructions
+     * - Estimated compute unit limit
+     *
+     * @param instructions Single instruction or array of instructions
+     * @param options Optional configuration
+     * @param options.feePayer Optional custom fee payer. Takes precedence over service feePayer and wallet.
+     * @returns An unsigned transaction message ready to be signed
+     */
+    async buildTransaction(
+      instructions: Instruction | Instruction[],
+      options?: { feePayer?: TransactionSigner }
+    ): Promise<
+      TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithBlockhashLifetime
+    > {
+      // Priority: options.feePayer > service.feePayer > wallet
+      const transactionFeePayer = options?.feePayer ?? feePayer ?? deps.getWallet();
+      if (!transactionFeePayer) {
+        throw new NosanaError('No wallet found and no feePayer provided', ErrorCodes.NO_WALLET);
       }
 
-      // Get the transaction signature for logging
-      const signature = getSignatureFromTransaction(signedTransaction);
+      try {
+        // Get latest blockhash
+        const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
 
-      // Log the transaction explorer link
-      const explorerLink = getExplorerLink({
-        cluster: this.sdk.config.solana.cluster,
-        transaction: signature,
+        // Normalize instructions to array
+        const instructionsArray = Array.isArray(instructions) ? instructions : [instructions];
+
+        // Build transaction message using pipe
+        const transactionMessage = await pipe(
+          createTransactionMessage({ version: 0 }),
+          (tx) => setTransactionMessageFeePayerSigner(transactionFeePayer, tx),
+          (tx) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx),
+          (tx) => appendTransactionMessageInstructions(instructionsArray, tx),
+          (tx) => estimateAndSetComputeUnitLimit(tx)
+        );
+
+        return transactionMessage;
+      } catch (error) {
+        deps.logger.error(`Failed to build transaction: ${error}`);
+        throw new NosanaError('Failed to build transaction', ErrorCodes.RPC_ERROR, error);
+      }
+    },
+
+    /**
+     * Sign a transaction message
+     * This function signs the transaction message using the signers embedded in the message.
+     * The transaction message should already contain the signers (e.g., from buildTransaction).
+     *
+     * @param transactionMessage The transaction message to sign (must contain signers)
+     * @returns A signed transaction
+     */
+    async signTransaction(
+      transactionMessage: TransactionMessage &
+        TransactionMessageWithFeePayer &
+        TransactionMessageWithBlockhashLifetime
+    ): Promise<SendableTransaction & Transaction & TransactionWithBlockhashLifetime> {
+      try {
+        // Sign the transaction message using signers embedded in the message
+        const transaction = await signTransactionMessageWithSigners(transactionMessage);
+
+        return transaction as SendableTransaction & Transaction & TransactionWithBlockhashLifetime;
+      } catch (error) {
+        deps.logger.error(`Failed to sign transaction: ${error}`);
+        throw new NosanaError('Failed to sign transaction', ErrorCodes.TRANSACTION_ERROR, error);
+      }
+    },
+
+    /**
+     * Send and confirm a signed transaction
+     * This function validates that the transaction is sendable, then sends it and waits for confirmation.
+     *
+     * @param transaction The signed transaction to send
+     * @param options Optional configuration (same as sendAndConfirmTransaction)
+     * @param options.commitment Commitment level for confirmation (takes precedence over config, then falls back to config.commitment, then 'confirmed')
+     * @returns The transaction signature
+     */
+    async sendTransaction(
+      transaction: SendableTransaction & Transaction & TransactionWithBlockhashLifetime,
+      options?: { commitment?: Commitment }
+    ): Promise<Signature> {
+      try {
+        // Ensure the transaction is sendable before attempting to send
+        assertIsSendableTransaction(transaction);
+
+        // Get the transaction signature for logging
+        const signature = getSignatureFromTransaction(transaction);
+
+        deps.logger.info(`Sending transaction: ${signature}`);
+
+        // Send and confirm the transaction with optional commitment level
+        // Priority: options.commitment > config.commitment > 'confirmed'
+        const commitment = options?.commitment ?? config.commitment ?? 'confirmed';
+        await sendAndConfirmTransaction(transaction, { commitment });
+
+        deps.logger.info(`Transaction ${signature} confirmed!`);
+
+        return signature;
+      } catch (error) {
+        const errorMessage = `Failed to send transaction: ${error instanceof Error ? error.message : String(error)}`;
+        deps.logger.error(errorMessage);
+        throw new NosanaError(errorMessage, ErrorCodes.RPC_ERROR, error);
+      }
+    },
+
+    /**
+     * Build, sign, and send a transaction in one call
+     * This is a convenience function that combines buildTransaction, signTransaction, and sendTransaction.
+     * Use this when you want to build, sign, and send in a single operation.
+     *
+     * @param instructions Single instruction or array of instructions
+     * @param options Optional configuration
+     * @param options.feePayer Optional custom fee payer. If not provided, uses the wallet.
+     * @param options.commitment Commitment level for confirmation (takes precedence over config, then falls back to config.commitment, then 'confirmed')
+     * @returns The transaction signature
+     */
+    async buildSignAndSend(
+      instructions: Instruction | Instruction[],
+      options?: {
+        feePayer?: TransactionSigner;
+        commitment?: 'processed' | 'confirmed' | 'finalized';
+      }
+    ): Promise<Signature> {
+      const transactionMessage = await this.buildTransaction(instructions, {
+        feePayer: options?.feePayer,
       });
-
-      this.sdk.logger.info(`Sending transaction: ${explorerLink}`);
-
-      // Send and confirm the transaction
-      await this.sendAndConfirmTransaction(signedTransaction);
-
-      this.sdk.logger.info('Transaction confirmed!');
-
-      return signature;
-    } catch (err) {
-      const errorMessage = `Failed to send transaction: ${err instanceof Error ? err.message : String(err)}`;
-      this.sdk.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-  }
+      const signedTransaction = await this.signTransaction(transactionMessage);
+      return await this.sendTransaction(signedTransaction, { commitment: options?.commitment });
+    },
+  };
 }

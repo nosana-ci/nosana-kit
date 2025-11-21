@@ -27,13 +27,14 @@
   "author": "Nosana",
   "license": "MIT",
   "dependencies": {
-    "@solana-program/token": "0.5.1",
-    "@solana/sysvars": "5.0.0",
+    "@solana-program/compute-budget": "0.11.0",
+    "@solana-program/system": "0.10.0",
+    "@solana-program/token": "0.8.0",
+    "@solana/kit": "5.0.0",
     "axios": "1.6.0",
     "bs58": "6.0.0",
     "buffer": "6.0.3",
-    "form-data": "4.0.0",
-    "gill": "0.12.0"
+    "form-data": "4.0.0"
   },
   "devDependencies": {
     "@codama/nodes-from-anchor": "^1.2.0",

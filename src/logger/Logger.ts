@@ -1,4 +1,4 @@
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogLevel = 'none' | 'error' | 'warn' | 'info' | 'debug';
 
 export interface LoggerOptions {
   level?: LogLevel;
@@ -8,9 +8,9 @@ export interface LoggerOptions {
 
 export class Logger {
   private static instance: Logger;
-  private level: LogLevel = 'info';
-  private prefix: string = '[Nosana]';
-  private enabled: boolean = true;
+  public level: LogLevel = 'info';
+  public prefix: string = '[Nosana]';
+  public enabled: boolean = true;
 
   private constructor(options?: LoggerOptions) {
     if (options) {
@@ -27,10 +27,14 @@ export class Logger {
     return Logger.instance;
   }
 
-  private shouldLog(messageLevel: LogLevel): boolean {
-    if (!this.enabled) return false;
-    const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-    return levels.indexOf(messageLevel) >= levels.indexOf(this.level);
+  private shouldLog(messageLevel: Exclude<LogLevel, 'none'>): boolean {
+    if (!this.enabled || this.level === 'none') return false;
+    // Levels ordered from most verbose (debug) to least verbose (error)
+    // If level is 'info', we log 'info', 'warn', 'error' (index >= 2)
+    const levels: Exclude<LogLevel, 'none'>[] = ['debug', 'info', 'warn', 'error'];
+    const currentLevelIndex = levels.indexOf(this.level as Exclude<LogLevel, 'none'>);
+    const messageLevelIndex = levels.indexOf(messageLevel);
+    return messageLevelIndex >= currentLevelIndex;
   }
 
   private formatMessage(level: LogLevel, message: string): string {

@@ -1,26 +1,27 @@
-import { Address, KeyPairSigner, SolanaClusterMoniker } from 'gill';
+import { Address, TransactionSigner } from '@solana/kit';
+import type { Wallet } from '../types.js';
+import type { LogLevel } from '../logger/Logger.js';
 
 export enum NosanaNetwork {
   MAINNET = 'mainnet',
   DEVNET = 'devnet',
 }
 
-export enum NosanaLogLevel {
-  NONE = 0,
-  ERROR = 1,
-  WARN = 2,
-  INFO = 3,
-  DEBUG = 4,
-}
+export type SolanaClusterMoniker =
+  | 'devnet'
+  | 'localnet'
+  | 'mainnet'
+  | 'testnet'
+  | 'mainnet-beta'
+  | 'localhost';
 
 export interface SolanaConfig {
-  cluster: SolanaClusterMoniker | 'mainnet-beta' | 'localhost';
+  cluster: SolanaClusterMoniker;
   rpcEndpoint: string;
   wsEndpoint?: string; // Optional WebSocket endpoint, if different from HTTP
   commitment?: 'processed' | 'confirmed' | 'finalized';
+  feePayer?: TransactionSigner; // Optional fee payer for transactions
 }
-
-export type WalletConfig = KeyPairSigner | string | Iterable<number>;
 
 export interface IpfsConfig {
   api: string;
@@ -28,24 +29,26 @@ export interface IpfsConfig {
   gateway: string;
 }
 
+export interface ProgramConfig {
+  nosTokenAddress: Address;
+  jobsAddress: Address;
+  rewardsAddress: Address;
+  stakeAddress: Address;
+  poolsAddress: Address;
+  merkleDistributorAddress: Address;
+}
+
 export interface ClientConfig {
   solana: SolanaConfig;
-  wallet?: WalletConfig;
-  logLevel: NosanaLogLevel;
+  wallet?: Wallet;
+  logLevel: LogLevel;
   ipfs: IpfsConfig;
-  programs: {
-    nosTokenAddress: Address;
-    jobsAddress: Address;
-    rewardsAddress: Address;
-    stakeAddress: Address;
-    poolsAddress: Address;
-    merkleDistributorAddress: Address;
-  };
+  programs: ProgramConfig;
 }
 
 export interface PartialClientConfig {
   solana?: Partial<SolanaConfig>;
-  wallet?: WalletConfig;
+  wallet?: Wallet;
   ipfs?: Partial<IpfsConfig>;
-  logLevel?: NosanaLogLevel;
+  logLevel?: LogLevel;
 }
