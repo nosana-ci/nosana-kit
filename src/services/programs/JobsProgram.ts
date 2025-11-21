@@ -141,7 +141,6 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
    * Transform job account to include address and convert types
    */
   function transformJobAccount(jobAccount: Account<programClient.JobAccount>): Job {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { discriminator: _, ...jobAccountData } = jobAccount.data;
 
     const converted = convertBigIntToNumber(jobAccountData);
@@ -158,7 +157,6 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
    * Transform run account to include address and convert types
    */
   function transformRunAccount(runAccount: Account<programClient.RunAccount>): Run {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { discriminator: _, ...runAccountData } = runAccount.data;
 
     return {
@@ -171,7 +169,6 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
    * Transform market account to include address and convert types
    */
   function transformMarketAccount(marketAccount: Account<programClient.MarketAccount>): Market {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { discriminator: _, ...marketAccountData } = marketAccount.data;
 
     const converted = convertBigIntToNumber(marketAccountData);

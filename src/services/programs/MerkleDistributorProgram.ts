@@ -144,7 +144,6 @@ export function createMerkleDistributorProgram(
     distributorAccount: Account<programClient.MerkleDistributor>
   ): MerkleDistributor {
     const {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       discriminator: _,
       root,
       buffer0,

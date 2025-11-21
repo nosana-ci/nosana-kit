@@ -56,7 +56,6 @@ export function createStakeProgram(deps: ProgramDeps, config: ProgramConfig): St
    * Transform stake account to include address and convert BigInt to numbers
    */
   function transformStakeAccount(stakeAccount: Account<programClient.StakeAccount>): Stake {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { discriminator: _, ...stakeAccountData } = stakeAccount.data;
 
     return {
