@@ -21,10 +21,7 @@ function extractSignature(
 
   const signature = signatures[signerAddress];
   if (!signature) {
-    throw new NosanaError(
-      'Failed to get signature from signer',
-      ErrorCodes.AUTH_ERROR
-    );
+    throw new NosanaError('Failed to get signature from signer', ErrorCodes.AUTH_ERROR);
   }
 
   return signature instanceof Uint8Array ? signature : new Uint8Array(signature);
@@ -46,10 +43,12 @@ export function walletToAuthorizationSigner(signer: MessageSigner): SignMessageF
     // Try modifyAndSignMessages first (MessageModifyingSigner)
     if ('modifyAndSignMessages' in signer && typeof signer.modifyAndSignMessages === 'function') {
       const signedMessages = await signer.modifyAndSignMessages([messageToSign]);
-      const signedMessage = signedMessages[0] as {
-        content: Uint8Array;
-        signatures: Record<typeof signerAddress, Uint8Array>;
-      } | undefined;
+      const signedMessage = signedMessages[0] as
+        | {
+            content: Uint8Array;
+            signatures: Record<typeof signerAddress, Uint8Array>;
+          }
+        | undefined;
       return extractSignature(
         signedMessage?.signatures,
         signerAddress,
@@ -61,18 +60,10 @@ export function walletToAuthorizationSigner(signer: MessageSigner): SignMessageF
     if ('signMessages' in signer && typeof signer.signMessages === 'function') {
       const signatures = await signer.signMessages([messageToSign]);
       const signatureDict = signatures[0] as Record<typeof signerAddress, Uint8Array> | undefined;
-      return extractSignature(
-        signatureDict,
-        signerAddress,
-        'Failed to get signatures from signer'
-      );
+      return extractSignature(signatureDict, signerAddress, 'Failed to get signatures from signer');
     }
 
     // This should never happen since MessageSigner always has one of these methods
-    throw new NosanaError(
-      'MessageSigner does not support message signing',
-      ErrorCodes.AUTH_ERROR
-    );
+    throw new NosanaError('MessageSigner does not support message signing', ErrorCodes.AUTH_ERROR);
   };
 }
-

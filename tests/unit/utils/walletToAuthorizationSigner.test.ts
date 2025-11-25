@@ -184,4 +184,3 @@ describe('walletToAuthorizationSigner', () => {
     expect(largeSig.length).toBeGreaterThan(0);
   });
 });
-
