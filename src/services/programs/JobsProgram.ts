@@ -275,18 +275,21 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       const encodedAccount: EncodedAccount = parseBase64RpcAccount(pubkey, account as never);
       const accountType = client.identifyNosanaJobsAccount(encodedAccount);
       switch (accountType) {
-        case client.NosanaJobsAccount.JobAccount:
+        case client.NosanaJobsAccount.JobAccount: {
           const jobAccount = client.decodeJobAccount(encodedAccount);
           await handleJobAccount(jobAccount, options.onJobAccount, isMonitoring);
           break;
-        case client.NosanaJobsAccount.MarketAccount:
+        }
+        case client.NosanaJobsAccount.MarketAccount: {
           const marketAccount = client.decodeMarketAccount(encodedAccount);
           await handleMarketAccount(marketAccount, options.onMarketAccount, isMonitoring);
           break;
-        case client.NosanaJobsAccount.RunAccount:
+        }
+        case client.NosanaJobsAccount.RunAccount: {
           const runAccount = client.decodeRunAccount(encodedAccount);
           await handleRunAccount(runAccount, options.onRunAccount, isMonitoring);
           break;
+        }
         default:
           deps.logger.error(`No support yet for account type: ${accountType}`);
           return;

@@ -1,7 +1,10 @@
+import js from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
+import importPlugin from 'eslint-plugin-import';
 
 export default [
+  js.configs.recommended,
   {
     ignores: [
       'dist/',
@@ -21,17 +24,116 @@ export default [
         ecmaVersion: 2020,
         sourceType: 'module',
       },
+      globals: {
+        // True globals
+        AbortController: 'readonly',
+        AbortSignal: 'readonly',
+        Blob: 'readonly',
+        Buffer: 'readonly',
+        ByteLengthQueuingStrategy: 'readonly',
+        atob: 'readonly',
+        BroadcastChannel: 'readonly',
+        btoa: 'readonly',
+        clearImmediate: 'readonly',
+        clearInterval: 'readonly',
+        clearTimeout: 'readonly',
+        CloseEvent: 'readonly',
+        CompressionStream: 'readonly',
+        console: 'readonly',
+        CountQueuingStrategy: 'readonly',
+        Crypto: 'readonly',
+        crypto: 'readonly',
+        CryptoKey: 'readonly',
+        CustomEvent: 'readonly',
+        DecompressionStream: 'readonly',
+        DOMException: 'readonly',
+        Event: 'readonly',
+        EventSource: 'readonly',
+        EventTarget: 'readonly',
+        fetch: 'readonly',
+        File: 'readonly',
+        FormData: 'readonly',
+        global: 'readonly',
+        globalThis: 'readonly',
+        Headers: 'readonly',
+        localStorage: 'readonly',
+        MessageChannel: 'readonly',
+        MessageEvent: 'readonly',
+        MessagePort: 'readonly',
+        Navigator: 'readonly',
+        navigator: 'readonly',
+        performance: 'readonly',
+        PerformanceEntry: 'readonly',
+        PerformanceMark: 'readonly',
+        PerformanceMeasure: 'readonly',
+        PerformanceObserver: 'readonly',
+        PerformanceObserverEntryList: 'readonly',
+        PerformanceResourceTiming: 'readonly',
+        process: 'readonly',
+        queueMicrotask: 'readonly',
+        ReadableByteStreamController: 'readonly',
+        ReadableStream: 'readonly',
+        ReadableStreamBYOBReader: 'readonly',
+        ReadableStreamBYOBRequest: 'readonly',
+        ReadableStreamDefaultController: 'readonly',
+        ReadableStreamDefaultReader: 'readonly',
+        Request: 'readonly',
+        RequestInit: 'readonly',
+        Response: 'readonly',
+        sessionStorage: 'readonly',
+        setImmediate: 'readonly',
+        setInterval: 'readonly',
+        setTimeout: 'readonly',
+        Storage: 'readonly',
+        structuredClone: 'readonly',
+        SubtleCrypto: 'readonly',
+        TextDecoder: 'readonly',
+        TextDecoderStream: 'readonly',
+        TextEncoder: 'readonly',
+        TextEncoderStream: 'readonly',
+        TransformStream: 'readonly',
+        TransformStreamDefaultController: 'readonly',
+        URL: 'readonly',
+        URLPattern: 'readonly',
+        URLSearchParams: 'readonly',
+        WebAssembly: 'readonly',
+        WebSocket: 'readonly',
+        WritableStream: 'readonly',
+        WritableStreamDefaultController: 'readonly',
+        WritableStreamDefaultWriter: 'readonly',
+
+        // CommonJS-specific (appear global but are module-scoped)
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        exports: 'writable',
+        module: 'writable',
+        require: 'readonly',
+
+        // TypeScript types/namespaces
+        NodeJS: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tseslint,
+      import: importPlugin,
     },
     rules: {
       ...tseslint.configs.recommended.rules,
+      '@typescript-eslint/no-empty-object-type': 0,
+      'no-redeclare': 'off',
+      '@typescript-eslint/no-redeclare': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
+      'import/extensions': [
+        'error',
+        'always',
+        {
+          ignorePackages: true,
+        },
+      ],
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { 
+        {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
         },
@@ -43,8 +145,7 @@ export default [
     // More lenient rules for test files
     files: ['tests/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off'
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 ];
-

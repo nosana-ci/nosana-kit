@@ -2,10 +2,12 @@ import { Address, TransactionSigner } from '@solana/kit';
 import type { Wallet } from '../types.js';
 import type { LogLevel } from '../logger/Logger.js';
 
-export enum NosanaNetwork {
-  MAINNET = 'mainnet',
-  DEVNET = 'devnet',
-}
+export const NosanaNetwork = {
+  MAINNET: 'mainnet',
+  DEVNET: 'devnet',
+} as const;
+
+export type NosanaNetwork = (typeof NosanaNetwork)[keyof typeof NosanaNetwork];
 
 export type SolanaClusterMoniker =
   | 'devnet'

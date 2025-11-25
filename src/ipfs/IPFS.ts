@@ -11,6 +11,7 @@ let fs: any;
 
 // Dynamically import Node.js-specific modules
 const loadNodeModules = async () => {
+  // eslint-disable-next-line
   if (typeof window === 'undefined') {
     try {
       const formDataModule = await import('form-data');
@@ -21,6 +22,7 @@ const loadNodeModules = async () => {
     }
   } else {
     // Use browser FormData
+    // eslint-disable-next-line
     FormData = window.FormData;
   }
 };
