@@ -8,10 +8,17 @@ import path from 'path';
  * @returns The transformed content
  */
 function convertEnumsToAsConst(content: string): string {
-  // Match: export enum EnumName { ... }
+  // First, collect all enum names that we're converting
   const enumPattern = /export enum (\w+)\s*\{([^}]+)\}/g;
+  const convertedEnums: Set<string> = new Set();
 
-  return content.replace(enumPattern, (match, enumName, enumBody) => {
+  let match;
+  while ((match = enumPattern.exec(content)) !== null) {
+    convertedEnums.add(match[1]);
+  }
+
+  // Replace enum declarations with as const objects
+  let result = content.replace(/export enum (\w+)\s*\{([^}]+)\}/g, (match, enumName, enumBody) => {
     // Parse enum members
     const members = enumBody
       .split(',')
@@ -31,6 +38,14 @@ function convertEnumsToAsConst(content: string): string {
 
     return `export const ${enumName} = {\n${constObject},\n} as const;\nexport type ${enumName} = (typeof ${enumName})[keyof typeof ${enumName}];`;
   });
+
+  // Add typeof only for enums we converted, in type annotation positions (after : in types)
+  convertedEnums.forEach((enumName) => {
+    const typePattern = new RegExp(`(:\\s*)${enumName}\\.(\\w+);`, 'g');
+    result = result.replace(typePattern, `$1typeof ${enumName}.$2;`);
+  });
+
+  return result;
 }
 
 /**
