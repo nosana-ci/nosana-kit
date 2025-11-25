@@ -33,9 +33,7 @@ async function main() {
 
   const anchorJobsIdl = JSON.parse(readFileSync(idlJobsPath, 'utf-8'));
   const anchorStakingIdl = JSON.parse(readFileSync(idlStakingPath, 'utf-8'));
-  const merkleDistributorIdl = JSON.parse(
-    readFileSync(idlMerkleDistributorPath, 'utf-8')
-  );
+  const merkleDistributorIdl = JSON.parse(readFileSync(idlMerkleDistributorPath, 'utf-8'));
 
   // Generate clients
   const codamaJobs = createFromRoot(rootNodeFromAnchor(anchorJobsIdl as AnchorIdl));
@@ -48,17 +46,9 @@ async function main() {
   await new Promise((resolve) => setTimeout(resolve, 100));
   processEnumsInDirectory(jobsPath);
 
-  const codamaStaking = createFromRoot(
-    rootNodeFromAnchor(anchorStakingIdl as AnchorIdl)
-  );
+  const codamaStaking = createFromRoot(rootNodeFromAnchor(anchorStakingIdl as AnchorIdl));
 
-  const stakingPath = path.join(
-    __dirname,
-    '..',
-    'src',
-    'generated_clients',
-    'staking'
-  );
+  const stakingPath = path.join(__dirname, '..', 'src', 'generated_clients', 'staking');
   ensureDir(stakingPath);
   codamaStaking.accept(renderJavaScriptVisitor(stakingPath));
   console.log('Processing enums in staking...');
