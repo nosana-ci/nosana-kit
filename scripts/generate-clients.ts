@@ -3,7 +3,7 @@ import { rootNodeFromAnchor, AnchorIdl } from '@codama/nodes-from-anchor';
 import { renderVisitor as renderJavaScriptVisitor } from '@codama/renderers-js';
 import anchorJobsIdl from '../idl/nosana_jobs.json' with { type: "json" };
 import anchorStakingIdl from '../idl/nosana_stake.json' with { type: "json" };
-import merkleDistributorIdl from '../src/idl/merkle_distributor.json' with { type: "json" };
+import merkleDistributorIdl from '../idl/merkle_distributor.json' with { type: "json" };
 import path from 'path';
 import { fileURLToPath } from 'url';
 
