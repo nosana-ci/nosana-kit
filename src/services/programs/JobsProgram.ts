@@ -6,13 +6,14 @@ import {
   Account,
   Base58EncodedBytes,
   GetProgramAccountsMemcmpFilter,
+  ReadonlyUint8Array,
 } from '@solana/kit';
 import { ErrorCodes, NosanaError } from '../../errors/NosanaError.js';
 import type { ProgramDeps } from '../../types.js';
 import * as programClient from '../../generated_clients/jobs/index.js';
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import bs58 from 'bs58';
-import { IPFS } from '../../ipfs/IPFS.js';
+import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../../utils/index.js';
 import { getStaticAccounts, type StaticAccounts } from '../../utils/getStaticAccounts.js';
 
@@ -140,6 +141,18 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
   /**
    * Transform job account to include address and convert types
    */
+  /**
+   * Convert Solana bytes array to IPFS hash, returning null for empty/invalid hashes
+   */
+  function solBytesToIpfsHashOrNull(hashArray: ReadonlyUint8Array): string | null {
+    const result = solBytesArrayToIpfsHash(Array.from(hashArray));
+    // Return null for the empty hash value
+    if (result === 'QmNLei78zWmzUdbeRB3CiUfAizWUrbeeZh5K1rhAQKCh51') {
+      return null;
+    }
+    return result;
+  }
+
   function transformJobAccount(jobAccount: Account<programClient.JobAccount>): Job {
     const { discriminator: _, ...jobAccountData } = jobAccount.data;
 
@@ -147,8 +160,8 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     return {
       address: jobAccount.address,
       ...converted,
-      ipfsJob: IPFS.solHashToIpfsHash(jobAccountData.ipfsJob),
-      ipfsResult: IPFS.solHashToIpfsHash(jobAccountData.ipfsResult),
+      ipfsJob: solBytesToIpfsHashOrNull(jobAccountData.ipfsJob),
+      ipfsResult: solBytesToIpfsHashOrNull(jobAccountData.ipfsResult),
       state: converted.state as JobState,
     };
   }

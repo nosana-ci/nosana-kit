@@ -1,6 +1,7 @@
 import { Address, TransactionSigner } from '@solana/kit';
 import type { Wallet } from '../types.js';
 import type { LogLevel } from '../logger/Logger.js';
+import type { IPFSConfig } from '@nosana/ipfs/dist/types.js';
 
 export const NosanaNetwork = {
   MAINNET: 'mainnet',
@@ -25,12 +26,6 @@ export interface SolanaConfig {
   feePayer?: TransactionSigner; // Optional fee payer for transactions
 }
 
-export interface IpfsConfig {
-  api: string;
-  jwt: string;
-  gateway: string;
-}
-
 export interface ProgramConfig {
   nosTokenAddress: Address;
   jobsAddress: Address;
@@ -44,13 +39,13 @@ export interface ClientConfig {
   solana: SolanaConfig;
   wallet?: Wallet;
   logLevel: LogLevel;
-  ipfs: IpfsConfig;
+  ipfs: IPFSConfig;
   programs: ProgramConfig;
 }
 
 export interface PartialClientConfig {
   solana?: Partial<SolanaConfig>;
   wallet?: Wallet;
-  ipfs?: Partial<IpfsConfig>;
+  ipfs?: Partial<IPFSConfig>;
   logLevel?: LogLevel;
 }

@@ -19,6 +19,7 @@ export const ErrorCodes = {
   NO_WALLET: 'NO_WALLET',
   FILE_ERROR: 'FILE_ERROR',
   WALLET_CONVERSION_ERROR: 'WALLET_CONVERSION_ERROR',
+  AUTH_ERROR: 'AUTH_ERROR',
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];

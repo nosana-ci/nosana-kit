@@ -34,8 +34,8 @@ export type {
 } from './services/programs/MerkleDistributorProgram.js';
 export { ClaimStatusNotFoundError } from './services/programs/MerkleDistributorProgram.js';
 
-// Export IPFS utilities
-export * from './ipfs/IPFS.js';
+// Export IPFS utilities from @nosana/ipfs
+export { solBytesArrayToIpfsHash, ipfsHashToSolBytesArray } from '@nosana/ipfs';
 
 // Export token service
 export { createTokenService, type TokenService } from './services/TokenService.js';

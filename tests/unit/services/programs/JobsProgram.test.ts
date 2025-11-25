@@ -7,6 +7,7 @@ import {
 } from '../../../../src/services/programs/JobsProgram.js';
 import * as programClient from '../../../../src/generated_clients/jobs/index.js';
 import { type Address } from '@solana/kit';
+import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 import {
   AddressFactory,
   MockClientFactory,
@@ -272,9 +273,7 @@ describe('JobsProgram', () => {
         const marketAddr = newAddr(74);
         const timeout = 1000;
         const ipfsBytes = Array.from({ length: IPFS_BYTES_LENGTH }, (_, i) => i);
-        const ipfsCid = (await import('../../../../src/ipfs/IPFS.js')).IPFS.solHashToIpfsHash(
-          ipfsBytes
-        )!;
+        const ipfsCid = solBytesArrayToIpfsHash(ipfsBytes);
 
         // Arrange wallet and mocks
         const wallet = {

@@ -13,9 +13,12 @@ import {
 } from './services/programs/MerkleDistributorProgram.js';
 import { createSolanaService, type SolanaService } from './services/SolanaService.js';
 import { createTokenService, type TokenService } from './services/TokenService.js';
-import { IPFS } from './ipfs/IPFS.js';
+import { createIpfsClient } from '@nosana/ipfs';
+import { type MessageSigner } from '@solana/kit';
 import { Wallet } from './types.js';
 import type { ProgramDeps } from './types.js';
+import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/authorization';
+import { walletToAuthorizationSigner } from './utils/walletToAuthorizationSigner.js';
 
 /**
  * The Nosana client interface. Contains all the services and programs
@@ -28,7 +31,8 @@ export interface NosanaClient {
   readonly merkleDistributor: MerkleDistributorProgram;
   readonly solana: SolanaService;
   readonly nos: TokenService;
-  readonly ipfs: IPFS;
+  readonly ipfs: ReturnType<typeof createIpfsClient>;
+  readonly authorization: NosanaAuthorization | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>;
   readonly logger: Logger;
   /**
    * The wallet. Must be a Wallet (supports both message and transaction signing).
@@ -75,7 +79,7 @@ export function createNosanaClient(
   const getWallet = () => wallet;
 
   // Initialize IPFS
-  const ipfs = new IPFS(config.ipfs);
+  const ipfs = createIpfsClient(config.ipfs);
 
   // Initialize SolanaService first (other services depend on it)
   const solana = createSolanaService(
@@ -118,6 +122,11 @@ export function createNosanaClient(
     },
     set wallet(value: Wallet | undefined) {
       wallet = value;
+    },
+    get authorization() {
+      return wallet
+        ? createNosanaAuthorization(walletToAuthorizationSigner(wallet as MessageSigner))
+        : createNosanaAuthorization();
     },
     ipfs,
     solana,
