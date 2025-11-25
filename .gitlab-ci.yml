@@ -9,6 +9,23 @@ include:
   - project: nosana-ci/tools/cicd/gitlab-ci
     file: templates/semver.yml
 
+check-generated-clients:
+  stage: test
+  script:
+    - npm ci
+    - npm run generate-clients
+    - |
+      if [ -n "$(git status --porcelain)" ]; then
+        echo "❌ Generated clients are out of date. Please run 'npm run generate-clients' and commit the changes."
+        git status
+        git diff
+        exit 1
+      fi
+      echo "✅ Generated clients are up to date."
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 npm format:
   stage: test
   script:
