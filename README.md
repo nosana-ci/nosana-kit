@@ -101,7 +101,8 @@ Main entry point for SDK interactions. Created using the `createNosanaClient()` 
 - `merkleDistributor: MerkleDistributorProgram` - Merkle distributor program interface
 - `solana: SolanaService` - General Solana utilities (RPC, transactions, PDAs)
 - `nos: TokenService` - Token operations service (configured for NOS token)
-- `ipfs: IPFS` - IPFS operations and utilities
+- `ipfs: ReturnType<typeof createIpfsClient>` - IPFS operations for pinning and retrieving data
+- `authorization: NosanaAuthorization | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>` - Authorization service for message signing and validation
 - `logger: Logger` - Logging instance
 - `wallet?: Wallet` - Active wallet (if set). Set this property directly to configure the wallet.
 
@@ -451,52 +452,147 @@ const pda = await client.solana.pda(
 );
 ```
 
-## IPFS Utilities
+## IPFS Service
 
-### Static Methods
+The IPFS service provides methods to pin data to IPFS and retrieve data from IPFS. It's configured via the `ipfs` property in the client configuration.
+
+### Configuration
 
 ```typescript
-// Convert Solana hash to IPFS CID
-IPFS.solHashToIpfsHash(hash: Uint8Array | number[]): string | null
-
-// Convert IPFS hash to byte array
-IPFS.IpfsHashToByteArray(ipfsHash: string): Uint8Array
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  ipfs: {
+    api: 'https://api.pinata.cloud',
+    jwt: 'your-pinata-jwt-token',
+    gateway: 'https://gateway.pinata.cloud/ipfs/'
+  }
+});
 ```
 
-### Instance Methods
+### Methods
 
 ```typescript
-// Pin JSON data to Pinata
+// Pin JSON data to IPFS
 pin(data: object): Promise<string>
 
-// Pin file to Pinata
+// Pin a file to IPFS
 pinFile(filePath: string): Promise<string>
 
-// Pin buffer/stream to Pinata
-pinFileFromBuffer(source: Buffer | Readable, filename: string): Promise<string>
-
 // Retrieve data from IPFS
-retrieve(hash: string | Uint8Array, options?: AxiosRequestConfig): Promise<any>
+retrieve(hash: string | Uint8Array): Promise<any>
 ```
 
 ### Examples
 
 ```typescript
-// Convert between Solana and IPFS hash formats
-const ipfsCid = IPFS.solHashToIpfsHash(solanaHashBytes);
-const solanaHash = IPFS.IpfsHashToByteArray(ipfsCid);
-
-// Pin job definition
+// Pin job definition to IPFS
 const cid = await client.ipfs.pin({
   version: 1,
   type: 'docker',
   image: 'ubuntu:latest',
   command: ['echo', 'hello']
 });
+console.log('Pinned to IPFS:', cid);
 
-// Retrieve job results
+// Pin a file to IPFS
+const fileCid = await client.ipfs.pinFile('/path/to/file.txt');
+
+// Retrieve job results from IPFS
 const results = await client.ipfs.retrieve(job.ipfsResult);
+console.log('Job results:', results);
 ```
+
+### Utility Functions
+
+The SDK also exports utility functions for converting between Solana hash formats and IPFS CIDs:
+
+```typescript
+import { solBytesArrayToIpfsHash, ipfsHashToSolBytesArray } from '@nosana/kit';
+
+// Convert Solana hash bytes to IPFS CID
+const ipfsCid = solBytesArrayToIpfsHash(solanaHashBytes);
+
+// Convert IPFS CID to Solana hash bytes
+const solanaHash = ipfsHashToSolBytesArray(ipfsCid);
+```
+
+## Authorization Service
+
+The authorization service provides cryptographic message signing and validation using Ed25519 signatures. It's automatically available on the client and adapts based on whether a wallet is configured.
+
+### Behavior
+
+- **With Wallet**: When a wallet is set, the authorization service provides all methods including `generate`, `validate`, `generateHeaders`, and `validateHeaders`.
+- **Without Wallet**: When no wallet is set, the authorization service only provides `validate` and `validateHeaders` methods (read-only validation).
+
+### Methods
+
+```typescript
+// Generate a signed message (requires wallet)
+generate(message: string | Uint8Array, options?: GenerateOptions): Promise<string>
+
+// Validate a signed message
+validate(
+  message: string | Uint8Array,
+  signature: string | Uint8Array,
+  publicKey?: string | Uint8Array
+): Promise<boolean>
+
+// Generate signed HTTP headers (requires wallet)
+generateHeaders(
+  method: string,
+  path: string,
+  body?: string | Uint8Array,
+  options?: GenerateHeaderOptions
+): Promise<Headers>
+
+// Validate HTTP headers
+validateHeaders(headers: Headers | Record<string, string>): Promise<boolean>
+```
+
+### Examples
+
+```typescript
+// Set wallet first to enable signing
+client.wallet = myWallet;
+
+// Generate a signed message
+const signedMessage = await client.authorization.generate('Hello, Nosana!');
+console.log('Signed message:', signedMessage);
+
+// Validate a signed message
+const isValid = await client.authorization.validate(
+  'Hello, Nosana!',
+  signedMessage
+);
+console.log('Message is valid:', isValid);
+
+// Generate signed HTTP headers for API requests
+const headers = await client.authorization.generateHeaders(
+  'POST',
+  '/api/jobs',
+  JSON.stringify({ data: 'example' })
+);
+
+// Use headers in HTTP request
+fetch('https://api.nosana.com/api/jobs', {
+  method: 'POST',
+  headers: headers,
+  body: JSON.stringify({ data: 'example' })
+});
+
+// Validate incoming HTTP headers
+const isValidRequest = await client.authorization.validateHeaders(requestHeaders);
+if (!isValidRequest) {
+  throw new Error('Invalid authorization');
+}
+```
+
+### Use Cases
+
+- **API Authentication**: Sign requests to Nosana APIs using message signatures
+- **Message Verification**: Verify signed messages from other parties
+- **Secure Communication**: Establish authenticated communication channels
+- **Request Authorization**: Validate incoming API requests
 
 ## Merkle Distributor Program
 

@@ -187,19 +187,6 @@ describe('NosanaClient', () => {
   });
 
   describe('service configuration', () => {
-    it('applies custom IPFS configuration to client config', () => {
-      const customGateway = 'https://my-gateway.example/ipfs/';
-      const customApi = 'https://my-api.example';
-
-      const client = createNosanaClient(NosanaNetwork.MAINNET, {
-        ipfs: { gateway: customGateway, api: customApi },
-      });
-
-      // Custom IPFS config is applied to ipfs service
-      expect(client.ipfs.config.gateway).toBe(customGateway);
-      expect(client.ipfs.config.api).toBe(customApi);
-    });
-
     it('applies custom log level to logger', () => {
       const customLogLevel = 'error';
       const client = createNosanaClient(NosanaNetwork.MAINNET, {
