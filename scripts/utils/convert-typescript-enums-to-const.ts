@@ -1,4 +1,3 @@
-
 import fs from 'fs';
 import path from 'path';
 
@@ -32,9 +31,7 @@ function convertEnumsToAsConst(content: string): string {
       });
 
     // Build the as const object
-    const constObject = members
-      .map((name: string) => `  ${name}: "${name}"`)
-      .join(',\n');
+    const constObject = members.map((name: string) => `  ${name}: "${name}"`).join(',\n');
 
     return `export const ${enumName} = {\n${constObject},\n} as const;\nexport type ${enumName} = (typeof ${enumName})[keyof typeof ${enumName}];`;
   });

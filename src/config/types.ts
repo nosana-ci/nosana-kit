@@ -7,8 +7,7 @@ export const NosanaNetwork = {
   DEVNET: 'devnet',
 } as const;
 
-export type NosanaNetwork = typeof NosanaNetwork[keyof typeof NosanaNetwork];
-
+export type NosanaNetwork = (typeof NosanaNetwork)[keyof typeof NosanaNetwork];
 
 export type SolanaClusterMoniker =
   | 'devnet'
