@@ -33,3 +33,5 @@ Thumbs.db
 examples/node/accounts.json
 v2
 testsv2
+
+src/generated_clients/**
