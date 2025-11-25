@@ -1,5 +1,5 @@
 import { address } from '@solana/kit';
-import { ClientConfig, NosanaNetwork } from './types';
+import { ClientConfig, NosanaNetwork } from './types.js';
 import type { LogLevel } from '../logger/Logger.js';
 
 export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {

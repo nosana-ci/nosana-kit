@@ -1,12 +1,14 @@
+/* eslint-disable no-console */
 import fs from 'fs';
 import path from 'path';
 
 /**
- * Converts TypeScript enums to `as const` objects
+ * Converts TypeScript enums to `as const` objects and adds .js extensions to imports
  * @param content - The file content to transform
+ * @param filePath - The path to the file being transformed
  * @returns The transformed content
  */
-function convertEnumsToAsConst(content: string): string {
+function convertEnumsToAsConst(content: string, filePath: string): string {
   // First, collect all enum names that we're converting
   const enumPattern = /export enum (\w+)\s*\{([^}]+)\}/g;
   const convertedEnums: Set<string> = new Set();
@@ -42,6 +44,29 @@ function convertEnumsToAsConst(content: string): string {
     result = result.replace(typePattern, `$1typeof ${enumName}.$2;`);
   });
 
+  // Add .js extensions to relative imports/exports
+  // Matches: from './path' or from "../path" (but not from 'package-name')
+  result = result.replace(
+    /(from\s+['"])(\.\.[/\w-]*|\.\/[\w/-]*?)(['"])/g,
+    (match, prefix, importPath, suffix) => {
+      // Don't add .js if already has an extension
+      if (importPath.match(/\.\w+$/)) {
+        return match;
+      }
+
+      // Check if the import path points to a directory by looking at the file system
+      const resolvedPath = path.resolve(path.dirname(filePath), importPath);
+
+      // If it's a directory or the path doesn't explicitly point to a file, add /index.js
+      if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isDirectory()) {
+        return `${prefix}${importPath}/index.js${suffix}`;
+      }
+
+      // Otherwise just add .js
+      return `${prefix}${importPath}.js${suffix}`;
+    }
+  );
+
   return result;
 }
 
@@ -65,11 +90,11 @@ export function processEnumsInDirectory(directory: string): void {
         walkDirectory(fullPath);
       } else if (entry.isFile() && entry.name.endsWith('.ts')) {
         const content = fs.readFileSync(fullPath, 'utf-8');
-        const transformed = convertEnumsToAsConst(content);
+        const transformed = convertEnumsToAsConst(content, fullPath);
 
         if (content !== transformed) {
           fs.writeFileSync(fullPath, transformed, 'utf-8');
-          console.log(`Converted enums in: ${path.relative(directory, fullPath)}`);
+          console.log(`Processed: ${path.relative(directory, fullPath)}`);
         }
       }
     }
