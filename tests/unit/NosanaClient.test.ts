@@ -1,10 +1,29 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NosanaNetwork } from '@nosana/types';
 
 import { SignerFactory } from '../setup/index.js';
 import { createNosanaClient } from '../../src/index.js';
 import { DEFAULT_CONFIGS } from '../../src/config/defaultConfigs.js';
 import { ErrorCodes, NosanaError } from '../../src/errors/NosanaError.js';
+import { NosanaAuthorization } from '@nosana/authorization';
+
+// Mock the @nosana/api module to verify createNosanaApi calls
+const mockCreateNosanaApi = vi.fn();
+vi.mock('@nosana/api', async () => {
+  const actual = await vi.importActual('@nosana/api');
+  return {
+    ...actual,
+    createNosanaApi: (...args: any[]) => {
+      mockCreateNosanaApi(...args);
+      // Return a mock API object
+      return {
+        jobs: {},
+        credits: {},
+        markets: {},
+      };
+    },
+  };
+});
 
 describe('NosanaClient', () => {
   describe('component initialization', () => {
@@ -199,6 +218,131 @@ describe('NosanaClient', () => {
       expect(client.config.logLevel).toBe(customLogLevel);
       // Logger level is set to the corresponding string level
       expect(client.logger.level).toBe(customLogLevel);
+    });
+  });
+
+  describe('API configuration', () => {
+    beforeEach(() => {
+      mockCreateNosanaApi.mockClear();
+    });
+
+    afterEach(() => {
+      mockCreateNosanaApi.mockClear();
+    });
+
+    it('creates API with API key when provided in config', () => {
+      const apiKey = 'test-api-key-123';
+      const client = createNosanaClient(NosanaNetwork.MAINNET, {
+        api: { apiKey },
+      });
+
+      // Verify createNosanaApi was called with API key
+      expect(mockCreateNosanaApi).toHaveBeenCalledTimes(1);
+      expect(mockCreateNosanaApi).toHaveBeenCalledWith(NosanaNetwork.MAINNET, apiKey);
+
+      // API should be created and accessible
+      expect(client.api).toBeDefined();
+    });
+
+    it('creates API with wallet-based auth when wallet is provided and no API key', async () => {
+      const wallet = await SignerFactory.createTestSigner();
+      const expectedAddress = SignerFactory.getExpectedAddress();
+
+      const client = createNosanaClient(NosanaNetwork.MAINNET, { wallet });
+
+      // Verify createNosanaApi was called with signer auth (wallet-based)
+      expect(mockCreateNosanaApi).toHaveBeenCalledTimes(1);
+      expect(mockCreateNosanaApi).toHaveBeenCalledWith(
+        NosanaNetwork.MAINNET,
+        expect.objectContaining({
+          identifier: expectedAddress.toString(),
+          generate: (client.authorization as NosanaAuthorization).generate,
+        })
+      );
+
+      // API should be created and accessible
+      expect(client.api).toBeDefined();
+    });
+
+    it('creates API with wallet-based auth when wallet is set after client creation', async () => {
+      const wallet = await SignerFactory.createTestSigner();
+      const expectedAddress = SignerFactory.getExpectedAddress();
+
+      const client = createNosanaClient(NosanaNetwork.MAINNET);
+      expect(client.api).toBeUndefined();
+      expect(mockCreateNosanaApi).not.toHaveBeenCalled();
+
+      client.wallet = wallet;
+
+      // Verify createNosanaApi was called with signer auth (wallet-based)
+      expect(mockCreateNosanaApi).toHaveBeenCalledTimes(1);
+      expect(mockCreateNosanaApi).toHaveBeenCalledWith(
+        NosanaNetwork.MAINNET,
+        expect.objectContaining({
+          identifier: expectedAddress.toString(),
+          generate: (client.authorization as NosanaAuthorization).generate,
+        })
+      );
+
+      // API should now be created and accessible
+      expect(client.api).toBeDefined();
+    });
+
+    it('prioritizes API key over wallet when both are provided', async () => {
+      const apiKey = 'test-api-key-456';
+      const wallet = await SignerFactory.createTestSigner();
+
+      const client = createNosanaClient(NosanaNetwork.MAINNET, {
+        api: { apiKey },
+        wallet,
+      });
+
+      // Verify createNosanaApi was called with API key, not wallet
+      expect(mockCreateNosanaApi).toHaveBeenCalledTimes(1);
+      expect(mockCreateNosanaApi).toHaveBeenCalledWith(NosanaNetwork.MAINNET, apiKey);
+
+      // API should be created (using API key, not wallet)
+      expect(client.api).toBeDefined();
+    });
+
+    it('does not create API when neither API key nor wallet is provided', () => {
+      const client = createNosanaClient(NosanaNetwork.MAINNET);
+
+      // Verify createNosanaApi was not called
+      expect(mockCreateNosanaApi).not.toHaveBeenCalled();
+
+      // API should not be created
+      expect(client.api).toBeUndefined();
+    });
+
+    it('removes API when wallet is unset after being set', async () => {
+      const wallet = await SignerFactory.createTestSigner();
+      const expectedAddress = SignerFactory.getExpectedAddress();
+
+      const client = createNosanaClient(NosanaNetwork.MAINNET);
+      client.wallet = wallet;
+
+      // Verify createNosanaApi was called when wallet was set
+      expect(mockCreateNosanaApi).toHaveBeenCalledTimes(1);
+      expect(mockCreateNosanaApi).toHaveBeenCalledWith(
+        NosanaNetwork.MAINNET,
+        expect.objectContaining({
+          identifier: expectedAddress.toString(),
+          generate: expect.any(Function),
+        })
+      );
+
+      // API should exist
+      expect(client.api).toBeDefined();
+
+      // Unset wallet
+      client.wallet = undefined;
+
+      // Verify createNosanaApi was not called again (API is removed, not recreated)
+      expect(mockCreateNosanaApi).toHaveBeenCalledTimes(1);
+
+      // API should be removed
+      expect(client.api).toBeUndefined();
     });
   });
 });

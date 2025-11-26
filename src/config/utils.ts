@@ -22,6 +22,12 @@ const mergeConfigs = (
       ...defaultConfig.ipfs,
       ...customConfig.ipfs,
     },
+    api: customConfig.api
+      ? {
+          ...defaultConfig.api,
+          ...customConfig.api,
+        }
+      : defaultConfig.api,
   };
 };
 

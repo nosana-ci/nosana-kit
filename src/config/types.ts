@@ -40,12 +40,17 @@ export interface ProgramConfig {
   merkleDistributorAddress: Address;
 }
 
+export interface APIConfig {
+  apiKey?: string;
+}
+
 export interface ClientConfig {
   solana: SolanaConfig;
   wallet?: Wallet;
   logLevel: LogLevel;
   ipfs: IPFSConfig;
   programs: ProgramConfig;
+  api?: APIConfig;
 }
 
 export interface PartialClientConfig {
@@ -53,4 +58,5 @@ export interface PartialClientConfig {
   wallet?: Wallet;
   ipfs?: Partial<IPFSConfig>;
   logLevel?: LogLevel;
+  api?: Partial<APIConfig>;
 }

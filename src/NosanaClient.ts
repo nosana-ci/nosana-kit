@@ -31,8 +31,8 @@ export interface NosanaClient {
   readonly api: NosanaApi | undefined;
   readonly ipfs: ReturnType<typeof createIpfsClient>;
   readonly authorization:
-  | NosanaAuthorization
-  | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>;
+    | NosanaAuthorization
+    | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>;
   readonly logger: Logger;
   /**
    * The wallet. Must be a Wallet (supports both message and transaction signing).
@@ -119,20 +119,19 @@ export function createNosanaClient(
       ? createNosanaAuthorization(walletToAuthorizationSigner(wallet))
       : createNosanaAuthorization();
 
-    if (!wallet || !wallet.address) {
-      return {
-        authorization,
-        api: undefined,
-      };
-    }
+    // Use API key if provided, otherwise fall back to wallet-based auth
+    const api = config.api?.apiKey
+      ? createNosanaApi(network, config.api.apiKey)
+      : wallet
+        ? createNosanaApi(network, {
+            identifier: wallet.address.toString(),
+            generate: (authorization as NosanaAuthorization).generate,
+          })
+        : undefined;
 
-    const walletAddress = wallet.address;
     return {
       authorization,
-      api: createNosanaApi(network, {
-        identifier: walletAddress.toString(),
-        generate: (authorization as NosanaAuthorization).generate,
-      }),
+      api,
     };
   };
 
@@ -148,7 +147,12 @@ export function createNosanaClient(
     stake,
     merkleDistributor,
     ipfs,
-    ...reactiveNosanaModules,
+    get authorization() {
+      return reactiveNosanaModules.authorization;
+    },
+    get api() {
+      return reactiveNosanaModules.api;
+    },
     get wallet() {
       return wallet;
     },
