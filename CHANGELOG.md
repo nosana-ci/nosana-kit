@@ -130,8 +130,9 @@ const client = new NosanaClient({
 const client = createNosanaClient();
 
 // Browser wallets (wallet-standard compatible)
-// Using the wallet standard.
-client.wallet = useWalletAccountTransactionSendingSigner(account, currentChain);
+// Using the wallet standard account and the @nosana/solana-vue package to
+// convert to a Wallet type with useWalletAccountSigner
+client.wallet = useWalletAccountSigner(account, currentChain);
 
 // Keypair wallets
 import { generateKeyPairSigner } from '@solana/kit';

@@ -2,6 +2,8 @@
 
 TypeScript SDK for interacting with the Nosana Network on Solana. Provides comprehensive tools for managing jobs, markets, runs, and protocol operations on the Nosana decentralized compute network.
 
+> **v2.0.0** - Major release featuring functional architecture, universal wallet support, and enhanced transaction handling. See [CHANGELOG.md](./CHANGELOG.md) for migration guide.
+
 ## Installation
 
 ```bash
@@ -42,7 +44,7 @@ const completedJobs = await client.jobs.all({
 
 ## Architecture
 
-The SDK is organized into clear, purpose-driven modules using a factory function pattern:
+The SDK uses a functional architecture with factory functions for improved modularity and testability:
 
 - **`services/`** - Utility services and program interfaces
   - **`SolanaService`** - Low-level Solana RPC operations, transactions, and PDA derivations
@@ -56,7 +58,7 @@ The SDK is organized into clear, purpose-driven modules using a factory function
 - **`utils/`** - Helper utilities and type conversions
 - **`generated_clients/`** - Auto-generated Solana program clients (exported as namespaces)
 
-The SDK uses factory functions (`createNosanaClient`, `createJobsProgram`, etc.) to build instances with dependency injection, making the architecture modular and testable.
+All components use factory functions with explicit dependency injection, making the codebase modular, testable, and maintainable.
 
 ## Configuration
 
@@ -117,25 +119,69 @@ Main entry point for SDK interactions. Created using the `createNosanaClient()` 
 
 ### Wallet Configuration
 
-The SDK uses a `Wallet` type that must support both message and transaction signing (`MessageSigner & TransactionSigner`). Set the wallet by directly assigning to the `wallet` property:
+The SDK supports universal wallet configuration through a unified `Wallet` type that must support both message and transaction signing (`MessageSigner & TransactionSigner`). This enables compatibility with both browser wallets (wallet-standard) and keypair-based wallets.
+
+#### Wallet Requirements
+
+The wallet must implement both `MessageSigner` and `TransactionSigner` interfaces from `@solana/kit`. This allows the SDK to use the wallet for:
+- **Message signing** - For API authentication and authorization
+- **Transaction signing** - For on-chain operations
+
+#### Browser Wallets (Wallet-Standard)
+
+Full support for wallet-standard compatible browser wallets (Phantom, Solflare, etc.):
 
 ```typescript
 import { createNosanaClient } from '@nosana/kit';
-import type { Wallet } from '@nosana/kit';
+import { useWalletAccountSigner } from '@nosana/solana-vue';
 
 // Create client
 const client = createNosanaClient();
 
-// Set wallet directly (must be a Wallet type that supports both message and transaction signing)
-client.wallet = myWallet;
-
-// The wallet can be set during initialization
-const clientWithWallet = createNosanaClient(NosanaNetwork.MAINNET, {
-  wallet: myWallet,
-});
+// Set browser wallet (wallet-standard compatible)
+client.wallet = useWalletAccountSigner(account, currentChain);
 ```
 
-The wallet must implement both `MessageSigner` and `TransactionSigner` interfaces from `@solana/kit`. This allows the SDK to use the wallet for both message signing (for authentication) and transaction signing (for on-chain operations).
+#### Keypair Wallets
+
+Seamless support for keypair-based wallets:
+
+```typescript
+import { createNosanaClient } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+
+// Create client
+const client = createNosanaClient();
+
+// Set keypair wallet
+const keypair = generateKeyPairSigner();
+client.wallet = keypair;
+```
+
+#### Configuration Options
+
+Wallets can be set at client initialization or dynamically assigned:
+
+```typescript
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+import type { Wallet } from '@nosana/kit';
+
+// Option 1: Set wallet during initialization
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  wallet: myWallet,
+});
+
+// Option 2: Set wallet dynamically
+const client = createNosanaClient();
+client.wallet = myWallet;
+
+// Option 3: Change wallet at runtime
+client.wallet = anotherWallet;
+```
+
+#### Type Safety
+
+The SDK leverages `@solana/kit` types for compile-time safety, ensuring wallet compatibility before runtime.
 
 ## Jobs Program API
 
@@ -1152,11 +1198,11 @@ import type { Address } from '@solana/kit';
 
 Core dependencies:
 
-- `@solana/kit` ^5.0.0 - Solana web3 library
-- `@solana-program/token` ^0.8.0 - Token program utilities
-- `@solana-program/system` ^0.10.0 - System program utilities
-- `@solana-program/compute-budget` ^0.11.0 - Compute budget utilities
-- `bs58` ^6.0.0 - Base58 encoding
+- `@solana/kit` 5.0.0 - Solana web3 library
+- `@solana-program/token` 0.8.0 - Token program utilities
+- `@solana-program/system` 0.10.0 - System program utilities
+- `@solana-program/compute-budget` 0.11.0 - Compute budget utilities
+- `bs58` 6.0.0 - Base58 encoding
 
 ## License
 
