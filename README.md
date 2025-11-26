@@ -25,8 +25,8 @@ const client = createNosanaClient();
 const client = createNosanaClient(NosanaNetwork.DEVNET, {
   solana: {
     rpcEndpoint: 'https://your-custom-rpc.com',
-    commitment: 'confirmed'
-  }
+    commitment: 'confirmed',
+  },
 });
 
 // Fetch a job by address
@@ -34,9 +34,9 @@ const job = await client.jobs.get('job-address');
 console.log('Job state:', job.state);
 
 // Query jobs with filters
-const completedJobs = await client.jobs.all({ 
+const completedJobs = await client.jobs.all({
   market: 'market-address',
-  state: 2  // JobState.COMPLETED
+  state: 2, // JobState.COMPLETED
 });
 ```
 
@@ -76,15 +76,18 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
   solana: {
     cluster: 'mainnet-beta',
     rpcEndpoint: 'https://api.mainnet-beta.solana.com',
-    commitment: 'confirmed'
+    commitment: 'confirmed',
   },
   ipfs: {
     api: 'https://api.pinata.cloud',
     jwt: 'your-pinata-jwt-token',
-    gateway: 'https://gateway.pinata.cloud/ipfs/'
+    gateway: 'https://gateway.pinata.cloud/ipfs/',
+  },
+  api: {
+    apiKey: 'your-api-key', // Optional: API key for authentication
   },
   logLevel: LogLevel.DEBUG,
-  wallet: myWallet  // Optional: Set wallet during initialization (must be a Wallet type)
+  wallet: myWallet, // Optional: Set wallet during initialization (must be a Wallet type)
 });
 ```
 
@@ -95,18 +98,21 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 Main entry point for SDK interactions. Created using the `createNosanaClient()` factory function.
 
 **Properties:**
+
 - `config: ClientConfig` - Active configuration
 - `jobs: JobsProgram` - Jobs program interface
 - `stake: StakeProgram` - Staking program interface
 - `merkleDistributor: MerkleDistributorProgram` - Merkle distributor program interface
 - `solana: SolanaService` - General Solana utilities (RPC, transactions, PDAs)
 - `nos: TokenService` - Token operations service (configured for NOS token)
+- `api: NosanaApi | undefined` - Nosana API client for interacting with Nosana APIs (jobs, credits, markets)
 - `ipfs: ReturnType<typeof createIpfsClient>` - IPFS operations for pinning and retrieving data
 - `authorization: NosanaAuthorization | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>` - Authorization service for message signing and validation
 - `logger: Logger` - Logging instance
 - `wallet?: Wallet` - Active wallet (if set). Set this property directly to configure the wallet.
 
 **Factory Function:**
+
 - `createNosanaClient(network?: NosanaNetwork, customConfig?: PartialClientConfig): NosanaClient` - Creates a new client instance
 
 ### Wallet Configuration
@@ -125,7 +131,7 @@ client.wallet = myWallet;
 
 // The wallet can be set during initialization
 const clientWithWallet = createNosanaClient(NosanaNetwork.MAINNET, {
-  wallet: myWallet
+  wallet: myWallet,
 });
 ```
 
@@ -145,10 +151,10 @@ Fetch a job account. If `checkRun` is true (default), automatically checks for a
 
 ```typescript
 const job = await client.jobs.get('job-address');
-console.log(job.state);      // JobState enum
-console.log(job.price);      // Job price in smallest unit
-console.log(job.ipfsJob);    // IPFS CID of job definition
-console.log(job.timeStart);  // Start timestamp (if running)
+console.log(job.state); // JobState enum
+console.log(job.price); // Job price in smallest unit
+console.log(job.ipfsJob); // IPFS CID of job definition
+console.log(job.timeStart); // Start timestamp (if running)
 ```
 
 #### Get Single Run
@@ -161,9 +167,9 @@ Fetch a run account by address.
 
 ```typescript
 const run = await client.jobs.run('run-address');
-console.log(run.job);   // Associated job address
-console.log(run.node);  // Node executing the run
-console.log(run.time);  // Run start time
+console.log(run.job); // Associated job address
+console.log(run.node); // Node executing the run
+console.log(run.time); // Run start time
 ```
 
 #### Get Single Market
@@ -176,8 +182,8 @@ Fetch a market account by address.
 
 ```typescript
 const market = await client.jobs.market('market-address');
-console.log(market.queueType);  // MarketQueueType enum
-console.log(market.jobPrice);   // Market job price
+console.log(market.queueType); // MarketQueueType enum
+console.log(market.jobPrice); // Market job price
 ```
 
 #### Get Multiple Jobs
@@ -189,11 +195,7 @@ async multiple(addresses: Address[], checkRuns?: boolean): Promise<Job[]>
 Batch fetch multiple jobs by addresses.
 
 ```typescript
-const jobs = await client.jobs.multiple([
-  'job-address-1',
-  'job-address-2',
-  'job-address-3'
-], true);
+const jobs = await client.jobs.multiple(['job-address-1', 'job-address-2', 'job-address-3'], true);
 ```
 
 ### Querying with Filters
@@ -217,12 +219,12 @@ import { JobState } from '@nosana/kit';
 // Get all running jobs in a market
 const runningJobs = await client.jobs.all({
   state: JobState.RUNNING,
-  market: 'market-address'
+  market: 'market-address',
 });
 
 // Get all jobs for a project
 const projectJobs = await client.jobs.all({
-  project: 'project-address'
+  project: 'project-address',
 });
 ```
 
@@ -279,9 +281,9 @@ client.wallet = yourWallet;
 // Create job instruction
 const instruction = await client.jobs.post({
   market: 'market-address',
-  timeout: 3600,           // Timeout in seconds
-  ipfsHash: 'QmXxx...',    // IPFS CID of job definition
-  node: 'node-address'     // Optional: target specific node
+  timeout: 3600, // Timeout in seconds
+  ipfsHash: 'QmXxx...', // IPFS CID of job definition
+  node: 'node-address', // Optional: target specific node
 });
 
 // Submit the instruction
@@ -308,7 +310,7 @@ Subscribe to real-time account updates via WebSocket. Includes automatic reconne
 const stopMonitoring = await client.jobs.monitor({
   onJobAccount: async (job) => {
     console.log('Job update:', job.address, job.state);
-    
+
     // Process updates - save to database, trigger workflows, etc.
     if (job.state === JobState.COMPLETED) {
       await processCompletedJob(job);
@@ -319,7 +321,7 @@ const stopMonitoring = await client.jobs.monitor({
   },
   onError: (error) => {
     console.error('Monitor error:', error);
-  }
+  },
 });
 
 // Stop monitoring when done
@@ -335,24 +337,24 @@ The monitor handles WebSocket reconnection automatically and continues processin
 ```typescript
 type Job = {
   address: Address;
-  state: JobState;           // QUEUED | RUNNING | COMPLETED | STOPPED
-  ipfsJob: string | null;    // IPFS CID of job definition
+  state: JobState; // QUEUED | RUNNING | COMPLETED | STOPPED
+  ipfsJob: string | null; // IPFS CID of job definition
   ipfsResult: string | null; // IPFS CID of job result
   market: Address;
   node: Address;
   payer: Address;
   project: Address;
   price: number;
-  timeStart: number;         // Unix timestamp
-  timeEnd: number;           // Unix timestamp
-  timeout: number;           // Seconds
+  timeStart: number; // Unix timestamp
+  timeEnd: number; // Unix timestamp
+  timeout: number; // Seconds
 };
 
 enum JobState {
   QUEUED = 0,
   RUNNING = 1,
   COMPLETED = 2,
-  STOPPED = 3
+  STOPPED = 3,
 }
 ```
 
@@ -361,9 +363,9 @@ enum JobState {
 ```typescript
 type Run = {
   address: Address;
-  job: Address;      // Associated job
-  node: Address;     // Node executing the job
-  time: number;      // Unix timestamp
+  job: Address; // Associated job
+  node: Address; // Node executing the job
+  time: number; // Unix timestamp
 };
 ```
 
@@ -372,7 +374,7 @@ type Run = {
 ```typescript
 type Market = {
   address: Address;
-  queueType: MarketQueueType;  // JOB_QUEUE | NODE_QUEUE
+  queueType: MarketQueueType; // JOB_QUEUE | NODE_QUEUE
   jobPrice: number;
   nodeStakeMinimum: number;
   jobTimeout: number;
@@ -383,7 +385,7 @@ type Market = {
 
 enum MarketQueueType {
   JOB_QUEUE = 0,
-  NODE_QUEUE = 1
+  NODE_QUEUE = 1,
 }
 ```
 
@@ -446,10 +448,7 @@ const balance = await client.solana.getBalance('address');
 console.log(`Balance: ${balance} lamports`);
 
 // Derive PDA
-const pda = await client.solana.pda(
-  ['seed1', 'seed2'],
-  programAddress
-);
+const pda = await client.solana.pda(['seed1', 'seed2'], programAddress);
 ```
 
 ## IPFS Service
@@ -463,8 +462,8 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
   ipfs: {
     api: 'https://api.pinata.cloud',
     jwt: 'your-pinata-jwt-token',
-    gateway: 'https://gateway.pinata.cloud/ipfs/'
-  }
+    gateway: 'https://gateway.pinata.cloud/ipfs/',
+  },
 });
 ```
 
@@ -489,7 +488,7 @@ const cid = await client.ipfs.pin({
   version: 1,
   type: 'docker',
   image: 'ubuntu:latest',
-  command: ['echo', 'hello']
+  command: ['echo', 'hello'],
 });
 console.log('Pinned to IPFS:', cid);
 
@@ -513,6 +512,91 @@ const ipfsCid = solBytesArrayToIpfsHash(solanaHashBytes);
 
 // Convert IPFS CID to Solana hash bytes
 const solanaHash = ipfsHashToSolBytesArray(ipfsCid);
+```
+
+## API Service
+
+The API service provides access to Nosana APIs for jobs, credits, and markets. It's automatically configured based on your authentication method.
+
+### Authentication Methods
+
+The API service supports two authentication methods:
+
+1. **API Key Authentication** (Recommended for server-side applications)
+   - Provide an API key in the configuration
+   - API key takes precedence over wallet-based authentication
+
+2. **Wallet-Based Authentication** (For client-side applications)
+   - Set a wallet on the client
+   - Uses message signing for authentication
+   - Automatically enabled when a wallet is configured
+
+### Configuration
+
+```typescript
+// Option 1: Use API key (recommended for servers)
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: {
+    apiKey: 'your-api-key-here',
+  },
+});
+
+// Option 2: Use wallet-based auth (for client-side)
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = myWallet;
+
+// Option 3: API key takes precedence when both are provided
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: {
+    apiKey: 'your-api-key-here',
+  },
+  wallet: myWallet, // API key will be used, not wallet
+});
+```
+
+### Behavior
+
+- **With API Key**: API is created immediately with API key authentication
+- **With Wallet**: API is created when wallet is set, using wallet-based authentication
+- **Without Both**: API is `undefined` until either an API key or wallet is provided
+- **Priority**: If both API key and wallet are provided, API key is used
+
+### API Structure
+
+The API service provides access to three main APIs:
+
+```typescript
+client.api?.jobs    // Jobs API
+client.api?.credits // Credits API
+client.api?.markets // Markets API
+```
+
+### Examples
+
+```typescript
+// Using API key
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: 'your-api-key' },
+});
+
+// API is immediately available
+if (client.api) {
+  // Use the API
+  const jobs = await client.api.jobs.list();
+}
+
+// Using wallet-based auth
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = myWallet;
+
+// API is now available
+if (client.api) {
+  const credits = await client.api.credits.get();
+}
+
+// API updates reactively when wallet changes
+client.wallet = undefined; // API becomes undefined
+client.wallet = anotherWallet; // API is recreated with new wallet
 ```
 
 ## Authorization Service
@@ -560,10 +644,7 @@ const signedMessage = await client.authorization.generate('Hello, Nosana!');
 console.log('Signed message:', signedMessage);
 
 // Validate a signed message
-const isValid = await client.authorization.validate(
-  'Hello, Nosana!',
-  signedMessage
-);
+const isValid = await client.authorization.validate('Hello, Nosana!', signedMessage);
 console.log('Message is valid:', isValid);
 
 // Generate signed HTTP headers for API requests
@@ -577,7 +658,7 @@ const headers = await client.authorization.generateHeaders(
 fetch('https://api.nosana.com/api/jobs', {
   method: 'POST',
   headers: headers,
-  body: JSON.stringify({ data: 'example' })
+  body: JSON.stringify({ data: 'example' }),
 });
 
 // Validate incoming HTTP headers
@@ -626,9 +707,8 @@ Fetch claim status for a specific distributor and claimant:
 
 ```typescript
 // Get claim status for the wallet's address
-const claimStatus = await client.merkleDistributor.getClaimStatusForDistributor(
-  'distributor-address'
-);
+const claimStatus =
+  await client.merkleDistributor.getClaimStatusForDistributor('distributor-address');
 
 // Or specify a claimant address
 const claimStatus = await client.merkleDistributor.getClaimStatusForDistributor(
@@ -671,10 +751,12 @@ client.wallet = yourWallet;
 // Claim tokens
 const instruction = await client.merkleDistributor.claim({
   distributor: 'distributor-address',
-  amountUnlocked: 1000000,  // Amount in smallest unit
+  amountUnlocked: 1000000, // Amount in smallest unit
   amountLocked: 500000,
-  proof: [/* merkle proof array */],
-  target: ClaimTarget.YES  // or ClaimTarget.NO
+  proof: [
+    /* merkle proof array */
+  ],
+  target: ClaimTarget.YES, // or ClaimTarget.NO
 });
 
 // Submit the instruction
@@ -691,7 +773,7 @@ client.wallet = adminWallet;
 
 // Clawback tokens
 const instruction = await client.merkleDistributor.clawback({
-  distributor: 'distributor-address'
+  distributor: 'distributor-address',
 });
 
 // Submit the instruction
@@ -705,7 +787,7 @@ interface MerkleDistributor {
   address: Address;
   admin: Address;
   mint: Address;
-  root: string;  // Base58 encoded merkle root
+  root: string; // Base58 encoded merkle root
   buffer0: string;
   buffer1: string;
   buffer2: string;
@@ -723,7 +805,7 @@ interface ClaimStatus {
 
 enum ClaimTarget {
   YES = 'YES',
-  NO = 'NO'
+  NO = 'NO',
 }
 ```
 
@@ -762,7 +844,7 @@ Fetch multiple stake accounts by their addresses:
 const addresses = ['address1', 'address2', 'address3'];
 const stakes = await client.stake.multiple(addresses);
 
-stakes.forEach(stake => {
+stakes.forEach((stake) => {
   console.log(`${stake.address}: ${stake.amount} staked`);
 });
 ```
@@ -811,9 +893,7 @@ const totalStaked = allStakes.reduce((sum, stake) => sum + stake.amount, 0);
 const averageStake = totalStaked / allStakes.length;
 
 // Find largest stake
-const largestStake = allStakes.reduce((max, stake) => 
-  Math.max(max, stake.amount), 0
-);
+const largestStake = allStakes.reduce((max, stake) => Math.max(max, stake.amount), 0);
 
 console.log('Staking Statistics:');
 console.log(`Total Staked: ${totalStaked.toLocaleString()} NOS`);
@@ -836,7 +916,7 @@ const holders = await client.nos.getAllTokenHolders();
 
 console.log(`Found ${holders.length} NOS token holders`);
 
-holders.forEach(holder => {
+holders.forEach((holder) => {
   console.log(`${holder.owner}: ${holder.uiAmount} NOS`);
 });
 
@@ -849,9 +929,9 @@ const userAccounts = await client.nos.getAllTokenHolders({ excludePdaAccounts: t
 console.log(`User-owned accounts: ${userAccounts.length}`);
 
 // Combine filters
-const activeUsers = await client.nos.getAllTokenHolders({ 
+const activeUsers = await client.nos.getAllTokenHolders({
   includeZeroBalance: false,
-  excludePdaAccounts: true 
+  excludePdaAccounts: true,
 });
 console.log(`Active user accounts: ${activeUsers.length}`);
 ```
@@ -896,7 +976,7 @@ interface TokenAccount {
 }
 
 interface TokenAccountWithBalance extends TokenAccount {
-  uiAmount: number;  // Balance with decimals applied
+  uiAmount: number; // Balance with decimals applied
 }
 ```
 
@@ -914,7 +994,7 @@ interface TokenAccountWithBalance extends TokenAccount {
 const holders = await client.nos.getAllTokenHolders();
 
 // Find holders with at least 1000 NOS
-const largeHolders = holders.filter(h => h.uiAmount >= 1000);
+const largeHolders = holders.filter((h) => h.uiAmount >= 1000);
 
 // Sort by balance descending
 largeHolders.sort((a, b) => b.uiAmount - a.uiAmount);
@@ -950,7 +1030,7 @@ enum ErrorCodes {
   VALIDATION_ERROR = 'VALIDATION_ERROR',
   NO_WALLET = 'NO_WALLET',
   FILE_ERROR = 'FILE_ERROR',
-  WALLET_CONVERSION_ERROR = 'WALLET_CONVERSION_ERROR'
+  WALLET_CONVERSION_ERROR = 'WALLET_CONVERSION_ERROR',
 }
 ```
 
@@ -978,7 +1058,7 @@ try {
         console.error('Unknown error:', error.message);
     }
   } else {
-    throw error;  // Re-throw non-Nosana errors
+    throw error; // Re-throw non-Nosana errors
   }
 }
 ```
@@ -995,7 +1075,7 @@ enum LogLevel {
   INFO = 'info',
   WARN = 'warn',
   ERROR = 'error',
-  NONE = 'none'
+  NONE = 'none',
 }
 ```
 
@@ -1006,7 +1086,7 @@ import { createNosanaClient, LogLevel } from '@nosana/kit';
 
 // Set log level during initialization
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
-  logLevel: LogLevel.DEBUG
+  logLevel: LogLevel.DEBUG,
 });
 
 // Access logger directly
@@ -1051,10 +1131,10 @@ npm run generate-clients
 The SDK is written in TypeScript and provides complete type definitions. All types are exported for use in your applications:
 
 ```typescript
-import type { 
-  Job, 
-  Run, 
-  Market, 
+import type {
+  Job,
+  Run,
+  Market,
   JobState,
   MarketQueueType,
   Stake,
@@ -1063,7 +1143,7 @@ import type {
   ClaimTarget,
   ClientConfig,
   NosanaClient,
-  Wallet
+  Wallet,
 } from '@nosana/kit';
 import type { Address } from '@solana/kit';
 ```
@@ -1071,14 +1151,12 @@ import type { Address } from '@solana/kit';
 ## Dependencies
 
 Core dependencies:
+
 - `@solana/kit` ^5.0.0 - Solana web3 library
 - `@solana-program/token` ^0.8.0 - Token program utilities
 - `@solana-program/system` ^0.10.0 - System program utilities
 - `@solana-program/compute-budget` ^0.11.0 - Compute budget utilities
-- `axios` ^1.6.0 - HTTP client
 - `bs58` ^6.0.0 - Base58 encoding
-- `form-data` ^4.0.0 - Multipart form data
-- `buffer` ^6.0.3 - Buffer polyfill
 
 ## License
 

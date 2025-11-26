@@ -20,14 +20,14 @@ import * as path from 'path';
 import {
   createNosanaClient,
   type NosanaClient,
-  NosanaNetwork,
   type PartialClientConfig,
   type Wallet,
-} from '../../../src/index.js';
-import * as programClient from '../../../src/generated_clients/jobs/index.js';
-import * as stakingClient from '../../../src/generated_clients/staking/index.js';
-import * as merkleDistributorClient from '../../../src/generated_clients/merkle_distributor/index.js';
-import { JobState, MarketQueueType } from '../../../src/services/programs/JobsProgram.js';
+} from '../../src/index.js';
+import * as programClient from '../../src/generated_clients/jobs/index.js';
+import * as stakingClient from '../../src/generated_clients/staking/index.js';
+import * as merkleDistributorClient from '../../src/generated_clients/merkle_distributor/index.js';
+import { JobState, MarketQueueType } from '../../src/services/programs/JobsProgram.js';
+import { NosanaNetwork } from '@nosana/types';
 
 /**
  * Signer Factory
@@ -289,7 +289,7 @@ export class MockClientFactory {
 /**
  * Helper function to convert NosanaClient mock to ProgramDeps
  */
-export function sdkToProgramDeps(sdk: NosanaClient): import('../../../src/types.js').ProgramDeps {
+export function sdkToProgramDeps(sdk: NosanaClient): import('../../src/types.js').ProgramDeps {
   return {
     logger: sdk.logger,
     solana: sdk.solana,

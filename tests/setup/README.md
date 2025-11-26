@@ -5,6 +5,7 @@ This directory contains reusable test utilities and factory functions that make 
 ## Purpose
 
 Test factories provide:
+
 - **Consistent test data** with sensible defaults
 - **Reduced boilerplate** in test files
 - **Clear intent** - factory names describe what's being created
@@ -99,6 +100,7 @@ const jobs = JobAccountFactory.createMany(10, JobState.QUEUED);
 ```
 
 **Default values:**
+
 - `price`: BigInt(1)
 - `state`: JobState.QUEUED
 - `timeStart`: BigInt(0)
@@ -150,6 +152,7 @@ const markets = MarketAccountFactory.createMany(3);
 ```
 
 **Default values:**
+
 - `nodeXnosMinimum`: BigInt(5)
 - `jobPrice`: BigInt(10)
 - `jobTimeout`: BigInt(200)
@@ -191,22 +194,6 @@ const solanaConfig = ConfigFactory.createSolanaConfig({
 });
 ```
 
-### MockBuilder
-
-Creates complex mocks.
-
-```typescript
-// Axios mock
-const axiosMock = MockBuilder.createAxiosMock();
-vi.mock('axios', () => ({ default: axiosMock }));
-
-// WebSocket subscription mock
-const subMock = MockBuilder.createSubscriptionMock([
-  { value: notification1 },
-  { value: notification2 },
-]);
-```
-
 ### ScenarioBuilder
 
 Creates common test scenarios.
@@ -227,6 +214,7 @@ const { job, runs } = ScenarioBuilder.createJobWithRuns(3);
 ### 1. Use Factories in Tests
 
 **Before:**
+
 ```typescript
 const job = {
   address: address('...'),
@@ -236,11 +224,12 @@ const job = {
     ipfsResult: new Uint8Array(32).map((_, i) => i),
     market: address('...'),
     // ... many more fields
-  }
+  },
 } as any;
 ```
 
 **After:**
+
 ```typescript
 const job = JobAccountFactory.createQueued();
 ```
@@ -272,7 +261,7 @@ beforeEach(() => {
 // Testing job lifecycle
 it('transitions job through states', () => {
   const { queued, running, completed } = ScenarioBuilder.createJobLifecycle(addr);
-  
+
   expect(queued.data.state).toBe(JobState.QUEUED);
   expect(running.data.state).toBe(JobState.RUNNING);
   expect(completed.data.state).toBe(JobState.COMPLETED);

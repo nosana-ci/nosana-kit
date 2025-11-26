@@ -1,28 +1,33 @@
-import { Address, TransactionSigner } from '@solana/kit';
-import type { Wallet } from '../types.js';
-import type { LogLevel } from '../logger/Logger.js';
+import type { Address, TransactionSigner } from '@solana/kit';
 import type { IPFSConfig } from '@nosana/ipfs';
 
-export const NosanaNetwork = {
-  MAINNET: 'mainnet',
+import type { Wallet } from '../types.js';
+import type { LogLevel } from '../logger/Logger.js';
+
+export const SolanaClusterMoniker = {
   DEVNET: 'devnet',
+  LOCALNET: 'localnet',
+  MAINNET: 'mainnet',
+  TESTNET: 'testnet',
+  MAINNET_BETA: 'mainnet-beta',
+  LOCALHOST: 'localhost',
 } as const;
 
-export type NosanaNetwork = (typeof NosanaNetwork)[keyof typeof NosanaNetwork];
+export type SolanaClusterMoniker = (typeof SolanaClusterMoniker)[keyof typeof SolanaClusterMoniker];
 
-export type SolanaClusterMoniker =
-  | 'devnet'
-  | 'localnet'
-  | 'mainnet'
-  | 'testnet'
-  | 'mainnet-beta'
-  | 'localhost';
+export const SolanaCommitment = {
+  PROCESSED: 'processed',
+  CONFIRMED: 'confirmed',
+  FINALIZED: 'finalized',
+} as const;
+
+export type SolanaCommitment = (typeof SolanaCommitment)[keyof typeof SolanaCommitment];
 
 export interface SolanaConfig {
   cluster: SolanaClusterMoniker;
   rpcEndpoint: string;
   wsEndpoint?: string; // Optional WebSocket endpoint, if different from HTTP
-  commitment?: 'processed' | 'confirmed' | 'finalized';
+  commitment?: SolanaCommitment;
   feePayer?: TransactionSigner; // Optional fee payer for transactions
 }
 
@@ -35,12 +40,17 @@ export interface ProgramConfig {
   merkleDistributorAddress: Address;
 }
 
+export interface APIConfig {
+  apiKey?: string;
+}
+
 export interface ClientConfig {
   solana: SolanaConfig;
   wallet?: Wallet;
   logLevel: LogLevel;
   ipfs: IPFSConfig;
   programs: ProgramConfig;
+  api?: APIConfig;
 }
 
 export interface PartialClientConfig {
@@ -48,4 +58,5 @@ export interface PartialClientConfig {
   wallet?: Wallet;
   ipfs?: Partial<IPFSConfig>;
   logLevel?: LogLevel;
+  api?: Partial<APIConfig>;
 }

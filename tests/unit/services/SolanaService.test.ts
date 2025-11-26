@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createSolanaService } from '../../../src/services/SolanaService.js';
 import type { Instruction } from '@solana/kit';
-import { Logger } from '../../../src/logger/Logger.js';
-import { AddressFactory, SignerFactory } from '../helpers/index.js';
+
+import { createSolanaService } from '../../../src/services/SolanaService.js';
+import { AddressFactory, MockClientFactory, SignerFactory } from '../../setup/index.js';
 import type { Wallet } from '../../../src/types.js';
 
 // Mock @solana/kit module
@@ -109,7 +109,7 @@ function makeInstruction(): Instruction {
 }
 
 describe('SolanaService', () => {
-  const logger = Logger.getInstance();
+  const logger = MockClientFactory.createBasic().logger;
   const rpcEndpoint = 'https://rpc.example';
   const cluster = 'devnet';
   const mockBalance = BigInt(1000);
