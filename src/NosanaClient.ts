@@ -31,8 +31,8 @@ export interface NosanaClient {
   readonly api: NosanaApi | undefined;
   readonly ipfs: ReturnType<typeof createIpfsClient>;
   readonly authorization:
-    | NosanaAuthorization
-    | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>;
+  | NosanaAuthorization
+  | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>;
   readonly logger: Logger;
   /**
    * The wallet. Must be a Wallet (supports both message and transaction signing).
@@ -127,12 +127,6 @@ export function createNosanaClient(
     }
 
     const walletAddress = wallet.address;
-
-    console.log({
-      identifier: walletAddress.toString(),
-      generate: (authorization as NosanaAuthorization).generate,
-    });
-
     return {
       authorization,
       api: createNosanaApi(network, {
