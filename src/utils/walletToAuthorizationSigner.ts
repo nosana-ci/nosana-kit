@@ -1,11 +1,6 @@
 import { type MessageSigner } from '@solana/kit';
 import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
-
-/**
- * Type for a function that signs a message and returns the signature.
- * Matches the SignMessageFn type from @nosana/authorization.
- */
-type SignMessageFn = (message: Uint8Array) => Promise<Uint8Array>;
+import { SignMessageFn } from '@nosana/authorization';
 
 /**
  * Extract signature from a signatures dictionary.
