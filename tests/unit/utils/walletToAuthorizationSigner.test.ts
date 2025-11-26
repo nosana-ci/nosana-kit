@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { walletToAuthorizationSigner } from '../../../src/utils/walletToAuthorizationSigner.js';
-import { SignerFactory } from '../helpers/index.js';
-import { NosanaError } from '../../../src/errors/NosanaError.js';
 import { type MessageSigner } from '@solana/kit';
+
+import { SignerFactory } from '../../setup/index.js';
+
+import { NosanaError } from '../../../src/errors/NosanaError.js';
+import { walletToAuthorizationSigner } from '../../../src/utils/walletToAuthorizationSigner.js';
 
 describe('walletToAuthorizationSigner', () => {
   let walletAddress: ReturnType<typeof SignerFactory.getExpectedAddress>;

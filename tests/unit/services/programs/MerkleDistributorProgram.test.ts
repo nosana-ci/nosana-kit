@@ -1,4 +1,6 @@
+import bs58 from 'bs58';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import {
   createMerkleDistributorProgram,
   type MerkleDistributorProgram,
@@ -13,8 +15,7 @@ import {
   MerkleDistributorAccountFactory,
   ClaimStatusAccountFactory,
   sdkToProgramDeps,
-} from '../../helpers/index.js';
-import bs58 from 'bs58';
+} from '../../../setup/index.js';
 
 vi.mock('@solana-program/token', () => ({
   findAssociatedTokenPda: vi.fn(async () => ['ata']),

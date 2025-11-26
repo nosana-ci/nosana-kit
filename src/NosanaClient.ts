@@ -1,10 +1,10 @@
-import {
-  ClientConfig,
-  getNosanaConfig,
-  NosanaNetwork,
-  PartialClientConfig,
-} from './config/index.js';
+import { NosanaNetwork } from '@nosana/types';
+import { createIpfsClient } from '@nosana/ipfs';
+import { createNosanaApi, type NosanaApi } from '@nosana/api';
+import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/authorization';
+
 import { Logger } from './logger/Logger.js';
+import { ClientConfig, getNosanaConfig, PartialClientConfig } from './config/index.js';
 import { createJobsProgram, type JobsProgram } from './services/programs/JobsProgram.js';
 import { createStakeProgram, type StakeProgram } from './services/programs/StakeProgram.js';
 import {
@@ -13,13 +13,10 @@ import {
 } from './services/programs/MerkleDistributorProgram.js';
 import { createSolanaService, type SolanaService } from './services/SolanaService.js';
 import { createTokenService, type TokenService } from './services/TokenService.js';
-import { createIpfsClient } from '@nosana/ipfs';
-import { type MessageSigner } from '@solana/kit';
-import { Wallet } from './types.js';
-import type { ProgramDeps } from './types.js';
-import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/authorization';
 import { walletToAuthorizationSigner } from './utils/walletToAuthorizationSigner.js';
 
+import type { Wallet } from './types.js';
+import type { ProgramDeps } from './types.js';
 /**
  * The Nosana client interface. Contains all the services and programs
  * needed to interact with the Nosana network.
@@ -31,10 +28,11 @@ export interface NosanaClient {
   readonly merkleDistributor: MerkleDistributorProgram;
   readonly solana: SolanaService;
   readonly nos: TokenService;
+  readonly api: NosanaApi | undefined;
   readonly ipfs: ReturnType<typeof createIpfsClient>;
   readonly authorization:
-    | NosanaAuthorization
-    | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>;
+  | NosanaAuthorization
+  | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>;
   readonly logger: Logger;
   /**
    * The wallet. Must be a Wallet (supports both message and transaction signing).
@@ -72,18 +70,13 @@ export function createNosanaClient(
   customConfig?: PartialClientConfig
 ): NosanaClient {
   const config = getNosanaConfig(network, customConfig);
-
   const logger = Logger.getInstance({ level: config.logLevel });
 
+  // Wallet management
   let wallet: Wallet | undefined = config.wallet;
-
-  // Create wallet getter
   const getWallet = () => wallet;
 
-  // Initialize IPFS
-  const ipfs = createIpfsClient(config.ipfs);
-
-  // Initialize SolanaService first (other services depend on it)
+  // Create Solana services
   const solana = createSolanaService(
     {
       logger,
@@ -115,26 +108,60 @@ export function createNosanaClient(
   const stake = createStakeProgram(programDeps, config.programs);
   const merkleDistributor = createMerkleDistributorProgram(programDeps, config.programs);
 
+  // Initialize Nosana Modules
+  const ipfs = createIpfsClient(config.ipfs)
+
+  const createReactiveNosanaModules = (): {
+    authorization: NosanaAuthorization | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>;
+    api: NosanaClient['api'] | undefined;
+  } => {
+    const authorization = wallet
+      ? createNosanaAuthorization(walletToAuthorizationSigner(wallet))
+      : createNosanaAuthorization();
+
+    if (!wallet || !wallet.address) {
+      return {
+        authorization,
+        api: undefined,
+      }
+    }
+
+    const walletAddress = wallet.address;
+
+    console.log({
+      identifier: walletAddress.toString(),
+      generate: (authorization as NosanaAuthorization).generate,
+    })
+
+    return {
+      authorization,
+      api: createNosanaApi(network, {
+        identifier: walletAddress.toString(),
+        generate: (authorization as NosanaAuthorization).generate,
+      })
+    }
+  }
+
+  let reactiveNosanaModules = createReactiveNosanaModules();
+
+
   // Build and return the client
   return {
     config,
     logger,
-    get wallet() {
-      return wallet;
-    },
-    set wallet(value: Wallet | undefined) {
-      wallet = value;
-    },
-    get authorization() {
-      return wallet
-        ? createNosanaAuthorization(walletToAuthorizationSigner(wallet as MessageSigner))
-        : createNosanaAuthorization();
-    },
-    ipfs,
     solana,
     nos,
     jobs,
     stake,
     merkleDistributor,
+    ipfs,
+    ...reactiveNosanaModules,
+    get wallet() {
+      return wallet;
+    },
+    set wallet(value: Wallet | undefined) {
+      wallet = value;
+      reactiveNosanaModules = createReactiveNosanaModules();
+    },
   };
-}
+} 

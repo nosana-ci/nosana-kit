@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { createNosanaClient, NosanaNetwork } from '../../src/index.js';
+import { NosanaNetwork } from '@nosana/types';
+
+import { SignerFactory } from '../setup/index.js';
+import { createNosanaClient } from '../../src/index.js';
 import { DEFAULT_CONFIGS } from '../../src/config/defaultConfigs.js';
 import { ErrorCodes, NosanaError } from '../../src/errors/NosanaError.js';
-import { SignerFactory } from './helpers/index.js';
 
 describe('NosanaClient', () => {
   describe('component initialization', () => {

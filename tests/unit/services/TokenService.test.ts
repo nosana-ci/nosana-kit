@@ -1,12 +1,21 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
-import {
-  createNosanaClient,
-  type NosanaClient,
-  NosanaNetwork,
-  TokenService,
-} from '../../../src/index.js';
 import { address } from '@solana/kit';
+import { NosanaNetwork } from '@nosana/types';
+import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
 
+import { createNosanaClient, type NosanaClient, TokenService } from '../../../src/index.js';
+
+vi.mock('../../../src/logger/Logger.js', () => {
+  return {
+    Logger: {
+      getInstance: vi.fn().mockReturnValue({
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+      }),
+    },
+  };
+});
 // Mock @solana/kit module
 vi.mock('@solana/kit', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@solana/kit')>();

@@ -2,6 +2,7 @@
 export { createNosanaClient, type NosanaClient } from './NosanaClient.js';
 
 // Export types
+export * from "@nosana/types";
 export type { Wallet } from './types.js';
 
 // Export types and configuration

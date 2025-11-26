@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { type Address } from '@solana/kit';
+import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
+
 import {
   createJobsProgram,
   type JobsProgram,
@@ -6,8 +9,6 @@ import {
   MarketQueueType,
 } from '../../../../src/services/programs/JobsProgram.js';
 import * as programClient from '../../../../src/generated_clients/jobs/index.js';
-import { type Address } from '@solana/kit';
-import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 import {
   AddressFactory,
   MockClientFactory,
@@ -15,7 +16,7 @@ import {
   RunAccountFactory,
   MarketAccountFactory,
   sdkToProgramDeps,
-} from '../../helpers/index.js';
+} from '../../../setup/index.js';
 
 vi.mock('@solana-program/token', () => ({
   findAssociatedTokenPda: vi.fn(async () => ['ata']),

@@ -1,8 +1,11 @@
-import { ErrorCodes, NosanaError } from '../errors/NosanaError.js';
-import { DEFAULT_CONFIGS } from './defaultConfigs.js';
-import { ClientConfig, NosanaNetwork, PartialClientConfig } from './types.js';
+import { NosanaNetwork } from '@nosana/types';
 
-export const mergeConfigs = (
+import { DEFAULT_CONFIGS } from './defaultConfigs.js';
+import { ErrorCodes, NosanaError } from '../errors/NosanaError.js';
+
+import type { ClientConfig, PartialClientConfig } from './types.js';
+
+const mergeConfigs = (
   defaultConfig: ClientConfig,
   customConfig?: PartialClientConfig
 ): ClientConfig => {

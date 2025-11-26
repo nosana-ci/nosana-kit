@@ -1,9 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+
+import { ClientFactory } from '../../setup/index.js';
+
 import {
   getStaticAccounts,
   type StaticAccountsCache,
 } from '../../../src/utils/getStaticAccounts.js';
-import { ClientFactory } from '../helpers/index.js';
 import type { ClientConfig } from '../../../src/config/types.js';
 import type { SolanaService } from '../../../src/services/SolanaService.js';
 

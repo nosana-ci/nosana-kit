@@ -10,7 +10,7 @@ import {
   MockClientFactory,
   StakeAccountFactory,
   sdkToProgramDeps,
-} from '../../helpers/index.js';
+} from '../../../setup/index.js';
 
 // Test constants
 const DEFAULT_STAKE_AMOUNT = 1000;
