@@ -1,7 +1,7 @@
 import { Address, TransactionSigner } from '@solana/kit';
 import type { Wallet } from '../types.js';
 import type { LogLevel } from '../logger/Logger.js';
-import type { IPFSConfig } from '@nosana/ipfs/dist/types.js';
+import type { IPFSConfig } from '@nosana/ipfs';
 
 export const NosanaNetwork = {
   MAINNET: 'mainnet',
