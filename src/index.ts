@@ -1,8 +1,11 @@
 // Export the main client
 export { createNosanaClient, type NosanaClient } from './NosanaClient.js';
 
-// Export types
+// Export types - explicitly re-export NosanaNetwork from types to resolve ambiguity
 export * from '@nosana/types';
+export type * from '@nosana/api';
+export { NosanaNetwork } from '@nosana/types';
+
 export type { Wallet } from './types.js';
 
 // Export types and configuration
