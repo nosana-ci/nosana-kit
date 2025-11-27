@@ -1,5 +1,6 @@
-import type { Address, TransactionSigner } from '@solana/kit';
+import { ApiConfig } from '@nosana/api';
 import type { IPFSConfig } from '@nosana/ipfs';
+import type { Address, TransactionSigner } from '@solana/kit';
 
 import type { Wallet } from '../types.js';
 import type { LogLevel } from '../logger/Logger.js';
@@ -40,7 +41,7 @@ export interface ProgramConfig {
   merkleDistributorAddress: Address;
 }
 
-export interface APIConfig {
+export interface APIConfig extends ApiConfig {
   apiKey?: string;
 }
 
