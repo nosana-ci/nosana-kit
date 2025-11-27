@@ -30,9 +30,7 @@ export interface NosanaClient {
   readonly nos: TokenService;
   readonly api: NosanaApi | undefined;
   readonly ipfs: ReturnType<typeof createIpfsClient>;
-  readonly authorization:
-    | NosanaAuthorization
-    | Omit<NosanaAuthorization, 'generate' | 'generateHeaders'>;
+  readonly authorization: NosanaAuthorization;
   readonly logger: Logger;
   /**
    * The wallet. Must be a Wallet (supports both message and transaction signing).
