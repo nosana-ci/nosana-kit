@@ -1,6 +1,6 @@
 export function covertStringToIterable(input: string): Iterable<number> {
   return input
-    .split(",")
+    .split(',')
     .map((s) => Number(s.trim()))
     .filter((n) => !isNaN(n));
 }
