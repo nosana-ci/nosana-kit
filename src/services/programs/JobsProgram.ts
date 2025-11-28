@@ -1,6 +1,5 @@
 import {
   Address,
-  generateKeyPairSigner,
   EncodedAccount,
   parseBase64RpcAccount,
   Account,
@@ -15,7 +14,12 @@ import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/t
 import bs58 from 'bs58';
 import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../../utils/index.js';
-import { getStaticAccounts, type StaticAccounts } from '../../utils/getStaticAccounts.js';
+import {
+  getStaticAccounts as getStaticAccountsFn,
+  type StaticAccounts,
+} from '../../utils/getStaticAccounts.js';
+import type { ProgramConfig } from '../../config/types.js';
+import * as Instructions from './instructions/index.js';
 
 export enum JobState {
   QUEUED = 0,
@@ -91,34 +95,20 @@ export interface JobsProgram {
   /**
    * Post a new job to the marketplace
    */
-  post(params: {
-    market: Address;
-    timeout: number | bigint;
-    ipfsHash: string;
-    node?: Address;
-  }): Promise<ReturnType<typeof programClient.getListInstruction>>;
+  post: Instructions.Post;
 
   /**
    *  Extend an existing job's timeout
    */
-  extend(params: {
-    job: Address;
-    timeout: number | bigint;
-  }): Promise<ReturnType<typeof programClient.getExtendInstruction>>;
-
+  extend: Instructions.Extend;
   /**
    * Delist a job from the marketplace
    */
-  delist(params: {
-    job: Address;
-  }): Promise<ReturnType<typeof programClient.getDelistInstruction>>;
-
+  delist: Instructions.Delist;
   /**
    * Stop a running job
    */
-  end(params: {
-    job: Address;
-  }): Promise<ReturnType<typeof programClient.getEndInstruction>>;
+  end(params: { job: Address }): Promise<ReturnType<typeof programClient.getEndInstruction>>;
 
   /**
    * Monitor program account updates using callback functions
@@ -151,7 +141,6 @@ export interface JobsProgram {
  * const job = await jobsProgram.get('job-address');
  * ```
  */
-import type { ProgramConfig } from '../../config/types.js';
 
 export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): JobsProgram {
   const programId = config.jobsAddress;
@@ -295,10 +284,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
   function getRequiredWallet(): Wallet {
     const wallet = deps.getWallet();
     if (!wallet) {
-      throw new NosanaError(
-        'Wallet is required for this operation',
-        ErrorCodes.NO_WALLET
-      );
+      throw new NosanaError('Wallet is required for this operation', ErrorCodes.NO_WALLET);
     }
     return wallet;
   }
@@ -310,6 +296,10 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       owner: wallet.address,
       tokenProgram: TOKEN_PROGRAM_ADDRESS,
     });
+  }
+
+  function getStaticAccounts() {
+    return getStaticAccountsFn(config, deps.solana, staticAccountsCache);
   }
 
   /**
@@ -694,126 +684,50 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     /**
      * Post a new job to the marketplace
      */
-    async post({ market, ipfsHash, timeout }: Parameters<JobsProgram["post"]>[0]): Promise<ReturnType<typeof client.getListInstruction>> {
-      const wallet = getRequiredWallet();
-      try {
-        // Generate new keypairs for job and run
-        const jobKey = await generateKeyPairSigner();
-        const runKey = await generateKeyPairSigner();
-
-        // Get Required accounts
-        const [associatedTokenAddress] = await getAssociatedTokenPda();
-        const { jobsProgram, ...staticAccounts } = await getStaticAccounts(config, deps.solana, staticAccountsCache);
-        const vault = await deps.solana.pda(
-          [market, config.nosTokenAddress],
-          jobsProgram
-        )
-
-        // Create the list instruction
-        return client.getListInstruction({
-          job: jobKey,
-          run: runKey,
-          market,
-          ipfsJob: bs58.decode(ipfsHash).subarray(2),
-          timeout,
-          user: associatedTokenAddress,
-          vault: vault,
-          payer: wallet,
-          authority: wallet,
-          ...staticAccounts
-        });
-      } catch (err) {
-        const errorMessage = `Failed to create list instruction: ${err instanceof Error ? err.message : String(err)}`;
-        deps.logger.error(errorMessage);
-        throw new Error(errorMessage);
-      }
+    async post(params: Instructions.PostParams): Promise<Instructions.PostInstruction> {
+      return Instructions.post(params, {
+        config,
+        deps,
+        client,
+        get: this.get,
+        getRequiredWallet,
+        getStaticAccounts,
+        getAssociatedTokenPda,
+      });
     },
-
-    async extend({ job, timeout }: Parameters<JobsProgram["extend"]>[0]): Promise<ReturnType<typeof client.getExtendInstruction>> {
-      const wallet = getRequiredWallet();
-      try {
-        // Get Required accounts
-        const { market } = await this.get(job, false);
-        const [associatedTokenAddress] = await getAssociatedTokenPda();
-        const { jobsProgram, ...staticAccounts } = await getStaticAccounts(config, deps.solana, staticAccountsCache);
-        const vault = await deps.solana.pda(
-          [market, config.nosTokenAddress],
-          jobsProgram
-        )
-
-        // Create the extend instruction
-        return client.getExtendInstruction({
-          job,
-          timeout,
-          market,
-          vault,
-          payer: wallet,
-          authority: wallet,
-          user: associatedTokenAddress,
-          ...staticAccounts
-        });
-
-      } catch (err) {
-        const errorMessage = `Failed to create list instruction: ${err instanceof Error ? err.message : String(err)}`;
-        deps.logger.error(errorMessage);
-        throw new Error(errorMessage);
-      }
+    async extend(params: Instructions.ExtendParams): Promise<Instructions.ExtendInstruction> {
+      return Instructions.extend(params, {
+        config,
+        deps,
+        client,
+        get: this.get,
+        getRequiredWallet,
+        getAssociatedTokenPda,
+        getStaticAccounts,
+      });
     },
-
-    async delist({ job }: Parameters<JobsProgram["delist"]>[0]): Promise<ReturnType<typeof client.getDelistInstruction>> {
-      const wallet = getRequiredWallet();
-      try {
-        // Get Required accounts
-        const { market } = await this.get(job, false);
-        const { jobsProgram } = await getStaticAccounts(config, deps.solana, staticAccountsCache);
-        const vault = await deps.solana.pda(
-          [market, config.nosTokenAddress],
-          jobsProgram
-        )
-
-        return client.getDelistInstruction({
-          job,
-          market,
-          vault,
-          // TODO: Set deposit account properly
-          deposit: undefined,
-          payer: wallet.address,
-          authority: wallet
-        });
-      } catch (err) {
-        const errorMessage = `Failed to create delist instruction: ${err instanceof Error ? err.message : String(err)}`;
-        deps.logger.error(errorMessage);
-        throw new Error(errorMessage);
-      }
+    async delist(params: Instructions.DelistParams): Promise<Instructions.DelistInstruction> {
+      return Instructions.delist(params, {
+        config,
+        deps,
+        client,
+        get: this.get,
+        getRequiredWallet,
+        getAssociatedTokenPda,
+        getStaticAccounts,
+      });
     },
-    async end({ job }: Parameters<JobsProgram["end"]>[0]): Promise<ReturnType<typeof client.getEndInstruction>> {
-      const wallet = getRequiredWallet();
-      try {
-        // Get Required accounts
-        const { market } = await this.get(job, false);
-        const { jobsProgram } = await getStaticAccounts(config, deps.solana, staticAccountsCache);
-        const vault = await deps.solana.pda(
-          [market, config.nosTokenAddress],
-          jobsProgram
-        )
-
-        return client.getEndInstruction({
-          job,
-          market,
-          // Todo: Set these accounts properly
-          run: undefined,
-          deposit: undefined,
-          user: undefined,
-          vault: vault,
-          payer: wallet.address,
-          authority: wallet
-        });
-      } catch (err) {
-        const errorMessage = `Failed to create end instruction: ${err instanceof Error ? err.message : String(err)}`;
-        deps.logger.error(errorMessage);
-        throw new Error(errorMessage);
-      }
-    }
+    async end(params: Instructions.EndParams): Promise<Instructions.EndInstruction> {
+      return Instructions.end(params, {
+        config,
+        deps,
+        client,
+        get: this.get,
+        getRequiredWallet,
+        getAssociatedTokenPda,
+        getStaticAccounts,
+      });
+    },
     /**
      * Monitor program account updates using callback functions
      * Uses WebSocket subscriptions with automatic restart on failure
