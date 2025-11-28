@@ -20,15 +20,17 @@ export async function end(
     getRuns,
     getRequiredWallet,
     getStaticAccounts,
+    getAssociatedTokenPda,
   }: InstructionsHelperParams
 ): Promise<EndInstruction> {
   try {
     const wallet = getRequiredWallet();
     // Get Required accounts
-    const [{ market }, [run], { jobsProgram }] = await Promise.all([
+    const [{ market }, [run], { jobsProgram }, [associatedTokenPda]] = await Promise.all([
       get(job, false),
       getRuns({ job }),
       getStaticAccounts(),
+      getAssociatedTokenPda(),
     ]);
 
     if (!run) {
@@ -42,7 +44,7 @@ export async function end(
       market,
       run: run.address, // Todo: Set these accounts properly
       deposit: undefined, // Todo: Set these accounts properly
-      user: undefined, // Todo: Set these accounts properly
+      user: associatedTokenPda, // Todo: Set these accounts properly
       vault: vault,
       payer: wallet.address,
       authority: wallet,

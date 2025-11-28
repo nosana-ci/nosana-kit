@@ -28,12 +28,13 @@ export async function post(
   try {
     const wallet = getRequiredWallet();
     // Generate new keypairs for job and run
-    const jobKey = await generateKeyPairSigner();
-    const runKey = await generateKeyPairSigner();
-
-    // Get Required accounts
-    const [associatedTokenAddress] = await getAssociatedTokenPda();
-    const { jobsProgram, ...staticAccounts } = await getStaticAccounts();
+    const [jobKey, runKey, [associatedTokenAddress], { jobsProgram, ...staticAccounts }] =
+      await Promise.all([
+        generateKeyPairSigner(),
+        generateKeyPairSigner(),
+        getAssociatedTokenPda(),
+        getStaticAccounts(),
+      ]);
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
     // Create the list instruction

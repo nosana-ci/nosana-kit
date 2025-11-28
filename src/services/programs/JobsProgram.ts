@@ -703,16 +703,16 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     /**
      * Post a new job to the marketplace
      */
-    async post(params: Instructions.PostParams): Promise<Instructions.PostInstruction> {
+    async post(params) {
       return Instructions.post(params, createInstructionsHelper(this.get, this.runs));
     },
-    async extend(params: Instructions.ExtendParams): Promise<Instructions.ExtendInstruction> {
+    async extend(params) {
       return Instructions.extend(params, createInstructionsHelper(this.get, this.runs));
     },
-    async delist(params: Instructions.DelistParams): Promise<Instructions.DelistInstruction> {
+    async delist(params) {
       return Instructions.delist(params, createInstructionsHelper(this.get, this.runs));
     },
-    async end(params: Instructions.EndParams): Promise<Instructions.EndInstruction> {
+    async end(params) {
       return Instructions.end(params, createInstructionsHelper(this.get, this.runs));
     },
     /**
