@@ -15,6 +15,7 @@ type RequiredHelpers = {
   config: ProgramConfig;
   client: typeof programClient;
   get: JobsProgram['get'];
+  getRuns: JobsProgram['runs'];
   getRequiredWallet: () => Wallet;
   getAssociatedTokenPda: () => Promise<readonly [Address<string>, ProgramDerivedAddressBump]>;
   getStaticAccounts: () => Promise<StaticAccounts>;
@@ -39,9 +40,8 @@ export async function extend(
   try {
     const wallet = getRequiredWallet();
     // Get Required accounts
-    const { market } = await get(job, false);
-    const [associatedTokenAddress] = await getAssociatedTokenPda();
-    const { jobsProgram, ...staticAccounts } = await getStaticAccounts();
+    const [{ market }, [associatedTokenAddress], { jobsProgram, ...staticAccounts }] =
+      await Promise.all([get(job, false), getAssociatedTokenPda(), getStaticAccounts()]);
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
     // Create the extend instruction

@@ -14,6 +14,7 @@ type RequiredHelpers = {
   config: ProgramConfig;
   client: typeof programClient;
   get: JobsProgram['get'];
+  getRuns: JobsProgram['runs'];
   getRequiredWallet: () => Wallet;
   getAssociatedTokenPda: () => Promise<readonly [Address<string>, ProgramDerivedAddressBump]>;
   getStaticAccounts: () => Promise<StaticAccounts>;
@@ -30,8 +31,7 @@ export async function delist(
   try {
     const wallet = getRequiredWallet();
     // Get Required accounts
-    const { market } = await get(job, false);
-    const { jobsProgram } = await getStaticAccounts();
+    const [{ market }, { jobsProgram }] = await Promise.all([get(job, false), getStaticAccounts()]);
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
     return client.getDelistInstruction({
