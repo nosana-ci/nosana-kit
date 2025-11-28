@@ -1,26 +1,13 @@
 import bs58 from 'bs58';
-import { Address, generateKeyPairSigner, ProgramDerivedAddressBump } from '@solana/kit';
+import { type Address, generateKeyPairSigner } from '@solana/kit';
 import * as programClient from '../../../generated_clients/jobs/index.js';
-import { JobsProgram } from '../JobsProgram.js';
-import { ProgramDeps, Wallet } from '../../../types.js';
-import { ProgramConfig } from '../../../config/types.js';
-import { StaticAccounts } from '../../../utils/getStaticAccounts.js';
+import type { InstructionsHelperParams } from './types.js';
 
 export type PostParams = {
   market: Address;
   timeout: number | bigint;
   ipfsHash: string;
   node?: Address;
-};
-
-type RequiredHelpers = {
-  deps: ProgramDeps;
-  config: ProgramConfig;
-  client: typeof programClient;
-  get: JobsProgram['get'];
-  getRequiredWallet: () => Wallet;
-  getAssociatedTokenPda: () => Promise<readonly [Address<string>, ProgramDerivedAddressBump]>;
-  getStaticAccounts: () => Promise<StaticAccounts>;
 };
 
 export type PostInstruction = ReturnType<typeof programClient.getListInstruction>;
@@ -36,7 +23,7 @@ export async function post(
     getRequiredWallet,
     getStaticAccounts,
     getAssociatedTokenPda,
-  }: RequiredHelpers
+  }: InstructionsHelperParams
 ): Promise<PostInstruction> {
   try {
     const wallet = getRequiredWallet();

@@ -1,23 +1,9 @@
-import { Address, ProgramDerivedAddressBump } from '@solana/kit';
+import type { Address } from '@solana/kit';
 import * as programClient from '../../../generated_clients/jobs/index.js';
-import { JobsProgram } from '../JobsProgram.js';
-import { ProgramDeps, Wallet } from '../../../types.js';
-import { ProgramConfig } from '../../../config/types.js';
-import { StaticAccounts } from '../../../utils/getStaticAccounts.js';
+import type { InstructionsHelperParams } from './types.js';
 
 export type EndParams = {
   job: Address;
-};
-
-type RequiredHelpers = {
-  deps: ProgramDeps;
-  config: ProgramConfig;
-  client: typeof programClient;
-  get: JobsProgram['get'];
-  getRuns: JobsProgram['runs'];
-  getRequiredWallet: () => Wallet;
-  getAssociatedTokenPda: () => Promise<readonly [Address<string>, ProgramDerivedAddressBump]>;
-  getStaticAccounts: () => Promise<StaticAccounts>;
 };
 
 export type EndInstruction = ReturnType<typeof programClient.getEndInstruction>;
@@ -26,7 +12,15 @@ export type End = (params: EndParams) => Promise<EndInstruction>;
 
 export async function end(
   { job }: EndParams,
-  { config, deps, client, get, getRuns, getRequiredWallet, getStaticAccounts }: RequiredHelpers
+  {
+    config,
+    deps,
+    client,
+    get,
+    getRuns,
+    getRequiredWallet,
+    getStaticAccounts,
+  }: InstructionsHelperParams
 ): Promise<EndInstruction> {
   try {
     const wallet = getRequiredWallet();

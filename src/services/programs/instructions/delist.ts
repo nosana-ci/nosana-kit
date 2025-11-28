@@ -1,23 +1,9 @@
-import { Address, ProgramDerivedAddressBump } from '@solana/kit';
+import type { Address } from '@solana/kit';
 import * as programClient from '../../../generated_clients/jobs/index.js';
-import { JobsProgram } from '../JobsProgram.js';
-import { ProgramDeps, Wallet } from '../../../types.js';
-import { ProgramConfig } from '../../../config/types.js';
-import { StaticAccounts } from '../../../utils/getStaticAccounts.js';
+import type { InstructionsHelperParams } from './types.js';
 
 export type DelistParams = {
   job: Address;
-};
-
-type RequiredHelpers = {
-  deps: ProgramDeps;
-  config: ProgramConfig;
-  client: typeof programClient;
-  get: JobsProgram['get'];
-  getRuns: JobsProgram['runs'];
-  getRequiredWallet: () => Wallet;
-  getAssociatedTokenPda: () => Promise<readonly [Address<string>, ProgramDerivedAddressBump]>;
-  getStaticAccounts: () => Promise<StaticAccounts>;
 };
 
 export type DelistInstruction = ReturnType<typeof programClient.getDelistInstruction>;
@@ -26,7 +12,7 @@ export type Delist = (params: DelistParams) => Promise<DelistInstruction>;
 
 export async function delist(
   { job }: DelistParams,
-  { config, deps, client, get, getRequiredWallet, getStaticAccounts }: RequiredHelpers
+  { config, deps, client, get, getRequiredWallet, getStaticAccounts }: InstructionsHelperParams
 ): Promise<DelistInstruction> {
   try {
     const wallet = getRequiredWallet();

@@ -1,25 +1,28 @@
-import {
+import bs58 from 'bs58';
+import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
+import { parseBase64RpcAccount } from '@solana/kit';
+import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
+import { ErrorCodes, NosanaError } from '../../errors/NosanaError.js';
+import { convertBigIntToNumber, type ConvertTypesForDb } from '../../utils/index.js';
+
+import type {
   Address,
   EncodedAccount,
-  parseBase64RpcAccount,
   Account,
   Base58EncodedBytes,
   GetProgramAccountsMemcmpFilter,
   ReadonlyUint8Array,
 } from '@solana/kit';
-import { ErrorCodes, NosanaError } from '../../errors/NosanaError.js';
 import type { ProgramDeps, Wallet } from '../../types.js';
-import * as programClient from '../../generated_clients/jobs/index.js';
-import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
-import bs58 from 'bs58';
-import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
-import { convertBigIntToNumber, ConvertTypesForDb } from '../../utils/index.js';
 import {
   getStaticAccounts as getStaticAccountsFn,
   type StaticAccounts,
 } from '../../utils/getStaticAccounts.js';
 import type { ProgramConfig } from '../../config/types.js';
+import type { InstructionsHelperParams } from './instructions/types.js';
+
 import * as Instructions from './instructions/index.js';
+import * as programClient from '../../generated_clients/jobs/index.js';
 
 export enum JobState {
   QUEUED = 0,
@@ -394,6 +397,22 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     }
   }
 
+  function createInstructionsHelper(
+    get: JobsProgram['get'],
+    getRuns: JobsProgram['runs']
+  ): InstructionsHelperParams {
+    return {
+      deps,
+      config,
+      client,
+      get,
+      getRuns,
+      getRequiredWallet,
+      getAssociatedTokenPda,
+      getStaticAccounts,
+    };
+  }
+
   return {
     /**
      * Fetch a job account by address
@@ -685,51 +704,16 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
      * Post a new job to the marketplace
      */
     async post(params: Instructions.PostParams): Promise<Instructions.PostInstruction> {
-      return Instructions.post(params, {
-        config,
-        deps,
-        client,
-        get: this.get,
-        getRequiredWallet,
-        getStaticAccounts,
-        getAssociatedTokenPda,
-      });
+      return Instructions.post(params, createInstructionsHelper(this.get, this.runs));
     },
     async extend(params: Instructions.ExtendParams): Promise<Instructions.ExtendInstruction> {
-      return Instructions.extend(params, {
-        config,
-        deps,
-        client,
-        get: this.get,
-        getRuns: this.runs,
-        getRequiredWallet,
-        getAssociatedTokenPda,
-        getStaticAccounts,
-      });
+      return Instructions.extend(params, createInstructionsHelper(this.get, this.runs));
     },
     async delist(params: Instructions.DelistParams): Promise<Instructions.DelistInstruction> {
-      return Instructions.delist(params, {
-        config,
-        deps,
-        client,
-        get: this.get,
-        getRuns: this.runs,
-        getRequiredWallet,
-        getAssociatedTokenPda,
-        getStaticAccounts,
-      });
+      return Instructions.delist(params, createInstructionsHelper(this.get, this.runs));
     },
     async end(params: Instructions.EndParams): Promise<Instructions.EndInstruction> {
-      return Instructions.end(params, {
-        config,
-        deps,
-        client,
-        get: this.get,
-        getRuns: this.runs,
-        getRequiredWallet,
-        getAssociatedTokenPda,
-        getStaticAccounts,
-      });
+      return Instructions.end(params, createInstructionsHelper(this.get, this.runs));
     },
     /**
      * Monitor program account updates using callback functions
