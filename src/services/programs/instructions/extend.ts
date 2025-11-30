@@ -31,11 +31,7 @@ export async function extend(
 
     // Get Required accounts
     const [jobAccount, associatedTokenAddress, { jobsProgram, ...staticAccounts }] =
-      await Promise.all([
-        get(job, false),
-        getNosATA(nosPayer.address),
-        getStaticAccounts(),
-      ]);
+      await Promise.all([get(job, false), getNosATA(nosPayer.address), getStaticAccounts()]);
     const vault = await deps.solana.pda([jobAccount.market, config.nosTokenAddress], jobsProgram);
 
     // Add the provided timeout to the job's existing timeout

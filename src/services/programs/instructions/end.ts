@@ -1,7 +1,6 @@
 import type { Address } from '@solana/kit';
 import type { getEndInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
-import { getCreateAssociatedTokenIdempotentInstruction, getCreateAssociatedTokenIdempotentInstructionAsync, getCreateAssociatedTokenIdempotentInstructionDataCodec, getCreateAssociatedTokenIdempotentInstructionDataDecoder, getCreateAssociatedTokenIdempotentInstructionDataEncoder } from '@solana-program/token';
 
 export type EndParams = {
   job: Address;

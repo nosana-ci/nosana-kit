@@ -396,11 +396,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
         return instruction;
       } catch (error) {
         deps.logger.error(`Failed to get create ATA instruction: ${error}`);
-        throw new NosanaError(
-          'Failed to get create ATA instruction',
-          ErrorCodes.RPC_ERROR,
-          error
-        );
+        throw new NosanaError('Failed to get create ATA instruction', ErrorCodes.RPC_ERROR, error);
       }
     },
   };

@@ -12,13 +12,21 @@ export type Delist = (params: DelistParams) => Promise<DelistInstruction>;
 
 export async function delist(
   { job }: DelistParams,
-  { config, deps, client, get, getRequiredWallet, getStaticAccounts, getNosATA }: InstructionsHelperParams
+  {
+    config,
+    deps,
+    client,
+    get,
+    getRequiredWallet,
+    getStaticAccounts,
+    getNosATA,
+  }: InstructionsHelperParams
 ): Promise<DelistInstruction> {
   try {
     const wallet = getRequiredWallet();
     // Get Required accounts
     const [jobAccount, { jobsProgram }] = await Promise.all([get(job, false), getStaticAccounts()]);
-    
+
     // Get associated token address for the job's payer
     const payerATA = await getNosATA(jobAccount.payer);
 
