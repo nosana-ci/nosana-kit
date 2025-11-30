@@ -1,5 +1,6 @@
 import bs58 from 'bs58';
 import { type Address, type TransactionSigner, generateKeyPairSigner } from '@solana/kit';
+import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import type { getListInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
@@ -23,23 +24,26 @@ export async function post(
     client,
     getRequiredWallet,
     getStaticAccounts,
-    getAssociatedTokenPda,
   }: InstructionsHelperParams
 ): Promise<PostInstruction> {
   try {
     const wallet = getRequiredWallet();
+    // Use provided payer or fall back to wallet
+    const nosPayer = payer ?? wallet;
+
     // Generate new keypairs for job and run
     const [jobKey, runKey, [associatedTokenAddress], { jobsProgram, ...staticAccounts }] =
       await Promise.all([
         generateKeyPairSigner(),
         generateKeyPairSigner(),
-        getAssociatedTokenPda(),
+        findAssociatedTokenPda({
+          mint: config.nosTokenAddress,
+          owner: nosPayer.address,
+          tokenProgram: TOKEN_PROGRAM_ADDRESS,
+        }),
         getStaticAccounts(),
       ]);
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
-
-    // Use provided payer or fall back to wallet
-    const nosPayer = payer ?? wallet;
 
     // Create the list instruction
     return client.getListInstruction({

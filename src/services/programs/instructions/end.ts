@@ -1,4 +1,5 @@
 import type { Address } from '@solana/kit';
+import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import type { getEndInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
@@ -20,33 +21,38 @@ export async function end(
     getRuns,
     getRequiredWallet,
     getStaticAccounts,
-    getAssociatedTokenPda,
   }: InstructionsHelperParams
 ): Promise<EndInstruction> {
   try {
     const wallet = getRequiredWallet();
     // Get Required accounts
-    const [{ market }, [run], { jobsProgram }, [associatedTokenPda]] = await Promise.all([
+    const [jobAccount, [run], { jobsProgram }] = await Promise.all([
       get(job, false),
       getRuns({ job }),
       getStaticAccounts(),
-      getAssociatedTokenPda(),
     ]);
 
     if (!run) {
       throw new Error('No job run account found for the specified job');
     }
 
-    const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
+    // Get associated token address for the job's payer
+    const [associatedTokenPda] = await findAssociatedTokenPda({
+      mint: config.nosTokenAddress,
+      owner: jobAccount.payer,
+      tokenProgram: TOKEN_PROGRAM_ADDRESS,
+    });
+
+    const vault = await deps.solana.pda([jobAccount.market, config.nosTokenAddress], jobsProgram);
 
     return client.getEndInstruction({
       job,
-      market,
+      market: jobAccount.market,
       run: run.address, // Todo: Set these accounts properly
-      deposit: undefined, // Todo: Set these accounts properly
-      user: associatedTokenPda, // Todo: Set these accounts properly
+      deposit: associatedTokenPda, // Deposit is the same as user (associated token address)
+      user: associatedTokenPda, // Associated token address for the job's payer
       vault: vault,
-      payer: wallet.address,
+      payer: jobAccount.payer, // Use payer from the job account
       authority: wallet,
     });
   } catch (err) {

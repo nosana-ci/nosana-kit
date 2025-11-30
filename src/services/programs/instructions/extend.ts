@@ -1,4 +1,5 @@
 import type { Address, TransactionSigner } from '@solana/kit';
+import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import type { getExtendInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
@@ -20,19 +21,26 @@ export async function extend(
     client,
     get,
     getRequiredWallet,
-    getAssociatedTokenPda,
     getStaticAccounts,
   }: InstructionsHelperParams
 ): Promise<ExtendInstruction> {
   try {
     const wallet = getRequiredWallet();
-    // Get Required accounts
-    const [{ market }, [associatedTokenAddress], { jobsProgram, ...staticAccounts }] =
-      await Promise.all([get(job, false), getAssociatedTokenPda(), getStaticAccounts()]);
-    const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
-
     // Use provided payer or fall back to wallet
     const nosPayer = payer ?? wallet;
+
+    // Get Required accounts
+    const [{ market }, [associatedTokenAddress], { jobsProgram, ...staticAccounts }] =
+      await Promise.all([
+        get(job, false),
+        findAssociatedTokenPda({
+          mint: config.nosTokenAddress,
+          owner: nosPayer.address,
+          tokenProgram: TOKEN_PROGRAM_ADDRESS,
+        }),
+        getStaticAccounts(),
+      ]);
+    const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
     // Create the extend instruction
     return client.getExtendInstruction({
