@@ -1,5 +1,4 @@
 import type { Address } from '@solana/kit';
-import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import type { getEndInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
@@ -21,6 +20,7 @@ export async function end(
     getRuns,
     getRequiredWallet,
     getStaticAccounts,
+    getNosATA,
   }: InstructionsHelperParams
 ): Promise<EndInstruction> {
   try {
@@ -37,19 +37,9 @@ export async function end(
     }
 
     // Get associated token addresses
-    const [[payerATA], [nodeATA]] = await Promise.all([
-      // ATA for the job's payer (for deposit)
-      findAssociatedTokenPda({
-        mint: config.nosTokenAddress,
-        owner: jobAccount.payer,
-        tokenProgram: TOKEN_PROGRAM_ADDRESS,
-      }),
-      // ATA for the node (for user)
-      findAssociatedTokenPda({
-        mint: config.nosTokenAddress,
-        owner: run.node,
-        tokenProgram: TOKEN_PROGRAM_ADDRESS,
-      }),
+    const [payerATA, nodeATA] = await Promise.all([
+      getNosATA(jobAccount.payer), // ATA for the job's payer (for deposit)
+      getNosATA(run.node), // ATA for the node (for user)
     ]);
 
     const vault = await deps.solana.pda([jobAccount.market, config.nosTokenAddress], jobsProgram);

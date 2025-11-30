@@ -13,4 +13,5 @@ export type InstructionsHelperParams = {
   getRuns: JobsProgram['runs'];
   getRequiredWallet: () => Wallet;
   getStaticAccounts: () => Promise<StaticAccounts>;
+  getNosATA: (owner: Address) => Promise<Address<string>>;
 };
