@@ -1,7 +1,6 @@
 import bs58 from 'bs58';
 import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 import { parseBase64RpcAccount } from '@solana/kit';
-import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import { ErrorCodes, NosanaError } from '../../errors/NosanaError.js';
 import { convertBigIntToNumber, type ConvertTypesForDb } from '../../utils/index.js';
 
@@ -292,15 +291,6 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     return wallet;
   }
 
-  function getAssociatedTokenPda() {
-    const wallet = getRequiredWallet();
-    return findAssociatedTokenPda({
-      mint: config.nosTokenAddress,
-      owner: wallet.address,
-      tokenProgram: TOKEN_PROGRAM_ADDRESS,
-    });
-  }
-
   function getStaticAccounts() {
     return getStaticAccountsFn(config, deps.solana, staticAccountsCache);
   }
@@ -408,7 +398,6 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       get,
       getRuns,
       getRequiredWallet,
-      getAssociatedTokenPda,
       getStaticAccounts,
     };
   }

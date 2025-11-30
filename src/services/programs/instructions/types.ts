@@ -1,4 +1,4 @@
-import type { Address, ProgramDerivedAddressBump } from '@solana/kit';
+import type { Address } from '@solana/kit';
 import type { ProgramConfig } from '../../../config';
 import type { ProgramDeps, Wallet } from '../../../types';
 import type { JobsProgram } from '../JobsProgram';
@@ -12,6 +12,5 @@ export type InstructionsHelperParams = {
   get: JobsProgram['get'];
   getRuns: JobsProgram['runs'];
   getRequiredWallet: () => Wallet;
-  getAssociatedTokenPda: () => Promise<readonly [Address<string>, ProgramDerivedAddressBump]>;
   getStaticAccounts: () => Promise<StaticAccounts>;
 };
