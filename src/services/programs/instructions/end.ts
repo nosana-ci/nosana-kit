@@ -1,12 +1,12 @@
 import type { Address } from '@solana/kit';
-import * as programClient from '../../../generated_clients/jobs/index.js';
+import type { getEndInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
 export type EndParams = {
   job: Address;
 };
 
-export type EndInstruction = ReturnType<typeof programClient.getEndInstruction>;
+export type EndInstruction = ReturnType<typeof getEndInstruction>;
 
 export type End = (params: EndParams) => Promise<EndInstruction>;
 

@@ -1,12 +1,12 @@
 import type { Address } from '@solana/kit';
-import * as programClient from '../../../generated_clients/jobs/index.js';
+import type { getDelistInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
 export type DelistParams = {
   job: Address;
 };
 
-export type DelistInstruction = ReturnType<typeof programClient.getDelistInstruction>;
+export type DelistInstruction = ReturnType<typeof getDelistInstruction>;
 
 export type Delist = (params: DelistParams) => Promise<DelistInstruction>;
 

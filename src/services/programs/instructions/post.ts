@@ -1,6 +1,6 @@
 import bs58 from 'bs58';
 import { type Address, generateKeyPairSigner } from '@solana/kit';
-import * as programClient from '../../../generated_clients/jobs/index.js';
+import type { getListInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
 export type PostParams = {
@@ -10,7 +10,7 @@ export type PostParams = {
   node?: Address;
 };
 
-export type PostInstruction = ReturnType<typeof programClient.getListInstruction>;
+export type PostInstruction = ReturnType<typeof getListInstruction>;
 
 export type Post = (params: PostParams) => Promise<PostInstruction>;
 

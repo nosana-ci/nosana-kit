@@ -1,5 +1,5 @@
 import type { Address } from '@solana/kit';
-import * as programClient from '../../../generated_clients/jobs/index.js';
+import type { getExtendInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
 export type ExtendParams = {
@@ -7,7 +7,7 @@ export type ExtendParams = {
   timeout: number | bigint;
 };
 
-export type ExtendInstruction = ReturnType<typeof programClient.getExtendInstruction>;
+export type ExtendInstruction = ReturnType<typeof getExtendInstruction>;
 
 export type Extend = (params: ExtendParams) => Promise<ExtendInstruction>;
 
