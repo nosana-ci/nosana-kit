@@ -36,21 +36,30 @@ export async function end(
       throw new Error('No job run account found for the specified job');
     }
 
-    // Get associated token address for the job's payer
-    const [associatedTokenPda] = await findAssociatedTokenPda({
-      mint: config.nosTokenAddress,
-      owner: jobAccount.payer,
-      tokenProgram: TOKEN_PROGRAM_ADDRESS,
-    });
+    // Get associated token addresses
+    const [[payerATA], [nodeATA]] = await Promise.all([
+      // ATA for the job's payer (for deposit)
+      findAssociatedTokenPda({
+        mint: config.nosTokenAddress,
+        owner: jobAccount.payer,
+        tokenProgram: TOKEN_PROGRAM_ADDRESS,
+      }),
+      // ATA for the node (for user)
+      findAssociatedTokenPda({
+        mint: config.nosTokenAddress,
+        owner: run.node,
+        tokenProgram: TOKEN_PROGRAM_ADDRESS,
+      }),
+    ]);
 
     const vault = await deps.solana.pda([jobAccount.market, config.nosTokenAddress], jobsProgram);
 
     return client.getEndInstruction({
       job,
       market: jobAccount.market,
-      run: run.address, // Todo: Set these accounts properly
-      deposit: associatedTokenPda, // Deposit is the same as user (associated token address)
-      user: associatedTokenPda, // Associated token address for the job's payer
+      run: run.address,
+      deposit: payerATA, // ATA of the job payer
+      user: nodeATA, // ATA of the node (from run account)
       vault: vault,
       payer: jobAccount.payer, // Use payer from the job account
       authority: wallet,
