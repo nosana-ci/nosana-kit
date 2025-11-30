@@ -1,5 +1,5 @@
 import bs58 from 'bs58';
-import { type Address, generateKeyPairSigner } from '@solana/kit';
+import { type Address, type TransactionSigner, generateKeyPairSigner } from '@solana/kit';
 import type { getListInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
@@ -8,6 +8,7 @@ export type PostParams = {
   timeout: number | bigint;
   ipfsHash: string;
   node?: Address;
+  payer?: TransactionSigner;
 };
 
 export type PostInstruction = ReturnType<typeof getListInstruction>;
@@ -15,7 +16,7 @@ export type PostInstruction = ReturnType<typeof getListInstruction>;
 export type Post = (params: PostParams) => Promise<PostInstruction>;
 
 export async function post(
-  { market, timeout, ipfsHash }: PostParams,
+  { market, timeout, ipfsHash, payer }: PostParams,
   {
     config,
     deps,
@@ -37,6 +38,9 @@ export async function post(
       ]);
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
+    // Use provided payer or fall back to wallet
+    const nosPayer = payer ?? wallet;
+
     // Create the list instruction
     return client.getListInstruction({
       job: jobKey,
@@ -46,7 +50,7 @@ export async function post(
       timeout,
       user: associatedTokenAddress,
       vault: vault,
-      payer: wallet,
+      payer: nosPayer,
       authority: wallet,
       ...staticAccounts,
     });
