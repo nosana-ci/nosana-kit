@@ -30,7 +30,7 @@ export async function extend(
     const nosPayer = payer ?? wallet;
 
     // Get Required accounts
-    const [{ market }, [associatedTokenAddress], { jobsProgram, ...staticAccounts }] =
+    const [jobAccount, [associatedTokenAddress], { jobsProgram, ...staticAccounts }] =
       await Promise.all([
         get(job, false),
         findAssociatedTokenPda({
@@ -40,13 +40,16 @@ export async function extend(
         }),
         getStaticAccounts(),
       ]);
-    const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
+    const vault = await deps.solana.pda([jobAccount.market, config.nosTokenAddress], jobsProgram);
+
+    // Add the provided timeout to the job's existing timeout
+    const newTimeout = BigInt(jobAccount.timeout) + BigInt(timeout);
 
     // Create the extend instruction
     return client.getExtendInstruction({
       job,
-      timeout,
-      market,
+      timeout: newTimeout,
+      market: jobAccount.market,
       vault,
       payer: nosPayer,
       authority: wallet,
