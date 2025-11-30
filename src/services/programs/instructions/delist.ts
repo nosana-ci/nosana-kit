@@ -1,4 +1,5 @@
 import type { Address } from '@solana/kit';
+import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import type { getDelistInstruction } from '../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
@@ -17,15 +18,23 @@ export async function delist(
   try {
     const wallet = getRequiredWallet();
     // Get Required accounts
-    const [{ market }, { jobsProgram }] = await Promise.all([get(job, false), getStaticAccounts()]);
-    const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
+    const [jobAccount, { jobsProgram }] = await Promise.all([get(job, false), getStaticAccounts()]);
+    
+    // Get associated token address for the job's payer
+    const [payerATA] = await findAssociatedTokenPda({
+      mint: config.nosTokenAddress,
+      owner: jobAccount.payer,
+      tokenProgram: TOKEN_PROGRAM_ADDRESS,
+    });
+
+    const vault = await deps.solana.pda([jobAccount.market, config.nosTokenAddress], jobsProgram);
 
     return client.getDelistInstruction({
       job,
-      market,
+      market: jobAccount.market,
       vault,
-      deposit: undefined, // Todo: Set account properly
-      payer: wallet.address,
+      deposit: payerATA, // Associated token address for the job's payer
+      payer: jobAccount.payer, // Use payer from the job account
       authority: wallet,
     });
   } catch (err) {
