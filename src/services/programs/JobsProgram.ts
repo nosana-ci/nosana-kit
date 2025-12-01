@@ -1,21 +1,28 @@
-import {
+import bs58 from 'bs58';
+import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
+import { parseBase64RpcAccount } from '@solana/kit';
+import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
+import { ErrorCodes, NosanaError } from '../../errors/NosanaError.js';
+import { convertBigIntToNumber, type ConvertTypesForDb } from '../../utils/index.js';
+
+import type {
   Address,
-  generateKeyPairSigner,
   EncodedAccount,
-  parseBase64RpcAccount,
   Account,
   Base58EncodedBytes,
   GetProgramAccountsMemcmpFilter,
   ReadonlyUint8Array,
 } from '@solana/kit';
-import { ErrorCodes, NosanaError } from '../../errors/NosanaError.js';
-import type { ProgramDeps } from '../../types.js';
+import type { ProgramDeps, Wallet } from '../../types.js';
+import {
+  getStaticAccounts as getStaticAccountsFn,
+  type StaticAccounts,
+} from '../../utils/getStaticAccounts.js';
+import type { ProgramConfig } from '../../config/types.js';
+import type { InstructionsHelperParams } from './instructions/types.js';
+
+import * as Instructions from './instructions/index.js';
 import * as programClient from '../../generated_clients/jobs/index.js';
-import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
-import bs58 from 'bs58';
-import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
-import { convertBigIntToNumber, ConvertTypesForDb } from '../../utils/index.js';
-import { getStaticAccounts, type StaticAccounts } from '../../utils/getStaticAccounts.js';
 
 export enum JobState {
   QUEUED = 0,
@@ -91,12 +98,20 @@ export interface JobsProgram {
   /**
    * Post a new job to the marketplace
    */
-  post(params: {
-    market: Address;
-    timeout: number | bigint;
-    ipfsHash: string;
-    node?: Address;
-  }): Promise<ReturnType<typeof programClient.getListInstruction>>;
+  post: Instructions.Post;
+
+  /**
+   *  Extend an existing job's timeout
+   */
+  extend: Instructions.Extend;
+  /**
+   * Delist a job from the marketplace
+   */
+  delist: Instructions.Delist;
+  /**
+   * Stop a running job
+   */
+  end(params: { job: Address }): Promise<ReturnType<typeof programClient.getEndInstruction>>;
 
   /**
    * Monitor program account updates using callback functions
@@ -129,7 +144,6 @@ export interface JobsProgram {
  * const job = await jobsProgram.get('job-address');
  * ```
  */
-import type { ProgramConfig } from '../../config/types.js';
 
 export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): JobsProgram {
   const programId = config.jobsAddress;
@@ -268,6 +282,30 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
   }
 
   /**
+   * Get the required wallet or throw an error if not available
+   */
+  function getRequiredWallet(): Wallet {
+    const wallet = deps.getWallet();
+    if (!wallet) {
+      throw new NosanaError('Wallet is required for this operation', ErrorCodes.NO_WALLET);
+    }
+    return wallet;
+  }
+
+  function getStaticAccounts() {
+    return getStaticAccountsFn(config, deps.solana, staticAccountsCache);
+  }
+
+  async function getNosATA(owner: Address) {
+    const [ata] = await findAssociatedTokenPda({
+      mint: config.nosTokenAddress,
+      owner,
+      tokenProgram: TOKEN_PROGRAM_ADDRESS,
+    });
+    return ata;
+  }
+
+  /**
    * Handle account update using callback functions
    */
   async function handleAccountUpdate(
@@ -357,6 +395,22 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       // Throw the error so the calling function can restart the subscription
       throw error;
     }
+  }
+
+  function createInstructionsHelper(
+    get: JobsProgram['get'],
+    getRuns: JobsProgram['runs']
+  ): InstructionsHelperParams {
+    return {
+      deps,
+      config,
+      client,
+      get,
+      getRuns,
+      getRequiredWallet,
+      getStaticAccounts,
+      getNosATA,
+    };
   }
 
   return {
@@ -646,52 +700,21 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
         throw err;
       }
     },
-
     /**
      * Post a new job to the marketplace
      */
-    async post(params: {
-      market: Address;
-      timeout: number | bigint;
-      ipfsHash: string;
-      node?: Address;
-    }): Promise<ReturnType<typeof client.getListInstruction>> {
-      const jobKey = await generateKeyPairSigner();
-      const runKey = await generateKeyPairSigner();
-
-      const [associatedTokenAddress] = await findAssociatedTokenPda({
-        mint: config.nosTokenAddress,
-        owner: deps.getWallet()!.address,
-        tokenProgram: TOKEN_PROGRAM_ADDRESS,
-      });
-      try {
-        const staticAccounts = await getStaticAccounts(config, deps.solana, staticAccountsCache);
-        // Create the list instruction
-        const instruction = client.getListInstruction({
-          job: jobKey,
-          market: params.market,
-          run: runKey,
-          user: associatedTokenAddress,
-          vault: await deps.solana.pda(
-            [params.market, config.nosTokenAddress],
-            staticAccounts.jobsProgram
-          ),
-          payer: deps.getWallet()!,
-          rewardsReflection: staticAccounts.rewardsReflection,
-          rewardsVault: staticAccounts.rewardsVault,
-          authority: deps.getWallet()!,
-          rewardsProgram: staticAccounts.rewardsProgram,
-          ipfsJob: bs58.decode(params.ipfsHash).subarray(2),
-          timeout: params.timeout,
-        });
-        return instruction;
-      } catch (err) {
-        const errorMessage = `Failed to create list instruction: ${err instanceof Error ? err.message : String(err)}`;
-        deps.logger.error(errorMessage);
-        throw new Error(errorMessage);
-      }
+    async post(params) {
+      return Instructions.post(params, createInstructionsHelper(this.get, this.runs));
     },
-
+    async extend(params) {
+      return Instructions.extend(params, createInstructionsHelper(this.get, this.runs));
+    },
+    async delist(params) {
+      return Instructions.delist(params, createInstructionsHelper(this.get, this.runs));
+    },
+    async end(params) {
+      return Instructions.end(params, createInstructionsHelper(this.get, this.runs));
+    },
     /**
      * Monitor program account updates using callback functions
      * Uses WebSocket subscriptions with automatic restart on failure

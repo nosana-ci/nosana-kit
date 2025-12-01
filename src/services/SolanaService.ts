@@ -30,6 +30,11 @@ import {
   estimateComputeUnitLimitFactory,
   getSetComputeUnitLimitInstruction,
 } from '@solana-program/compute-budget';
+import {
+  getCreateAssociatedTokenIdempotentInstructionAsync,
+  TOKEN_PROGRAM_ADDRESS,
+} from '@solana-program/token';
+import { SYSTEM_PROGRAM_ADDRESS } from '@solana-program/system';
 import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
 import { Logger } from '../logger/Logger.js';
 import { Wallet } from '../types.js';
@@ -100,6 +105,23 @@ export interface SolanaService {
       commitment?: 'processed' | 'confirmed' | 'finalized';
     }
   ): Promise<Signature>;
+  /**
+   * Get an instruction to create an associated token account if it doesn't exist.
+   * Checks if the ATA exists, and if not, returns an instruction to create it.
+   * Uses the idempotent version so it's safe to call even if the account already exists.
+   *
+   * @param ata The associated token account address
+   * @param mint The token mint address
+   * @param owner The owner of the associated token account
+   * @param payer Optional payer for the account creation. If not provided, uses the wallet or service feePayer.
+   * @returns An instruction to create the ATA if it doesn't exist, or null if it already exists
+   */
+  getCreateATAInstructionIfNeeded(
+    ata: Address,
+    mint: Address,
+    owner: Address,
+    payer?: TransactionSigner
+  ): Promise<Instruction | null>;
 }
 
 /**
@@ -325,6 +347,57 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       });
       const signedTransaction = await this.signTransaction(transactionMessage);
       return await this.sendTransaction(signedTransaction, { commitment: options?.commitment });
+    },
+
+    /**
+     * Get an instruction to create an associated token account if it doesn't exist.
+     * Checks if the ATA exists, and if not, returns an instruction to create it.
+     * Uses the idempotent version so it's safe to call even if the account already exists.
+     *
+     * @param ata The associated token account address
+     * @param mint The token mint address
+     * @param owner The owner of the associated token account
+     * @param payer Optional payer for the account creation. If not provided, uses the wallet or service feePayer.
+     * @returns An instruction to create the ATA if it doesn't exist, or null if it already exists
+     */
+    async getCreateATAInstructionIfNeeded(
+      ata: Address,
+      mint: Address,
+      owner: Address,
+      payer?: TransactionSigner
+    ): Promise<Instruction | null> {
+      try {
+        // Check if the account exists
+        const accountInfo = await rpc.getAccountInfo(ata).send();
+        if (accountInfo.value !== null) {
+          // Account already exists
+          return null;
+        }
+
+        // Account doesn't exist, create instruction
+        // Priority: provided payer > service feePayer > wallet
+        const instructionPayer = payer ?? feePayer ?? deps.getWallet();
+        if (!instructionPayer) {
+          throw new NosanaError(
+            'No payer found for creating associated token account',
+            ErrorCodes.NO_WALLET
+          );
+        }
+
+        const instruction = await getCreateAssociatedTokenIdempotentInstructionAsync({
+          payer: instructionPayer,
+          ata,
+          owner,
+          mint,
+          systemProgram: SYSTEM_PROGRAM_ADDRESS,
+          tokenProgram: TOKEN_PROGRAM_ADDRESS,
+        });
+
+        return instruction;
+      } catch (error) {
+        deps.logger.error(`Failed to get create ATA instruction: ${error}`);
+        throw new NosanaError('Failed to get create ATA instruction', ErrorCodes.RPC_ERROR, error);
+      }
     },
   };
 }
