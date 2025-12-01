@@ -26,7 +26,7 @@ export async function end(
   try {
     const wallet = getRequiredWallet();
     // Get Required accounts
-    const [jobAccount, [run], { jobsProgram }] = await Promise.all([
+    const [{ market, payer }, [run], { jobsProgram }] = await Promise.all([
       get(job, false),
       getRuns({ job }),
       getStaticAccounts(),
@@ -38,20 +38,20 @@ export async function end(
 
     // Get associated token addresses
     const [payerATA, nodeATA] = await Promise.all([
-      getNosATA(jobAccount.payer), // ATA for the job's payer (for deposit)
+      getNosATA(payer), // ATA for the job's payer (for deposit)
       getNosATA(run.node), // ATA for the node (for user)
     ]);
 
-    const vault = await deps.solana.pda([jobAccount.market, config.nosTokenAddress], jobsProgram);
+    const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
     return client.getEndInstruction({
       job,
-      market: jobAccount.market,
+      market: market,
       run: run.address,
       deposit: payerATA, // ATA of the job payer
       user: nodeATA, // ATA of the node (from run account)
       vault: vault,
-      payer: jobAccount.payer, // Use payer from the job account
+      payer: payer, // Use payer from the job account
       authority: wallet,
     });
   } catch (err) {

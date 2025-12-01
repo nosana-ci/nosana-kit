@@ -25,19 +25,20 @@ export async function delist(
   try {
     const wallet = getRequiredWallet();
     // Get Required accounts
-    const [jobAccount, { jobsProgram }] = await Promise.all([get(job, false), getStaticAccounts()]);
+    const [{ market, payer }, { jobsProgram }] = await Promise.all([get(job, false), getStaticAccounts()]);
 
     // Get associated token address for the job's payer
-    const payerATA = await getNosATA(jobAccount.payer);
-
-    const vault = await deps.solana.pda([jobAccount.market, config.nosTokenAddress], jobsProgram);
+    const [payerATA, vault] = await Promise.all([
+      getNosATA(payer),
+      deps.solana.pda([market, config.nosTokenAddress], jobsProgram),
+    ]);
 
     return client.getDelistInstruction({
       job,
-      market: jobAccount.market,
+      market,
       vault,
       deposit: payerATA, // Associated token address for the job's payer
-      payer: jobAccount.payer, // Use payer from the job account
+      payer,
       authority: wallet,
     });
   } catch (err) {
