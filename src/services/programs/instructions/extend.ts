@@ -30,8 +30,11 @@ export async function extend(
     const nosPayer = payer ?? wallet;
 
     // Get Required accounts
-    const [{ market, timeout: currentTimeout }, associatedTokenAddress, { jobsProgram, ...staticAccounts }] =
-      await Promise.all([get(job, false), getNosATA(nosPayer.address), getStaticAccounts()]);
+    const [
+      { market, timeout: currentTimeout },
+      associatedTokenAddress,
+      { jobsProgram, ...staticAccounts },
+    ] = await Promise.all([get(job, false), getNosATA(nosPayer.address), getStaticAccounts()]);
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
     // Create the extend instruction

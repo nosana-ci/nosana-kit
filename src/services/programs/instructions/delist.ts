@@ -25,7 +25,10 @@ export async function delist(
   try {
     const wallet = getRequiredWallet();
     // Get Required accounts
-    const [{ market, payer }, { jobsProgram }] = await Promise.all([get(job, false), getStaticAccounts()]);
+    const [{ market, payer }, { jobsProgram }] = await Promise.all([
+      get(job, false),
+      getStaticAccounts(),
+    ]);
 
     // Get associated token address for the job's payer
     const [payerATA, vault] = await Promise.all([
