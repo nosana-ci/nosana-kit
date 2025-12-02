@@ -53,14 +53,27 @@ export type Market = Omit<ConvertTypesForDb<programClient.MarketAccountArgs>, 'q
 export type Run = ConvertTypesForDb<programClient.RunAccountArgs> & { address: Address };
 
 /**
+ * Monitor event type constants
+ */
+export const MonitorEventType = {
+  JOB: 'job',
+  MARKET: 'market',
+  RUN: 'run',
+} as const;
+
+export type MonitorEventType = typeof MonitorEventType[keyof typeof MonitorEventType];
+
+/**
  * Simple monitor event (run accounts are auto-merged into job events)
  */
-export type SimpleMonitorEvent = { type: 'job'; data: Job } | { type: 'market'; data: Market };
+export type SimpleMonitorEvent =
+  | { type: typeof MonitorEventType.JOB; data: Job }
+  | { type: typeof MonitorEventType.MARKET; data: Market };
 
 /**
  * Event types for monitoring (extends SimpleMonitorEvent with run events)
  */
-export type MonitorEvent = SimpleMonitorEvent | { type: 'run'; data: Run };
+export type MonitorEvent = SimpleMonitorEvent | { type: typeof MonitorEventType.RUN; data: Run };
 
 /**
  * Jobs program interface
@@ -136,9 +149,9 @@ export interface JobsProgram {
    * ```typescript
    * const [eventStream, stop] = await jobsProgram.monitor();
    * for await (const event of eventStream) {
-   *   if (event.type === 'job') {
+   *   if (event.type === MonitorEventType.JOB) {
    *     console.log('Job updated:', event.data.address);
-   *   } else if (event.type === 'market') {
+   *   } else if (event.type === MonitorEventType.MARKET) {
    *     console.log('Market updated:', event.data.address);
    *   }
    * }
@@ -156,13 +169,13 @@ export interface JobsProgram {
    * const [eventStream, stop] = await jobsProgram.monitorDetailed();
    * for await (const event of eventStream) {
    *   switch (event.type) {
-   *     case 'job':
+   *     case MonitorEventType.JOB:
    *       console.log('Job updated:', event.data.address);
    *       break;
-   *     case 'market':
+   *     case MonitorEventType.MARKET:
    *       console.log('Market updated:', event.data.address);
    *       break;
-   *     case 'run':
+   *     case MonitorEventType.RUN:
    *       console.log('Run updated:', event.data.address);
    *       break;
    *   }
@@ -426,13 +439,13 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
                 }
               }
 
-              yield { type: 'job', data: job };
+              yield { type: MonitorEventType.JOB, data: job };
               break;
             }
             case client.NosanaJobsAccount.MarketAccount: {
               const marketAccount = client.decodeMarketAccount(encodedAccount);
               const market = transformMarketAccount(marketAccount);
-              yield { type: 'market', data: market };
+              yield { type: MonitorEventType.MARKET, data: market };
               break;
             }
             case client.NosanaJobsAccount.RunAccount: {
@@ -444,7 +457,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
                 try {
                   const job = await get(run.job, false);
                   const mergedJob = mergeRunIntoJob(job, run);
-                  yield { type: 'job', data: mergedJob };
+                  yield { type: MonitorEventType.JOB, data: mergedJob };
                 } catch (error) {
                   deps.logger.error(
                     `Error fetching job ${run.job} for run account ${runAccount.address}: ${error}`
@@ -453,7 +466,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
                 }
               } else {
                 // For detailed monitoring, yield run event as-is
-                yield { type: 'run', data: run };
+                yield { type: MonitorEventType.RUN, data: run };
               }
               break;
             }
@@ -801,10 +814,10 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
      * // Example: Simple monitoring - run accounts are automatically merged into job updates
      * const [eventStream, stop] = await jobsProgram.monitor();
      * for await (const event of eventStream) {
-     *   if (event.type === 'job') {
+     *   if (event.type === MonitorEventType.JOB) {
      *     console.log('Job updated:', event.data.address.toString());
      *     // event.data will have state, node, and timeStart from run account if it exists
-     *   } else if (event.type === 'market') {
+     *   } else if (event.type === MonitorEventType.MARKET) {
      *     console.log('Market updated:', event.data.address.toString());
      *   }
      * }
@@ -828,13 +841,13 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
      * const [eventStream, stop] = await jobsProgram.monitorDetailed();
      * for await (const event of eventStream) {
      *   switch (event.type) {
-     *     case 'job':
+     *     case MonitorEventType.JOB:
      *       console.log('Job updated:', event.data.address.toString());
      *       break;
-     *     case 'market':
+     *     case MonitorEventType.MARKET:
      *       console.log('Market updated:', event.data.address.toString());
      *       break;
-     *     case 'run':
+     *     case MonitorEventType.RUN:
      *       console.log('Run updated:', event.data.address.toString());
      *       break;
      *   }

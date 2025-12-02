@@ -7,6 +7,7 @@ import {
   type JobsProgram,
   JobState,
   MarketQueueType,
+  MonitorEventType,
 } from '../../../../src/services/programs/jobs/index.js';
 import * as programClient from '../../../../src/generated_clients/jobs/index.js';
 import {
@@ -385,7 +386,7 @@ describe('JobsProgram', () => {
           executable: false,
           lamports: 1000000,
           owner: sdk.config.programs.jobsAddress,
-          space: BigInt(accountType === 'run' ? 113 : 233),
+          space: BigInt(accountType === MonitorEventType.RUN ? 113 : 233),
         },
         pubkey,
       },
@@ -406,8 +407,8 @@ describe('JobsProgram', () => {
       const jobAccount = makeJobAccount(JobState.QUEUED, JOB_ADDR);
       const marketAccount = makeMarketAccount();
       const notifications = [
-        createNotification(JOB_ADDR, 'job'),
-        createNotification(MARKET_ADDR, 'market'),
+        createNotification(JOB_ADDR, MonitorEventType.JOB),
+        createNotification(MARKET_ADDR, MonitorEventType.MARKET),
       ];
 
       createMockSubscription(notifications);
@@ -432,9 +433,9 @@ describe('JobsProgram', () => {
       }
 
       expect(events).toHaveLength(2);
-      expect(events[0].type).toBe('job');
-      expect(events[1].type).toBe('market');
-      expect(events.every((e) => e.type !== 'run')).toBe(true);
+      expect(events[0].type).toBe(MonitorEventType.JOB);
+      expect(events[1].type).toBe(MonitorEventType.MARKET);
+      expect(events.every((e) => e.type !== MonitorEventType.RUN)).toBe(true);
 
       stop();
     });
@@ -442,7 +443,7 @@ describe('JobsProgram', () => {
     it('auto-merges run accounts into job events', async () => {
       const jobAccount = makeJobAccount(JobState.QUEUED, JOB_ADDR);
       const runAccount = makeRunAccount(JOB_ADDR, RUN_TIME_555, NODE_ADDR);
-      const notifications = [createNotification(RUN_ADDR, 'run')];
+      const notifications = [createNotification(RUN_ADDR, MonitorEventType.RUN)];
 
       createMockSubscription(notifications);
       vi.spyOn(programClient, 'decodeRunAccount' as any).mockReturnValue(runAccount);
@@ -461,7 +462,7 @@ describe('JobsProgram', () => {
 
       expect(events).toHaveLength(1);
       const event = events[0];
-      expect(event.type).toBe('job');
+      expect(event.type).toBe(MonitorEventType.JOB);
       expect(event.data.state).toBe(JobState.RUNNING);
       expect(event.data.timeStart).toBe(RUN_TIME_555);
       expect(event.data.node).toBe(NODE_ADDR);
@@ -471,7 +472,7 @@ describe('JobsProgram', () => {
 
     it('monitorDetailed yields run events separately', async () => {
       const runAccount = makeRunAccount(JOB_ADDR, RUN_TIME_777);
-      const notifications = [createNotification(RUN_ADDR, 'run')];
+      const notifications = [createNotification(RUN_ADDR, MonitorEventType.RUN)];
 
       createMockSubscription(notifications);
       vi.spyOn(programClient, 'decodeRunAccount' as any).mockReturnValue(runAccount);
@@ -488,7 +489,7 @@ describe('JobsProgram', () => {
 
       expect(events).toHaveLength(1);
       const event = events[0];
-      expect(event.type).toBe('run');
+      expect(event.type).toBe(MonitorEventType.RUN);
       expect(event.data.time).toBe(RUN_TIME_777);
       expect(event.data.job).toBe(JOB_ADDR);
 
