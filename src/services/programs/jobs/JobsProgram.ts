@@ -12,6 +12,10 @@ import type {
   Base58EncodedBytes,
   GetProgramAccountsMemcmpFilter,
   ReadonlyUint8Array,
+  AccountInfoWithBase64EncodedData,
+  AccountInfoBase,
+  SolanaRpcResponse,
+  AccountInfoWithPubkey,
 } from '@solana/kit';
 import type { ProgramDeps, Wallet } from '../../../types.js';
 import {
@@ -114,9 +118,20 @@ export interface JobsProgram {
   end(params: { job: Address }): Promise<ReturnType<typeof programClient.getEndInstruction>>;
 
   /**
-   * Monitor program account updates using callback functions
+   * Monitor program account updates using callback functions.
+   * Automatically merges run account data into job account updates.
    */
   monitor(options?: {
+    onJobAccount?: (jobAccount: Job) => Promise<void> | void;
+    onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
+    onError?: (error: Error, accountType?: string) => Promise<void> | void;
+  }): Promise<() => void>;
+
+  /**
+   * Monitor program account updates with detailed callbacks for each account type.
+   * Provides separate callbacks for job, market, and run accounts.
+   */
+  monitorDetailed(options?: {
     onJobAccount?: (jobAccount: Job) => Promise<void> | void;
     onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
     onRunAccount?: (runAccount: Run) => Promise<void> | void;
@@ -193,6 +208,19 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
   }
 
   /**
+   * Merge run account data into a job account.
+   * Updates the job state to RUNNING and sets node and timeStart from the run account.
+   */
+  function mergeRunIntoJob(job: Job, run: Run): Job {
+    return {
+      ...job,
+      state: JobState.RUNNING,
+      node: run.node,
+      timeStart: run.time,
+    };
+  }
+
+  /**
    * Transform market account to include address and convert types
    */
   function transformMarketAccount(marketAccount: Account<programClient.MarketAccount>): Market {
@@ -211,7 +239,13 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
    */
   async function setupSubscription(
     abortController: AbortController
-  ): Promise<AsyncIterable<unknown>> {
+  ): Promise<
+    AsyncIterable<
+      SolanaRpcResponse<
+        AccountInfoWithPubkey<AccountInfoBase & AccountInfoWithBase64EncodedData>
+      >
+    >
+  > {
     try {
       // Set up the subscription using the correct API pattern
       const subscriptionIterable = await deps.solana.rpcSubscriptions
@@ -310,7 +344,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
    */
   async function handleAccountUpdate(
     accountData: {
-      account: unknown;
+      account: AccountInfoBase & AccountInfoWithBase64EncodedData;
       pubkey: Address;
     },
     options: {
@@ -323,7 +357,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
   ): Promise<void> {
     try {
       const { account, pubkey } = accountData;
-      const encodedAccount: EncodedAccount = parseBase64RpcAccount(pubkey, account as never);
+      const encodedAccount: EncodedAccount = parseBase64RpcAccount(pubkey, account);
       const accountType = client.identifyNosanaJobsAccount(encodedAccount);
       switch (accountType) {
         case client.NosanaJobsAccount.JobAccount: {
@@ -354,7 +388,11 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
    * Process subscription notifications
    */
   async function processSubscriptionNotifications(
-    notificationIterable: AsyncIterable<unknown>,
+    notificationIterable: AsyncIterable<
+      SolanaRpcResponse<
+        AccountInfoWithPubkey<AccountInfoBase & AccountInfoWithBase64EncodedData>
+      >
+    >,
     options: {
       onJobAccount?: (jobAccount: Job) => Promise<void> | void;
       onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
@@ -372,12 +410,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
         }
 
         try {
-          const { value } = notification as {
-            value: {
-              account: unknown;
-              pubkey: Address;
-            };
-          };
+          const { value } = notification;
           await handleAccountUpdate(value, options, isMonitoring);
         } catch (error) {
           deps.logger.error(`Error handling account update notification: ${error}`);
@@ -716,13 +749,100 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       return Instructions.end(params, createInstructionsHelper(this.get, this.runs));
     },
     /**
-     * Monitor program account updates using callback functions
-     * Uses WebSocket subscriptions with automatic restart on failure
+     * Monitor program account updates using callback functions.
+     * Automatically merges run account data into job account updates.
+     * Uses WebSocket subscriptions with automatic restart on failure.
+     *
+     * @example
+     * ```typescript
+     * // Example: Simple monitoring - run accounts are automatically merged into job updates
+     * const stopMonitoring = await jobsProgram.monitor({
+     *   onJobAccount: async (jobAccount) => {
+     *     console.log('Job updated:', jobAccount.address.toString());
+     *     // jobAccount will have state, node, and timeStart from run account if it exists
+     *   },
+     *   onError: async (error, accountType) => {
+     *     console.error('Error processing account:', error, accountType);
+     *   }
+     * });
+     *
+     * // Stop monitoring when done
+     * stopMonitoring();
+     * ```
+     *
+     * @param options Configuration options for monitoring
+     * @returns A function to stop monitoring
+     */
+    async monitor(
+      options: {
+        onJobAccount?: (jobAccount: Job) => Promise<void> | void;
+        onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
+        onError?: (error: Error, accountType?: string) => Promise<void> | void;
+      } = {}
+    ): Promise<() => void> {
+      const { onJobAccount, onMarketAccount, onError } = options;
+
+      // Wrapper for onJobAccount that checks for run accounts and merges if needed
+      const wrappedOnJobAccount = onJobAccount
+        ? async (job: Job): Promise<void> => {
+            // If job is queued, check if there's a run account
+            if (job.state === JobState.QUEUED) {
+              try {
+                const runs = await this.runs({ job: job.address });
+                if (runs.length > 0) {
+                  const mergedJob = mergeRunIntoJob(job, runs[0]);
+                  await onJobAccount(mergedJob);
+                } else {
+                  await onJobAccount(job);
+                }
+              } catch (error) {
+                deps.logger.error(`Error checking run account for job ${job.address}: ${error}`);
+                // Still call onJobAccount with the job even if run check fails
+                await onJobAccount(job);
+              }
+            } else {
+              await onJobAccount(job);
+            }
+          }
+        : undefined;
+
+      // Wrapper for onRunAccount that fetches the job and merges run data
+      const wrappedOnRunAccount = onJobAccount
+        ? async (run: Run): Promise<void> => {
+            try {
+              // Fetch job without checkRun to avoid recursion
+              const job = await this.get(run.job, false);
+              const mergedJob = mergeRunIntoJob(job, run);
+              await onJobAccount(mergedJob);
+            } catch (error) {
+              deps.logger.error(`Error fetching job ${run.job} for run account ${run.address}: ${error}`);
+              if (onError) {
+                await onError(
+                  error instanceof Error ? error : new Error(String(error)),
+                  'RunAccount'
+                );
+              }
+            }
+          }
+        : undefined;
+
+      // Delegate to monitorDetailed with wrapped callbacks
+      return this.monitorDetailed({
+        onJobAccount: wrappedOnJobAccount,
+        onMarketAccount,
+        onRunAccount: wrappedOnRunAccount,
+        onError,
+      });
+    },
+    /**
+     * Monitor program account updates with detailed callbacks for each account type.
+     * Uses WebSocket subscriptions with automatic restart on failure.
+     * Provides separate callbacks for job, market, and run accounts.
      *
      * @example
      * ```typescript
      * // Example: Monitor job accounts and save to file
-     * const stopMonitoring = await jobsProgram.monitor({
+     * const stopMonitoring = await jobsProgram.monitorDetailed({
      *   onJobAccount: async (jobAccount) => {
      *     console.log('Job updated:', jobAccount.address.toString());
      *     // Save to database, file, or process as needed
@@ -742,7 +862,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
      * @param options Configuration options for monitoring
      * @returns A function to stop monitoring
      */
-    async monitor(
+    async monitorDetailed(
       options: {
         onJobAccount?: (jobAccount: Job) => Promise<void> | void;
         onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
