@@ -170,7 +170,8 @@ describe('SolanaService', () => {
 
     it('falls back to rpcEndpoint when wsEndpoint not provided', () => {
       createSolanaService({ logger, getWallet: () => undefined }, { rpcEndpoint, cluster });
-      expect(solanaKitMock.createSolanaRpcSubscriptions).toHaveBeenCalledWith(rpcEndpoint);
+      // When wsEndpoint is not provided, rpcEndpoint is converted from http(s) to ws(s)
+      expect(solanaKitMock.createSolanaRpcSubscriptions).toHaveBeenCalledWith('wss://rpc.example/');
     });
   });
 
