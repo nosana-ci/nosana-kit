@@ -2,9 +2,9 @@ import { address } from '@solana/kit';
 import { NosanaNetwork } from '@nosana/types';
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
 
-import { createNosanaClient, type NosanaClient, TokenService } from '../../../src/index.js';
+import { createNosanaClient, type NosanaClient, TokenService } from '../../../../src/index.js';
 
-vi.mock('../../../src/logger/Logger.js', () => {
+vi.mock('../../../../src/logger/Logger.js', () => {
   return {
     Logger: {
       getInstance: vi.fn().mockReturnValue({

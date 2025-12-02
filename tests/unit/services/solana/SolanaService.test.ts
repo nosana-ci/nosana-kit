@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { Instruction } from '@solana/kit';
 
-import { createSolanaService } from '../../../src/services/solana/index.js';
-import { PROTOCOL } from '../../../src/utils/convertHttpToWebSocketUrl.js';
-import { AddressFactory, MockClientFactory, SignerFactory } from '../../setup/index.js';
-import type { Wallet } from '../../../src/types.js';
+import { createSolanaService } from '../../../../src/services/solana/index.js';
+import { PROTOCOL } from '../../../../src/utils/convertHttpToWebSocketUrl.js';
+import { AddressFactory, MockClientFactory, SignerFactory } from '../../../setup/index.js';
+import type { Wallet } from '../../../../src/types.js';
 
 // Mock @solana/kit module
 // We mock:
