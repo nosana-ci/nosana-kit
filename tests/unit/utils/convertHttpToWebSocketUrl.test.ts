@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { convertHttpToWebSocketUrl, PROTOCOL } from '../../../src/utils/convertHttpToWebSocketUrl.js';
+import {
+  convertHttpToWebSocketUrl,
+  PROTOCOL,
+} from '../../../src/utils/convertHttpToWebSocketUrl.js';
 import { NosanaError, ErrorCodes } from '../../../src/errors/NosanaError.js';
 
 describe('convertHttpToWebSocketUrl', () => {
