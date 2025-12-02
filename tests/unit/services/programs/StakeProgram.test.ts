@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   createStakeProgram,
   type StakeProgram,
-} from '../../../../src/services/programs/StakeProgram.js';
+} from '../../../../src/services/programs/stake/index.js';
 import * as stakingClient from '../../../../src/generated_clients/staking/index.js';
 import { type Address } from '@solana/kit';
 import {

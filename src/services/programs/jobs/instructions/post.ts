@@ -1,6 +1,6 @@
 import bs58 from 'bs58';
 import { type Address, type TransactionSigner, generateKeyPairSigner } from '@solana/kit';
-import type { getListInstruction } from '../../../generated_clients/jobs/index.js';
+import type { getListInstruction } from '../../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
 export type PostParams = {

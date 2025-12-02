@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { Instruction } from '@solana/kit';
 
-import { createSolanaService } from '../../../src/services/SolanaService.js';
+import { createSolanaService } from '../../../src/services/solana/index.js';
 import { AddressFactory, MockClientFactory, SignerFactory } from '../../setup/index.js';
 import type { Wallet } from '../../../src/types.js';
 

@@ -1,5 +1,5 @@
 import { Address } from '@solana/kit';
-import type { SolanaService } from '../services/SolanaService.js';
+import type { SolanaService } from '../services/solana/index.js';
 import type { ProgramConfig } from '../config/types.js';
 
 export type StaticAccounts = {

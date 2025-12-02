@@ -6,7 +6,7 @@ import {
   type MerkleDistributorProgram,
   ALLOWED_RECEIVE_ADDRESSES,
   ClaimTarget,
-} from '../../../../src/services/programs/MerkleDistributorProgram.js';
+} from '../../../../src/services/programs/merkleDistributor/index.js';
 import * as merkleDistributorClient from '../../../../src/generated_clients/merkle_distributor/index.js';
 import { type Address, generateKeyPairSigner } from '@solana/kit';
 import {

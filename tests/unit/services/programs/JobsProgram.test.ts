@@ -7,7 +7,7 @@ import {
   type JobsProgram,
   JobState,
   MarketQueueType,
-} from '../../../../src/services/programs/JobsProgram.js';
+} from '../../../../src/services/programs/jobs/index.js';
 import * as programClient from '../../../../src/generated_clients/jobs/index.js';
 import {
   AddressFactory,

@@ -7,10 +7,10 @@ import {
   address,
   TransactionSigner,
 } from '@solana/kit';
-import { NosanaError, ErrorCodes } from '../../errors/NosanaError.js';
-import type { ProgramDeps } from '../../types.js';
-import * as programClient from '../../generated_clients/merkle_distributor/index.js';
-import { convertBigIntToNumber, ConvertTypesForDb } from '../../utils/index.js';
+import { NosanaError, ErrorCodes } from '../../../errors/NosanaError.js';
+import type { ProgramDeps } from '../../../types.js';
+import * as programClient from '../../../generated_clients/merkle_distributor/index.js';
+import { convertBigIntToNumber, ConvertTypesForDb } from '../../../utils/index.js';
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import { SYSTEM_PROGRAM_ADDRESS } from '@solana-program/system';
 import bs58 from 'bs58';
@@ -128,7 +128,7 @@ export interface MerkleDistributorProgram {
  * const distributor = await merkleDistributor.get('distributor-address');
  * ```
  */
-import type { ProgramConfig } from '../../config/types.js';
+import type { ProgramConfig } from '../../../config/types.js';
 
 export function createMerkleDistributorProgram(
   deps: ProgramDeps,

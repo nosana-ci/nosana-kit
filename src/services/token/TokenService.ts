@@ -1,6 +1,6 @@
 import { Address, address, Base58EncodedBytes } from '@solana/kit';
-import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
-import { Logger } from '../logger/Logger.js';
+import { NosanaError, ErrorCodes } from '../../errors/NosanaError.js';
+import { Logger } from '../../logger/Logger.js';
 import { TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 
 // Standard SPL token account size
@@ -21,7 +21,7 @@ export interface TokenAccountWithBalance extends TokenAccount {
   uiAmount: number;
 }
 
-import type { SolanaService } from './SolanaService.js';
+import type { SolanaService } from '../solana/index.js';
 
 /**
  * Dependencies for TokenService
