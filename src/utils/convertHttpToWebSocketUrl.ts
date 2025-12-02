@@ -1,4 +1,14 @@
 /**
+ * URL protocol constants
+ */
+export const PROTOCOL = {
+  HTTP: 'http',
+  HTTPS: 'https',
+  WS: 'ws',
+  WSS: 'wss',
+} as const;
+
+/**
  * Converts an HTTP/HTTPS URL to a WebSocket URL (ws/wss).
  * Replaces the protocol: http -> ws, https -> wss
  *
@@ -22,6 +32,6 @@ export function convertHttpToWebSocketUrl(httpUrl: string): string {
     throw new Error(`Unsupported protocol: ${url.protocol}. Only HTTP and HTTPS are supported.`);
   }
 
-  url.protocol = url.protocol.replace('http', 'ws');
+  url.protocol = url.protocol.replace(PROTOCOL.HTTP, PROTOCOL.WS);
   return url.toString();
 }

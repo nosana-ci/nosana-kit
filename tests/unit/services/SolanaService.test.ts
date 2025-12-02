@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import type { Instruction } from '@solana/kit';
 
 import { createSolanaService } from '../../../src/services/SolanaService.js';
+import { PROTOCOL } from '../../../src/utils/convertHttpToWebSocketUrl.js';
 import { AddressFactory, MockClientFactory, SignerFactory } from '../../setup/index.js';
 import type { Wallet } from '../../../src/types.js';
 
@@ -110,8 +111,9 @@ function makeInstruction(): Instruction {
 
 describe('SolanaService', () => {
   const logger = MockClientFactory.createBasic().logger;
-  const rpcEndpoint = 'https://rpc.example';
-  const wsEndpoint = 'wss://rpc.example/';
+  const baseHost = 'rpc.example';
+  const rpcEndpoint = `${PROTOCOL.HTTPS}://${baseHost}`;
+  const wsEndpoint = `${PROTOCOL.WSS}://${baseHost}/`;
   const cluster = 'devnet';
   const mockBalance = BigInt(1000);
   const mockSignature = 'mock-signature';
@@ -160,7 +162,6 @@ describe('SolanaService', () => {
     });
 
     it('uses wsEndpoint when provided', () => {
-      const wsEndpoint = 'wss://ws.example';
       const service = createSolanaService(
         { logger, getWallet: () => undefined },
         { rpcEndpoint, cluster, wsEndpoint }
