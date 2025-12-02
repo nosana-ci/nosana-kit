@@ -39,6 +39,7 @@ import { NosanaError, ErrorCodes } from '../../errors/NosanaError.js';
 import { Logger } from '../../logger/Logger.js';
 import { Wallet } from '../../types.js';
 import { SolanaConfig } from '../../config/types.js';
+import { convertHttpToWebSocketUrl } from '../../utils/convertHttpToWebSocketUrl.js';
 
 /**
  * Factory function to create an estimateAndSetComputeUnitLimit function
@@ -133,8 +134,9 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
   }
 
   const rpc = createSolanaRpc(config.rpcEndpoint);
-  // Use wsEndpoint if provided, otherwise fall back to rpcEndpoint
-  const rpcSubscriptions = createSolanaRpcSubscriptions(config.wsEndpoint ?? config.rpcEndpoint);
+  // Use wsEndpoint if provided, otherwise convert rpcEndpoint from http(s) to ws(s)
+  const wsUrl = config.wsEndpoint ?? convertHttpToWebSocketUrl(config.rpcEndpoint);
+  const rpcSubscriptions = createSolanaRpcSubscriptions(wsUrl);
   const sendAndConfirmTransaction = sendAndConfirmTransactionFactory({
     rpc,
     rpcSubscriptions,
