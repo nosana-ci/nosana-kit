@@ -24,7 +24,6 @@ vi.mock('@solana-program/token', () => ({
 }));
 
 // Test constants
-const TEST_TIMEOUT = 10;
 const DEFAULT_JOB_PRICE = 1;
 const DEFAULT_TIME = 0;
 const DEFAULT_JOB_TIMEOUT = 200;
@@ -344,96 +343,156 @@ describe('JobsProgram', () => {
   });
 
   describe('monitor', () => {
-    it('returns a stop function and sets up program notifications subscription', async () => {
-      const sdk = makeMonitorSdk();
-      const jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
+    let sdk: ReturnType<typeof makeMonitorSdk>;
+    let jobs: JobsProgram;
+    const JOB_ADDR = newAddr(100);
+    const MARKET_ADDR = newAddr(101);
+    const RUN_ADDR = newAddr(102);
+    const NODE_ADDR = newAddr(103);
 
-      // Mock WebSocket subscription with immediate completion
+    beforeEach(() => {
+      sdk = makeMonitorSdk();
+      jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
+    });
+
+    const createMockSubscription = (notifications: any[]) => {
+      let index = 0;
       const mockIterable = {
         [Symbol.asyncIterator]() {
           return {
-            next: vi.fn().mockResolvedValue({ done: true, value: undefined }),
+            async next() {
+              if (index < notifications.length) {
+                return { done: false, value: notifications[index++] };
+              }
+              return { done: true, value: undefined };
+            },
             return: vi.fn().mockResolvedValue({ done: true, value: undefined }),
           };
         },
       };
-
       const mockSubscribe = vi.fn().mockResolvedValue(mockIterable);
       const mockProgramNotifications = vi.fn().mockReturnValue({ subscribe: mockSubscribe });
-
       (sdk as any).solana.rpcSubscriptions = {
         programNotifications: mockProgramNotifications,
       };
+      return mockIterable;
+    };
 
-      const stopMonitoring = await jobs.monitor();
-
-      expect(stopMonitoring).toBeInstanceOf(Function);
-      expect(mockProgramNotifications).toHaveBeenCalledWith(sdk.config.programs.jobsAddress, {
-        encoding: 'base64',
-      });
-
-      // Stop monitoring to clean up
-      stopMonitoring();
-      await new Promise((resolve) => setTimeout(resolve, TEST_TIMEOUT));
-    });
-
-    it('accepts callback options for job, market, run accounts, and error handling', async () => {
-      const sdk = makeMonitorSdk();
-      const jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
-
-      const onJobAccount = vi.fn();
-      const onMarketAccount = vi.fn();
-      const onRunAccount = vi.fn();
-      const onError = vi.fn();
-
-      const mockIterable = {
-        [Symbol.asyncIterator]() {
-          return {
-            next: vi.fn().mockResolvedValue({ done: true, value: undefined }),
-            return: vi.fn().mockResolvedValue({ done: true, value: undefined }),
-          };
+    const createNotification = (pubkey: Address, accountType: string) => ({
+      value: {
+        account: {
+          data: Buffer.from(`mock-${accountType}-data`).toString('base64'),
+          executable: false,
+          lamports: 1000000,
+          owner: sdk.config.programs.jobsAddress,
+          space: BigInt(accountType === 'run' ? 113 : 233),
         },
-      };
-
-      const mockSubscribe = vi.fn().mockResolvedValue(mockIterable);
-      const mockProgramNotifications = vi.fn().mockReturnValue({ subscribe: mockSubscribe });
-
-      (sdk as any).solana.rpcSubscriptions = {
-        programNotifications: mockProgramNotifications,
-      };
-
-      const stopMonitoring = await jobs.monitor({
-        onJobAccount,
-        onMarketAccount,
-        onRunAccount,
-        onError,
-      });
-
-      expect(stopMonitoring).toBeInstanceOf(Function);
-
-      stopMonitoring();
-      await new Promise((resolve) => setTimeout(resolve, 10));
+        pubkey,
+      },
     });
 
-    it('handles subscription setup errors gracefully', async () => {
-      const sdk = makeMonitorSdk();
-      const jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
+    it('returns event stream and stop function', async () => {
+      createMockSubscription([]);
+      const [eventStream, stop] = await jobs.monitor();
 
-      // Mock subscription to throw error
-      const mockSubscribe = vi.fn().mockRejectedValue(new Error('Subscription failed'));
-      const mockProgramNotifications = vi.fn().mockReturnValue({ subscribe: mockSubscribe });
+      expect(eventStream).toBeDefined();
+      expect(stop).toBeInstanceOf(Function);
+      expect(typeof eventStream[Symbol.asyncIterator]).toBe('function');
 
-      (sdk as any).solana.rpcSubscriptions = {
-        programNotifications: mockProgramNotifications,
-      };
+      stop();
+    });
 
-      // Should not throw immediately since error handling is internal with retry logic
-      const stopMonitoring = await jobs.monitor();
+    it('yields job and market events without run events', async () => {
+      const jobAccount = makeJobAccount(JobState.QUEUED, JOB_ADDR);
+      const marketAccount = makeMarketAccount();
+      const notifications = [
+        createNotification(JOB_ADDR, 'job'),
+        createNotification(MARKET_ADDR, 'market'),
+      ];
 
-      expect(stopMonitoring).toBeInstanceOf(Function);
+      createMockSubscription(notifications);
+      vi.spyOn(programClient, 'decodeJobAccount' as any).mockReturnValue(jobAccount);
+      vi.spyOn(programClient, 'decodeMarketAccount' as any).mockReturnValue(marketAccount);
+      vi.spyOn(programClient, 'identifyNosanaJobsAccount' as any).mockImplementation(
+        (account: any) => {
+          if (account.address === JOB_ADDR) return programClient.NosanaJobsAccount.JobAccount;
+          if (account.address === MARKET_ADDR) return programClient.NosanaJobsAccount.MarketAccount;
+          return null;
+        }
+      );
+      sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
+        send: vi.fn().mockResolvedValue([]),
+      })) as any;
 
-      stopMonitoring();
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      const [eventStream, stop] = await jobs.monitor();
+      const events: any[] = [];
+      for await (const event of eventStream) {
+        events.push(event);
+        if (events.length >= 2) break;
+      }
+
+      expect(events).toHaveLength(2);
+      expect(events[0].type).toBe('job');
+      expect(events[1].type).toBe('market');
+      expect(events.every((e) => e.type !== 'run')).toBe(true);
+
+      stop();
+    });
+
+    it('auto-merges run accounts into job events', async () => {
+      const jobAccount = makeJobAccount(JobState.QUEUED, JOB_ADDR);
+      const runAccount = makeRunAccount(JOB_ADDR, RUN_TIME_555, NODE_ADDR);
+      const notifications = [createNotification(RUN_ADDR, 'run')];
+
+      createMockSubscription(notifications);
+      vi.spyOn(programClient, 'decodeRunAccount' as any).mockReturnValue(runAccount);
+      vi.spyOn(programClient, 'decodeJobAccount' as any).mockReturnValue(jobAccount);
+      vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(jobAccount);
+      vi.spyOn(programClient, 'identifyNosanaJobsAccount' as any).mockReturnValue(
+        programClient.NosanaJobsAccount.RunAccount
+      );
+
+      const [eventStream, stop] = await jobs.monitor();
+      const events: any[] = [];
+      for await (const event of eventStream) {
+        events.push(event);
+        break;
+      }
+
+      expect(events).toHaveLength(1);
+      const event = events[0];
+      expect(event.type).toBe('job');
+      expect(event.data.state).toBe(JobState.RUNNING);
+      expect(event.data.timeStart).toBe(RUN_TIME_555);
+      expect(event.data.node).toBe(NODE_ADDR);
+
+      stop();
+    });
+
+    it('monitorDetailed yields run events separately', async () => {
+      const runAccount = makeRunAccount(JOB_ADDR, RUN_TIME_777);
+      const notifications = [createNotification(RUN_ADDR, 'run')];
+
+      createMockSubscription(notifications);
+      vi.spyOn(programClient, 'decodeRunAccount' as any).mockReturnValue(runAccount);
+      vi.spyOn(programClient, 'identifyNosanaJobsAccount' as any).mockReturnValue(
+        programClient.NosanaJobsAccount.RunAccount
+      );
+
+      const [eventStream, stop] = await jobs.monitorDetailed();
+      const events: any[] = [];
+      for await (const event of eventStream) {
+        events.push(event);
+        break;
+      }
+
+      expect(events).toHaveLength(1);
+      const event = events[0];
+      expect(event.type).toBe('run');
+      expect(event.data.time).toBe(RUN_TIME_777);
+      expect(event.data.job).toBe(JOB_ADDR);
+
+      stop();
     });
   });
 });
