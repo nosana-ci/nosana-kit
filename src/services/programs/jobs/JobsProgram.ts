@@ -61,7 +61,7 @@ export const MonitorEventType = {
   RUN: 'run',
 } as const;
 
-export type MonitorEventType = typeof MonitorEventType[keyof typeof MonitorEventType];
+export type MonitorEventType = (typeof MonitorEventType)[keyof typeof MonitorEventType];
 
 /**
  * Simple monitor event (run accounts are auto-merged into job events)
