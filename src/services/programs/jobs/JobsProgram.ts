@@ -241,9 +241,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     abortController: AbortController
   ): Promise<
     AsyncIterable<
-      SolanaRpcResponse<
-        AccountInfoWithPubkey<AccountInfoBase & AccountInfoWithBase64EncodedData>
-      >
+      SolanaRpcResponse<AccountInfoWithPubkey<AccountInfoBase & AccountInfoWithBase64EncodedData>>
     >
   > {
     try {
@@ -389,9 +387,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
    */
   async function processSubscriptionNotifications(
     notificationIterable: AsyncIterable<
-      SolanaRpcResponse<
-        AccountInfoWithPubkey<AccountInfoBase & AccountInfoWithBase64EncodedData>
-      >
+      SolanaRpcResponse<AccountInfoWithPubkey<AccountInfoBase & AccountInfoWithBase64EncodedData>>
     >,
     options: {
       onJobAccount?: (jobAccount: Job) => Promise<void> | void;
@@ -815,7 +811,9 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
               const mergedJob = mergeRunIntoJob(job, run);
               await onJobAccount(mergedJob);
             } catch (error) {
-              deps.logger.error(`Error fetching job ${run.job} for run account ${run.address}: ${error}`);
+              deps.logger.error(
+                `Error fetching job ${run.job} for run account ${run.address}: ${error}`
+              );
               if (onError) {
                 await onError(
                   error instanceof Error ? error : new Error(String(error)),
