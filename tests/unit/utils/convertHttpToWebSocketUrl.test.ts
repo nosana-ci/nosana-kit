@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { convertHttpToWebSocketUrl, PROTOCOL } from '../../../src/utils/convertHttpToWebSocketUrl.js';
+import { NosanaError, ErrorCodes } from '../../../src/errors/NosanaError.js';
 
 describe('convertHttpToWebSocketUrl', () => {
   const baseHost = 'api.mainnet-beta.solana.com';
@@ -50,15 +51,27 @@ describe('convertHttpToWebSocketUrl', () => {
     expect(result).toBe(`${PROTOCOL.WSS}://${auth}${baseHost}/`);
   });
 
-  it('throws error for non-HTTP/HTTPS protocols', () => {
+  it('throws NosanaError for non-HTTP/HTTPS protocols', () => {
     const wsUrl = `${PROTOCOL.WS}://${baseHost}:${port}`;
-    expect(() => convertHttpToWebSocketUrl(wsUrl)).toThrow();
+    try {
+      convertHttpToWebSocketUrl(wsUrl);
+    } catch (error) {
+      expect(error).toBeInstanceOf(NosanaError);
+      expect((error as NosanaError).code).toBe(ErrorCodes.VALIDATION_ERROR);
+      expect((error as NosanaError).message).toBe(
+        `Unsupported protocol: ${PROTOCOL.WS}:. Only HTTP and HTTPS are supported.`
+      );
+    }
   });
 
-  it('throws error for invalid URL', () => {
-    const invalidUrl = 'not-a-valid-url';
-
-    expect(() => convertHttpToWebSocketUrl(invalidUrl)).toThrow();
+  it.each([
+    { description: 'invalid URL', url: 'not-a-valid-url' },
+    { description: 'empty string', url: '' },
+    { description: 'null', url: null as unknown as string },
+    { description: 'undefined', url: undefined as unknown as string },
+  ])('throws TypeError for $description', ({ url }) => {
+    expect(() => convertHttpToWebSocketUrl(url)).toThrow(TypeError);
+    expect(() => convertHttpToWebSocketUrl(url)).toThrow('Invalid URL');
   });
 
   it('handles case-insensitive protocol matching', () => {

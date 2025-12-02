@@ -1,3 +1,5 @@
+import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
+
 /**
  * URL protocol constants
  */
@@ -14,7 +16,8 @@ export const PROTOCOL = {
  *
  * @param httpUrl The HTTP or HTTPS URL to convert
  * @returns The WebSocket URL with the protocol replaced
- * @throws Error if the URL is invalid or doesn't use HTTP/HTTPS protocol
+ * @throws NosanaError if the URL doesn't use HTTP/HTTPS protocol
+ * @throws TypeError if the URL is invalid
  *
  * @example
  * ```ts
@@ -29,7 +32,10 @@ export function convertHttpToWebSocketUrl(httpUrl: string): string {
   const url = new URL(httpUrl);
 
   if (!url.protocol.match(/^https?:$/i)) {
-    throw new Error(`Unsupported protocol: ${url.protocol}. Only HTTP and HTTPS are supported.`);
+    throw new NosanaError(
+      `Unsupported protocol: ${url.protocol}. Only HTTP and HTTPS are supported.`,
+      ErrorCodes.VALIDATION_ERROR
+    );
   }
 
   url.protocol = url.protocol.replace(PROTOCOL.HTTP, PROTOCOL.WS);
