@@ -111,6 +111,7 @@ function makeInstruction(): Instruction {
 describe('SolanaService', () => {
   const logger = MockClientFactory.createBasic().logger;
   const rpcEndpoint = 'https://rpc.example';
+  const wsEndpoint = 'wss://rpc.example/';
   const cluster = 'devnet';
   const mockBalance = BigInt(1000);
   const mockSignature = 'mock-signature';
@@ -171,7 +172,7 @@ describe('SolanaService', () => {
     it('falls back to rpcEndpoint when wsEndpoint not provided', () => {
       createSolanaService({ logger, getWallet: () => undefined }, { rpcEndpoint, cluster });
       // When wsEndpoint is not provided, rpcEndpoint is converted from http(s) to ws(s)
-      expect(solanaKitMock.createSolanaRpcSubscriptions).toHaveBeenCalledWith('wss://rpc.example/');
+      expect(solanaKitMock.createSolanaRpcSubscriptions).toHaveBeenCalledWith(wsEndpoint);
     });
   });
 
