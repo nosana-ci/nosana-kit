@@ -20,31 +20,31 @@ export {
   type JobsProgram,
   JobState,
   MarketQueueType,
-} from './services/programs/JobsProgram.js';
-export type { Job, Market, Run } from './services/programs/JobsProgram.js';
+} from './services/programs/jobs/index.js';
+export type { Job, Market, Run } from './services/programs/jobs/index.js';
 
 // Export StakeProgram and related types
-export { createStakeProgram, type StakeProgram } from './services/programs/StakeProgram.js';
-export type { Stake } from './services/programs/StakeProgram.js';
+export { createStakeProgram, type StakeProgram } from './services/programs/stake/index.js';
+export type { Stake } from './services/programs/stake/index.js';
 
 // Export MerkleDistributorProgram and related types
 export {
   createMerkleDistributorProgram,
   type MerkleDistributorProgram,
   ClaimTarget,
-} from './services/programs/MerkleDistributorProgram.js';
+} from './services/programs/merkleDistributor/index.js';
 export type {
   MerkleDistributor,
   ClaimStatus,
-} from './services/programs/MerkleDistributorProgram.js';
-export { ClaimStatusNotFoundError } from './services/programs/MerkleDistributorProgram.js';
+} from './services/programs/merkleDistributor/index.js';
+export { ClaimStatusNotFoundError } from './services/programs/merkleDistributor/index.js';
 
 // Export IPFS utilities from @nosana/ipfs
 export { solBytesArrayToIpfsHash, ipfsHashToSolBytesArray } from '@nosana/ipfs';
 
 // Export token service
-export { createTokenService, type TokenService } from './services/TokenService.js';
-export type { TokenAccount, TokenAccountWithBalance } from './services/TokenService.js';
+export { createTokenService, type TokenService } from './services/token/index.js';
+export type { TokenAccount, TokenAccountWithBalance } from './services/token/index.js';
 
 // Export generated clients under namespaces to avoid naming conflicts
 export * as JobsClient from './generated_clients/jobs/index.js';

@@ -1,5 +1,5 @@
 import type { Address, TransactionSigner } from '@solana/kit';
-import type { getExtendInstruction } from '../../../generated_clients/jobs/index.js';
+import type { getExtendInstruction } from '../../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
 export type ExtendParams = {

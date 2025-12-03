@@ -7,7 +7,7 @@ import {
   type StaticAccountsCache,
 } from '../../../src/utils/getStaticAccounts.js';
 import type { ClientConfig } from '../../../src/config/types.js';
-import type { SolanaService } from '../../../src/services/SolanaService.js';
+import type { SolanaService } from '../../../src/services/solana/index.js';
 
 describe('getStaticAccounts', () => {
   let config: ClientConfig;

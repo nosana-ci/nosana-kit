@@ -1,9 +1,9 @@
 import type { Address } from '@solana/kit';
-import type { ProgramConfig } from '../../../config';
-import type { ProgramDeps, Wallet } from '../../../types';
-import type { JobsProgram } from '../JobsProgram';
-import type { StaticAccounts } from '../../../utils/getStaticAccounts';
-import * as programClient from '../../../generated_clients/jobs/index.js';
+import type { ProgramConfig } from '../../../../config/index.js';
+import type { ProgramDeps, Wallet } from '../../../../types.js';
+import type { JobsProgram } from '../JobsProgram.js';
+import type { StaticAccounts } from '../../../../utils/getStaticAccounts.js';
+import * as programClient from '../../../../generated_clients/jobs/index.js';
 
 export type InstructionsHelperParams = {
   deps: ProgramDeps;

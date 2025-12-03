@@ -5,14 +5,14 @@ import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/aut
 
 import { Logger } from './logger/Logger.js';
 import { ClientConfig, getNosanaConfig, PartialClientConfig } from './config/index.js';
-import { createJobsProgram, type JobsProgram } from './services/programs/JobsProgram.js';
-import { createStakeProgram, type StakeProgram } from './services/programs/StakeProgram.js';
+import { createJobsProgram, type JobsProgram } from './services/programs/jobs/index.js';
+import { createStakeProgram, type StakeProgram } from './services/programs/stake/index.js';
 import {
   createMerkleDistributorProgram,
   type MerkleDistributorProgram,
-} from './services/programs/MerkleDistributorProgram.js';
-import { createSolanaService, type SolanaService } from './services/SolanaService.js';
-import { createTokenService, type TokenService } from './services/TokenService.js';
+} from './services/programs/merkleDistributor/index.js';
+import { createSolanaService, type SolanaService } from './services/solana/index.js';
+import { createTokenService, type TokenService } from './services/token/index.js';
 import { walletToAuthorizationSigner } from './utils/walletToAuthorizationSigner.js';
 
 import type { Wallet } from './types.js';

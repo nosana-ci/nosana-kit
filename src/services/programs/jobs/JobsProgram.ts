@@ -2,8 +2,8 @@ import bs58 from 'bs58';
 import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 import { parseBase64RpcAccount } from '@solana/kit';
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
-import { ErrorCodes, NosanaError } from '../../errors/NosanaError.js';
-import { convertBigIntToNumber, type ConvertTypesForDb } from '../../utils/index.js';
+import { ErrorCodes, NosanaError } from '../../../errors/NosanaError.js';
+import { convertBigIntToNumber, type ConvertTypesForDb } from '../../../utils/index.js';
 
 import type {
   Address,
@@ -13,16 +13,16 @@ import type {
   GetProgramAccountsMemcmpFilter,
   ReadonlyUint8Array,
 } from '@solana/kit';
-import type { ProgramDeps, Wallet } from '../../types.js';
+import type { ProgramDeps, Wallet } from '../../../types.js';
 import {
   getStaticAccounts as getStaticAccountsFn,
   type StaticAccounts,
-} from '../../utils/getStaticAccounts.js';
-import type { ProgramConfig } from '../../config/types.js';
+} from '../../../utils/getStaticAccounts.js';
+import type { ProgramConfig } from '../../../config/types.js';
 import type { InstructionsHelperParams } from './instructions/types.js';
 
 import * as Instructions from './instructions/index.js';
-import * as programClient from '../../generated_clients/jobs/index.js';
+import * as programClient from '../../../generated_clients/jobs/index.js';
 
 export enum JobState {
   QUEUED = 0,

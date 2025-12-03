@@ -1,5 +1,5 @@
 import { TransactionSigner, MessageSigner } from '@solana/kit';
-import type { SolanaService } from './services/SolanaService.js';
+import type { SolanaService } from './services/solana/index.js';
 import { Logger } from './logger/Logger.js';
 
 /**

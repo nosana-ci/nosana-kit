@@ -1,7 +1,7 @@
 import { Address, Account, parseBase64RpcAccount, Base58EncodedBytes } from '@solana/kit';
-import type { ProgramDeps } from '../../types.js';
-import * as programClient from '../../generated_clients/staking/index.js';
-import { convertBigIntToNumber, ConvertTypesForDb } from '../../utils/index.js';
+import type { ProgramDeps } from '../../../types.js';
+import * as programClient from '../../../generated_clients/staking/index.js';
+import { convertBigIntToNumber, ConvertTypesForDb } from '../../../utils/index.js';
 import bs58 from 'bs58';
 
 export type Stake = ConvertTypesForDb<programClient.StakeAccountArgs> & { address: Address };
@@ -46,7 +46,7 @@ export interface StakeProgram {
  * const stake = await stakeProgram.get('stake-address');
  * ```
  */
-import type { ProgramConfig } from '../../config/types.js';
+import type { ProgramConfig } from '../../../config/types.js';
 
 export function createStakeProgram(deps: ProgramDeps, config: ProgramConfig): StakeProgram {
   const programId = config.stakeAddress;

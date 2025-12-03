@@ -35,11 +35,11 @@ import {
   TOKEN_PROGRAM_ADDRESS,
 } from '@solana-program/token';
 import { SYSTEM_PROGRAM_ADDRESS } from '@solana-program/system';
-import { NosanaError, ErrorCodes } from '../errors/NosanaError.js';
-import { Logger } from '../logger/Logger.js';
-import { Wallet } from '../types.js';
-import { SolanaConfig } from '../config/types.js';
-import { convertHttpToWebSocketUrl } from '../utils/convertHttpToWebSocketUrl.js';
+import { NosanaError, ErrorCodes } from '../../errors/NosanaError.js';
+import { Logger } from '../../logger/Logger.js';
+import { Wallet } from '../../types.js';
+import { SolanaConfig } from '../../config/types.js';
+import { convertHttpToWebSocketUrl } from '../../utils/convertHttpToWebSocketUrl.js';
 
 /**
  * Factory function to create an estimateAndSetComputeUnitLimit function
