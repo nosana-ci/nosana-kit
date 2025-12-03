@@ -7,7 +7,6 @@ import { convertBigIntToNumber, type ConvertTypesForDb } from '../../../utils/in
 
 import type {
   Address,
-  EncodedAccount,
   Account,
   Base58EncodedBytes,
   GetProgramAccountsMemcmpFilter,
@@ -23,6 +22,8 @@ import type { InstructionsHelperParams } from './instructions/types.js';
 
 import * as Instructions from './instructions/index.js';
 import * as programClient from '../../../generated_clients/jobs/index.js';
+import { createMonitorFunctions } from './monitor/index.js';
+import type { SimpleMonitorEvent, MonitorEvent } from './monitor/index.js';
 
 export enum JobState {
   QUEUED = 0,
@@ -47,6 +48,10 @@ export type Market = Omit<ConvertTypesForDb<programClient.MarketAccountArgs>, 'q
 };
 
 export type Run = ConvertTypesForDb<programClient.RunAccountArgs> & { address: Address };
+
+// Re-export monitor types for convenience
+export { MonitorEventType } from './monitor/index.js';
+export type { SimpleMonitorEvent, MonitorEvent } from './monitor/index.js';
 
 /**
  * Jobs program interface
@@ -114,14 +119,48 @@ export interface JobsProgram {
   end(params: { job: Address }): Promise<ReturnType<typeof programClient.getEndInstruction>>;
 
   /**
-   * Monitor program account updates using callback functions
+   * Monitor program account updates using async iterators.
+   * Automatically merges run account data into job account updates.
+   * Returns a tuple of [eventStream, stopFunction].
+   *
+   * @example
+   * ```typescript
+   * const [eventStream, stop] = await jobsProgram.monitor();
+   * for await (const event of eventStream) {
+   *   if (event.type === MonitorEventType.JOB) {
+   *     console.log('Job updated:', event.data.address);
+   *   } else if (event.type === MonitorEventType.MARKET) {
+   *     console.log('Market updated:', event.data.address);
+   *   }
+   * }
+   * ```
    */
-  monitor(options?: {
-    onJobAccount?: (jobAccount: Job) => Promise<void> | void;
-    onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
-    onRunAccount?: (runAccount: Run) => Promise<void> | void;
-    onError?: (error: Error, accountType?: string) => Promise<void> | void;
-  }): Promise<() => void>;
+  monitor(): Promise<[AsyncIterable<SimpleMonitorEvent>, () => void]>;
+
+  /**
+   * Monitor program account updates with detailed events for each account type.
+   * Provides separate events for job, market, and run accounts.
+   * Returns a tuple of [eventStream, stopFunction].
+   *
+   * @example
+   * ```typescript
+   * const [eventStream, stop] = await jobsProgram.monitorDetailed();
+   * for await (const event of eventStream) {
+   *   switch (event.type) {
+   *     case MonitorEventType.JOB:
+   *       console.log('Job updated:', event.data.address);
+   *       break;
+   *     case MonitorEventType.MARKET:
+   *       console.log('Market updated:', event.data.address);
+   *       break;
+   *     case MonitorEventType.RUN:
+   *       console.log('Run updated:', event.data.address);
+   *       break;
+   *   }
+   * }
+   * ```
+   */
+  monitorDetailed(): Promise<[AsyncIterable<MonitorEvent>, () => void]>;
 }
 
 /**
@@ -193,6 +232,19 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
   }
 
   /**
+   * Merge run account data into a job account.
+   * Updates the job state to RUNNING and sets node and timeStart from the run account.
+   */
+  function mergeRunIntoJob(job: Job, run: Run): Job {
+    return {
+      ...job,
+      state: JobState.RUNNING,
+      node: run.node,
+      timeStart: run.time,
+    };
+  }
+
+  /**
    * Transform market account to include address and convert types
    */
   function transformMarketAccount(marketAccount: Account<programClient.MarketAccount>): Market {
@@ -204,81 +256,6 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       ...converted,
       queueType: converted.queueType as MarketQueueType,
     };
-  }
-
-  /**
-   * Set up WebSocket subscription for program notifications
-   */
-  async function setupSubscription(
-    abortController: AbortController
-  ): Promise<AsyncIterable<unknown>> {
-    try {
-      // Set up the subscription using the correct API pattern
-      const subscriptionIterable = await deps.solana.rpcSubscriptions
-        .programNotifications(programId, { encoding: 'base64' })
-        .subscribe({ abortSignal: abortController.signal });
-
-      return subscriptionIterable;
-    } catch (error) {
-      throw new Error(`Failed to setup subscription: ${error}`);
-    }
-  }
-
-  /**
-   * Handle job account update
-   */
-  async function handleJobAccount(
-    jobAccount: Account<programClient.JobAccount>,
-    onJobAccount?: (jobAccount: Job) => Promise<void> | void,
-    _isMonitoring?: () => boolean
-  ): Promise<void> {
-    if (onJobAccount) {
-      try {
-        await onJobAccount(transformJobAccount(jobAccount));
-      } catch (error) {
-        deps.logger.error(`Error in onJobAccount callback: ${error}`);
-        throw error;
-      }
-    }
-    deps.logger.debug(`Processed job account ${jobAccount.address.toString()}`);
-  }
-
-  /**
-   * Handle market account update
-   */
-  async function handleMarketAccount(
-    marketAccount: Account<programClient.MarketAccount>,
-    onMarketAccount?: (marketAccount: Market) => Promise<void> | void,
-    _isMonitoring?: () => boolean
-  ): Promise<void> {
-    if (onMarketAccount) {
-      try {
-        await onMarketAccount(transformMarketAccount(marketAccount));
-      } catch (error) {
-        deps.logger.error(`Error in onMarketAccount callback: ${error}`);
-        throw error;
-      }
-    }
-    deps.logger.debug(`Processed market account ${marketAccount.address.toString()}`);
-  }
-
-  /**
-   * Handle run account update
-   */
-  async function handleRunAccount(
-    runAccount: Account<programClient.RunAccount>,
-    onRunAccount?: (runAccount: Run) => Promise<void> | void,
-    _isMonitoring?: () => boolean
-  ): Promise<void> {
-    if (onRunAccount) {
-      try {
-        await onRunAccount(transformRunAccount(runAccount));
-      } catch (error) {
-        deps.logger.error(`Error in onRunAccount callback: ${error}`);
-        throw error;
-      }
-    }
-    deps.logger.debug(`Processed run account ${runAccount.address.toString()}`);
   }
 
   /**
@@ -303,98 +280,6 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       tokenProgram: TOKEN_PROGRAM_ADDRESS,
     });
     return ata;
-  }
-
-  /**
-   * Handle account update using callback functions
-   */
-  async function handleAccountUpdate(
-    accountData: {
-      account: unknown;
-      pubkey: Address;
-    },
-    options: {
-      onJobAccount?: (jobAccount: Job) => Promise<void> | void;
-      onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
-      onRunAccount?: (runAccount: Run) => Promise<void> | void;
-      onError?: (error: Error, accountType?: string) => Promise<void> | void;
-    },
-    isMonitoring: () => boolean
-  ): Promise<void> {
-    try {
-      const { account, pubkey } = accountData;
-      const encodedAccount: EncodedAccount = parseBase64RpcAccount(pubkey, account as never);
-      const accountType = client.identifyNosanaJobsAccount(encodedAccount);
-      switch (accountType) {
-        case client.NosanaJobsAccount.JobAccount: {
-          const jobAccount = client.decodeJobAccount(encodedAccount);
-          await handleJobAccount(jobAccount, options.onJobAccount, isMonitoring);
-          break;
-        }
-        case client.NosanaJobsAccount.MarketAccount: {
-          const marketAccount = client.decodeMarketAccount(encodedAccount);
-          await handleMarketAccount(marketAccount, options.onMarketAccount, isMonitoring);
-          break;
-        }
-        case client.NosanaJobsAccount.RunAccount: {
-          const runAccount = client.decodeRunAccount(encodedAccount);
-          await handleRunAccount(runAccount, options.onRunAccount, isMonitoring);
-          break;
-        }
-        default:
-          deps.logger.error(`No support yet for account type: ${accountType}`);
-          return;
-      }
-    } catch (error) {
-      deps.logger.error(`Error in handleAccountUpdate: ${error}`);
-    }
-  }
-
-  /**
-   * Process subscription notifications
-   */
-  async function processSubscriptionNotifications(
-    notificationIterable: AsyncIterable<unknown>,
-    options: {
-      onJobAccount?: (jobAccount: Job) => Promise<void> | void;
-      onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
-      onRunAccount?: (runAccount: Run) => Promise<void> | void;
-      onError?: (error: Error, accountType?: string) => Promise<void> | void;
-    },
-    isMonitoring: () => boolean
-  ): Promise<void> {
-    try {
-      for await (const notification of notificationIterable) {
-        // Check if monitoring should continue
-        if (!isMonitoring()) {
-          deps.logger.info('Monitoring stopped, exiting subscription processing');
-          break;
-        }
-
-        try {
-          const { value } = notification as {
-            value: {
-              account: unknown;
-              pubkey: Address;
-            };
-          };
-          await handleAccountUpdate(value, options, isMonitoring);
-        } catch (error) {
-          deps.logger.error(`Error handling account update notification: ${error}`);
-          if (options.onError) {
-            try {
-              await options.onError(error instanceof Error ? error : new Error(String(error)));
-            } catch (callbackError) {
-              deps.logger.error(`Error in onError callback: ${callbackError}`);
-            }
-          }
-        }
-      }
-    } catch (error) {
-      deps.logger.error(`Subscription error: ${error}`);
-      // Throw the error so the calling function can restart the subscription
-      throw error;
-    }
   }
 
   function createInstructionsHelper(
@@ -716,109 +601,79 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       return Instructions.end(params, createInstructionsHelper(this.get, this.runs));
     },
     /**
-     * Monitor program account updates using callback functions
-     * Uses WebSocket subscriptions with automatic restart on failure
+     * Monitor program account updates using async iterators.
+     * Automatically merges run account data into job account updates.
+     * Uses WebSocket subscriptions with automatic restart on failure.
+     *
+     * @example
+     * ```typescript
+     * // Example: Simple monitoring - run accounts are automatically merged into job updates
+     * const [eventStream, stop] = await jobsProgram.monitor();
+     * for await (const event of eventStream) {
+     *   if (event.type === MonitorEventType.JOB) {
+     *     console.log('Job updated:', event.data.address.toString());
+     *     // event.data will have state, node, and timeStart from run account if it exists
+     *   } else if (event.type === MonitorEventType.MARKET) {
+     *     console.log('Market updated:', event.data.address.toString());
+     *   }
+     * }
+     * // Stop monitoring when done
+     * stop();
+     * ```
+     *
+     * @returns A tuple of [eventStream, stopFunction]
+     */
+    async monitor(): Promise<[AsyncIterable<SimpleMonitorEvent>, () => void]> {
+      const monitorFunctions = createMonitorFunctions(this.get, this.runs, {
+        deps,
+        config,
+        client,
+        transformJobAccount,
+        transformRunAccount,
+        transformMarketAccount,
+        mergeRunIntoJob,
+      });
+      return monitorFunctions.monitor();
+    },
+    /**
+     * Monitor program account updates with detailed events for each account type.
+     * Uses WebSocket subscriptions with automatic restart on failure.
+     * Provides separate events for job, market, and run accounts.
      *
      * @example
      * ```typescript
      * // Example: Monitor job accounts and save to file
-     * const stopMonitoring = await jobsProgram.monitor({
-     *   onJobAccount: async (jobAccount) => {
-     *     console.log('Job updated:', jobAccount.address.toString());
-     *     // Save to database, file, or process as needed
-     *   },
-     *   onRunAccount: async (runAccount) => {
-     *     console.log('Run updated:', runAccount.address.toString());
-     *   },
-     *   onError: async (error, accountType) => {
-     *     console.error('Error processing account:', error, accountType);
+     * const [eventStream, stop] = await jobsProgram.monitorDetailed();
+     * for await (const event of eventStream) {
+     *   switch (event.type) {
+     *     case MonitorEventType.JOB:
+     *       console.log('Job updated:', event.data.address.toString());
+     *       break;
+     *     case MonitorEventType.MARKET:
+     *       console.log('Market updated:', event.data.address.toString());
+     *       break;
+     *     case MonitorEventType.RUN:
+     *       console.log('Run updated:', event.data.address.toString());
+     *       break;
      *   }
-     * });
-     *
+     * }
      * // Stop monitoring when done
-     * stopMonitoring();
+     * stop();
      * ```
      *
-     * @param options Configuration options for monitoring
-     * @returns A function to stop monitoring
+     * @returns A tuple of [eventStream, stopFunction]
      */
-    async monitor(
-      options: {
-        onJobAccount?: (jobAccount: Job) => Promise<void> | void;
-        onMarketAccount?: (marketAccount: Market) => Promise<void> | void;
-        onRunAccount?: (runAccount: Run) => Promise<void> | void;
-        onError?: (error: Error, accountType?: string) => Promise<void> | void;
-      } = {}
-    ): Promise<() => void> {
-      const { onJobAccount, onMarketAccount, onRunAccount, onError } = options;
-
-      try {
-        deps.logger.info(
-          `Starting to monitor job program account updates for program: ${programId}`
-        );
-
-        let abortController: AbortController | null = null;
-        let isMonitoring = true;
-
-        // Function to stop all monitoring
-        const stopMonitoring = () => {
-          isMonitoring = false;
-          if (abortController) {
-            abortController.abort();
-          }
-          deps.logger.info(`Stopped monitoring job program account updates`);
-        };
-
-        // Function to start/restart subscription with retry logic
-        const startSubscription = async (): Promise<void> => {
-          while (isMonitoring) {
-            try {
-              deps.logger.info('Attempting to establish WebSocket subscription...');
-
-              abortController = new AbortController();
-              const subscriptionIterable = await setupSubscription(abortController);
-
-              deps.logger.info('Successfully established WebSocket subscription');
-
-              // Start processing subscription notifications
-              await processSubscriptionNotifications(
-                subscriptionIterable,
-                { onJobAccount, onMarketAccount, onRunAccount, onError },
-                () => isMonitoring
-              );
-            } catch (error) {
-              deps.logger.warn(`WebSocket subscription failed: ${error}`);
-
-              // Clean up current subscription
-              if (abortController) {
-                abortController.abort();
-                abortController = null;
-              }
-
-              if (isMonitoring) {
-                deps.logger.info('Retrying WebSocket subscription in 5 seconds...');
-                await new Promise((resolve) => setTimeout(resolve, 5000));
-              }
-            }
-          }
-        };
-
-        // Start the subscription loop
-        startSubscription().catch((error) => {
-          deps.logger.error(`Failed to start subscription loop: ${error}`);
-        });
-
-        deps.logger.info(`Successfully started monitoring job program account updates`);
-
-        return stopMonitoring;
-      } catch (error) {
-        deps.logger.error(`Failed to start monitoring job program accounts: ${error}`);
-        throw new NosanaError(
-          'Failed to start monitoring job program accounts',
-          ErrorCodes.RPC_ERROR,
-          error
-        );
-      }
+    async monitorDetailed(): Promise<[AsyncIterable<MonitorEvent>, () => void]> {
+      const monitorFunctions = createMonitorFunctions(this.get, this.runs, {
+        deps,
+        config,
+        client,
+        transformJobAccount,
+        transformRunAccount,
+        transformMarketAccount,
+        mergeRunIntoJob,
+      });
+      return monitorFunctions.monitorDetailed();
     },
   };
 }
