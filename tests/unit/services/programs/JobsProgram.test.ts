@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { type Address } from '@solana/kit';
 import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 
@@ -346,6 +346,7 @@ describe('JobsProgram', () => {
   describe('monitor', () => {
     let sdk: ReturnType<typeof makeMonitorSdk>;
     let jobs: JobsProgram;
+    let stop: (() => void) | undefined;
     const JOB_ADDR = newAddr(100);
     const MARKET_ADDR = newAddr(101);
     const RUN_ADDR = newAddr(102);
@@ -354,6 +355,13 @@ describe('JobsProgram', () => {
     beforeEach(() => {
       sdk = makeMonitorSdk();
       jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
+      stop = undefined;
+    });
+
+    afterEach(() => {
+      if (stop) {
+        stop();
+      }
     });
 
     const createMockSubscription = (notifications: any[]) => {
@@ -394,13 +402,13 @@ describe('JobsProgram', () => {
 
     it('returns event stream and stop function', async () => {
       createMockSubscription([]);
-      const [eventStream, stop] = await jobs.monitor();
+      const [eventStream, stopFn] = await jobs.monitor();
 
       expect(eventStream).toBeDefined();
-      expect(stop).toBeInstanceOf(Function);
+      expect(stopFn).toBeInstanceOf(Function);
       expect(typeof eventStream[Symbol.asyncIterator]).toBe('function');
 
-      stop();
+      stop = stopFn;
     });
 
     it('yields job and market events without run events', async () => {
@@ -425,7 +433,8 @@ describe('JobsProgram', () => {
         send: vi.fn().mockResolvedValue([]),
       })) as any;
 
-      const [eventStream, stop] = await jobs.monitor();
+      const [eventStream, stopFn] = await jobs.monitor();
+      stop = stopFn;
       const events: any[] = [];
       for await (const event of eventStream) {
         events.push(event);
@@ -436,8 +445,6 @@ describe('JobsProgram', () => {
       expect(events[0].type).toBe(MonitorEventType.JOB);
       expect(events[1].type).toBe(MonitorEventType.MARKET);
       expect(events.every((e) => e.type !== MonitorEventType.RUN)).toBe(true);
-
-      stop();
     });
 
     it('auto-merges run accounts into job events', async () => {
@@ -453,7 +460,8 @@ describe('JobsProgram', () => {
         programClient.NosanaJobsAccount.RunAccount
       );
 
-      const [eventStream, stop] = await jobs.monitor();
+      const [eventStream, stopFn] = await jobs.monitor();
+      stop = stopFn;
       const events: any[] = [];
       for await (const event of eventStream) {
         events.push(event);
@@ -466,8 +474,6 @@ describe('JobsProgram', () => {
       expect(event.data.state).toBe(JobState.RUNNING);
       expect(event.data.timeStart).toBe(RUN_TIME_555);
       expect(event.data.node).toBe(NODE_ADDR);
-
-      stop();
     });
 
     it('monitorDetailed yields run events separately', async () => {
@@ -480,7 +486,8 @@ describe('JobsProgram', () => {
         programClient.NosanaJobsAccount.RunAccount
       );
 
-      const [eventStream, stop] = await jobs.monitorDetailed();
+      const [eventStream, stopFn] = await jobs.monitorDetailed();
+      stop = stopFn;
       const events: any[] = [];
       for await (const event of eventStream) {
         events.push(event);
@@ -492,8 +499,6 @@ describe('JobsProgram', () => {
       expect(event.type).toBe(MonitorEventType.RUN);
       expect(event.data.time).toBe(RUN_TIME_777);
       expect(event.data.job).toBe(JOB_ADDR);
-
-      stop();
     });
   });
 });
