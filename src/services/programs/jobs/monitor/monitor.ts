@@ -50,6 +50,83 @@ async function setupSubscription(
 }
 
 /**
+ * Handle JobAccount updates
+ */
+async function handleJobAccount(
+  encodedAccount: EncodedAccount,
+  autoMerge: boolean,
+  runs: JobsProgram['runs'],
+  monitorDeps: MonitorDeps
+): Promise<SimpleMonitorEvent> {
+  const { client, transformJobAccount, mergeRunIntoJob, deps } = monitorDeps;
+
+  const jobAccount = client.decodeJobAccount(encodedAccount);
+  let job = transformJobAccount(jobAccount);
+
+  // If auto-merge is enabled, check for run accounts
+  if (autoMerge && job.state === JobState.QUEUED) {
+    try {
+      const runAccounts = await runs({ job: job.address });
+      if (runAccounts.length > 0) {
+        job = mergeRunIntoJob(job, runAccounts[0]);
+      }
+    } catch (error) {
+      deps.logger.error(`Error checking run account for job ${job.address}: ${error}`);
+    }
+  }
+
+  return { type: MonitorEventType.JOB, data: job };
+}
+
+/**
+ * Handle MarketAccount updates
+ */
+function handleMarketAccount(
+  encodedAccount: EncodedAccount,
+  monitorDeps: MonitorDeps
+): SimpleMonitorEvent {
+  const { client, transformMarketAccount } = monitorDeps;
+
+  const marketAccount = client.decodeMarketAccount(encodedAccount);
+  const market = transformMarketAccount(marketAccount);
+
+  return { type: MonitorEventType.MARKET, data: market };
+}
+
+/**
+ * Handle RunAccount updates
+ */
+async function handleRunAccount(
+  encodedAccount: EncodedAccount,
+  autoMerge: boolean,
+  get: JobsProgram['get'],
+  monitorDeps: MonitorDeps
+): Promise<MonitorEvent | null> {
+  const { client, transformRunAccount, mergeRunIntoJob, deps } = monitorDeps;
+
+  const runAccount = client.decodeRunAccount(encodedAccount);
+  const run = transformRunAccount(runAccount);
+
+  if (autoMerge) {
+    // For auto-merge, fetch the job and merge run data, then yield as job event
+    try {
+      const job = await get(run.job, false);
+      const mergedJob = mergeRunIntoJob(job, run);
+      return { type: MonitorEventType.JOB, data: mergedJob };
+    } catch (error) {
+      deps.logger.error(
+        `Error fetching job ${run.job} for run account ${runAccount.address}: ${error}`
+      );
+      // Skip this event if we can't fetch the job
+      return null;
+    }
+  } else {
+    // For detailed monitoring, yield run event as-is
+    return { type: MonitorEventType.RUN, data: run };
+  }
+}
+
+/**
  * Create an async generator that yields monitor events from subscription notifications
  */
 async function* createEventStream(
@@ -62,14 +139,7 @@ async function* createEventStream(
   runs: JobsProgram['runs'],
   monitorDeps: MonitorDeps
 ): AsyncGenerator<MonitorEvent, void, unknown> {
-  const {
-    deps,
-    client,
-    transformJobAccount,
-    transformRunAccount,
-    transformMarketAccount,
-    mergeRunIntoJob,
-  } = monitorDeps;
+  const { deps, client } = monitorDeps;
 
   try {
     for await (const notification of subscriptionIterable) {
@@ -85,57 +155,25 @@ async function* createEventStream(
         const encodedAccount: EncodedAccount = parseBase64RpcAccount(pubkey, account);
         const accountType = client.identifyNosanaJobsAccount(encodedAccount);
 
+        let event: MonitorEvent | null = null;
+
         switch (accountType) {
-          case client.NosanaJobsAccount.JobAccount: {
-            const jobAccount = client.decodeJobAccount(encodedAccount);
-            let job = transformJobAccount(jobAccount);
-
-            // If auto-merge is enabled, check for run accounts
-            if (autoMerge && job.state === JobState.QUEUED) {
-              try {
-                const runAccounts = await runs({ job: job.address });
-                if (runAccounts.length > 0) {
-                  job = mergeRunIntoJob(job, runAccounts[0]);
-                }
-              } catch (error) {
-                deps.logger.error(`Error checking run account for job ${job.address}: ${error}`);
-              }
-            }
-
-            yield { type: MonitorEventType.JOB, data: job };
+          case client.NosanaJobsAccount.JobAccount:
+            event = await handleJobAccount(encodedAccount, autoMerge, runs, monitorDeps);
             break;
-          }
-          case client.NosanaJobsAccount.MarketAccount: {
-            const marketAccount = client.decodeMarketAccount(encodedAccount);
-            const market = transformMarketAccount(marketAccount);
-            yield { type: MonitorEventType.MARKET, data: market };
+          case client.NosanaJobsAccount.MarketAccount:
+            event = handleMarketAccount(encodedAccount, monitorDeps);
             break;
-          }
-          case client.NosanaJobsAccount.RunAccount: {
-            const runAccount = client.decodeRunAccount(encodedAccount);
-            const run = transformRunAccount(runAccount);
-
-            if (autoMerge) {
-              // For auto-merge, fetch the job and merge run data, then yield as job event
-              try {
-                const job = await get(run.job, false);
-                const mergedJob = mergeRunIntoJob(job, run);
-                yield { type: MonitorEventType.JOB, data: mergedJob };
-              } catch (error) {
-                deps.logger.error(
-                  `Error fetching job ${run.job} for run account ${runAccount.address}: ${error}`
-                );
-                // Skip this event if we can't fetch the job
-              }
-            } else {
-              // For detailed monitoring, yield run event as-is
-              yield { type: MonitorEventType.RUN, data: run };
-            }
+          case client.NosanaJobsAccount.RunAccount:
+            event = await handleRunAccount(encodedAccount, autoMerge, get, monitorDeps);
             break;
-          }
           default:
             deps.logger.error(`No support yet for account type: ${accountType}`);
             break;
+        }
+
+        if (event) {
+          yield event;
         }
       } catch (error) {
         deps.logger.error(`Error handling account update notification: ${error}`);
