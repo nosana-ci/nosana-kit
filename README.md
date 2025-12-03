@@ -340,41 +340,71 @@ await client.solana.buildSignAndSend(instruction);
 
 #### Monitor Account Updates
 
+The SDK provides two monitoring methods using async iterators for real-time account updates via WebSocket:
+
+**Simple Monitoring** (`monitor()`) - Automatically merges run account data into job events:
+
 ```typescript
-async monitor(options?: {
-  onJobAccount?: (job: Job) => void | Promise<void>,
-  onMarketAccount?: (market: Market) => void | Promise<void>,
-  onRunAccount?: (run: Run) => void | Promise<void>,
-  onError?: (error: Error, accountType?: string) => void | Promise<void>
-}): Promise<() => void>
+async monitor(): Promise<[AsyncIterable<SimpleMonitorEvent>, () => void]>
 ```
 
-Subscribe to real-time account updates via WebSocket. Includes automatic reconnection on failure.
-
 ```typescript
-// Start monitoring
-const stopMonitoring = await client.jobs.monitor({
-  onJobAccount: async (job) => {
-    console.log('Job update:', job.address, job.state);
+import { MonitorEventType } from '@nosana/kit';
 
+// Start monitoring
+const [eventStream, stop] = await client.jobs.monitor();
+
+// Process events using async iteration
+for await (const event of eventStream) {
+  if (event.type === MonitorEventType.JOB) {
+    console.log('Job update:', event.data.address, event.data.state);
+    // event.data will have state, node, and timeStart from run account if it exists
+    
     // Process updates - save to database, trigger workflows, etc.
-    if (job.state === JobState.COMPLETED) {
-      await processCompletedJob(job);
+    if (event.data.state === JobState.COMPLETED) {
+      await processCompletedJob(event.data);
     }
-  },
-  onRunAccount: async (run) => {
-    console.log('Run started:', run.job, 'on node', run.node);
-  },
-  onError: (error) => {
-    console.error('Monitor error:', error);
-  },
-});
+  } else if (event.type === MonitorEventType.MARKET) {
+    console.log('Market update:', event.data.address);
+  }
+}
 
 // Stop monitoring when done
-stopMonitoring();
+stop();
 ```
 
-The monitor handles WebSocket reconnection automatically and continues processing updates until explicitly stopped.
+**Detailed Monitoring** (`monitorDetailed()`) - Provides separate events for job, market, and run accounts:
+
+```typescript
+async monitorDetailed(): Promise<[AsyncIterable<MonitorEvent>, () => void]>
+```
+
+```typescript
+import { MonitorEventType } from '@nosana/kit';
+
+// Start detailed monitoring
+const [eventStream, stop] = await client.jobs.monitorDetailed();
+
+// Process events using async iteration
+for await (const event of eventStream) {
+  switch (event.type) {
+    case MonitorEventType.JOB:
+      console.log('Job update:', event.data.address);
+      break;
+    case MonitorEventType.MARKET:
+      console.log('Market update:', event.data.address);
+      break;
+    case MonitorEventType.RUN:
+      console.log('Run started:', event.data.job, 'on node', event.data.node);
+      break;
+  }
+}
+
+// Stop monitoring when done
+stop();
+```
+
+Both methods handle WebSocket reconnection automatically and continue processing updates until explicitly stopped. The simple `monitor()` method is recommended for most use cases as it automatically merges run account data into job updates, eliminating the need to manually track run accounts.
 
 ## Account Types
 
