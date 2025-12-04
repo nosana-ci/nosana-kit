@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { Instruction } from '@solana/kit';
+import { getTransferSolInstructionDataDecoder } from '@solana-program/system';
 
 import { createSolanaService } from '../../../../src/services/solana/index.js';
 import { PROTOCOL } from '../../../../src/utils/convertHttpToWebSocketUrl.js';
@@ -498,7 +499,7 @@ describe('SolanaService', () => {
   describe('transfer', () => {
     const amount = BigInt(1000000);
 
-    it('should create a transfer SOL instruction with wallet sender', async () => {
+    it('should use wallet address as source when from is not provided', async () => {
       const wallet = await SignerFactory.createTestSigner();
       const service = createService(() => wallet);
       const recipient = AddressFactory.createValid();
@@ -509,9 +510,11 @@ describe('SolanaService', () => {
       });
 
       expect(instruction).toBeDefined();
+      expect(instruction.accounts).toBeDefined();
+      expect(instruction.accounts[0].address).toBe(wallet.address); // source
     });
 
-    it('should create a transfer SOL instruction with explicit from parameter', async () => {
+    it('should use explicit from address as source when provided', async () => {
       const wallet = await SignerFactory.createTestSigner();
       const explicitSender = await SignerFactory.createRandomSigner();
       const service = createService(() => wallet);
@@ -524,6 +527,42 @@ describe('SolanaService', () => {
       });
 
       expect(instruction).toBeDefined();
+      expect(instruction.accounts).toBeDefined();
+      expect(instruction.accounts[0].address).toBe(explicitSender.address); // source
+    });
+
+    it('should include amount in instruction data', async () => {
+      const wallet = await SignerFactory.createTestSigner();
+      const service = createService(() => wallet);
+      const recipient = AddressFactory.createValid();
+
+      const instruction = await service.transfer({
+        to: recipient,
+        amount,
+      });
+
+      expect(instruction).toBeDefined();
+      expect(instruction.data).toBeDefined();
+
+      const decoder = getTransferSolInstructionDataDecoder();
+      const decodedData = decoder.decode(instruction.data!);
+
+      expect(decodedData.amount).toBe(amount);
+    });
+
+    it('should use recipient address as destination', async () => {
+      const wallet = await SignerFactory.createTestSigner();
+      const service = createService(() => wallet);
+      const recipient = AddressFactory.createValid();
+
+      const instruction = await service.transfer({
+        to: recipient,
+        amount,
+      });
+
+      expect(instruction).toBeDefined();
+      expect(instruction.accounts).toBeDefined();
+      expect(instruction.accounts[1].address).toBe(recipient); // destination
     });
 
     it('should throw error when no wallet and no from parameter provided', async () => {
@@ -549,6 +588,7 @@ describe('SolanaService', () => {
       });
 
       expect(instruction).toBeDefined();
+      expect(instruction.programAddress).toBeDefined();
     });
   });
 });
