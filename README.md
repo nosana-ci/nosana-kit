@@ -503,6 +503,13 @@ getBalance(address?: Address | string): Promise<bigint>
 
 // Derive program derived address
 pda(seeds: Array<Address | string>, programId: Address): Promise<Address>
+
+// Get instruction to transfer SOL
+transfer(params: {
+  to: Address | string;
+  amount: number | bigint;
+  from?: TransactionSigner;
+}): Promise<Instruction> // Returns TransferSolInstruction
 ```
 
 ### Examples
@@ -525,6 +532,16 @@ console.log(`Balance: ${balance} lamports`);
 
 // Derive PDA
 const pda = await client.solana.pda(['seed1', 'seed2'], programAddress);
+
+// Get instruction to transfer SOL
+const transferSolIx = await client.solana.transfer({
+  to: 'recipient-address',
+  amount: 1000000, // lamports (can be number or bigint)
+  // from is optional - uses wallet if not provided
+});
+
+// Execute the transfer
+await client.solana.buildSignAndSend(transferSolIx);
 ```
 
 ## IPFS Service
@@ -1039,6 +1056,31 @@ const balance = await client.nos.getBalance('owner-address');
 console.log(`Balance: ${balance} NOS`);
 // Returns 0 if no token account exists
 ```
+
+### Transfer Tokens
+
+Get instruction(s) to transfer SPL tokens. Returns either 1 or 2 instructions depending on whether the recipient's associated token account needs to be created:
+
+```typescript
+// Get transfer instruction(s)
+const instructions = await client.nos.transfer({
+  to: 'recipient-address',
+  amount: 1000000, // token base units (can be number or bigint)
+  // from is optional - uses wallet if not provided
+});
+
+// Execute the transfer
+// instructions is a tuple:
+// - [TransferInstruction] when recipient ATA exists (1 instruction)
+// - [CreateAssociatedTokenIdempotentInstruction, TransferInstruction] when ATA needs creation (2 instructions)
+await client.solana.buildSignAndSend(instructions);
+```
+
+The function automatically:
+- Finds the sender's associated token account
+- Finds the recipient's associated token account
+- Creates the recipient's ATA if it doesn't exist (returns 2 instructions: create ATA + transfer)
+- Returns only the transfer instruction if the recipient's ATA already exists (returns 1 instruction)
 
 ### Type Definitions
 

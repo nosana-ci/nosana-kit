@@ -494,4 +494,61 @@ describe('SolanaService', () => {
       expect(pda.length).toBeGreaterThan(0);
     });
   });
+
+  describe('transfer', () => {
+    const amount = BigInt(1000000);
+
+    it('should create a transfer SOL instruction with wallet sender', async () => {
+      const wallet = await SignerFactory.createTestSigner();
+      const service = createService(() => wallet);
+      const recipient = AddressFactory.createValid();
+
+      const instruction = await service.transfer({
+        to: recipient,
+        amount,
+      });
+
+      expect(instruction).toBeDefined();
+    });
+
+    it('should create a transfer SOL instruction with explicit from parameter', async () => {
+      const wallet = await SignerFactory.createTestSigner();
+      const explicitSender = await SignerFactory.createRandomSigner();
+      const service = createService(() => wallet);
+      const recipient = AddressFactory.createValid();
+
+      const instruction = await service.transfer({
+        to: recipient,
+        amount,
+        from: explicitSender,
+      });
+
+      expect(instruction).toBeDefined();
+    });
+
+    it('should throw error when no wallet and no from parameter provided', async () => {
+      const service = createService(() => undefined);
+      const recipient = AddressFactory.createValid();
+
+      await expect(
+        service.transfer({
+          to: recipient,
+          amount,
+        })
+      ).rejects.toMatchObject({ code: 'NO_WALLET' });
+    });
+
+    it('should accept string address for recipient', async () => {
+      const wallet = await SignerFactory.createTestSigner();
+      const service = createService(() => wallet);
+      const recipient = AddressFactory.createValid().toString();
+
+      const instruction = await service.transfer({
+        to: recipient,
+        amount,
+      });
+
+      expect(instruction).toBeDefined();
+    });
+  });
 });
