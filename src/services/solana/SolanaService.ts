@@ -83,7 +83,14 @@ export interface SolanaService {
    */
   feePayer: TransactionSigner | undefined;
   pda(seeds: Array<Address | string>, programId: Address): Promise<Address>;
-  getBalance(addressStr?: string | Address): Promise<bigint>;
+  /**
+   * Get the SOL balance for a specific address.
+   *
+   * @param addressStr - Optional address to query. If not provided, uses the wallet address.
+   * @returns The SOL balance in lamports as a number
+   * @throws {NosanaError} If neither address nor wallet is provided
+   */
+  getBalance(addressStr?: string | Address): Promise<number>;
   buildTransaction(
     instructions: Instruction | Instruction[],
     options?: { feePayer?: TransactionSigner }
@@ -205,7 +212,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       return pda;
     },
 
-    async getBalance(addressStr?: string | Address): Promise<bigint> {
+    async getBalance(addressStr?: string | Address): Promise<number> {
       try {
         // Use wallet address if no address is provided
         let addr: Address;
@@ -221,7 +228,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
         deps.logger.debug(`Getting balance for address: ${addr}`);
         const balance = await rpc.getBalance(addr).send();
-        return balance.value;
+        return Number(balance.value);
       } catch (error) {
         if (error instanceof NosanaError) {
           throw error;
