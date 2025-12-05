@@ -61,6 +61,9 @@ describe('TokenService (nos)', () => {
   beforeEach(() => {
     client = createNosanaClient(NosanaNetwork.DEVNET);
     nosService = client.nos;
+
+    // Clear all mocks before each test
+    vi.clearAllMocks();
   });
 
   describe('initialization', () => {
@@ -492,7 +495,7 @@ describe('TokenService (nos)', () => {
   describe('getBalance', () => {
     const ownerAddress = '9aKHLbxLbgKGz9vL3kZKz9XwPnxGKLWxjZHWzLHfbT1J';
 
-    it('should return the token balance', async () => {
+    it('should return the token balance when owner is provided', async () => {
       const mockResponse = {
         value: [
           {
@@ -523,6 +526,33 @@ describe('TokenService (nos)', () => {
       const balance = await nosService.getBalance(ownerAddress);
 
       expect(balance).toBe(2000);
+    });
+
+    it('should use wallet address when owner is not provided', async () => {
+      const mockSigner = await SignerFactory.createTestSigner();
+      client.wallet = mockSigner;
+
+      (client.solana.rpc.getTokenAccountsByOwner as any).mockReturnValue({
+        send: vi.fn().mockResolvedValue({ value: [] }),
+      });
+
+      await nosService.getBalance();
+
+      // Verify it was called with the wallet address
+      expect(client.solana.rpc.getTokenAccountsByOwner).toHaveBeenCalledWith(
+        mockSigner.address,
+        expect.any(Object),
+        expect.any(Object)
+      );
+    });
+
+    it('should throw error when neither owner nor wallet is provided', async () => {
+      const clientWithoutWallet = createNosanaClient(NosanaNetwork.DEVNET);
+      clientWithoutWallet.wallet = undefined;
+
+      await expect(clientWithoutWallet.nos.getBalance()).rejects.toMatchObject({
+        code: 'NO_WALLET',
+      });
     });
 
     it('should return 0 when no token account exists', async () => {
@@ -572,6 +602,9 @@ describe('TokenService (nos)', () => {
     const amount = BigInt(1000000);
 
     beforeEach(async () => {
+      // Clear mocks before setting up for this test suite
+      vi.clearAllMocks();
+
       client = createNosanaClient(NosanaNetwork.DEVNET);
       nosService = client.nos;
       // Set the wallet on the client

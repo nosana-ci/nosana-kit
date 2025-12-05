@@ -289,9 +289,9 @@ export function createTokenService(
     }): Promise<
       | [ReturnType<typeof getTransferInstruction>]
       | [
-        Awaited<ReturnType<typeof getCreateAssociatedTokenIdempotentInstructionAsync>>,
-        ReturnType<typeof getTransferInstruction>,
-      ]
+          Awaited<ReturnType<typeof getCreateAssociatedTokenIdempotentInstructionAsync>>,
+          ReturnType<typeof getTransferInstruction>,
+        ]
     > {
       try {
         // Determine sender: use params.from if provided, otherwise use wallet

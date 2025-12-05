@@ -12,6 +12,7 @@ export default [
       'coverage/',
       'src/generated_clients/',
       'examples/',
+      'docs/',
       '**/*.config.js',
       '**/*.config.ts',
     ],
