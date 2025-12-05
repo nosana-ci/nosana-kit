@@ -34,7 +34,7 @@ import {
   getCreateAssociatedTokenIdempotentInstructionAsync,
   TOKEN_PROGRAM_ADDRESS,
 } from '@solana-program/token';
-import { SYSTEM_PROGRAM_ADDRESS } from '@solana-program/system';
+import { SYSTEM_PROGRAM_ADDRESS, getTransferSolInstruction } from '@solana-program/system';
 import { NosanaError, ErrorCodes } from '../../errors/NosanaError.js';
 import { Logger } from '../../logger/Logger.js';
 import { Wallet } from '../../types.js';
@@ -107,6 +107,20 @@ export interface SolanaService {
     }
   ): Promise<Signature>;
   /**
+   * Get an instruction to transfer SOL from one address to another.
+   *
+   * @param params Transfer parameters
+   * @param params.to Recipient address
+   * @param params.amount Amount in lamports (number or bigint)
+   * @param params.from Optional sender TransactionSigner. If not provided, uses wallet from client.
+   * @returns An instruction to transfer SOL
+   */
+  transfer(params: {
+    to: Address | string;
+    amount: number | bigint;
+    from?: TransactionSigner;
+  }): Promise<ReturnType<typeof getTransferSolInstruction>>;
+  /**
    * Get an instruction to create an associated token account if it doesn't exist.
    * Checks if the ATA exists, and if not, returns an instruction to create it.
    * Uses the idempotent version so it's safe to call even if the account already exists.
@@ -122,7 +136,7 @@ export interface SolanaService {
     mint: Address,
     owner: Address,
     payer?: TransactionSigner
-  ): Promise<Instruction | null>;
+  ): Promise<Awaited<ReturnType<typeof getCreateAssociatedTokenIdempotentInstructionAsync>> | null>;
 }
 
 /**
@@ -352,6 +366,62 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
     },
 
     /**
+     * Get an instruction to transfer SOL from one address to another.
+     *
+     * @param params Transfer parameters
+     * @param params.to Recipient address
+     * @param params.amount Amount in lamports (number or bigint)
+     * @param params.from Optional sender TransactionSigner. If not provided, uses wallet from client.
+     * @returns An instruction to transfer SOL
+     */
+    async transfer(params: {
+      to: Address | string;
+      amount: number | bigint;
+      from?: TransactionSigner;
+    }): Promise<ReturnType<typeof getTransferSolInstruction>> {
+      try {
+        // Determine sender: use params.from if provided, otherwise get from wallet
+        const sender = params.from ?? deps.getWallet();
+        if (!sender) {
+          throw new NosanaError(
+            'No wallet found and no from parameter provided',
+            ErrorCodes.NO_WALLET
+          );
+        }
+
+        // Convert amount to bigint if it's a number
+        const amountBigInt =
+          typeof params.amount === 'bigint' ? params.amount : BigInt(params.amount);
+
+        // Convert recipient to Address
+        const recipient = typeof params.to === 'string' ? address(params.to) : params.to;
+
+        deps.logger.debug(
+          `Creating SOL transfer instruction: ${amountBigInt} lamports from ${sender.address} to ${recipient}`
+        );
+
+        // Create and return transfer instruction
+        const instruction = getTransferSolInstruction({
+          source: sender,
+          destination: recipient,
+          amount: amountBigInt,
+        });
+
+        return instruction;
+      } catch (error) {
+        if (error instanceof NosanaError) {
+          throw error;
+        }
+        deps.logger.error(`Failed to get transfer SOL instruction: ${error}`);
+        throw new NosanaError(
+          'Failed to get transfer SOL instruction',
+          ErrorCodes.TRANSACTION_ERROR,
+          error
+        );
+      }
+    },
+
+    /**
      * Get an instruction to create an associated token account if it doesn't exist.
      * Checks if the ATA exists, and if not, returns an instruction to create it.
      * Uses the idempotent version so it's safe to call even if the account already exists.
@@ -367,7 +437,9 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       mint: Address,
       owner: Address,
       payer?: TransactionSigner
-    ): Promise<Instruction | null> {
+    ): Promise<Awaited<
+      ReturnType<typeof getCreateAssociatedTokenIdempotentInstructionAsync>
+    > | null> {
       try {
         // Check if the account exists
         const accountInfo = await rpc.getAccountInfo(ata).send();

@@ -98,6 +98,7 @@ export function createNosanaClient(
   const programDeps: ProgramDeps = {
     logger,
     solana,
+    nos,
     getWallet,
   };
 

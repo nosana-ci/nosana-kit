@@ -7,9 +7,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest",
+    "test": "NODE_NO_WARNINGS=1 vitest run",
+    "test:coverage": "NODE_NO_WARNINGS=1 vitest run --coverage",
+    "test:watch": "NODE_NO_WARNINGS=1 vitest",
     "generate-clients": "npx tsx scripts/generate-clients.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

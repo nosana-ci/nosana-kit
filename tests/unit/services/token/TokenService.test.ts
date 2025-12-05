@@ -1,8 +1,10 @@
 import { address } from '@solana/kit';
 import { NosanaNetwork } from '@nosana/types';
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
+import { getTransferInstructionDataDecoder } from '@solana-program/token';
 
 import { createNosanaClient, type NosanaClient, TokenService } from '../../../../src/index.js';
+import { SignerFactory, AddressFactory } from '../../../setup/index.js';
 
 vi.mock('../../../../src/logger/Logger.js', () => {
   return {
@@ -561,6 +563,141 @@ describe('TokenService (nos)', () => {
       expect(devnetClient.config.programs.nosTokenAddress).toBe(
         address('devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP')
       );
+    });
+  });
+
+  describe('transfer', () => {
+    let client: NosanaClient;
+    let nosService: TokenService;
+    const amount = BigInt(1000000);
+
+    beforeEach(async () => {
+      client = createNosanaClient(NosanaNetwork.DEVNET);
+      nosService = client.nos;
+      // Set the wallet on the client
+      const mockSigner = await SignerFactory.createTestSigner();
+      client.wallet = mockSigner;
+      // Also set feePayer for backward compatibility
+      client.solana.feePayer = mockSigner;
+      // Default mock: ATA already exists (returns null)
+      vi.spyOn(client.solana, 'getCreateATAInstructionIfNeeded').mockResolvedValue(null);
+    });
+
+    it('should return 1 instruction when recipient ATA exists', async () => {
+      const recipient = AddressFactory.createValid();
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+      });
+
+      expect(instructions).toBeDefined();
+      expect(Array.isArray(instructions)).toBe(true);
+      expect(instructions.length).toBe(1);
+    });
+
+    it('should return 2 instructions when recipient ATA needs to be created', async () => {
+      const recipient = AddressFactory.createValid();
+
+      // Mock getCreateATAInstructionIfNeeded to return an instruction (ATA doesn't exist)
+      const mockCreateAtaIx = {
+        programAddress: 'TokenProgram',
+        accounts: [],
+        data: new Uint8Array(),
+      };
+      vi.spyOn(client.solana, 'getCreateATAInstructionIfNeeded').mockResolvedValue(
+        mockCreateAtaIx as any
+      );
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+      });
+
+      expect(instructions).toBeDefined();
+      expect(instructions.length).toBe(2);
+      expect(instructions[0]).toBe(mockCreateAtaIx);
+    });
+
+    it('should use wallet address as authority when from is not provided', async () => {
+      const recipient = AddressFactory.createValid();
+      const wallet = client.wallet!;
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+      });
+
+      expect(instructions.length).toBe(1);
+      const transferIx = instructions[0];
+      expect(transferIx.accounts).toBeDefined();
+      expect(transferIx.accounts![2].address).toBe(wallet.address); // authority
+    });
+
+    it('should use explicit from address as authority when provided', async () => {
+      const recipient = AddressFactory.createValid();
+      const explicitSender = await SignerFactory.createRandomSigner();
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+        from: explicitSender,
+      });
+
+      expect(instructions.length).toBe(1);
+      const transferIx = instructions[0];
+      expect(transferIx.accounts).toBeDefined();
+      expect(transferIx.accounts![2].address).toBe(explicitSender.address); // authority
+    });
+
+    it('should include amount in instruction data', async () => {
+      const recipient = AddressFactory.createValid();
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+      });
+
+      expect(instructions.length).toBe(1);
+      const transferIx = instructions[0];
+      expect(transferIx.data).toBeDefined();
+
+      const decoder = getTransferInstructionDataDecoder();
+      const decodedData = decoder.decode(transferIx.data!);
+
+      expect(decodedData.amount).toBe(amount);
+    });
+
+    it('should use recipient address for destination ATA', async () => {
+      const recipient = AddressFactory.createValid();
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+      });
+
+      expect(instructions.length).toBe(1);
+      const transferIx = instructions[0];
+      expect(transferIx.accounts).toBeDefined();
+
+      // Verify destination is the recipient's ATA
+      const recipientAta = await nosService.getATA(recipient);
+      expect(transferIx.accounts![1].address).toBe(recipientAta); // destination
+    });
+
+    it('should throw error when no wallet and no from parameter provided', async () => {
+      const clientWithoutWallet = createNosanaClient(NosanaNetwork.DEVNET);
+      const recipient = AddressFactory.createValid();
+
+      // Ensure feePayer is not set
+      clientWithoutWallet.solana.feePayer = undefined;
+
+      await expect(
+        clientWithoutWallet.nos.transfer({
+          to: recipient,
+          amount,
+        })
+      ).rejects.toMatchObject({ code: 'NO_WALLET' });
     });
   });
 });

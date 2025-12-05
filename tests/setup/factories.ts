@@ -218,6 +218,9 @@ export class MockClientFactory {
         rpc: {},
         pda: vi.fn().mockResolvedValue(validAddr),
       },
+      nos: {
+        getATA: vi.fn().mockResolvedValue(validAddr),
+      },
       get wallet() {
         return wallet;
       },
@@ -293,6 +296,7 @@ export function sdkToProgramDeps(sdk: NosanaClient): import('../../src/types.js'
   return {
     logger: sdk.logger,
     solana: sdk.solana,
+    nos: sdk.nos,
     getWallet: () => sdk.wallet,
   };
 }

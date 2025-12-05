@@ -1,7 +1,12 @@
-import { Address, address, Base58EncodedBytes } from '@solana/kit';
+import { Address, address, Base58EncodedBytes, Instruction, TransactionSigner } from '@solana/kit';
 import { NosanaError, ErrorCodes } from '../../errors/NosanaError.js';
 import { Logger } from '../../logger/Logger.js';
-import { TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
+import {
+  TOKEN_PROGRAM_ADDRESS,
+  getTransferInstruction,
+  findAssociatedTokenPda,
+  getCreateAssociatedTokenIdempotentInstructionAsync,
+} from '@solana-program/token';
 
 // Standard SPL token account size
 const TOKEN_ACCOUNT_SIZE = 165;
@@ -48,6 +53,28 @@ export interface TokenService {
   }): Promise<TokenAccountWithBalance[]>;
   getTokenAccountForAddress(owner: string | Address): Promise<TokenAccountWithBalance | null>;
   getBalance(owner: string | Address): Promise<number>;
+  /**
+   * Get the associated token account address for a given owner.
+   *
+   * @param owner The owner address
+   * @returns The associated token account address
+   */
+  getATA(owner: Address | string): Promise<Address>;
+  /**
+   * Get instruction(s) to transfer SPL tokens from one address to another.
+   * May return 1 or 2 instructions depending on whether the recipient's associated token account needs to be created.
+   *
+   * @param params Transfer parameters
+   * @param params.to Recipient address
+   * @param params.amount Amount in token base units (number or bigint)
+   * @param params.from Optional sender TransactionSigner. If not provided, uses wallet from client.
+   * @returns Array of instructions (create ATA instruction if needed, then transfer instruction)
+   */
+  transfer(params: {
+    to: Address | string;
+    amount: number | bigint;
+    from?: TransactionSigner;
+  }): Promise<Instruction[]>;
 }
 
 /**
@@ -208,6 +235,109 @@ export function createTokenService(
     async getBalance(owner: string | Address): Promise<number> {
       const account = await this.getTokenAccountForAddress(owner);
       return account ? account.uiAmount : 0;
+    },
+
+    /**
+     * Get the associated token account address for a given owner.
+     *
+     * @param owner The owner address
+     * @returns The associated token account address
+     */
+    async getATA(owner: Address | string): Promise<Address> {
+      const ownerAddr = typeof owner === 'string' ? address(owner) : owner;
+      const tokenMint = config.tokenAddress;
+
+      const [ata] = await findAssociatedTokenPda({
+        mint: tokenMint,
+        owner: ownerAddr,
+        tokenProgram: TOKEN_PROGRAM_ADDRESS,
+      });
+
+      return ata;
+    },
+
+    /**
+     * Get instruction(s) to transfer SPL tokens from one address to another.
+     * May return 1 or 2 instructions depending on whether the recipient's associated token account needs to be created.
+     *
+     * @param params Transfer parameters
+     * @param params.to Recipient address
+     * @param params.amount Amount in token base units (number or bigint)
+     * @param params.from Optional sender TransactionSigner. If not provided, uses wallet from client.
+     * @returns Array of instructions (create ATA instruction if needed, then transfer instruction)
+     */
+    async transfer(params: {
+      to: Address | string;
+      amount: number | bigint;
+      from?: TransactionSigner;
+    }): Promise<
+      | [ReturnType<typeof getTransferInstruction>]
+      | [
+          Awaited<ReturnType<typeof getCreateAssociatedTokenIdempotentInstructionAsync>>,
+          ReturnType<typeof getTransferInstruction>,
+        ]
+    > {
+      try {
+        // Determine sender: use params.from if provided, otherwise use feePayer from solana service
+        // Note: feePayer is typically set to the wallet when the client wallet is set
+        const sender = params.from ?? deps.solana.feePayer;
+        if (!sender) {
+          throw new NosanaError(
+            'No wallet found and no from parameter provided',
+            ErrorCodes.NO_WALLET
+          );
+        }
+
+        // Convert amount to bigint if it's a number
+        const amountBigInt =
+          typeof params.amount === 'bigint' ? params.amount : BigInt(params.amount);
+
+        // Convert recipient to Address
+        const recipient = typeof params.to === 'string' ? address(params.to) : params.to;
+        const tokenMint = config.tokenAddress;
+
+        deps.logger.debug(
+          `Creating SPL token transfer instruction: ${amountBigInt} tokens from ${sender.address} to ${recipient}`
+        );
+
+        // Find sender's ATA
+        const senderAta = await this.getATA(sender.address);
+
+        // Find recipient's ATA
+        const recipientAta = await this.getATA(recipient);
+
+        // Check if recipient ATA exists and get create instruction if needed
+        const createAtaInstruction = await deps.solana.getCreateATAInstructionIfNeeded(
+          recipientAta,
+          tokenMint,
+          recipient,
+          sender
+        );
+
+        // Create transfer instruction
+        const transferIx = getTransferInstruction({
+          source: senderAta,
+          destination: recipientAta,
+          authority: sender.address,
+          amount: amountBigInt,
+        });
+
+        // Return array of instructions - either 1 or 2 instructions
+        if (createAtaInstruction) {
+          return [createAtaInstruction, transferIx];
+        }
+        return [transferIx];
+      } catch (error) {
+        if (error instanceof NosanaError) {
+          throw error;
+        }
+        deps.logger.error(`Failed to get transfer instruction: ${error}`);
+        throw new NosanaError(
+          'Failed to get transfer instruction',
+          ErrorCodes.TRANSACTION_ERROR,
+          error
+        );
+      }
     },
   };
 }
