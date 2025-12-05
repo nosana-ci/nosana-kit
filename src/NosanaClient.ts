@@ -88,6 +88,7 @@ export function createNosanaClient(
     {
       logger,
       solana,
+      getWallet,
     },
     {
       tokenAddress: config.programs.nosTokenAddress,

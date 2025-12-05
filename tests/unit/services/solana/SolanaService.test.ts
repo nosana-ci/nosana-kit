@@ -452,7 +452,7 @@ describe('SolanaService', () => {
 
       const balance = await service.getBalance(testAddress);
 
-      expect(balance).toBe(mockBalance);
+      expect(balance).toBe(Number(mockBalance));
     });
 
     it('returns balance for wallet when no address provided', async () => {
@@ -460,7 +460,7 @@ describe('SolanaService', () => {
 
       const balance = await service.getBalance();
 
-      expect(balance).toBe(mockBalance);
+      expect(balance).toBe(Number(mockBalance));
       expect(service.rpc.getBalance).toHaveBeenCalledWith(wallet.address);
     });
 

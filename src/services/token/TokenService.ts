@@ -1,6 +1,7 @@
 import { Address, address, Base58EncodedBytes, Instruction, TransactionSigner } from '@solana/kit';
 import { NosanaError, ErrorCodes } from '../../errors/NosanaError.js';
 import { Logger } from '../../logger/Logger.js';
+import { Wallet } from '../../types.js';
 import {
   TOKEN_PROGRAM_ADDRESS,
   getTransferInstruction,
@@ -34,6 +35,7 @@ import type { SolanaService } from '../solana/index.js';
 export interface TokenServiceDeps {
   logger: Logger;
   solana: SolanaService;
+  getWallet: () => Wallet | undefined;
 }
 
 /**
@@ -52,7 +54,7 @@ export interface TokenService {
     excludePdaAccounts?: boolean;
   }): Promise<TokenAccountWithBalance[]>;
   getTokenAccountForAddress(owner: string | Address): Promise<TokenAccountWithBalance | null>;
-  getBalance(owner: string | Address): Promise<number>;
+  getBalance(owner?: string | Address): Promise<number>;
   /**
    * Get the associated token account address for a given owner.
    *
@@ -229,11 +231,25 @@ export function createTokenService(
      * Get the token balance for a specific owner address
      * Convenience method that returns just the balance
      *
-     * @param owner - The owner address to query
+     * @param owner - Optional owner address to query. If not provided, uses the wallet address.
      * @returns The token balance as a UI amount (with decimals), or 0 if no account exists
+     * @throws {NosanaError} If neither owner nor wallet is provided
      */
-    async getBalance(owner: string | Address): Promise<number> {
-      const account = await this.getTokenAccountForAddress(owner);
+    async getBalance(owner?: string | Address): Promise<number> {
+      let ownerAddr: Address;
+      if (owner) {
+        ownerAddr = typeof owner === 'string' ? address(owner) : owner;
+      } else {
+        const wallet = deps.getWallet();
+        if (!wallet) {
+          throw new NosanaError(
+            'No wallet found and no owner address provided',
+            ErrorCodes.NO_WALLET
+          );
+        }
+        ownerAddr = wallet.address;
+      }
+      const account = await this.getTokenAccountForAddress(ownerAddr);
       return account ? account.uiAmount : 0;
     },
 
@@ -278,9 +294,8 @@ export function createTokenService(
         ]
     > {
       try {
-        // Determine sender: use params.from if provided, otherwise use feePayer from solana service
-        // Note: feePayer is typically set to the wallet when the client wallet is set
-        const sender = params.from ?? deps.solana.feePayer;
+        // Determine sender: use params.from if provided, otherwise use wallet
+        const sender = params.from ?? deps.getWallet();
         if (!sender) {
           throw new NosanaError(
             'No wallet found and no from parameter provided',
