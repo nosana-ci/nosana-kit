@@ -58,6 +58,7 @@ docs build:
   script:
     - npm ci
     - npm run build
+    - npm install ./ --no-save
     - npm run docs:build
   artifacts:
     paths:
