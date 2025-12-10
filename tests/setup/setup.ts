@@ -20,7 +20,7 @@ vi.mock('@solana/kit', async (importOriginal) => {
     })),
     getLatestBlockhash: vi.fn(() => ({
       send: vi.fn().mockResolvedValue({
-        value: { blockhash: 'mock-blockhash', lastValidBlockHeight: BigInt(0) },
+        value: { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: BigInt(123) },
       }),
     })),
   } as any;

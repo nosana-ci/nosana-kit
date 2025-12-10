@@ -247,7 +247,7 @@ describe('SolanaService', () => {
 
       // observable behavior: transaction message is returned
       expect(transactionMessage).toBeDefined();
-      expect(transactionMessage.instructions).toHaveLength(2); // instruction + compute unit limit
+      expect(transactionMessage.instructions).toHaveLength(1);
     });
 
     it('builds a transaction message with custom fee payer', async () => {
@@ -493,6 +493,124 @@ describe('SolanaService', () => {
 
       expect(pda).toBeTypeOf('string');
       expect(pda.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('buildTransaction with address as feePayer', () => {
+    it('accepts a string address as fee payer for partial signing flow', async () => {
+      const { service } = await createWalletAndService();
+      const feePayerAddress = AddressFactory.createValid();
+      const instruction = makeInstruction();
+
+      const transactionMessage = await service.buildTransaction(instruction, {
+        feePayer: feePayerAddress,
+      });
+
+      expect(transactionMessage).toBeDefined();
+      expect(transactionMessage.feePayer.address).toBe(feePayerAddress);
+    });
+  });
+
+  describe('buildTransaction with estimateComputeUnits', () => {
+    it('does not add compute unit instruction by default', async () => {
+      const { service } = await createWalletAndService();
+      const instruction = makeInstruction();
+
+      const transactionMessage = await service.buildTransaction(instruction);
+
+      // Only the provided instruction should be present
+      expect(transactionMessage.instructions).toHaveLength(1);
+    });
+
+    it('adds compute unit instruction when estimateComputeUnits is true', async () => {
+      const { service } = await createWalletAndService();
+      const instruction = makeInstruction();
+
+      const transactionMessage = await service.buildTransaction(instruction, {
+        estimateComputeUnits: true,
+      });
+
+      // Should have original instruction + compute budget instruction
+      expect(transactionMessage.instructions).toHaveLength(2);
+    });
+  });
+
+  describe('partiallySignTransaction', () => {
+    it('partially signs a transaction message', async () => {
+      const { service } = await createWalletAndService();
+      const instruction = makeInstruction();
+
+      const transactionMessage = await service.buildTransaction(instruction);
+
+      const partiallySignedTx = await service.partiallySignTransaction(transactionMessage);
+
+      expect(partiallySignedTx).toBeDefined();
+      expect(partiallySignedTx.signatures).toBeDefined();
+      expect(partiallySignedTx.messageBytes).toBeDefined();
+    });
+  });
+
+  describe('serializeTransaction and deserializeTransaction', () => {
+    it('round-trips a transaction through serialize/deserialize', async () => {
+      const { service } = await createWalletAndService();
+      const instruction = makeInstruction();
+      const transactionMessage = await createTransactionMessage(service, instruction);
+      const partiallySignedTx = await service.partiallySignTransaction(transactionMessage);
+
+      const serialized = service.serializeTransaction(partiallySignedTx);
+      const deserialized = service.deserializeTransaction(serialized);
+
+      expect(deserialized).toBeDefined();
+      expect(deserialized.messageBytes).toStrictEqual(partiallySignedTx.messageBytes);
+    });
+  });
+
+  describe('signTransactionWithSigners', () => {
+    it('signs a transaction with provided signers', async () => {
+      const { service } = await createWalletAndService();
+      const instruction = makeInstruction();
+      const transactionMessage = await createTransactionMessage(service, instruction);
+      // Use partiallySignTransaction to get a real transaction structure
+      const partiallySignedTx = await service.partiallySignTransaction(transactionMessage);
+
+      // Create a mock signer that returns a signature dictionary
+      const signerAddress = AddressFactory.createValid();
+      const mockSigner = {
+        address: signerAddress,
+        signTransactions: vi.fn().mockResolvedValue([{ [signerAddress]: new Uint8Array(64).fill(1) }]),
+      };
+
+      // Serialize and deserialize to simulate receiving a transaction
+      const serialized = service.serializeTransaction(partiallySignedTx);
+      const receivedTx = service.deserializeTransaction(serialized);
+
+      const reSigned = await service.signTransactionWithSigners(receivedTx, [mockSigner as any]);
+
+      expect(reSigned).toBeDefined();
+      expect(reSigned.signatures).toBeDefined();
+      expect(mockSigner.signTransactions).toHaveBeenCalledWith([receivedTx]);
+    });
+  });
+
+  describe('decompileTransaction', () => {
+    it('decompiles a transaction to inspect its contents', async () => {
+      const { service } = await createWalletAndService();
+      const instruction = makeInstruction();
+      const transactionMessage = await createTransactionMessage(service, instruction);
+      // Use partiallySignTransaction to get a real transaction structure
+      const partiallySignedTx = await service.partiallySignTransaction(transactionMessage);
+
+      // Serialize and deserialize to simulate receiving a transaction
+      const serialized = service.serializeTransaction(partiallySignedTx);
+      const receivedTx = service.deserializeTransaction(serialized);
+
+      const decompiled = service.decompileTransaction(receivedTx);
+
+      expect(decompiled).toBeDefined();
+      expect(decompiled.feePayer.address).toBe(transactionMessage.feePayer.address);
+      expect(decompiled.instructions.length).toBe(transactionMessage.instructions.length);
+      expect(decompiled.instructions[0].programAddress).toBe(transactionMessage.instructions[0].programAddress);
+      expect(decompiled.instructions[0].data).toStrictEqual(transactionMessage.instructions[0].data);
     });
   });
 

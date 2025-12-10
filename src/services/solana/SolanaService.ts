@@ -7,14 +7,17 @@ import {
   getAddressEncoder,
   createTransactionMessage,
   signTransactionMessageWithSigners,
+  partiallySignTransactionMessageWithSigners,
   getSignatureFromTransaction,
   Signature,
   Instruction,
   TransactionMessageWithBlockhashLifetime,
+  setTransactionMessageFeePayer,
   setTransactionMessageFeePayerSigner,
   setTransactionMessageLifetimeUsingBlockhash,
   sendAndConfirmTransactionFactory,
   TransactionMessageWithFeePayer,
+  TransactionMessageWithLifetime,
   TransactionMessage,
   SendableTransaction,
   Transaction,
@@ -25,6 +28,13 @@ import {
   TransactionSigner,
   Commitment,
   TransactionWithBlockhashLifetime,
+  getTransactionDecoder,
+  getBase64Encoder,
+  getBase64EncodedWireTransaction,
+  isTransactionSigner,
+  TransactionPartialSigner,
+  decompileTransactionMessage,
+  getCompiledTransactionMessageDecoder,
 } from '@solana/kit';
 import {
   estimateComputeUnitLimitFactory,
@@ -91,9 +101,21 @@ export interface SolanaService {
    * @throws {NosanaError} If neither address nor wallet is provided
    */
   getBalance(addressStr?: string | Address): Promise<number>;
+  /**
+   * Build a transaction message from instructions.
+   * This function creates a transaction message with fee payer, blockhash, and instructions.
+   *
+   * @param instructions Single instruction or array of instructions
+   * @param options Optional configuration
+   * @param options.feePayer Optional custom fee payer. Can be a TransactionSigner (for full signing)
+   *                         or an Address/string (for partial signing where feepayer signs later).
+   *                         Takes precedence over service feePayer and wallet.
+   * @param options.estimateComputeUnits If true, estimates and sets the compute unit limit. Default: false.
+   * @returns An unsigned transaction message ready to be signed
+   */
   buildTransaction(
     instructions: Instruction | Instruction[],
-    options?: { feePayer?: TransactionSigner }
+    options?: { feePayer?: TransactionSigner | Address | string; estimateComputeUnits?: boolean }
   ): Promise<
     TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithBlockhashLifetime
   >;
@@ -111,8 +133,67 @@ export interface SolanaService {
     options?: {
       feePayer?: TransactionSigner;
       commitment?: 'processed' | 'confirmed' | 'finalized';
+      estimateComputeUnits?: boolean;
     }
   ): Promise<Signature>;
+  /**
+   * Partially sign a transaction message with the signers embedded in the transaction.
+   * The transaction message must already have a fee payer address set (via buildTransaction with an address).
+   * Signers are extracted from instructions in the message (e.g., transfer source signer).
+   * Use this when building transactions where the fee payer will sign later.
+   *
+   * @param transactionMessage The transaction message to sign (must have fee payer address set and signers embedded in instructions)
+   * @returns A partially signed transaction
+   */
+  partiallySignTransaction(
+    transactionMessage: TransactionMessage &
+      TransactionMessageWithFeePayer &
+      TransactionMessageWithBlockhashLifetime
+  ): Promise<Transaction & TransactionWithBlockhashLifetime>;
+  /**
+   * Serialize a transaction to a base64 string.
+   * Works with both partially signed and fully signed transactions.
+   * Use this to transmit transactions to other parties (e.g., for fee payer signing).
+   *
+   * @param transaction The transaction to serialize
+   * @returns Base64 encoded wire transaction string
+   */
+  serializeTransaction(transaction: Transaction): string;
+  /**
+   * Deserialize a base64 string back to a transaction.
+   * Use this to receive transactions from other parties.
+   *
+   * @param base64 The base64 encoded transaction string
+   * @returns The deserialized transaction
+   */
+  deserializeTransaction(base64: string): Transaction & TransactionWithBlockhashLifetime;
+  /**
+   * Sign a transaction with the provided signers.
+   * Use this when receiving a partially signed transaction that needs additional signatures.
+   * This adds signatures from the provided signers to the transaction.
+   *
+   * @param transaction The transaction to sign (typically partially signed, received from another party)
+   * @param signers Array of TransactionPartialSigners to sign with
+   * @returns The signed transaction with additional signatures
+   */
+  signTransactionWithSigners(
+    transaction: Transaction & TransactionWithBlockhashLifetime,
+    signers: TransactionPartialSigner[]
+  ): Promise<SendableTransaction & Transaction & TransactionWithBlockhashLifetime>;
+  /**
+   * Decompile a transaction back to a transaction message.
+   * Use this to inspect/verify the content of a deserialized transaction before signing.
+   *
+   * Note: Decompilation is lossy - some information like lastValidBlockHeight may not be fully
+   * reconstructed. The returned message is suitable for inspection but may not be suitable
+   * for re-signing without additional context.
+   *
+   * @param transaction The compiled transaction to decompile
+   * @returns The decompiled transaction message (with either blockhash or durable nonce lifetime)
+   */
+  decompileTransaction(
+    transaction: Transaction & TransactionWithBlockhashLifetime
+  ): BaseTransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime;
   /**
    * Get an instruction to transfer SOL from one address to another.
    *
@@ -244,16 +325,19 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
      * - Fee payer set to the provided feePayer, service feePayer, or wallet (in that order)
      * - Latest blockhash for lifetime
      * - Provided instructions
-     * - Estimated compute unit limit
+     * - Optionally: estimated compute unit limit
      *
      * @param instructions Single instruction or array of instructions
      * @param options Optional configuration
-     * @param options.feePayer Optional custom fee payer. Takes precedence over service feePayer and wallet.
+     * @param options.feePayer Optional custom fee payer. Can be a TransactionSigner (for full signing)
+     *                         or an Address/string (for partial signing where feepayer signs later).
+     *                         Takes precedence over service feePayer and wallet.
+     * @param options.estimateComputeUnits If true, estimates and sets the compute unit limit. Default: false.
      * @returns An unsigned transaction message ready to be signed
      */
     async buildTransaction(
       instructions: Instruction | Instruction[],
-      options?: { feePayer?: TransactionSigner }
+      options?: { feePayer?: TransactionSigner | Address | string; estimateComputeUnits?: boolean }
     ): Promise<
       TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithBlockhashLifetime
     > {
@@ -270,13 +354,27 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
         // Normalize instructions to array
         const instructionsArray = Array.isArray(instructions) ? instructions : [instructions];
 
+        // Helper to check if the feePayer is a TransactionSigner
+        const isSigner = (value: TransactionSigner | Address | string): value is TransactionSigner =>
+          typeof value === 'object' && isTransactionSigner(value);
+
         // Build transaction message using pipe
+        // Use setTransactionMessageFeePayerSigner for TransactionSigner, setTransactionMessageFeePayer for Address
         const transactionMessage = await pipe(
           createTransactionMessage({ version: 0 }),
-          (tx) => setTransactionMessageFeePayerSigner(transactionFeePayer, tx),
+          (tx) => {
+            if (isSigner(transactionFeePayer)) {
+              return setTransactionMessageFeePayerSigner(transactionFeePayer, tx);
+            } else {
+              // It's a string address, convert to Address type
+              const feePayerAddress = address(transactionFeePayer);
+              return setTransactionMessageFeePayer(feePayerAddress, tx);
+            }
+          },
           (tx) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx),
           (tx) => appendTransactionMessageInstructions(instructionsArray, tx),
-          (tx) => estimateAndSetComputeUnitLimit(tx)
+          // Optionally estimate and set compute unit limit
+          (tx) => (options?.estimateComputeUnits ? estimateAndSetComputeUnitLimit(tx) : tx)
         );
 
         return transactionMessage;
@@ -356,6 +454,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
      * @param options Optional configuration
      * @param options.feePayer Optional custom fee payer. If not provided, uses the wallet.
      * @param options.commitment Commitment level for confirmation (takes precedence over config, then falls back to config.commitment, then 'confirmed')
+     * @param options.estimateComputeUnits If true, estimates and sets the compute unit limit. Default: false.
      * @returns The transaction signature
      */
     async buildSignAndSend(
@@ -363,10 +462,12 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       options?: {
         feePayer?: TransactionSigner;
         commitment?: 'processed' | 'confirmed' | 'finalized';
+        estimateComputeUnits?: boolean;
       }
     ): Promise<Signature> {
       const transactionMessage = await this.buildTransaction(instructions, {
         feePayer: options?.feePayer,
+        estimateComputeUnits: options?.estimateComputeUnits,
       });
       const signedTransaction = await this.signTransaction(transactionMessage);
       return await this.sendTransaction(signedTransaction, { commitment: options?.commitment });
@@ -478,6 +579,175 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       } catch (error) {
         deps.logger.error(`Failed to get create ATA instruction: ${error}`);
         throw new NosanaError('Failed to get create ATA instruction', ErrorCodes.RPC_ERROR, error);
+      }
+    },
+
+    /**
+     * Partially sign a transaction message with the signers embedded in the transaction.
+     * The transaction message must already have a fee payer address set (via buildTransaction with an address).
+     * Signers are extracted from instructions in the message (e.g., transfer source signer).
+     * Use this when building transactions where the fee payer will sign later.
+     *
+     * @param transactionMessage The transaction message to sign (must have fee payer address set and signers embedded in instructions)
+     * @returns A partially signed transaction
+     */
+    async partiallySignTransaction(
+      transactionMessage: TransactionMessage &
+        TransactionMessageWithFeePayer &
+        TransactionMessageWithBlockhashLifetime
+    ): Promise<Transaction & TransactionWithBlockhashLifetime> {
+      try {
+        deps.logger.debug('Partially signing transaction with embedded signers');
+
+        // Use partiallySignTransactionMessageWithSigners to sign with signers embedded in the message
+        const partiallySignedTransaction =
+          await partiallySignTransactionMessageWithSigners(transactionMessage);
+
+        return partiallySignedTransaction as Transaction & TransactionWithBlockhashLifetime;
+      } catch (error) {
+        deps.logger.error(`Failed to partially sign transaction: ${error}`);
+        throw new NosanaError(
+          'Failed to partially sign transaction',
+          ErrorCodes.TRANSACTION_ERROR,
+          error
+        );
+      }
+    },
+
+    /**
+     * Serialize a transaction to a base64 string.
+     * Works with both partially signed and fully signed transactions.
+     * Use this to transmit transactions to other parties (e.g., for fee payer signing).
+     *
+     * @param transaction The transaction to serialize
+     * @returns Base64 encoded wire transaction string
+     */
+    serializeTransaction(transaction: Transaction): string {
+      try {
+        deps.logger.debug('Serializing transaction to base64');
+
+        // Use getBase64EncodedWireTransaction to encode the transaction
+        const base64String = getBase64EncodedWireTransaction(transaction);
+
+        return base64String;
+      } catch (error) {
+        deps.logger.error(`Failed to serialize transaction: ${error}`);
+        throw new NosanaError(
+          'Failed to serialize transaction',
+          ErrorCodes.TRANSACTION_ERROR,
+          error
+        );
+      }
+    },
+
+    /**
+     * Deserialize a base64 string back to a transaction.
+     * Use this to receive transactions from other parties.
+     *
+     * @param base64 The base64 encoded transaction string
+     * @returns The deserialized transaction
+     */
+    deserializeTransaction(base64: string): Transaction & TransactionWithBlockhashLifetime {
+      try {
+        deps.logger.debug('Deserializing transaction from base64');
+
+        // Decode the base64 string to bytes, then to transaction
+        const transactionBytes = getBase64Encoder().encode(base64);
+        const transaction = getTransactionDecoder().decode(transactionBytes);
+
+        return transaction as Transaction & TransactionWithBlockhashLifetime;
+      } catch (error) {
+        deps.logger.error(`Failed to deserialize transaction: ${error}`);
+        throw new NosanaError(
+          'Failed to deserialize transaction',
+          ErrorCodes.TRANSACTION_ERROR,
+          error
+        );
+      }
+    },
+
+    /**
+     * Sign a transaction with the provided signers.
+     * Use this when receiving a partially signed transaction that needs additional signatures.
+     * This adds signatures from the provided signers to the transaction.
+     *
+     * @param transaction The transaction to sign (typically partially signed, received from another party)
+     * @param signers Array of TransactionPartialSigners to sign with
+     * @returns The signed transaction with additional signatures
+     */
+    async signTransactionWithSigners(
+      transaction: Transaction & TransactionWithBlockhashLifetime,
+      signers: TransactionPartialSigner[]
+    ): Promise<SendableTransaction & Transaction & TransactionWithBlockhashLifetime> {
+      try {
+        deps.logger.debug(
+          `Signing transaction with ${signers.length} signer(s): ${signers.map((s) => s.address).join(', ')}`
+        );
+
+        // Sign with each signer and merge signatures into the transaction
+        // TransactionPartialSigner.signTransactions returns SignatureDictionary[] (not transactions)
+        // We need to merge these signatures into the transaction's signatures map
+        let updatedSignatures = { ...transaction.signatures };
+
+        for (const signer of signers) {
+          // signTransactions returns an array of SignatureDictionary (one per transaction)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const [signatureDict] = await signer.signTransactions([transaction as any]);
+          // Merge the new signatures into our accumulated signatures
+          updatedSignatures = { ...updatedSignatures, ...signatureDict };
+        }
+
+        // Create a new transaction with the merged signatures
+        const signedTransaction = {
+          ...transaction,
+          signatures: updatedSignatures,
+        };
+
+        return signedTransaction as SendableTransaction &
+          Transaction &
+          TransactionWithBlockhashLifetime;
+      } catch (error) {
+        if (error instanceof NosanaError) {
+          throw error;
+        }
+        deps.logger.error(`Failed to sign transaction: ${error}`);
+        throw new NosanaError('Failed to sign transaction', ErrorCodes.TRANSACTION_ERROR, error);
+      }
+    },
+
+    /**
+     * Decompile a transaction back to a transaction message.
+     * Use this to inspect/verify the content of a deserialized transaction before signing.
+     *
+     * Note: Decompilation is lossy - some information like lastValidBlockHeight may not be fully
+     * reconstructed. The returned message is suitable for inspection but may not be suitable
+     * for re-signing without additional context.
+     *
+     * @param transaction The compiled transaction to decompile
+     * @returns The decompiled transaction message (with either blockhash or durable nonce lifetime)
+     */
+    decompileTransaction(
+      transaction: Transaction & TransactionWithBlockhashLifetime
+    ): BaseTransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime {
+      try {
+        deps.logger.debug('Decompiling transaction to transaction message');
+
+        // First decode the compiled transaction message from the transaction bytes
+        const compiledMessage = getCompiledTransactionMessageDecoder().decode(
+          transaction.messageBytes
+        );
+
+        // Then decompile to get the transaction message
+        const transactionMessage = decompileTransactionMessage(compiledMessage);
+
+        return transactionMessage;
+      } catch (error) {
+        deps.logger.error(`Failed to decompile transaction: ${error}`);
+        throw new NosanaError(
+          'Failed to decompile transaction',
+          ErrorCodes.TRANSACTION_ERROR,
+          error
+        );
       }
     },
   };

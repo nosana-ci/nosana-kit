@@ -21,6 +21,6 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/unit/SolanaService.test.ts"],
   "exclude": ["node_modules", "tests", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
