@@ -122,6 +122,12 @@ export default defineConfig({
         tsconfigPath: '.vitepress/tsconfig.json',
         // Don't throw on errors - code examples may have intentional errors or incomplete code
         throws: true,
+        // Additional compiler options to help with module resolution
+        compilerOptions: {
+          moduleResolution: 'node',
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+        },
       }),
     ],
   },

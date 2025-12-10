@@ -58,7 +58,10 @@ docs build:
   script:
     - npm ci
     - npm run build
-    - npm install ./ --no-save
+    - mkdir -p node_modules/@nosana/kit
+    - cp package.json node_modules/@nosana/kit/
+    - cp -r dist node_modules/@nosana/kit/
+    - ls -la node_modules/@nosana/kit || echo "Package setup failed"
     - npm run docs:build
   artifacts:
     paths:
