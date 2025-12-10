@@ -1,0 +1,57 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs/api",
+  "tsconfig": "./tsconfig.json",
+  "plugin": [
+    "typedoc-plugin-mdn-links",
+    "typedoc-plugin-markdown",
+    "typedoc-plugin-frontmatter",
+    "./typedoc.plugin.mjs"
+  ],
+  "disableSources": true,
+  "readme": "none",
+  "hidePageHeader": true,
+  "hideBreadcrumbs": true,
+  "hideGroupHeadings": false,
+  "hidePageTitle": false,
+  "indexFormat": "table",
+  "parametersFormat": "table",
+  "classPropertiesFormat": "table",
+  "enumMembersFormat": "table",
+  "typeDeclarationFormat": "table",
+  "propertyMembersFormat": "table",
+  "interfacePropertiesFormat": "table",
+  "fileExtension": ".md",
+  "entryFileName": "index",
+  "theme": "nosana-docs-theme",
+  "useCodeBlocks": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "excludeExternals": false,
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "groupOrder": [
+    "@nosana/kit",
+    "@nosana/authorization",
+    "@nosana/ipfs",
+    "@nosana/endpoints",
+    "@nosana/api",
+    "@nosana/types",
+    "@solana/kit",
+    "*"
+  ],
+  "kindSortOrder": [
+    "Project",
+    "Module",
+    "Namespace",
+    "Enum",
+    "Class",
+    "Interface",
+    "TypeAlias",
+    "Function",
+    "Variable"
+  ]
+}
+

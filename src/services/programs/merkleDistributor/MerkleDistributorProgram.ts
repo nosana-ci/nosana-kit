@@ -18,6 +18,7 @@ import bs58 from 'bs58';
 /**
  * Claim target enum for merkle distributor.
  * Determines which address receives the claimed tokens.
+ * @group @nosana/kit
  */
 export enum ClaimTarget {
   YES = 'YES',
@@ -43,6 +44,7 @@ export type ClaimStatus = ConvertTypesForDb<programClient.ClaimStatusArgs> & {
 
 /**
  * Error thrown when a claim status account is not found
+ * @group @nosana/kit
  */
 export class ClaimStatusNotFoundError extends Error {
   constructor(address: Address) {
@@ -53,6 +55,7 @@ export class ClaimStatusNotFoundError extends Error {
 
 /**
  * Merkle distributor program interface
+ * @group @nosana/kit
  */
 export interface MerkleDistributorProgram {
   /**

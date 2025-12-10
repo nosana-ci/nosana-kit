@@ -1262,8 +1262,12 @@ import type {
   ClientConfig,
   NosanaClient,
   Wallet,
+  Address,
 } from '@nosana/kit';
-import type { Address } from '@solana/kit';
+
+// The `address` utility function is also available for creating typed addresses
+import { address } from '@nosana/kit';
+const jobAddress = address('your-job-address');
 ```
 
 ## Dependencies

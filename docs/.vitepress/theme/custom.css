@@ -1,0 +1,82 @@
+/* Custom styles for the documentation site */
+
+/* Nosana Brand Colors */
+:root {
+  --vp-c-brand: #10E80C;
+  --vp-c-brand-1: #10E80C;
+  --vp-c-brand-2: #0FC90B;
+  --vp-c-brand-3: #0EAA0A;
+  --vp-c-brand-soft: rgba(16, 232, 12, 0.14);
+}
+
+.dark {
+  --vp-c-brand: #10E80C;
+  --vp-c-brand-1: #10E80C;
+  --vp-c-brand-2: #0FC90B;
+  --vp-c-brand-3: #0EAA0A;
+  --vp-c-brand-soft: rgba(16, 232, 12, 0.16);
+}
+
+/* Ensure code blocks have proper spacing */
+.vp-code-group {
+  margin: 1rem 0;
+}
+
+/* Style for type hover information */
+.vp-code code {
+  position: relative;
+}
+
+/* Hide Twoslash query markers (^?) by default, show only on hover */
+.twoslash-query {
+  display: none;
+}
+
+/* Show query markers when hovering over the code block */
+.vp-code:hover .twoslash-query {
+  display: inline;
+}
+
+/* Hide ALL twoslash query popups by default - they should only show on hover */
+/* Use maximum specificity to override FloatingVue styles */
+body .v-popper__popper[data-theme="twoslash-query"],
+html .v-popper__popper[data-theme="twoslash-query"],
+.v-popper__popper[data-theme="twoslash-query"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+}
+
+/* Show popups only when they have the data-show attribute (set by FloatingVue on hover) */
+body .v-popper__popper[data-theme="twoslash-query"][data-show],
+html .v-popper__popper[data-theme="twoslash-query"][data-show],
+.v-popper__popper[data-theme="twoslash-query"][data-show] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  position: fixed !important;
+  left: auto !important;
+  top: auto !important;
+}
+
+
+/* Improve readability of API reference */
+.api-reference {
+  line-height: 1.6;
+}
+
+.api-reference h2 {
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  padding-bottom: 0.5rem;
+}
+
+.api-reference h3 {
+  margin-top: 1.5rem;
+}
+

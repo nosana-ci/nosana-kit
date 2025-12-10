@@ -136,7 +136,7 @@ client.wallet = useWalletAccountSigner(account, currentChain);
 
 // Keypair wallets
 import { generateKeyPairSigner } from '@solana/kit';
-client.wallet = generateKeyPairSigner();
+client.wallet = await generateKeyPairSigner();
 
 // Can also be set during initialization
 const client = createNosanaClient(NosanaNetwork.MAINNET, {

@@ -20,6 +20,7 @@ import type { ProgramDeps } from './types.js';
 /**
  * The Nosana client interface. Contains all the services and programs
  * needed to interact with the Nosana network.
+ * @group @nosana/kit
  */
 export interface NosanaClient {
   readonly config: ClientConfig;
@@ -124,9 +125,9 @@ export function createNosanaClient(
       ? createNosanaApi(network, config.api.apiKey)
       : wallet
         ? createNosanaApi(network, {
-            identifier: wallet.address.toString(),
-            generate: (authorization as NosanaAuthorization).generate,
-          })
+          identifier: wallet.address.toString(),
+          generate: (authorization as NosanaAuthorization).generate,
+        })
         : undefined;
 
     return {
