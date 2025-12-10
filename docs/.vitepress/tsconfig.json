@@ -8,7 +8,11 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "types": ["node"],
-    "typeRoots": ["../../node_modules/@types", "../../node_modules"]
+    "typeRoots": ["../../node_modules/@types", "../../node_modules"],
+    "paths": {
+      "@nosana/kit": ["../../src/index.ts"],
+      "@nosana/kit/*": ["../../src/*"]
+    }
   },
   "include": [
     "../../src/**/*",
