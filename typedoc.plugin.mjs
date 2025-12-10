@@ -62,7 +62,8 @@ function splitTableByKind(tableContent) {
     
     // Build output with subheadings for each kind
     let output = '';
-    for (const { pattern, kind, singular } of KIND_PATTERNS) {
+    // eslint-disable-next-line no-unused-vars
+    for (const { _, kind, singular } of KIND_PATTERNS) {
         const group = kindGroups.get(kind);
         if (!group || group.rows.length === 0) continue;
         
@@ -136,7 +137,7 @@ export function load(app) {
         if (!page.contents) return;
 
         // Rewrite links to be root relative for VitePress
-        page.contents = page.contents.replace(/]\(((?:[^\/\)]+\/)*[^\/\)]+)\.md([^)]*)?\)/gm, (_, path, suffix) => {
+        page.contents = page.contents.replace(/]\(((?:[^/)]+\/)*[^/)]+)\.md([^)]*)?\)/gm, (_, path, suffix) => {
             const rootRelativeUrl = resolve('/api', dirname(page.url), path);
             return `](${rootRelativeUrl}${suffix ?? ''})`;
         });

@@ -41,9 +41,9 @@ export function walletToAuthorizationSigner(signer: MessageSigner): SignMessageF
       const signedMessages = await signer.modifyAndSignMessages([messageToSign]);
       const signedMessage = signedMessages[0] as
         | {
-          content: Uint8Array;
-          signatures: Record<typeof signerAddress, Uint8Array>;
-        }
+            content: Uint8Array;
+            signatures: Record<typeof signerAddress, Uint8Array>;
+          }
         | undefined;
       return extractSignature(
         signedMessage?.signatures,

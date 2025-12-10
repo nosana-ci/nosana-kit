@@ -33,7 +33,11 @@ export default defineConfig({
   description: 'TypeScript SDK for interacting with the Nosana Network on Solana',
   // GitLab Pages base path - update this to match your GitLab project path
   // Format: /<group>/<project>/
-  base: process.env.CI ? (process.env.CI_PAGES_URL ? new URL(process.env.CI_PAGES_URL).pathname : '/kit/') : '/',
+  base: process.env.CI
+    ? process.env.CI_PAGES_URL
+      ? new URL(process.env.CI_PAGES_URL).pathname
+      : '/kit/'
+    : '/',
 
   themeConfig: {
     nav: [
@@ -95,9 +99,7 @@ export default defineConfig({
       '/api/': getApiSidebar(),
     },
 
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/nosana-ci/nosana-kit' },
-    ],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/nosana-ci/nosana-kit' }],
 
     search: {
       provider: 'local',
@@ -127,4 +129,3 @@ export default defineConfig({
   // Ensure VitePress serves .mdx files from the api directory
   srcExclude: ['**/node_modules/**', '**/.git/**'],
 });
-

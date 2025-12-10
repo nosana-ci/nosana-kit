@@ -13,10 +13,10 @@ export type ConvertBigIntToNumber<T> = {
  */
 export type ConvertTypesForDb<T> = {
   [K in keyof T]: T[K] extends bigint
-  ? number
-  : T[K] extends ReadonlyUint8Array
-  ? string | null
-  : T[K];
+    ? number
+    : T[K] extends ReadonlyUint8Array
+      ? string | null
+      : T[K];
 };
 
 /**

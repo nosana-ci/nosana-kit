@@ -125,9 +125,9 @@ export function createNosanaClient(
       ? createNosanaApi(network, config.api.apiKey)
       : wallet
         ? createNosanaApi(network, {
-          identifier: wallet.address.toString(),
-          generate: (authorization as NosanaAuthorization).generate,
-        })
+            identifier: wallet.address.toString(),
+            generate: (authorization as NosanaAuthorization).generate,
+          })
         : undefined;
 
     return {

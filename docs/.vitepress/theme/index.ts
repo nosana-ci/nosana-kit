@@ -45,4 +45,3 @@ export default {
     app.component('Steps', Steps);
   },
 } satisfies Theme;
-

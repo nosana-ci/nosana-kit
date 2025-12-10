@@ -80,7 +80,10 @@ export type { StakeProgram, Stake } from './services/programs/stake/index.js';
 /**
  * @group @nosana/kit
  */
-export { createMerkleDistributorProgram, ClaimTarget } from './services/programs/merkleDistributor/index.js';
+export {
+  createMerkleDistributorProgram,
+  ClaimTarget,
+} from './services/programs/merkleDistributor/index.js';
 
 /**
  * @group @nosana/kit
@@ -108,7 +111,11 @@ export { createTokenService } from './services/token/index.js';
 /**
  * @group @nosana/kit
  */
-export type { TokenService, TokenAccount, TokenAccountWithBalance } from './services/token/index.js';
+export type {
+  TokenService,
+  TokenAccount,
+  TokenAccountWithBalance,
+} from './services/token/index.js';
 
 /**
  * @group @nosana/kit
