@@ -355,8 +355,9 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
         const instructionsArray = Array.isArray(instructions) ? instructions : [instructions];
 
         // Helper to check if the feePayer is a TransactionSigner
-        const isSigner = (value: TransactionSigner | Address | string): value is TransactionSigner =>
-          typeof value === 'object' && isTransactionSigner(value);
+        const isSigner = (
+          value: TransactionSigner | Address | string
+        ): value is TransactionSigner => typeof value === 'object' && isTransactionSigner(value);
 
         // Build transaction message using pipe
         // Use setTransactionMessageFeePayerSigner for TransactionSigner, setTransactionMessageFeePayer for Address

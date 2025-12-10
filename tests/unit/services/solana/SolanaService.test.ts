@@ -577,7 +577,9 @@ describe('SolanaService', () => {
       const signerAddress = AddressFactory.createValid();
       const mockSigner = {
         address: signerAddress,
-        signTransactions: vi.fn().mockResolvedValue([{ [signerAddress]: new Uint8Array(64).fill(1) }]),
+        signTransactions: vi
+          .fn()
+          .mockResolvedValue([{ [signerAddress]: new Uint8Array(64).fill(1) }]),
       };
 
       // Serialize and deserialize to simulate receiving a transaction
@@ -609,8 +611,12 @@ describe('SolanaService', () => {
       expect(decompiled).toBeDefined();
       expect(decompiled.feePayer.address).toBe(transactionMessage.feePayer.address);
       expect(decompiled.instructions.length).toBe(transactionMessage.instructions.length);
-      expect(decompiled.instructions[0].programAddress).toBe(transactionMessage.instructions[0].programAddress);
-      expect(decompiled.instructions[0].data).toStrictEqual(transactionMessage.instructions[0].data);
+      expect(decompiled.instructions[0].programAddress).toBe(
+        transactionMessage.instructions[0].programAddress
+      );
+      expect(decompiled.instructions[0].data).toStrictEqual(
+        transactionMessage.instructions[0].data
+      );
     });
   });
 
