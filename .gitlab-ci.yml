@@ -57,6 +57,7 @@ docs build:
   stage: build
   script:
     - npm ci
+    - npm run build
     - npm run docs:build
   artifacts:
     paths:

@@ -22,8 +22,6 @@ import type { Job, NosanaClient } from '@nosana/kit';
 
 // Initialize with mainnet defaults
 const client = createNosanaClient();
-//    ^?
-// Hover over 'client' above to see it's typed as NosanaClient
 
 // Or specify network and configuration
 const client2: NosanaClient = createNosanaClient(NosanaNetwork.DEVNET, {
