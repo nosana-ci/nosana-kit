@@ -9,9 +9,10 @@
     "skipLibCheck": true,
     "types": ["node"],
     "typeRoots": ["../../node_modules/@types", "../../node_modules"],
+    "baseUrl": "../../",
     "paths": {
-      "@nosana/kit": ["../../src/index.ts"],
-      "@nosana/kit/*": ["../../src/*"]
+      "@nosana/kit": ["dist/index.d.ts", "src/index.ts"],
+      "@nosana/kit/*": ["dist/*", "src/*"]
     }
   },
   "include": [
