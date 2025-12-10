@@ -92,6 +92,7 @@ type LiteralString = string &
 // Spread marker to inject JSON (array/object) resolved from a placeholder at runtime
 type SpreadMarker = {
   __spread__: LiteralString;
+  chunked?: boolean;
 } &
   tags.TagBase<{
     kind: 'spreadMarker';
@@ -101,7 +102,6 @@ type SpreadMarker = {
       typeof $input === "object" &&
       $input !== null &&
       !Array.isArray($input) &&
-      Object.keys($input).length === 1 &&
       typeof $input.__spread__ === "string" &&
       /^%%(ops|global)\.[^%]+%%$/.test($input.__spread__)
     `;
