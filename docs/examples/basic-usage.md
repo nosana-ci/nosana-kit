@@ -13,7 +13,6 @@ This page demonstrates common patterns for using Nosana Kit.
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
 const client = createNosanaClient();
-//    ^?
 ```
 
   </template>
@@ -22,7 +21,6 @@ const client = createNosanaClient();
 ```ts twoslash
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 const client = createNosanaClient(NosanaNetwork.DEVNET);
-//    ^?
 ```
 
   </template>
@@ -37,7 +35,6 @@ const client = createNosanaClient(NosanaNetwork.DEVNET);
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
 const client = createNosanaClient();
-//    ^?
 ```
 
 <Callout type="info">
@@ -51,7 +48,6 @@ The `Job` type includes all properties from the on-chain account data. Hover ove
 ```ts twoslash
 import { createNosanaClient, JobState } from '@nosana/kit';
 const client = createNosanaClient();
-//    ^?
 ```
 
 ## Set Up Wallet

@@ -34,7 +34,6 @@ const client2: NosanaClient = createNosanaClient(NosanaNetwork.DEVNET, {
 
 // Fetch a job by address
 const job: Job = await client.jobs.get('job-address' as any);
-//    ^?
 console.log('Job state:', job.state);
 
 // Query jobs with filters
