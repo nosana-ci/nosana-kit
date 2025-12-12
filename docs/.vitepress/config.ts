@@ -110,9 +110,7 @@ export default defineConfig({
     // Enhanced code block features
     lineNumbers: true,
     // Twoslash transformer for type hover information
-    codeTransformers: [
-      transformerTwoslash(),
-    ],
+    codeTransformers: [transformerTwoslash()],
   },
 
   // Ensure VitePress serves .md files from the api directory
