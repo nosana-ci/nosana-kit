@@ -4,7 +4,7 @@ The SDK provides structured error handling with specific error codes.
 
 ## NosanaError
 
-```ts twoslash
+```ts
 class NosanaError extends Error {
   code: string;
   details?: any;
@@ -13,7 +13,7 @@ class NosanaError extends Error {
 
 ## Error Codes
 
-```ts twoslash
+```ts
 enum ErrorCodes {
   INVALID_NETWORK = 'INVALID_NETWORK',
   INVALID_CONFIG = 'INVALID_CONFIG',
@@ -29,7 +29,7 @@ enum ErrorCodes {
 
 ## Examples
 
-```ts twoslash
+```ts
 import { NosanaError, ErrorCodes } from '@nosana/kit';
 
 try {

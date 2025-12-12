@@ -13,7 +13,7 @@ The wallet must implement both `MessageSigner` and `TransactionSigner` interface
 
 Full support for wallet-standard compatible browser wallets (Phantom, Solflare, etc.):
 
-```ts twoslash
+```ts
 import { createNosanaClient } from '@nosana/kit';
 import { useWalletAccountSigner } from '@nosana/solana-vue';
 
@@ -28,7 +28,7 @@ client.wallet = useWalletAccountSigner(account, currentChain);
 
 Seamless support for keypair-based wallets:
 
-```ts twoslash
+```ts
 import { createNosanaClient } from '@nosana/kit';
 import { generateKeyPairSigner } from '@solana/kit';
 
@@ -44,21 +44,26 @@ client.wallet = keypair;
 
 Wallets can be set at client initialization or dynamically assigned:
 
-```ts twoslash
+```ts
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 import type { Wallet } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+
+// Create wallet instances for examples
+const myWallet: Wallet = await generateKeyPairSigner();
+const anotherWallet: Wallet = await generateKeyPairSigner();
 
 // Option 1: Set wallet during initialization
-const client = createNosanaClient(NosanaNetwork.MAINNET, {
+const client1 = createNosanaClient(NosanaNetwork.MAINNET, {
   wallet: myWallet,
 });
 
 // Option 2: Set wallet dynamically
-const client = createNosanaClient();
-client.wallet = myWallet;
+const client2 = createNosanaClient();
+client2.wallet = myWallet;
 
 // Option 3: Change wallet at runtime
-client.wallet = anotherWallet;
+client2.wallet = anotherWallet;
 ```
 
 ## Type Safety

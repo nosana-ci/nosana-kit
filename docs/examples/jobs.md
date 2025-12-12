@@ -30,8 +30,9 @@ const ipfsHash: string = await client.ipfs.pin({
 });
 
 // Create job instruction
+import { address } from '@nosana/kit';
 const instruction: Instruction = await client.jobs.post({
-  market: 'market-address',
+  market: address('market-address'),
   timeout: 3600, // 1 hour
   ipfsHash: ipfsHash,
 });
@@ -44,15 +45,18 @@ console.log('Job posted:', signature);
 ## Monitor Job Updates
 
 ```ts twoslash
-import { MonitorEventType, JobState } from '@nosana/kit';
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { JobState } from '@nosana/kit';
 import type { SimpleMonitorEvent } from '@nosana/kit';
 
 // Start monitoring
 const [eventStream, stop] = await client.jobs.monitor();
 
 // Process events using async iteration
-for await (const event: SimpleMonitorEvent of eventStream) {
-  if (event.type === MonitorEventType.JOB) {
+for await (const event of eventStream) {
+  if (event.type === 'job') {
     console.log('Job update:', event.data.address, event.data.state);
     
     // Process updates - save to database, trigger workflows, etc.
@@ -65,7 +69,7 @@ for await (const event: SimpleMonitorEvent of eventStream) {
         console.log('Job results:', results);
       }
     }
-  } else if (event.type === MonitorEventType.MARKET) {
+  } else if (event.type === 'market') {
     console.log('Market update:', event.data.address);
   }
 }
@@ -77,8 +81,13 @@ stop();
 ## Query Jobs by State
 
 ```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
 import { JobState } from '@nosana/kit';
 import type { Job } from '@nosana/kit';
+
+import { address } from '@nosana/kit';
 
 // Get all running jobs
 const runningJobs: Job[] = await client.jobs.all({
@@ -87,26 +96,30 @@ const runningJobs: Job[] = await client.jobs.all({
 
 // Get all jobs for a specific project
 const projectJobs: Job[] = await client.jobs.all({
-  project: 'project-address',
+  project: address('project-address'),
 });
 
 // Get all jobs in a market
 const marketJobs: Job[] = await client.jobs.all({
-  market: 'market-address',
+  market: address('market-address'),
 });
 ```
 
 ## Get Job with Run Information
 
 ```ts twoslash
+import { createNosanaClient, JobState } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
 import type { Job } from '@nosana/kit';
 
 // Get job and automatically check for associated run
-const job: Job = await client.jobs.get('job-address', true);
+import { address } from '@nosana/kit';
+const job: Job = await client.jobs.get(address('job-address'), true);
 
 if (job.state === JobState.RUNNING) {
   console.log('Job is running on node:', job.node);
-  console.log('Started at:', new Date(job.timeStart * 1000));
+  console.log('Started at:', new Date(Number(job.timeStart) * 1000));
 }
 ```
 

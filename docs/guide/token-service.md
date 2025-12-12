@@ -6,7 +6,7 @@ The TokenService provides methods to interact with token accounts on Solana. In 
 
 Fetch all accounts holding NOS tokens using a single RPC call:
 
-```ts twoslash
+```ts
 // Get all holders (excludes zero balance accounts by default)
 const holders: TokenAccountWithBalance[] = await client.nos.getAllTokenHolders();
 
@@ -29,7 +29,7 @@ console.log(`User-owned accounts: ${userAccounts.length}`);
 
 Retrieve the NOS token account for a specific owner:
 
-```ts twoslash
+```ts
 const account: TokenAccountWithBalance | null = await client.nos.getTokenAccountForAddress('owner-address');
 
 if (account) {
@@ -47,7 +47,7 @@ if (account) {
 
 Convenience method to get just the NOS balance for an address:
 
-```ts twoslash
+```ts
 const balance: number = await client.nos.getBalance('owner-address');
 console.log(`Balance: ${balance} NOS`);
 // Returns 0 if no token account exists
@@ -57,7 +57,7 @@ console.log(`Balance: ${balance} NOS`);
 
 Get instruction(s) to transfer SPL tokens. Returns either 1 or 2 instructions depending on whether the recipient's associated token account needs to be created:
 
-```ts twoslash
+```ts
 // Get transfer instruction(s)
 const instructions: Instruction[] = await client.nos.transfer({
   to: 'recipient-address',
@@ -80,7 +80,9 @@ The function automatically:
 
 ## Type Definitions
 
-```ts twoslash
+```ts
+import type { Address, TokenAccount, TokenAccountWithBalance } from '@nosana/kit';
+
 interface TokenAccount {
   pubkey: Address;
   owner: Address;

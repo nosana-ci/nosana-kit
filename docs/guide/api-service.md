@@ -17,7 +17,7 @@ The API service supports two authentication methods:
 
 ## Configuration
 
-```ts twoslash
+```ts
 // Option 1: Use API key (recommended for servers)
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
@@ -49,7 +49,7 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 
 The API service provides access to three main APIs:
 
-```ts twoslash
+```ts
 client.api?.jobs    // Jobs API
 client.api?.credits // Credits API
 client.api?.markets // Markets API
@@ -57,7 +57,7 @@ client.api?.markets // Markets API
 
 ## Examples
 
-```ts twoslash
+```ts
 // Using API key
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: { apiKey: 'your-api-key' },

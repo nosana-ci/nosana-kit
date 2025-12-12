@@ -16,7 +16,7 @@ npm install @nosana/kit
 
 ## Basic Usage
 
-```ts twoslash
+```ts
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 import type { Job, NosanaClient } from '@nosana/kit';
 

@@ -43,7 +43,7 @@ pnpm add @nosana/kit
 
 The SDK is written in TypeScript and provides complete type definitions. All types are exported for use in your applications:
 
-```ts twoslash
+```ts
 import type {
   Job,
   Run,

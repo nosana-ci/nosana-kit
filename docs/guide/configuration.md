@@ -9,7 +9,7 @@ The SDK supports two networks:
 
 ## Configuration Options
 
-```ts twoslash
+```ts
 import { createNosanaClient, NosanaNetwork, LogLevel } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
@@ -35,7 +35,7 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 
 Configure logging levels:
 
-```ts twoslash
+```ts
 import { LogLevel } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {

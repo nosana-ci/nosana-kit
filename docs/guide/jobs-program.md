@@ -6,13 +6,13 @@ The Jobs Program provides methods to interact with jobs, runs, and markets on th
 
 ### Get Single Job
 
-```ts twoslash
+```ts
 async get(address: Address, checkRun?: boolean): Promise<Job>
 ```
 
 Fetch a job account. If `checkRun` is true (default), automatically checks for associated run accounts to determine if a queued job is actually running.
 
-```ts twoslash
+```ts
 const job: Job = await client.jobs.get('job-address');
 console.log(job.state); // JobState enum
 console.log(job.price); // Job price in smallest unit
@@ -22,13 +22,13 @@ console.log(job.timeStart); // Start timestamp (if running)
 
 ### Get Single Run
 
-```ts twoslash
+```ts
 async run(address: Address): Promise<Run>
 ```
 
 Fetch a run account by address.
 
-```ts twoslash
+```ts
 const run: Run = await client.jobs.run('run-address');
 console.log(run.job); // Associated job address
 console.log(run.node); // Node executing the run
@@ -37,13 +37,13 @@ console.log(run.time); // Run start time
 
 ### Get Single Market
 
-```ts twoslash
+```ts
 async market(address: Address): Promise<Market>
 ```
 
 Fetch a market account by address.
 
-```ts twoslash
+```ts
 const market: Market = await client.jobs.market('market-address');
 console.log(market.queueType); // MarketQueueType enum
 console.log(market.jobPrice); // Market job price
@@ -51,13 +51,13 @@ console.log(market.jobPrice); // Market job price
 
 ### Get Multiple Jobs
 
-```ts twoslash
+```ts
 async multiple(addresses: Address[], checkRuns?: boolean): Promise<Job[]>
 ```
 
 Batch fetch multiple jobs by addresses.
 
-```ts twoslash
+```ts
 const jobs: Job[] = await client.jobs.multiple(['job-address-1', 'job-address-2', 'job-address-3'], true);
 ```
 
@@ -65,7 +65,7 @@ const jobs: Job[] = await client.jobs.multiple(['job-address-1', 'job-address-2'
 
 ### Query All Jobs
 
-```ts twoslash
+```ts
 async all(filters?: {
   state?: JobState,
   market?: Address,
@@ -76,7 +76,7 @@ async all(filters?: {
 
 Fetch all jobs matching filter criteria using getProgramAccounts.
 
-```ts twoslash
+```ts
 import { JobState } from '@nosana/kit';
 
 // Get all running jobs in a market
@@ -93,7 +93,7 @@ const projectJobs: Job[] = await client.jobs.all({
 
 ### Query All Runs
 
-```ts twoslash
+```ts
 async runs(filters?: {
   job?: Address,
   node?: Address
@@ -102,7 +102,7 @@ async runs(filters?: {
 
 Fetch runs with optional filtering.
 
-```ts twoslash
+```ts
 // Get all runs for a specific job
 const jobRuns: Run[] = await client.jobs.runs({ job: 'job-address' });
 
@@ -112,13 +112,13 @@ const nodeRuns: Run[] = await client.jobs.runs({ node: 'node-address' });
 
 ### Query All Markets
 
-```ts twoslash
+```ts
 async markets(): Promise<Market[]>
 ```
 
 Fetch all market accounts.
 
-```ts twoslash
+```ts
 const markets: Market[] = await client.jobs.markets();
 ```
 
@@ -126,7 +126,7 @@ const markets: Market[] = await client.jobs.markets();
 
 ### Post a Job
 
-```ts twoslash
+```ts
 async post(params: {
   market: Address,
   timeout: number | bigint,
@@ -137,7 +137,7 @@ async post(params: {
 
 Create a list instruction for posting a job to a market. Returns an instruction that must be submitted to the network.
 
-```ts twoslash
+```ts
 // Set wallet first
 client.wallet = yourWallet;
 
@@ -161,7 +161,7 @@ The SDK provides monitoring methods using async iterators for real-time account 
 
 ### Job
 
-```ts twoslash
+```ts
 type Job = {
   address: Address;
   state: JobState; // QUEUED | RUNNING | COMPLETED | STOPPED
@@ -187,7 +187,7 @@ enum JobState {
 
 ### Run
 
-```ts twoslash
+```ts
 type Run = {
   address: Address;
   job: Address; // Associated job
@@ -198,7 +198,7 @@ type Run = {
 
 ### Market
 
-```ts twoslash
+```ts
 type Market = {
   address: Address;
   queueType: MarketQueueType; // JOB_QUEUE | NODE_QUEUE

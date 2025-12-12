@@ -6,7 +6,7 @@ The MerkleDistributorProgram provides methods to interact with merkle distributo
 
 Fetch a merkle distributor account by its address:
 
-```ts twoslash
+```ts
 const distributor: MerkleDistributor = await client.merkleDistributor.get('distributor-address');
 
 console.log('Distributor:', distributor.address);
@@ -19,7 +19,7 @@ console.log('Root:', distributor.root);
 
 Fetch all merkle distributor accounts:
 
-```ts twoslash
+```ts
 const distributors: MerkleDistributor[] = await client.merkleDistributor.all();
 console.log(`Found ${distributors.length} distributors`);
 ```
@@ -28,7 +28,7 @@ console.log(`Found ${distributors.length} distributors`);
 
 Fetch claim status for a specific distributor and claimant:
 
-```ts twoslash
+```ts
 // Get claim status for the wallet's address
 const claimStatus: ClaimStatus | null =
   await client.merkleDistributor.getClaimStatusForDistributor('distributor-address');
@@ -52,7 +52,7 @@ if (claimStatus) {
 
 Claim tokens from a merkle distributor:
 
-```ts twoslash
+```ts
 // Set wallet first
 client.wallet = yourWallet;
 
@@ -73,7 +73,7 @@ await client.solana.buildSignAndSend(instruction);
 
 ## Type Definitions
 
-```ts twoslash
+```ts
 interface MerkleDistributor {
   address: Address;
   admin: Address;
