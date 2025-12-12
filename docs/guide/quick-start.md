@@ -2,11 +2,11 @@
 
 Get started with Nosana Kit in minutes.
 
-<Callout type="tip">
+::: tip
 
 This guide assumes you have a basic understanding of TypeScript and Solana. If you're new to Solana, check out the [Solana documentation](https://docs.solana.com/) first.
 
-</Callout>
+:::
 
 ## Installation
 
@@ -45,9 +45,11 @@ const completedJobs: Job[] = await client.jobs.all({
 });
 ```
 
-<Callout type="info">
-  The `client` object is typed as `NosanaClient`, which provides full TypeScript autocomplete and type checking for all available methods and properties.
-</Callout>
+::: info
+
+The `client` object is typed as `NosanaClient`, which provides full TypeScript autocomplete and type checking for all available methods and properties.
+
+:::
 
 ## Next Steps
 

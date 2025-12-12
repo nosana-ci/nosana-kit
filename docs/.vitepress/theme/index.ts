@@ -5,7 +5,6 @@ import '@shikijs/vitepress-twoslash/style.css';
 import './custom.css';
 
 // Import custom components
-import Callout from '../components/Callout.vue';
 import Card from '../components/Card.vue';
 import Tabs from '../components/Tabs.vue';
 import Steps from '../components/Steps.vue';
@@ -24,7 +23,6 @@ export default {
       // },
     });
     // Register global components
-    app.component('Callout', Callout);
     app.component('Card', Card);
     app.component('Tabs', Tabs);
     app.component('Steps', Steps);

@@ -35,9 +35,11 @@ pnpm add @nosana/kit
 - **Node.js** >= 20.18.0
 - **TypeScript** >= 5.3.0 (for development)
 
-<Callout type="info">
-  The SDK is fully typed with TypeScript. While TypeScript is not required at runtime, we highly recommend using it for the best developer experience.
-</Callout>
+::: info
+
+The SDK is fully typed with TypeScript. While TypeScript is not required at runtime, we highly recommend using it for the best developer experience.
+
+:::
 
 ## TypeScript Support
 
@@ -64,9 +66,9 @@ import type {
 import { address } from '@nosana/kit';
 ```
 
-<Callout type="tip">
+::: tip
 
 All exported types are documented in the [SDK Reference](/api/). Hover over types in your IDE or click through to see detailed documentation.
 
-</Callout>
+:::
 

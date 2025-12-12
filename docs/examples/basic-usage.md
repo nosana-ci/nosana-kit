@@ -26,9 +26,11 @@ const client = createNosanaClient(NosanaNetwork.DEVNET);
   </template>
 </Tabs>
 
-<Callout type="tip">
-  The `createNosanaClient` function returns a fully typed `NosanaClient` instance. All methods and properties are type-checked at compile time.
-</Callout>
+::: tip
+
+The `createNosanaClient` function returns a fully typed `NosanaClient` instance. All methods and properties are type-checked at compile time.
+
+:::
 
 ## Fetch a Job
 
@@ -37,11 +39,11 @@ import { createNosanaClient } from '@nosana/kit';
 const client = createNosanaClient();
 ```
 
-<Callout type="info">
+::: info
 
 The `Job` type includes all properties from the on-chain account data. Hover over `job` in your IDE to see the full type definition, or check the [SDK Reference](/api/type-aliases/Job).
 
-</Callout>
+:::
 
 ## Query Jobs with Filters
 
@@ -99,7 +101,9 @@ await client.solana.buildSignAndSend(instruction);
 </Tabs>
 </Card>
 
-<Callout type="warning">
-  Never share your private key or seed phrase. Always use secure key management practices in production.
-</Callout>
+::: warning
+
+Never share your private key or seed phrase. Always use secure key management practices in production.
+
+:::
 
