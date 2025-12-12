@@ -66,7 +66,7 @@ import { address } from '@nosana/kit';
 
 <Callout type="tip">
 
-All exported types are documented in the [API Reference](/api/). Hover over types in your IDE or click through to see detailed documentation.
+All exported types are documented in the [SDK Reference](/api/). Hover over types in your IDE or click through to see detailed documentation.
 
 </Callout>
 

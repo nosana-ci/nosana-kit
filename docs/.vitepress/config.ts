@@ -16,7 +16,7 @@ function getApiSidebar() {
 
   return [
     {
-      text: 'API Reference',
+      text: 'SDK Reference',
       items: [
         { text: 'Overview', link: '/api/' },
         ...packageGroups.map((pkg) => ({
@@ -44,7 +44,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/' },
       { text: 'Examples', link: '/examples/' },
-      { text: 'API Reference', link: '/api/' },
+      { text: 'SDK Reference', link: '/api/' },
     ],
 
     sidebar: {
