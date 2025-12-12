@@ -12,8 +12,12 @@ async get(address: Address, checkRun?: boolean): Promise<Job>
 
 Fetch a job account. If `checkRun` is true (default), automatically checks for associated run accounts to determine if a queued job is actually running.
 
-```ts
-const job: Job = await client.jobs.get('job-address');
+```ts twoslash
+import { createNosanaClient, JobState } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address, Job } from '@nosana/kit';
+const job: Job = await client.jobs.get(address('job-address'));
 console.log(job.state); // JobState enum
 console.log(job.price); // Job price in smallest unit
 console.log(job.ipfsJob); // IPFS CID of job definition
@@ -28,8 +32,12 @@ async run(address: Address): Promise<Run>
 
 Fetch a run account by address.
 
-```ts
-const run: Run = await client.jobs.run('run-address');
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address, Run } from '@nosana/kit';
+const run: Run = await client.jobs.run(address('run-address'));
 console.log(run.job); // Associated job address
 console.log(run.node); // Node executing the run
 console.log(run.time); // Run start time
@@ -43,8 +51,12 @@ async market(address: Address): Promise<Market>
 
 Fetch a market account by address.
 
-```ts
-const market: Market = await client.jobs.market('market-address');
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address, Market } from '@nosana/kit';
+const market: Market = await client.jobs.market(address('market-address'));
 console.log(market.queueType); // MarketQueueType enum
 console.log(market.jobPrice); // Market job price
 ```
@@ -57,8 +69,12 @@ async multiple(addresses: Address[], checkRuns?: boolean): Promise<Job[]>
 
 Batch fetch multiple jobs by addresses.
 
-```ts
-const jobs: Job[] = await client.jobs.multiple(['job-address-1', 'job-address-2', 'job-address-3'], true);
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address, Job } from '@nosana/kit';
+const jobs: Job[] = await client.jobs.multiple([address('job-address-1'), address('job-address-2'), address('job-address-3')], true);
 ```
 
 ## Querying with Filters
@@ -76,18 +92,21 @@ async all(filters?: {
 
 Fetch all jobs matching filter criteria using getProgramAccounts.
 
-```ts
-import { JobState } from '@nosana/kit';
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { JobState, address, Job } from '@nosana/kit';
 
 // Get all running jobs in a market
 const runningJobs: Job[] = await client.jobs.all({
   state: JobState.RUNNING,
-  market: 'market-address',
+  market: address('market-address'),
 });
 
 // Get all jobs for a project
 const projectJobs: Job[] = await client.jobs.all({
-  project: 'project-address',
+  project: address('project-address'),
 });
 ```
 
@@ -102,12 +121,17 @@ async runs(filters?: {
 
 Fetch runs with optional filtering.
 
-```ts
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address, Run } from '@nosana/kit';
+
 // Get all runs for a specific job
-const jobRuns: Run[] = await client.jobs.runs({ job: 'job-address' });
+const jobRuns: Run[] = await client.jobs.runs({ job: address('job-address') });
 
 // Get all runs on a specific node
-const nodeRuns: Run[] = await client.jobs.runs({ node: 'node-address' });
+const nodeRuns: Run[] = await client.jobs.runs({ node: address('node-address') });
 ```
 
 ### Query All Markets
@@ -118,7 +142,11 @@ async markets(): Promise<Market[]>
 
 Fetch all market accounts.
 
-```ts
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { Market } from '@nosana/kit';
 const markets: Market[] = await client.jobs.markets();
 ```
 
@@ -137,16 +165,25 @@ async post(params: {
 
 Create a list instruction for posting a job to a market. Returns an instruction that must be submitted to the network.
 
-```ts
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+import type { Wallet } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+const client = createNosanaClient();
+const yourWallet: Wallet = await generateKeyPairSigner();
+// ---cut---
+import { address } from '@nosana/kit';
+import type { Instruction } from '@solana/kit';
+
 // Set wallet first
 client.wallet = yourWallet;
 
 // Create job instruction
 const instruction: Instruction = await client.jobs.post({
-  market: 'market-address',
+  market: address('market-address'),
   timeout: 3600, // Timeout in seconds
   ipfsHash: 'QmXxx...', // IPFS CID of job definition
-  node: 'node-address', // Optional: target specific node
+  node: address('node-address'), // Optional: target specific node
 });
 
 // Submit the instruction

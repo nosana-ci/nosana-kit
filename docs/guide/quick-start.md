@@ -16,8 +16,8 @@ npm install @nosana/kit
 
 ## Basic Usage
 
-```ts
-import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, address } from '@nosana/kit';
 import type { Job, NosanaClient } from '@nosana/kit';
 
 // Initialize with mainnet defaults
@@ -27,8 +27,6 @@ const client = createNosanaClient();
 const client2: NosanaClient = createNosanaClient(NosanaNetwork.DEVNET, {
   solana: {
     rpcEndpoint: 'https://your-custom-rpc.com',
-    commitment: 'confirmed' as const,
-    cluster: 'devnet' as const,
   },
 });
 
@@ -40,7 +38,7 @@ console.log('Job state:', job.state);
 import { JobState } from '@nosana/kit';
 
 const completedJobs: Job[] = await client.jobs.all({
-  market: 'market-address' as any,
+  market: address('market-address'),
   state: JobState.COMPLETED,
 });
 ```

@@ -66,20 +66,33 @@ transfer(params: {
 
 ## Examples
 
-```ts
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+import type { Instruction } from '@solana/kit';
+import { address } from '@nosana/kit';
+const client = createNosanaClient();
+const instruction: Instruction = {} as Instruction;
+const ix1: Instruction = {} as Instruction;
+const ix2: Instruction = {} as Instruction;
+const ix3: Instruction = {} as Instruction;
+const programAddress = address('program-address');
+// ---cut---
+import type { Signature } from '@solana/kit';
+import type { Address } from '@nosana/kit';
+
 // Send a single instruction (convenience method)
 const signature: Signature = await client.solana.buildSignAndSend(instruction);
 
 // Send multiple instructions atomically
-const signature: Signature = await client.solana.buildSignAndSend([ix1, ix2, ix3]);
+const signature2: Signature = await client.solana.buildSignAndSend([ix1, ix2, ix3]);
 
 // Or build, sign, and send separately for more control
 const transactionMessage = await client.solana.buildTransaction(instruction);
 const signedTransaction = await client.solana.signTransaction(transactionMessage);
-const signature: Signature = await client.solana.sendTransaction(signedTransaction);
+const signature3: Signature = await client.solana.sendTransaction(signedTransaction);
 
 // Check account balance
-const balance: bigint = await client.solana.getBalance('address');
+const balance: number = await client.solana.getBalance(address('address'));
 console.log(`Balance: ${balance} lamports`);
 
 // Derive PDA
@@ -87,7 +100,7 @@ const pda: Address = await client.solana.pda(['seed1', 'seed2'], programAddress)
 
 // Get instruction to transfer SOL
 const transferSolIx: Instruction = await client.solana.transfer({
-  to: 'recipient-address',
+  to: address('recipient-address'),
   amount: 1000000, // lamports (can be number or bigint)
   // from is optional - uses wallet if not provided
 });

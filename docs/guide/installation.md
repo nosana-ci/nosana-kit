@@ -45,7 +45,7 @@ The SDK is fully typed with TypeScript. While TypeScript is not required at runt
 
 The SDK is written in TypeScript and provides complete type definitions. All types are exported for use in your applications:
 
-```ts
+```ts twoslash
 import type {
   Job,
   Run,

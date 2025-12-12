@@ -17,20 +17,25 @@ The API service supports two authentication methods:
 
 ## Configuration
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+import type { Wallet } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+const myWallet: Wallet = await generateKeyPairSigner();
+// ---cut---
 // Option 1: Use API key (recommended for servers)
-const client = createNosanaClient(NosanaNetwork.MAINNET, {
+const client1 = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: 'your-api-key-here',
   },
 });
 
 // Option 2: Use wallet-based auth (for client-side)
-const client = createNosanaClient(NosanaNetwork.MAINNET);
-client.wallet = myWallet;
+const client2 = createNosanaClient(NosanaNetwork.MAINNET);
+client2.wallet = myWallet;
 
 // Option 3: API key takes precedence when both are provided
-const client = createNosanaClient(NosanaNetwork.MAINNET, {
+const client3 = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: 'your-api-key-here',
   },
@@ -57,29 +62,34 @@ client.api?.markets // Markets API
 
 ## Examples
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+import type { Wallet } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+const myWallet: Wallet = await generateKeyPairSigner();
+const anotherWallet: Wallet = await generateKeyPairSigner();
+// ---cut---
 // Using API key
-const client = createNosanaClient(NosanaNetwork.MAINNET, {
+const client1 = createNosanaClient(NosanaNetwork.MAINNET, {
   api: { apiKey: 'your-api-key' },
 });
 
 // API is immediately available
-if (client.api) {
-  // Use the API
-  const jobs = await client.api.jobs.list();
+if (client1.api) {
+  // Use the API - methods available on client1.api.jobs, client1.api.credits, client1.api.markets
 }
 
 // Using wallet-based auth
-const client = createNosanaClient(NosanaNetwork.MAINNET);
-client.wallet = myWallet;
+const client2 = createNosanaClient(NosanaNetwork.MAINNET);
+client2.wallet = myWallet;
 
 // API is now available
-if (client.api) {
-  const credits = await client.api.credits.get();
+if (client2.api) {
+  // Methods available on client2.api.jobs, client2.api.credits, client2.api.markets
 }
 
 // API updates reactively when wallet changes
-client.wallet = undefined; // API becomes undefined
-client.wallet = anotherWallet; // API is recreated with new wallet
+client2.wallet = undefined; // API becomes undefined
+client2.wallet = anotherWallet; // API is recreated with new wallet
 ```
 

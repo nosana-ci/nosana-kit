@@ -52,24 +52,39 @@ Validate HTTP headers.
 
 ## Examples
 
-```ts
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+import type { Wallet } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+const client = createNosanaClient();
+const myWallet: Wallet = await generateKeyPairSigner();
+const requestHeaders: Record<string, string | string[] | undefined> = { 'authorization': 'some-token' };
+// ---cut---
 // Set wallet first to enable signing
 client.wallet = myWallet;
 
 // Generate a signed message
-const signedMessage: string = await client.authorization.generate('Hello, Nosana!');
+const messageToSign = 'Hello, Nosana!';
+const signedMessage: string = await client.authorization.generate(messageToSign);
 console.log('Signed message:', signedMessage);
 
-// Validate a signed message
-const isValid: boolean = await client.authorization.validate('Hello, Nosana!', signedMessage);
+// Validate a signed message (requires validationString with message+signature, and publicKey)
+// Note: validationString typically contains both message and signature separated
+const validationString = `${messageToSign}:${signedMessage}`; // Format may vary
+// Get publicKey from wallet (in real usage, extract from wallet's public key)
+const publicKey = new Uint8Array(32); // Placeholder - extract actual public key from wallet
+const isValid: boolean = client.authorization.validate(validationString, publicKey);
 console.log('Message is valid:', isValid);
 
 // Generate signed HTTP headers for API requests
-const headers: Headers = await client.authorization.generateHeaders(
-  'POST',
-  '/api/jobs',
-  JSON.stringify({ data: 'example' })
-);
+// generateHeaders takes a message string and optional options
+const requestMessage = 'POST /api/jobs';
+const headers: Headers = await client.authorization.generateHeaders(requestMessage, {
+  expiry: Date.now() + 3600000, // 1 hour from now
+  key: 'authorization',
+  includeTime: true,
+  separator: ':',
+});
 
 // Use headers in HTTP request
 fetch('https://api.nosana.com/api/jobs', {
@@ -78,8 +93,10 @@ fetch('https://api.nosana.com/api/jobs', {
   body: JSON.stringify({ data: 'example' }),
 });
 
-// Validate incoming HTTP headers
-const isValidRequest: boolean = await client.authorization.validateHeaders(requestHeaders);
+// Validate incoming HTTP headers (requires headers as IncomingHttpHeaders and publicKey)
+const publicKeyForValidation = new Uint8Array(32); // Placeholder - extract actual public key
+// Convert Headers to IncomingHttpHeaders format (Record<string, string | string[] | undefined>)
+const isValidRequest: boolean = client.authorization.validateHeaders(requestHeaders, publicKeyForValidation);
 if (!isValidRequest) {
   throw new Error('Invalid authorization');
 }

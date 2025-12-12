@@ -28,7 +28,7 @@ client.wallet = useWalletAccountSigner(account, currentChain);
 
 Seamless support for keypair-based wallets:
 
-```ts
+```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
 import { generateKeyPairSigner } from '@solana/kit';
 
@@ -36,7 +36,7 @@ import { generateKeyPairSigner } from '@solana/kit';
 const client = createNosanaClient();
 
 // Set keypair wallet
-const keypair = generateKeyPairSigner();
+const keypair = await generateKeyPairSigner();
 client.wallet = keypair;
 ```
 
@@ -44,7 +44,7 @@ client.wallet = keypair;
 
 Wallets can be set at client initialization or dynamically assigned:
 
-```ts
+```ts twoslash
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 import type { Wallet } from '@nosana/kit';
 import { generateKeyPairSigner } from '@solana/kit';

@@ -9,8 +9,12 @@ The SDK supports two networks:
 
 ## Configuration Options
 
-```ts
+```ts twoslash
 import { createNosanaClient, NosanaNetwork, LogLevel } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+import type { Wallet } from '@nosana/kit';
+
+const myWallet: Wallet = await generateKeyPairSigner();
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
   solana: {
@@ -26,7 +30,7 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: 'your-api-key', // Optional: API key for authentication
   },
-  logLevel: LogLevel.DEBUG,
+  logLevel: 'debug',
   wallet: myWallet, // Optional: Set wallet during initialization (must be a Wallet type)
 });
 ```
@@ -35,11 +39,11 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 
 Configure logging levels:
 
-```ts
-import { LogLevel } from '@nosana/kit';
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
-  logLevel: LogLevel.DEBUG, // DEBUG | INFO | WARN | ERROR | NONE
+  logLevel: 'debug', // DEBUG | INFO | WARN | ERROR | NONE
 });
 ```
 

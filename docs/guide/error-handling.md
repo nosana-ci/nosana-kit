@@ -29,11 +29,21 @@ enum ErrorCodes {
 
 ## Examples
 
-```ts
-import { NosanaError, ErrorCodes } from '@nosana/kit';
+```ts twoslash
+import { createNosanaClient, NosanaError, ErrorCodes, address } from '@nosana/kit';
+import type { Instruction } from '@solana/kit';
+import type { Wallet } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+
+const client = createNosanaClient();
+const myWallet: Wallet = await generateKeyPairSigner();
 
 try {
-  const job: Job = await client.jobs.get('invalid-address');
+  const instruction: Instruction = await client.jobs.post({
+    market: address('market-address'),
+    timeout: 3600,
+    ipfsHash: 'invalid-ipfs-hash',
+  });
 } catch (error) {
   if (error instanceof NosanaError) {
     switch (error.code) {

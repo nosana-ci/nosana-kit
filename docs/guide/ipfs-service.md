@@ -36,7 +36,12 @@ retrieve(hash: string | Uint8Array): Promise<any>
 
 ## Examples
 
-```ts
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+import type { Job } from '@nosana/kit';
+const client = createNosanaClient();
+const job: Job = {} as Job;
+// ---cut---
 // Pin job definition to IPFS
 const cid: string = await client.ipfs.pin({
   version: '0.1',
@@ -61,21 +66,27 @@ console.log('Pinned to IPFS:', cid);
 const fileCid: string = await client.ipfs.pinFile('/path/to/file.txt');
 
 // Retrieve job results from IPFS
-const results: any = await client.ipfs.retrieve(job.ipfsResult);
-console.log('Job results:', results);
+if (job.ipfsResult) {
+  const results: any = await client.ipfs.retrieve(job.ipfsResult);
+  console.log('Job results:', results);
+}
 ```
 
 ## Utility Functions
 
 The SDK also exports utility functions for converting between Solana hash formats and IPFS CIDs:
 
-```ts
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
 import { solBytesArrayToIpfsHash, ipfsHashToSolBytesArray } from '@nosana/kit';
 
 // Convert Solana hash bytes to IPFS CID
+const solanaHashBytes: number[] = [1, 2, 3, 4, 5]; // Example bytes
 const ipfsCid: string = solBytesArrayToIpfsHash(solanaHashBytes);
 
 // Convert IPFS CID to Solana hash bytes
-const solanaHash: Uint8Array = ipfsHashToSolBytesArray(ipfsCid);
+const solanaHash: number[] = ipfsHashToSolBytesArray(ipfsCid);
 ```
 

@@ -6,8 +6,12 @@ The StakeProgram provides methods to interact with Nosana staking accounts on-ch
 
 Fetch a stake account by its address:
 
-```ts
-const stake: Stake = await client.stake.get('stake-account-address');
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address, Stake } from '@nosana/kit';
+const stake: Stake = await client.stake.get(address('stake-account-address'));
 
 console.log('Stake Account:', stake.address);
 console.log('Authority:', stake.authority);
@@ -22,8 +26,13 @@ console.log('Vault:', stake.vault);
 
 Fetch multiple stake accounts by their addresses:
 
-```ts
-const addresses: Address[] = ['address1', 'address2', 'address3'];
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address, Stake } from '@nosana/kit';
+import type { Address } from '@nosana/kit';
+const addresses: Address[] = [address('address1'), address('address2'), address('address3')];
 const stakes: Stake[] = await client.stake.multiple(addresses);
 
 stakes.forEach((stake) => {
@@ -35,7 +44,11 @@ stakes.forEach((stake) => {
 
 Fetch all stake accounts in the program:
 
-```ts
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { Stake } from '@nosana/kit';
 // Get all stakes
 const allStakes: Stake[] = await client.stake.all();
 console.log(`Found ${allStakes.length} stake accounts`);

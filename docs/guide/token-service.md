@@ -6,7 +6,11 @@ The TokenService provides methods to interact with token accounts on Solana. In 
 
 Fetch all accounts holding NOS tokens using a single RPC call:
 
-```ts
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import type { TokenAccountWithBalance } from '@nosana/kit';
 // Get all holders (excludes zero balance accounts by default)
 const holders: TokenAccountWithBalance[] = await client.nos.getAllTokenHolders();
 
@@ -29,8 +33,13 @@ console.log(`User-owned accounts: ${userAccounts.length}`);
 
 Retrieve the NOS token account for a specific owner:
 
-```ts
-const account: TokenAccountWithBalance | null = await client.nos.getTokenAccountForAddress('owner-address');
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address } from '@nosana/kit';
+import type { TokenAccountWithBalance } from '@nosana/kit';
+const account: TokenAccountWithBalance | null = await client.nos.getTokenAccountForAddress(address('owner-address'));
 
 if (account) {
   console.log('Token Account:', account.pubkey);
@@ -47,8 +56,12 @@ if (account) {
 
 Convenience method to get just the NOS balance for an address:
 
-```ts
-const balance: number = await client.nos.getBalance('owner-address');
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address } from '@nosana/kit';
+const balance: number = await client.nos.getBalance(address('owner-address'));
 console.log(`Balance: ${balance} NOS`);
 // Returns 0 if no token account exists
 ```
@@ -57,10 +70,19 @@ console.log(`Balance: ${balance} NOS`);
 
 Get instruction(s) to transfer SPL tokens. Returns either 1 or 2 instructions depending on whether the recipient's associated token account needs to be created:
 
-```ts
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+import type { Wallet } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+const client = createNosanaClient();
+const myWallet: Wallet = await generateKeyPairSigner();
+// ---cut---
+import { address } from '@nosana/kit';
+import type { Instruction } from '@solana/kit';
+
 // Get transfer instruction(s)
 const instructions: Instruction[] = await client.nos.transfer({
-  to: 'recipient-address',
+  to: address('recipient-address'),
   amount: 1000000, // token base units (can be number or bigint)
   // from is optional - uses wallet if not provided
 });
