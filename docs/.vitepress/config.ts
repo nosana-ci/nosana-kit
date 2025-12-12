@@ -111,6 +111,7 @@ export default defineConfig({
     lineNumbers: true,
     // Twoslash transformer for type hover information
     codeTransformers: [transformerTwoslash()],
+    languages: ['ts', 'typescript', 'tsx', 'js', 'javascript', 'json', 'bash', 'shell'],
   },
 
   // Ensure VitePress serves .md files from the api directory
