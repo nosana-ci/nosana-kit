@@ -11,7 +11,7 @@ The authorization service provides cryptographic message signing and validation 
 
 ### Generate Signed Message
 
-```typescript
+```ts twoslash
 generate(message: string | Uint8Array, options?: GenerateOptions): Promise<string>
 ```
 
@@ -19,7 +19,7 @@ Generate a signed message (requires wallet).
 
 ### Validate Signed Message
 
-```typescript
+```ts twoslash
 validate(
   message: string | Uint8Array,
   signature: string | Uint8Array,
@@ -31,7 +31,7 @@ Validate a signed message.
 
 ### Generate Signed HTTP Headers
 
-```typescript
+```ts twoslash
 generateHeaders(
   method: string,
   path: string,
@@ -44,7 +44,7 @@ Generate signed HTTP headers (requires wallet).
 
 ### Validate HTTP Headers
 
-```typescript
+```ts twoslash
 validateHeaders(headers: Headers | Record<string, string>): Promise<boolean>
 ```
 
@@ -52,7 +52,7 @@ Validate HTTP headers.
 
 ## Examples
 
-```typescript
+```ts twoslash
 // Set wallet first to enable signing
 client.wallet = myWallet;
 

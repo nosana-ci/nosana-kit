@@ -2,7 +2,7 @@
 
 ## Get Stake Account
 
-```typescript
+```ts twoslash
 import type { Stake } from '@nosana/kit';
 
 // Get a single stake account
@@ -16,7 +16,7 @@ console.log('Time to Unstake:', new Date(stake.timeUnstake * 1000));
 
 ## Analyze Staking Distribution
 
-```typescript
+```ts twoslash
 import type { Stake } from '@nosana/kit';
 
 // Get all stake accounts
@@ -40,7 +40,7 @@ console.log(`Number of Stakers: ${allStakes.length}`);
 
 ## Get Multiple Stake Accounts
 
-```typescript
+```ts twoslash
 import type { Stake, Address } from '@nosana/kit';
 
 const addresses: Address[] = ['address1', 'address2', 'address3'];

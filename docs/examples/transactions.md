@@ -2,7 +2,7 @@
 
 ## Send a Single Instruction
 
-```typescript
+```ts twoslash
 import type { Instruction, Signature } from '@solana/kit';
 
 // Create an instruction
@@ -19,7 +19,7 @@ console.log('Transaction signature:', signature);
 
 ## Send Multiple Instructions Atomically
 
-```typescript
+```ts twoslash
 import type { Instruction, Signature } from '@solana/kit';
 
 // Create multiple instructions
@@ -38,7 +38,7 @@ const signature: Signature = await client.solana.buildSignAndSend([
 
 ## Build, Sign, and Send Separately
 
-```typescript
+```ts twoslash
 import type { Instruction, Signature } from '@solana/kit';
 
 // Build transaction from instructions
@@ -55,7 +55,7 @@ const signature: Signature = await client.solana.sendTransaction(signedTransacti
 
 ## Transfer SOL
 
-```typescript
+```ts twoslash
 import type { Instruction } from '@solana/kit';
 
 // Get instruction to transfer SOL
@@ -71,7 +71,7 @@ await client.solana.buildSignAndSend(transferSolIx);
 
 ## Transfer Tokens
 
-```typescript
+```ts twoslash
 import type { Instruction } from '@solana/kit';
 
 // Get transfer instruction(s)
@@ -87,7 +87,7 @@ await client.solana.buildSignAndSend(instructions);
 
 ## Derive PDA
 
-```typescript
+```ts twoslash
 import type { Address } from '@nosana/kit';
 
 // Derive program derived address
@@ -100,7 +100,7 @@ console.log('PDA:', pda);
 
 ## Check Balance
 
-```typescript
+```ts twoslash
 // Check account balance
 const balance: bigint = await client.solana.getBalance('address');
 console.log(`Balance: ${balance} lamports`);

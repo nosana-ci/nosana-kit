@@ -2,7 +2,7 @@
 
 ## Create and Post a Job
 
-```typescript
+```ts twoslash
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 import type { Instruction } from '@solana/kit';
 import { generateKeyPairSigner } from '@solana/kit';
@@ -32,7 +32,7 @@ console.log('Job posted:', signature);
 
 ## Monitor Job Updates
 
-```typescript
+```ts twoslash
 import { MonitorEventType, JobState } from '@nosana/kit';
 import type { SimpleMonitorEvent } from '@nosana/kit';
 
@@ -65,7 +65,7 @@ stop();
 
 ## Query Jobs by State
 
-```typescript
+```ts twoslash
 import { JobState } from '@nosana/kit';
 import type { Job } from '@nosana/kit';
 
@@ -87,7 +87,7 @@ const marketJobs: Job[] = await client.jobs.all({
 
 ## Get Job with Run Information
 
-```typescript
+```ts twoslash
 import type { Job } from '@nosana/kit';
 
 // Get job and automatically check for associated run

@@ -6,7 +6,7 @@ General Solana utility service for low-level RPC operations, transactions, and P
 
 ### Build, Sign, and Send (Convenience Method)
 
-```typescript
+```ts twoslash
 buildSignAndSend(
   instructions: Instruction | Instruction[],
   options?: {
@@ -18,7 +18,7 @@ buildSignAndSend(
 
 ### Build Transaction
 
-```typescript
+```ts twoslash
 buildTransaction(
   instructions: Instruction | Instruction[],
   options?: { feePayer?: TransactionSigner }
@@ -27,7 +27,7 @@ buildTransaction(
 
 ### Sign Transaction
 
-```typescript
+```ts twoslash
 signTransaction(
   transactionMessage: TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithBlockhashLifetime
 ): Promise<SendableTransaction & Transaction & TransactionWithBlockhashLifetime>
@@ -35,7 +35,7 @@ signTransaction(
 
 ### Send Transaction
 
-```typescript
+```ts twoslash
 sendTransaction(
   transaction: SendableTransaction & Transaction & TransactionWithBlockhashLifetime,
   options?: { commitment?: 'processed' | 'confirmed' | 'finalized' }
@@ -44,19 +44,19 @@ sendTransaction(
 
 ### Get Balance
 
-```typescript
+```ts twoslash
 getBalance(address?: Address | string): Promise<bigint>
 ```
 
 ### Derive PDA
 
-```typescript
+```ts twoslash
 pda(seeds: Array<Address | string>, programId: Address): Promise<Address>
 ```
 
 ### Transfer SOL
 
-```typescript
+```ts twoslash
 transfer(params: {
   to: Address | string;
   amount: number | bigint;
@@ -66,7 +66,7 @@ transfer(params: {
 
 ## Examples
 
-```typescript
+```ts twoslash
 // Send a single instruction (convenience method)
 const signature: Signature = await client.solana.buildSignAndSend(instruction);
 

@@ -6,7 +6,7 @@ The StakeProgram provides methods to interact with Nosana staking accounts on-ch
 
 Fetch a stake account by its address:
 
-```typescript
+```ts twoslash
 const stake: Stake = await client.stake.get('stake-account-address');
 
 console.log('Stake Account:', stake.address);
@@ -22,7 +22,7 @@ console.log('Vault:', stake.vault);
 
 Fetch multiple stake accounts by their addresses:
 
-```typescript
+```ts twoslash
 const addresses: Address[] = ['address1', 'address2', 'address3'];
 const stakes: Stake[] = await client.stake.multiple(addresses);
 
@@ -35,7 +35,7 @@ stakes.forEach((stake) => {
 
 Fetch all stake accounts in the program:
 
-```typescript
+```ts twoslash
 // Get all stakes
 const allStakes: Stake[] = await client.stake.all();
 console.log(`Found ${allStakes.length} stake accounts`);
@@ -43,7 +43,7 @@ console.log(`Found ${allStakes.length} stake accounts`);
 
 ## Type Definitions
 
-```typescript
+```ts twoslash
 interface Stake {
   address: Address;
   amount: number;

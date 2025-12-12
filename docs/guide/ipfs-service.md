@@ -4,7 +4,7 @@ The IPFS service provides methods to pin data to IPFS and retrieve data from IPF
 
 ## Configuration
 
-```typescript
+```ts twoslash
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
   ipfs: {
     api: 'https://api.pinata.cloud',
@@ -18,25 +18,25 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 
 ### Pin JSON Data
 
-```typescript
+```ts twoslash
 pin(data: object): Promise<string>
 ```
 
 ### Pin File
 
-```typescript
+```ts twoslash
 pinFile(filePath: string): Promise<string>
 ```
 
 ### Retrieve Data
 
-```typescript
+```ts twoslash
 retrieve(hash: string | Uint8Array): Promise<any>
 ```
 
 ## Examples
 
-```typescript
+```ts twoslash
 // Pin job definition to IPFS
 const cid: string = await client.ipfs.pin({
   version: 1,
@@ -58,7 +58,7 @@ console.log('Job results:', results);
 
 The SDK also exports utility functions for converting between Solana hash formats and IPFS CIDs:
 
-```typescript
+```ts twoslash
 import { solBytesArrayToIpfsHash, ipfsHashToSolBytesArray } from '@nosana/kit';
 
 // Convert Solana hash bytes to IPFS CID

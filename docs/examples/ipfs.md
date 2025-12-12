@@ -2,7 +2,7 @@
 
 ## Pin Job Definition
 
-```typescript
+```ts twoslash
 // Pin job definition to IPFS
 const cid: string = await client.ipfs.pin({
   version: 1,
@@ -19,7 +19,7 @@ console.log('Pinned to IPFS:', cid);
 
 ## Pin a File
 
-```typescript
+```ts twoslash
 // Pin a file to IPFS
 const fileCid: string = await client.ipfs.pinFile('/path/to/file.txt');
 console.log('File CID:', fileCid);
@@ -27,7 +27,7 @@ console.log('File CID:', fileCid);
 
 ## Retrieve Job Results
 
-```typescript
+```ts twoslash
 import type { Job } from '@nosana/kit';
 
 // Get a job
@@ -42,7 +42,7 @@ if (job.ipfsResult) {
 
 ## Convert Hash Formats
 
-```typescript
+```ts twoslash
 import { solBytesArrayToIpfsHash, ipfsHashToSolBytesArray } from '@nosana/kit';
 
 // Convert Solana hash bytes to IPFS CID
