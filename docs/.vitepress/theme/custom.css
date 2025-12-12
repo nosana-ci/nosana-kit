@@ -7,6 +7,8 @@
   --vp-c-brand-2: #0FC90B;
   --vp-c-brand-3: #0EAA0A;
   --vp-c-brand-soft: rgba(16, 232, 12, 0.14);
+  /* Override code color to not use brand color - use neutral text color instead */
+  --vp-code-color: var(--vp-c-text-1);
 }
 
 .dark {
@@ -15,55 +17,9 @@
   --vp-c-brand-2: #0FC90B;
   --vp-c-brand-3: #0EAA0A;
   --vp-c-brand-soft: rgba(16, 232, 12, 0.16);
+  /* Override code color to not use brand color - use neutral text color instead */
+  --vp-code-color: var(--vp-c-text-1);
 }
-
-/* Ensure code blocks have proper spacing */
-.vp-code-group {
-  margin: 1rem 0;
-}
-
-/* Style for type hover information */
-.vp-code code {
-  position: relative;
-}
-
-/* Hide Twoslash query markers (^?) by default, show only on hover */
-.twoslash-query {
-  display: none;
-}
-
-/* Show query markers when hovering over the code block */
-.vp-code:hover .twoslash-query {
-  display: inline;
-}
-
-/* Hide ALL twoslash query popups by default - they should only show on hover */
-/* Use maximum specificity to override FloatingVue styles */
-body .v-popper__popper[data-theme="twoslash-query"],
-html .v-popper__popper[data-theme="twoslash-query"],
-.v-popper__popper[data-theme="twoslash-query"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  position: absolute !important;
-  left: -9999px !important;
-  top: -9999px !important;
-}
-
-/* Show popups only when they have the data-show attribute (set by FloatingVue on hover) */
-body .v-popper__popper[data-theme="twoslash-query"][data-show],
-html .v-popper__popper[data-theme="twoslash-query"][data-show],
-.v-popper__popper[data-theme="twoslash-query"][data-show] {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  position: fixed !important;
-  left: auto !important;
-  top: auto !important;
-}
-
 
 /* Improve readability of API reference */
 .api-reference {
@@ -80,3 +36,20 @@ html .v-popper__popper[data-theme="twoslash-query"][data-show],
   margin-top: 1.5rem;
 }
 
+/* Override twoslash CSS for code elements that contain pre (code blocks) */
+/* Reset inline code styles when code contains a pre child */
+.vp-doc :not(pre) > code:has(> pre) {
+  border-radius: 0;
+  padding: 0;
+  background-color: transparent;
+  transition: none;
+  font-size: inherit;
+  color: inherit;
+}
+.vp-doc :not(pre) > code > pre {
+  border-radius: 8px;
+  padding: 15px;
+  overflow-x: auto;
+  background-color: var(--vp-code-bg);
+  transition: color 0.25s, background-color 0.5s;
+}

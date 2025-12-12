@@ -107,31 +107,14 @@ export default defineConfig({
   },
 
   markdown: {
-    // Enable MDX support
-    mdxOptions: {
-      remarkPlugins: [],
-      rehypePlugins: [],
-    },
     // Enhanced code block features
     lineNumbers: true,
     // Twoslash transformer for type hover information
     codeTransformers: [
-      transformerTwoslash({
-        // Use the VitePress-specific TypeScript configuration
-        // Path is relative to the docs directory
-        tsconfigPath: '.vitepress/tsconfig.json',
-        // Don't throw on errors - code examples may have intentional errors or incomplete code
-        throws: true,
-        // Additional compiler options to help with module resolution
-        compilerOptions: {
-          moduleResolution: 'node',
-          esModuleInterop: true,
-          allowSyntheticDefaultImports: true,
-        },
-      }),
+      transformerTwoslash(),
     ],
   },
 
-  // Ensure VitePress serves .mdx files from the api directory
+  // Ensure VitePress serves .md files from the api directory
   srcExclude: ['**/node_modules/**', '**/.git/**'],
 });
