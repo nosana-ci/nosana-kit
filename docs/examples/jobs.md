@@ -12,10 +12,21 @@ client.wallet = await generateKeyPairSigner();
 
 // First, pin job definition to IPFS
 const ipfsHash: string = await client.ipfs.pin({
-  version: 1,
-  type: 'docker',
-  image: 'ubuntu:latest',
-  command: ['echo', 'Hello from Nosana!'],
+  version: '0.1',
+  type: 'container',
+  meta: {
+    trigger: 'cli',
+  },
+  ops: [
+    {
+      type: 'container/run',
+      id: 'run-1',
+      args: {
+        cmd: 'echo Hello from Nosana!',
+        image: 'ubuntu:latest',
+      },
+    },
+  ],
 });
 
 // Create job instruction

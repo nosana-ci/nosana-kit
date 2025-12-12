@@ -39,10 +39,21 @@ retrieve(hash: string | Uint8Array): Promise<any>
 ```ts twoslash
 // Pin job definition to IPFS
 const cid: string = await client.ipfs.pin({
-  version: 1,
-  type: 'docker',
-  image: 'ubuntu:latest',
-  command: ['echo', 'hello'],
+  version: '0.1',
+  type: 'container',
+  meta: {
+    trigger: 'cli',
+  },
+  ops: [
+    {
+      type: 'container/run',
+      id: 'run-1',
+      args: {
+        cmd: 'echo hello',
+        image: 'ubuntu:latest',
+      },
+    },
+  ],
 });
 console.log('Pinned to IPFS:', cid);
 

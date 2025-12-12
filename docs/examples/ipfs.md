@@ -5,13 +5,24 @@
 ```ts twoslash
 // Pin job definition to IPFS
 const cid: string = await client.ipfs.pin({
-  version: 1,
-  type: 'docker',
-  image: 'ubuntu:latest',
-  command: ['echo', 'Hello World'],
-  env: {
-    MY_VAR: 'value',
+  version: '0.1',
+  type: 'container',
+  meta: {
+    trigger: 'cli',
   },
+  ops: [
+    {
+      type: 'container/run',
+      id: 'run-1',
+      args: {
+        cmd: 'echo Hello World',
+        image: 'ubuntu:latest',
+        env: {
+          MY_VAR: 'value',
+        },
+      },
+    },
+  ],
 });
 
 console.log('Pinned to IPFS:', cid);
