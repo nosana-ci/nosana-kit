@@ -1,5 +1,5 @@
 import { NosanaAuthorization } from "@nosana/authorization";
-import { createNosanaApi, NosanaNetwork, TopupVaultOptions } from "@nosana/api";
+import { createNosanaApi, NosanaApi, NosanaApiWithApiKey, NosanaNetwork, TopupVaultOptions } from "@nosana/api";
 
 import { APIConfig } from "../config/types.js";
 import { SolanaService } from "../services/solana/SolanaService.js";
@@ -43,12 +43,21 @@ const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: { solana: S
   },
 });
 
-export const createApiInstance = (
+export interface NosanaApiDeps {
+  authorization: NosanaAuthorization;
+  solana: SolanaService;
+  nos: TokenService;
+}
+
+export function createApiInstance(network: NosanaNetwork, config: APIConfig | undefined, wallet: Wallet, deps: NosanaApiDeps): NosanaApi;
+export function createApiInstance(network: NosanaNetwork, config: APIConfig | undefined, wallet: undefined, deps: NosanaApiDeps): NosanaApiWithApiKey;
+
+export function createApiInstance(
   network: NosanaNetwork,
   config: APIConfig | undefined,
   wallet: Wallet | undefined,
   deps: { authorization: NosanaAuthorization, solana: SolanaService, nos: TokenService }
-) => {
+): NosanaApi | NosanaApiWithApiKey {
   const apiOptions = config?.backend_url ? { backend_url: config.backend_url } : undefined;
 
   if (config?.apiKey) {

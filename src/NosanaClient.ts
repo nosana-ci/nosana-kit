@@ -13,7 +13,7 @@ import {
 } from './services/programs/merkleDistributor/index.js';
 import { createSolanaService, type SolanaService } from './services/solana/index.js';
 import { createTokenService, type TokenService } from './services/token/index.js';
-import { createApiInstance } from './utils/createApiInstance.js';
+import { createApiInstance, NosanaApiDeps } from './utils/createApiInstance.js';
 import { walletToAuthorizationSigner } from './utils/walletToAuthorizationSigner.js';
 
 import type { Wallet } from './types.js';
@@ -119,16 +119,11 @@ export function createNosanaClient(
       ? createNosanaAuthorization(walletToAuthorizationSigner(wallet))
       : createNosanaAuthorization();
 
-    const api = createApiInstance(
-      network,
-      config.api,
-      wallet,
-      {
-        authorization,
-        solana,
-        nos,
-      }
-    );
+    const apiDeps: NosanaApiDeps = { authorization, solana, nos }
+
+    const api = wallet
+      ? createApiInstance(network, config.api, wallet, apiDeps)
+      : createApiInstance(network, config.api, undefined, apiDeps);
 
     return {
       authorization,
