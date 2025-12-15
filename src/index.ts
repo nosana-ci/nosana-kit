@@ -4,7 +4,7 @@ export { createNosanaClient, type NosanaClient } from './NosanaClient.js';
 // Export types - explicitly re-export NosanaNetwork from types to resolve ambiguity
 export * from '@nosana/types';
 export * from '@nosana/endpoints';
-export type * from '@nosana/api';
+export type * as api from '@nosana/api';
 export { NosanaNetwork } from '@nosana/types';
 
 export type { Wallet } from './types.js';

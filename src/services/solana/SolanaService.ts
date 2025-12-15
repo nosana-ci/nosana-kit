@@ -35,6 +35,7 @@ import {
   TransactionPartialSigner,
   decompileTransactionMessage,
   getCompiledTransactionMessageDecoder,
+  TransactionWithinSizeLimit,
 } from '@solana/kit';
 import {
   estimateComputeUnitLimitFactory,
@@ -717,7 +718,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
      * @returns The signed transaction with additional signatures
      */
     async signTransactionWithSigners(
-      transaction: Transaction & TransactionWithBlockhashLifetime,
+      transaction: Transaction & TransactionWithBlockhashLifetime & TransactionWithinSizeLimit,
       signers: TransactionPartialSigner[]
     ): Promise<SendableTransaction & Transaction & TransactionWithBlockhashLifetime> {
       try {
@@ -732,8 +733,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
         for (const signer of signers) {
           // signTransactions returns an array of SignatureDictionary (one per transaction)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const [signatureDict] = await signer.signTransactions([transaction as any]);
+          const [signatureDict] = await signer.signTransactions([transaction]);
           // Merge the new signatures into our accumulated signatures
           updatedSignatures = { ...updatedSignatures, ...signatureDict };
         }

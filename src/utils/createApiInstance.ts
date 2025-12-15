@@ -6,6 +6,7 @@ import { SolanaService } from "../services/solana/SolanaService.js";
 import { TokenService } from "../services/token/TokenService.js";
 
 import { Wallet } from "../types.js";
+import { isTransactionPartialSigner } from "@solana/kit";
 
 const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: { solana: SolanaService, nos: TokenService }) => ({
   getBalance: async (address: string) => {
@@ -37,6 +38,9 @@ const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: { solana: S
     await solana.buildSignAndSend(instructions);
   },
   deserializeSignSendAndConfirmTransaction: async (transactionData: string) => {
+    if (!isTransactionPartialSigner(wallet)) {
+      throw new Error('Wallet is not a transaction partial signer.');
+    }
     const deserializedTx = await solana.deserializeTransaction(transactionData);
     const decompileTransaction = await solana.decompileTransaction(deserializedTx);
     if (decompileTransaction.feePayer.address !== wallet.address) {
@@ -77,4 +81,4 @@ export function createApiInstance(
   }
 
   return createNosanaApi(network, undefined, apiOptions);
-};
+}
