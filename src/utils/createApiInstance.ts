@@ -1,5 +1,5 @@
 import { NosanaAuthorization } from "@nosana/authorization";
-import { createNosanaApi, NosanaApi, NosanaApiWithApiKey, NosanaNetwork, TopupVaultOptions } from "@nosana/api";
+import { createNosanaApi, ExternalSolanaFunctions, NosanaApi, NosanaApiWithApiKey, NosanaNetwork, TopupVaultOptions } from "@nosana/api";
 
 import { APIConfig } from "../config/types.js";
 import { SolanaService } from "../services/solana/SolanaService.js";
@@ -8,7 +8,9 @@ import { TokenService } from "../services/token/TokenService.js";
 import { Wallet } from "../types.js";
 import { isTransactionPartialSigner } from "@solana/kit";
 
-const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: { solana: SolanaService, nos: TokenService }) => ({
+const LAMPORTS_PER_SOL = 1000000000;
+
+const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: NosanaApiDeps): ExternalSolanaFunctions => ({
   getBalance: async (address: string) => {
     const [SOL, NOS] = await Promise.all([
       solana.getBalance(address),
@@ -16,23 +18,25 @@ const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: { solana: S
     ]);
     return { SOL, NOS };
   },
-  transferTokensToRecipient: async (recipient: string, options: TopupVaultOptions) => {
+  transferTokensToRecipient: async (recipient: string, { SOL, NOS, lamports }: TopupVaultOptions) => {
     const instructions = [];
 
-    if (options.SOL && options.SOL > 0) {
-      const solTransferTx = await solana.transfer({
+    if (SOL && SOL > 0) {
+      instructions.push(await solana.transfer({
         to: recipient,
-        amount: options.SOL,
-      });
-      instructions.push(solTransferTx);
+        amount: lamports ? SOL : SOL * LAMPORTS_PER_SOL,
+      }));
     }
 
-    if (options.NOS && options.NOS > 0) {
-      const nosTransferTx = await nos.transfer({
+    if (NOS && NOS > 0) {
+      instructions.push(...await nos.transfer({
         to: recipient,
-        amount: options.NOS,
-      });
-      instructions.push(...nosTransferTx);
+        amount: lamports ? NOS : NOS * 1e6,
+      }));
+    }
+
+    if (instructions.length === 0) {
+      throw new Error('At least one of SOL or NOS amount must be greater than zero.');
     }
 
     await solana.buildSignAndSend(instructions);
