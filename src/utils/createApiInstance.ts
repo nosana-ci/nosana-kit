@@ -14,8 +14,6 @@ export interface NosanaApiDeps {
   nos: TokenService;
 }
 
-const LAMPORTS_PER_SOL = 1e9;
-
 const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: NosanaApiDeps): ExternalSolanaFunctions => ({
   getBalance: async (address: string) => {
     const [SOL, NOS] = await Promise.all([
@@ -30,7 +28,7 @@ const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: NosanaApiDe
     if (SOL && SOL > 0) {
       instructions.push(await solana.transfer({
         to: recipient,
-        amount: lamports ? SOL : SOL * LAMPORTS_PER_SOL,
+        amount: lamports ? SOL : SOL * 1e9,
       }));
     }
 
