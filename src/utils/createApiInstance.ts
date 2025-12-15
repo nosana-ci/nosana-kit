@@ -8,6 +8,12 @@ import { TokenService } from "../services/token/TokenService.js";
 import { Wallet } from "../types.js";
 import { isTransactionPartialSigner } from "@solana/kit";
 
+export interface NosanaApiDeps {
+  authorization: NosanaAuthorization;
+  solana: SolanaService;
+  nos: TokenService;
+}
+
 const LAMPORTS_PER_SOL = 1000000000;
 
 const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: NosanaApiDeps): ExternalSolanaFunctions => ({
@@ -54,12 +60,6 @@ const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: NosanaApiDe
     return solana.sendTransaction(fullySignedTx);
   },
 });
-
-export interface NosanaApiDeps {
-  authorization: NosanaAuthorization;
-  solana: SolanaService;
-  nos: TokenService;
-}
 
 export function createApiInstance(network: NosanaNetwork, config: APIConfig | undefined, wallet: Wallet, deps: NosanaApiDeps): NosanaApi;
 export function createApiInstance(network: NosanaNetwork, config: APIConfig | undefined, wallet: undefined, deps: NosanaApiDeps): NosanaApiWithApiKey;
