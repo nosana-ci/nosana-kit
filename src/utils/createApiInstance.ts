@@ -1,0 +1,67 @@
+import { NosanaAuthorization } from "@nosana/authorization";
+import { createNosanaApi, NosanaNetwork, TopupVaultOptions } from "@nosana/api";
+
+import { APIConfig } from "../config/types.js";
+import { SolanaService } from "../services/solana/SolanaService.js";
+import { TokenService } from "../services/token/TokenService.js";
+
+import { Wallet } from "../types.js";
+
+const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: { solana: SolanaService, nos: TokenService }) => ({
+  getBalance: async (address: string) => {
+    const [SOL, NOS] = await Promise.all([
+      solana.getBalance(address),
+      nos.getBalance(address),
+    ]);
+    return { SOL, NOS };
+  },
+  transferTokensToRecipient: async (recipient: string, options: TopupVaultOptions) => {
+    const instructions = [];
+
+    if (options.SOL && options.SOL > 0) {
+      const solTransferTx = await solana.transfer({
+        to: recipient,
+        amount: options.SOL,
+      });
+      instructions.push(solTransferTx);
+    }
+
+    if (options.NOS && options.NOS > 0) {
+      const nosTransferTx = await nos.transfer({
+        to: recipient,
+        amount: options.NOS,
+      });
+      instructions.push(...nosTransferTx);
+    }
+
+    await solana.buildSignAndSend(instructions);
+  },
+  deserializeSignSendAndConfirmTransaction: async (transactionData: string) => {
+    const deserializedTx = await solana.deserializeTransaction(transactionData);
+    const fullySignedTx = await solana.signTransactionWithSigners(deserializedTx, [wallet]);
+    return solana.sendTransaction(fullySignedTx);
+  },
+});
+
+export const createApiInstance = (
+  network: NosanaNetwork,
+  config: APIConfig | undefined,
+  wallet: Wallet | undefined,
+  deps: { authorization: NosanaAuthorization, solana: SolanaService, nos: TokenService }
+) => {
+  const apiOptions = config?.backend_url ? { backend_url: config.backend_url } : undefined;
+
+  if (config?.apiKey) {
+    return createNosanaApi(network, config.apiKey, apiOptions);
+  }
+
+  if (wallet) {
+    return createNosanaApi(network, {
+      identifier: wallet.address.toString(),
+      generate: deps.authorization.generate,
+      solana: createApiSolanaIntegration(wallet, deps),
+    }, apiOptions);
+  }
+
+  return createNosanaApi(network, undefined, apiOptions);
+};

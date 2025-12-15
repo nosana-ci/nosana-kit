@@ -1,6 +1,6 @@
 import { NosanaNetwork } from '@nosana/types';
+import { createNosanaApi } from '@nosana/api';
 import { createIpfsClient } from '@nosana/ipfs';
-import { createNosanaApi, type NosanaApi } from '@nosana/api';
 import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/authorization';
 
 import { Logger } from './logger/Logger.js';
@@ -13,6 +13,7 @@ import {
 } from './services/programs/merkleDistributor/index.js';
 import { createSolanaService, type SolanaService } from './services/solana/index.js';
 import { createTokenService, type TokenService } from './services/token/index.js';
+import { createApiInstance } from './utils/createApiInstance.js';
 import { walletToAuthorizationSigner } from './utils/walletToAuthorizationSigner.js';
 
 import type { Wallet } from './types.js';
@@ -28,7 +29,7 @@ export interface NosanaClient {
   readonly merkleDistributor: MerkleDistributorProgram;
   readonly solana: SolanaService;
   readonly nos: TokenService;
-  readonly api: NosanaApi | undefined;
+  readonly api: ReturnType<typeof createNosanaApi>;
   readonly ipfs: ReturnType<typeof createIpfsClient>;
   readonly authorization: NosanaAuthorization;
   readonly logger: Logger;
@@ -49,7 +50,6 @@ export interface NosanaClient {
 
 /**
  * Creates a new Nosana client instance.
- *
  *
  * @param network - The network to connect to (default: MAINNET)
  * @param customConfig - Optional custom configuration to override defaults
@@ -113,21 +113,22 @@ export function createNosanaClient(
 
   const createReactiveNosanaModules = (): {
     authorization: NosanaAuthorization;
-    api: NosanaClient['api'] | undefined;
+    api: NosanaClient['api'];
   } => {
     const authorization = wallet
       ? createNosanaAuthorization(walletToAuthorizationSigner(wallet))
       : createNosanaAuthorization();
 
-    // Use API key if provided, otherwise fall back to wallet-based auth
-    const api = config.api?.apiKey
-      ? createNosanaApi(network, config.api.apiKey)
-      : wallet
-        ? createNosanaApi(network, {
-            identifier: wallet.address.toString(),
-            generate: (authorization as NosanaAuthorization).generate,
-          })
-        : undefined;
+    const api = createApiInstance(
+      network,
+      config.api,
+      wallet,
+      {
+        authorization,
+        solana,
+        nos,
+      }
+    );
 
     return {
       authorization,

@@ -27,7 +27,7 @@
   "author": "Nosana",
   "license": "MIT",
   "dependencies": {
-    "@nosana/api": "^0.1.6",
+    "@nosana/api": "^0.1.7",
     "@nosana/authorization": "^0.1.4",
     "@nosana/endpoints": "^1.0.0",
     "@nosana/ipfs": "^0.1.2",
