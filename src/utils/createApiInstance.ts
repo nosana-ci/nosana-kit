@@ -14,7 +14,7 @@ export interface NosanaApiDeps {
   nos: TokenService;
 }
 
-const LAMPORTS_PER_SOL = 1000000000;
+const LAMPORTS_PER_SOL = 1e9;
 
 const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: NosanaApiDeps): ExternalSolanaFunctions => ({
   getBalance: async (address: string) => {
