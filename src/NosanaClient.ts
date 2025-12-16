@@ -119,7 +119,7 @@ export function createNosanaClient(
       ? createNosanaAuthorization(walletToAuthorizationSigner(wallet))
       : createNosanaAuthorization();
 
-    const apiDeps: NosanaApiDeps = { authorization, solana, nos }
+    const apiDeps: NosanaApiDeps = { authorization, solana, nos };
 
     const api = wallet
       ? createApiInstance(network, config.api, wallet, apiDeps)
