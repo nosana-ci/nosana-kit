@@ -13,15 +13,7 @@ export default {
   extends: DefaultTheme,
   enhanceApp({ app, router }: EnhanceAppContext) {
     // Register Twoslash FloatingVue plugin for type hover tooltips
-    app.use(TwoslashFloatingVue, {
-      // themes: {
-      //   'twoslash-query': {
-      //     triggers: ['hover'],
-      //     popperTriggers: ['hover'],
-      //     autoHide: true,
-      //   },
-      // },
-    });
+    app.use(TwoslashFloatingVue);
     // Register global components
     app.component('Card', Card);
     app.component('Tabs', Tabs);

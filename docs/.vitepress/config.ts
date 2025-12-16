@@ -31,14 +31,7 @@ function getApiSidebar() {
 export default defineConfig({
   title: 'Nosana Kit',
   description: 'TypeScript SDK for interacting with the Nosana Network on Solana',
-  // GitLab Pages base path - update this to match your GitLab project path
-  // Format: /<group>/<project>/
-  base: process.env.CI
-    ? process.env.CI_PAGES_URL
-      ? new URL(process.env.CI_PAGES_URL).pathname
-      : '/kit/'
-    : '/',
-
+  base: '/',
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
