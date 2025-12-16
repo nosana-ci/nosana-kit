@@ -235,7 +235,7 @@ type OperationId = string &
       typeof $input === "string" &&
       !$input.includes(" ")
     `;
-    message: 'ops[*].id must not contain spaces';
+    message: 'ops[*].id must be a string and not contain spaces';
   }>;
 
 export type Operation<T extends OperationType> = {
