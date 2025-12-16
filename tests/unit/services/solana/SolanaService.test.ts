@@ -19,9 +19,9 @@ import type { Wallet } from '../../../../src/types.js';
 vi.mock('@solana/kit', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@solana/kit')>();
   const mockBlockhash = '11111111111111111111111111111111'; // Valid base58 format
+  const mockSignature = 'mock-signature';
   const mockLastValidBlockHeight = BigInt(123);
   const mockBalance = BigInt(1000);
-  const mockSignature = 'mock-signature';
 
   const latestBlockhashValue = {
     blockhash: mockBlockhash,
@@ -102,6 +102,11 @@ type SolanaKitMock = {
 };
 const solanaKitMock = solanaKit as unknown as SolanaKitMock;
 
+// Test constants (defined at module level for use in tests)
+// Note: These must match the values defined inside the vi.mock factory
+const mockLastValidBlockHeight = BigInt(123);
+const mockBalance = BigInt(1000);
+
 function makeInstruction(): Instruction {
   return {
     programAddress: AddressFactory.createValid(),
@@ -116,7 +121,6 @@ describe('SolanaService', () => {
   const rpcEndpoint = `${PROTOCOL.HTTPS}://${baseHost}`;
   const wsEndpoint = `${PROTOCOL.WSS}://${baseHost}/`;
   const cluster = 'devnet';
-  const mockBalance = BigInt(1000);
   const mockSignature = 'mock-signature';
   const testAddress = '11111111111111111111111111111111';
 
@@ -562,6 +566,20 @@ describe('SolanaService', () => {
 
       expect(deserialized).toBeDefined();
       expect(deserialized.messageBytes).toStrictEqual(partiallySignedTx.messageBytes);
+    });
+
+    it('restores lastValidBlockHeight after deserialization', async () => {
+      const { service } = await createWalletAndService();
+      const instruction = makeInstruction();
+      const transactionMessage = await createTransactionMessage(service, instruction);
+      const partiallySignedTx = await service.partiallySignTransaction(transactionMessage);
+
+      const serialized = service.serializeTransaction(partiallySignedTx);
+      const deserialized = await service.deserializeTransaction(serialized);
+
+      expect(deserialized.lifetimeConstraint).toBeDefined();
+      expect(deserialized.lifetimeConstraint.lastValidBlockHeight).toBeDefined();
+      expect(deserialized.lifetimeConstraint.lastValidBlockHeight).toBe(mockLastValidBlockHeight);
     });
   });
 
