@@ -1,6 +1,9 @@
 {
   "version": "0.1.0",
   "name": "nosana_jobs",
+  "metadata": {
+    "address": "nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM"
+  },
   "instructions": [
     {
       "name": "open",

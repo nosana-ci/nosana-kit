@@ -25,7 +25,8 @@ import {
   type ParsedSetEnableSlotInstruction,
 } from '../instructions/index.js';
 
-export const MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS = '' as Address<''>;
+export const MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS =
+  'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425' as Address<'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425'>;
 
 export const MerkleDistributorAccount = {
   ClaimStatus: "ClaimStatus",
@@ -185,7 +186,9 @@ export function identifyMerkleDistributorInstruction(
   );
 }
 
-export type ParsedMerkleDistributorInstruction<TProgram extends string = ''> =
+export type ParsedMerkleDistributorInstruction<
+  TProgram extends string = 'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425',
+> =
   | ({
       instructionType: typeof MerkleDistributorInstruction.NewDistributor;
     } & ParsedNewDistributorInstruction<TProgram>)

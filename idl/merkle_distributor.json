@@ -1,6 +1,9 @@
 {
   "version": "0.0.2",
   "name": "merkle_distributor",
+  "metadata": {
+    "address": "merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425"
+  },
   "instructions": [
     {
       "name": "newDistributor",
