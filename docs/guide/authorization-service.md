@@ -15,9 +15,9 @@ The authorization service provides cryptographic message signing and validation 
 generate(message: string | Uint8Array, options?: GenerateOptions): Promise<string>
 ```
 
-Generate a signed message (requires wallet).
+Generating message signatures (requires wallet).
 
-### Validate Signed Message
+### Validate Message Signature
 
 ```ts
 validate(
@@ -27,7 +27,7 @@ validate(
 ): Promise<boolean>
 ```
 
-Validate a signed message.
+Validate message signatures.
 
 ### Generate HTTP Header Signatures
 
@@ -65,10 +65,10 @@ client.wallet = myWallet;
 
 // Generate message signature
 const messageToSign = 'Hello, Nosana!';
-const signedMessage: string = await client.authorization.generate(messageToSign);
-console.log('Signed message:', signedMessage);
+const messageSignature: string = await client.authorization.generate(messageToSign);
+console.log('Message signature:', messageSignature);
 
-// Validate a signed message (requires validationString with message+signature, and publicKey)
+// Validate message signature (requires validationString with message+signature, and publicKey)
 // Note: validationString typically contains both message and signature separated
 const validationString = `${messageToSign}:${signedMessage}`; // Format may vary
 // Get publicKey from wallet (in real usage, extract from wallet's public key)
@@ -76,7 +76,7 @@ const publicKey = new Uint8Array(32); // Placeholder - extract actual public key
 const isValid: boolean = client.authorization.validate(validationString, publicKey);
 console.log('Message is valid:', isValid);
 
-// Generate signed HTTP headers for API requests
+// Generate HTTP header signatures for API requests
 // generateHeaders takes a message string and optional options
 const requestMessage = 'POST /api/jobs';
 const headers: Headers = await client.authorization.generateHeaders(requestMessage, {
@@ -93,7 +93,7 @@ fetch('https://api.nosana.com/api/jobs', {
   body: JSON.stringify({ data: 'example' }),
 });
 
-// Validate incoming HTTP headers (requires headers as IncomingHttpHeaders and publicKey)
+// Validate incoming HTTP header signatures (requires headers as IncomingHttpHeaders and publicKey)
 const publicKeyForValidation = new Uint8Array(32); // Placeholder - extract actual public key
 // Convert Headers to IncomingHttpHeaders format (Record<string, string | string[] | undefined>)
 const isValidRequest: boolean = client.authorization.validateHeaders(requestHeaders, publicKeyForValidation);
@@ -105,7 +105,7 @@ if (!isValidRequest) {
 ## Use Cases
 
 - **API Authentication**: Sign requests to Nosana APIs using message signatures
-- **Message Verification**: Verify signed messages from other parties
+- **Message Verification**: Verify message signatures from other parties
 - **Secure Communication**: Establish authenticated communication channels
 - **Request Authorization**: Validate incoming API requests
 
