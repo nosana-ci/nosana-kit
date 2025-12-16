@@ -510,6 +510,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
                   encoding: 'base58',
                 },
               },
+              ...extraGPAFilters,
             ],
           })
           .send();
