@@ -226,9 +226,21 @@ export type JobDefinition = {
 };
 export type JobType = 'container';
 
+type OperationId = string &
+  tags.TagBase<{
+    kind: 'operationId';
+    target: 'string';
+    value: 'operationId';
+    validate: `
+      typeof $input === "string" &&
+      !$input.includes(" ")
+    `;
+    message: 'ops[*].id must be a string and not contain spaces';
+  }>;
+
 export type Operation<T extends OperationType> = {
   type: OperationType;
-  id: string;
+  id: OperationId;
   args: OperationArgsMap[T];
   results?: OperationResults;
   execution?: Execution;
