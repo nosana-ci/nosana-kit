@@ -31,7 +31,7 @@ console.log(`User-owned accounts: ${userAccounts.length}`);
 
 ## Get Token Account for Address
 
-Retrieve the NOS token account for a specific owner:
+Retrieve the NOS token account for a specific owner.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
@@ -54,7 +54,7 @@ if (account) {
 
 ## Get Balance
 
-Convenience method to get just the NOS balance for an address:
+Convenience method to get just the NOS balance for an address.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
@@ -68,7 +68,7 @@ console.log(`Balance: ${balance} NOS`);
 
 ## Transfer Tokens
 
-Get instruction(s) to transfer SPL tokens. Returns either 1 or 2 instructions depending on whether the recipient's associated token account needs to be created:
+Get instruction(s) to transfer SPL tokens. Returns either 1 or 2 instructions depending on whether the recipient's associated token account needs to be created.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
@@ -95,10 +95,10 @@ await client.solana.buildSignAndSend(instructions);
 ```
 
 The function automatically:
-- Finds the sender's associated token account
-- Finds the recipient's associated token account
-- Creates the recipient's ATA if it doesn't exist (returns 2 instructions: create ATA + transfer)
-- Returns only the transfer instruction if the recipient's ATA already exists (returns 1 instruction)
+- finds the sender's associated token account;
+- finds the recipient's associated token account;
+- creates the recipient's ATA if it doesn't exist (returns 2 instructions: create ATA + transfer);
+- returns only the transfer instruction if the recipient's ATA already exists (returns 1 instruction).
 
 ## Type Definitions
 

@@ -37,7 +37,7 @@ pnpm add @nosana/kit
 
 ::: info
 
-The SDK is fully typed with TypeScript. While TypeScript is not required at runtime, we highly recommend using it for the best developer experience.
+The SDK is fully typed with TypeScript. While TypeScript is not required at runtime, we highly recommend using it for the best development experience.
 
 :::
 

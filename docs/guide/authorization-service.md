@@ -9,7 +9,7 @@ The authorization service provides cryptographic message signing and validation 
 
 ## Methods
 
-### Generate Signed Message
+### Generate Message Signature
 
 ```ts
 generate(message: string | Uint8Array, options?: GenerateOptions): Promise<string>
@@ -29,7 +29,7 @@ validate(
 
 Validate a signed message.
 
-### Generate Signed HTTP Headers
+### Generate HTTP Header Signatures
 
 ```ts
 generateHeaders(
@@ -40,15 +40,15 @@ generateHeaders(
 ): Promise<Headers>
 ```
 
-Generate signed HTTP headers (requires wallet).
+Signing HTTP headers requires wallet.
 
-### Validate HTTP Headers
+### Validate HTTP Header Signatures
 
 ```ts
 validateHeaders(headers: Headers | Record<string, string>): Promise<boolean>
 ```
 
-Validate HTTP headers.
+Validate HTTP header signatures.
 
 ## Examples
 
@@ -63,7 +63,7 @@ const requestHeaders: Record<string, string | string[] | undefined> = { 'authori
 // Set wallet first to enable signing
 client.wallet = myWallet;
 
-// Generate a signed message
+// Generate message signature
 const messageToSign = 'Hello, Nosana!';
 const signedMessage: string = await client.authorization.generate(messageToSign);
 console.log('Signed message:', signedMessage);

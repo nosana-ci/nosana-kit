@@ -4,7 +4,7 @@ The MerkleDistributorProgram provides methods to interact with merkle distributo
 
 ## Get a Single Distributor
 
-Fetch a merkle distributor account by its address:
+Fetch a merkle distributor account by its address.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
@@ -21,7 +21,7 @@ console.log('Root:', distributor.root);
 
 ## Get All Distributors
 
-Fetch all merkle distributor accounts:
+Fetch all merkle distributor accounts.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
@@ -34,7 +34,7 @@ console.log(`Found ${distributors.length} distributors`);
 
 ## Get Claim Status
 
-Fetch claim status for a specific distributor and claimant:
+Fetch claim status for a specific distributor and claimant.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
@@ -63,7 +63,7 @@ if (claimStatus2) {
 
 ## Claim Tokens
 
-Claim tokens from a merkle distributor:
+Claim tokens from a merkle distributor.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
