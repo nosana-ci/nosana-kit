@@ -17,7 +17,7 @@ interface InstructionAccountIndices {
 /**
  * Visitor that collects account index information from the Codama model.
  * Returns the collected data for post-processing (file injection).
- * 
+ *
  * Uses the mergeVisitor pattern to collect data from program nodes.
  */
 export function createAccountIndicesVisitor(): Visitor<InstructionAccountIndices> {
@@ -84,7 +84,6 @@ export function injectAccountIndicesIntoFiles(
   outputPath: string,
   indices: InstructionAccountIndices
 ): void {
-
   const instructionsDir = path.join(outputPath, 'instructions');
 
   for (const [instructionName, accountInfo] of Object.entries(indices)) {
