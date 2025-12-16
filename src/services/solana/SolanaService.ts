@@ -162,7 +162,7 @@ export interface SolanaService {
   /**
    * Deserialize a base64 string back to a transaction.
    * Use this to receive transactions from other parties.
-   * 
+   *
    * Note: This method automatically restores the `lastValidBlockHeight` metadata
    * that is lost during serialization by fetching the latest blockhash from the RPC.
    *
@@ -648,14 +648,16 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
     /**
      * Deserialize a base64 string back to a transaction.
      * Use this to receive transactions from other parties.
-     * 
+     *
      * Note: This method automatically restores the `lastValidBlockHeight` metadata
      * that is lost during serialization by fetching the latest blockhash from the RPC.
      *
      * @param base64 The base64 encoded transaction string
      * @returns The deserialized transaction with restored lifetime metadata
      */
-    async deserializeTransaction(base64: string): Promise<Transaction & TransactionWithBlockhashLifetime> {
+    async deserializeTransaction(
+      base64: string
+    ): Promise<Transaction & TransactionWithBlockhashLifetime> {
       try {
         deps.logger.debug('Deserializing transaction from base64');
 
@@ -669,11 +671,12 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
         // Use decompileTransaction to extract the blockhash from the transaction
         const decompiled = this.decompileTransaction(transaction);
 
-        const transactionBlockhash = 'lifetimeConstraint' in decompiled &&
+        const transactionBlockhash =
+          'lifetimeConstraint' in decompiled &&
           decompiled.lifetimeConstraint &&
           'blockhash' in decompiled.lifetimeConstraint
-          ? decompiled.lifetimeConstraint.blockhash
-          : null;
+            ? decompiled.lifetimeConstraint.blockhash
+            : null;
 
         if (transactionBlockhash) {
           // Restore lastValidBlockHeight in the transaction's lifetime constraint
@@ -690,7 +693,9 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
             },
           };
         } else {
-          throw new Error('Could not determine transaction blockhash - lastValidBlockHeight not restored');
+          throw new Error(
+            'Could not determine transaction blockhash - lastValidBlockHeight not restored'
+          );
         }
       } catch (error) {
         deps.logger.error(`Failed to deserialize transaction: ${error}`);
