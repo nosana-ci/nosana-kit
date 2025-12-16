@@ -35,7 +35,8 @@ import {
   type ParsedWorkInstruction,
 } from '../instructions/index.js';
 
-export const NOSANA_JOBS_PROGRAM_ADDRESS = '' as Address<''>;
+export const NOSANA_JOBS_PROGRAM_ADDRESS =
+  'nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM' as Address<'nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM'>;
 
 export const NosanaJobsAccount = {
   MarketAccount: "MarketAccount",
@@ -327,7 +328,9 @@ export function identifyNosanaJobsInstruction(
   );
 }
 
-export type ParsedNosanaJobsInstruction<TProgram extends string = ''> =
+export type ParsedNosanaJobsInstruction<
+  TProgram extends string = 'nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM',
+> =
   | ({
       instructionType: typeof NosanaJobsInstruction.Open;
     } & ParsedOpenInstruction<TProgram>)
