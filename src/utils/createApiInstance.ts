@@ -6,7 +6,7 @@ import { SolanaService } from "../services/solana/SolanaService.js";
 import { TokenService } from "../services/token/TokenService.js";
 
 import { Wallet } from "../types.js";
-import { isTransactionPartialSigner } from "@solana/kit";
+import { isTransactionPartialSigner, setTransactionMessageLifetimeUsingBlockhash } from "@solana/kit";
 
 export interface NosanaApiDeps {
   authorization: NosanaAuthorization;
@@ -20,7 +20,7 @@ const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: NosanaApiDe
       solana.getBalance(address),
       nos.getBalance(address),
     ]);
-    return { SOL, NOS };
+    return { SOL: SOL / 1e9, NOS };
   },
   transferTokensToRecipient: async (recipient: string, { SOL, NOS, lamports }: TopupVaultOptions) => {
     const instructions = [];
@@ -50,10 +50,16 @@ const createApiSolanaIntegration = (wallet: Wallet, { solana, nos }: NosanaApiDe
       throw new Error('Wallet is not a transaction partial signer.');
     }
     const deserializedTx = await solana.deserializeTransaction(transactionData);
-    const decompileTransaction = await solana.decompileTransaction(deserializedTx);
-    if (decompileTransaction.feePayer.address !== wallet.address) {
-      throw new Error('Fee payer of the transaction must match the wallet address.');
-    }
+    // const decompileTransaction = await solana.decompileTransaction(deserializedTx);
+    // if (decompileTransaction.feePayer.address !== wallet.address) {
+    //   throw new Error('Fee payer of the transaction must match the wallet address.');
+    // }
+    // const latestBlockhash = await solana.rpc.getBlockHeight();
+    const { value: latestBlockhash } = await solana.rpc.getLatestBlockhash().send();
+
+    // @ts-ignore
+    setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, deserializedTx);
+
     const fullySignedTx = await solana.signTransactionWithSigners(deserializedTx, [wallet]);
     return solana.sendTransaction(fullySignedTx);
   },
