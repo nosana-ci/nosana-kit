@@ -32,6 +32,13 @@ import {
 import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const SET_ADMIN_INSTRUCTION_ACCOUNTS = {
+  distributor: 0,
+  admin: 1,
+  newAdmin: 2,
+} as const;
+
+export type SetAdminInstructionAccountName = keyof typeof SET_ADMIN_INSTRUCTION_ACCOUNTS;
 export const SET_ADMIN_DISCRIMINATOR = new Uint8Array([
   251, 163, 0, 52, 91, 194, 187, 92,
 ]);

@@ -36,6 +36,22 @@ import {
 import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const LIST_INSTRUCTION_ACCOUNTS = {
+  job: 0,
+  market: 1,
+  run: 2,
+  user: 3,
+  vault: 4,
+  payer: 5,
+  rewardsReflection: 6,
+  rewardsVault: 7,
+  authority: 8,
+  rewardsProgram: 9,
+  tokenProgram: 10,
+  systemProgram: 11,
+} as const;
+
+export type ListInstructionAccountName = keyof typeof LIST_INSTRUCTION_ACCOUNTS;
 export const LIST_DISCRIMINATOR = new Uint8Array([
   54, 174, 193, 67, 17, 41, 132, 38,
 ]);

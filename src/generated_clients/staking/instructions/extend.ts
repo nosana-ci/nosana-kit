@@ -34,6 +34,12 @@ import {
 import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const EXTEND_INSTRUCTION_ACCOUNTS = {
+  stake: 0,
+  authority: 1,
+} as const;
+
+export type ExtendInstructionAccountName = keyof typeof EXTEND_INSTRUCTION_ACCOUNTS;
 export const EXTEND_DISCRIMINATOR = new Uint8Array([
   228, 127, 0, 1, 227, 154, 54, 168,
 ]);

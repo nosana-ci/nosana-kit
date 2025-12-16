@@ -33,6 +33,17 @@ import {
 import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const DELIST_INSTRUCTION_ACCOUNTS = {
+  job: 0,
+  market: 1,
+  deposit: 2,
+  payer: 3,
+  vault: 4,
+  tokenProgram: 5,
+  authority: 6,
+} as const;
+
+export type DelistInstructionAccountName = keyof typeof DELIST_INSTRUCTION_ACCOUNTS;
 export const DELIST_DISCRIMINATOR = new Uint8Array([
   55, 136, 205, 107, 107, 173, 4, 31,
 ]);

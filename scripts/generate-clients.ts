@@ -7,6 +7,10 @@ import { rootNodeFromAnchor, AnchorIdl } from '@codama/nodes-from-anchor';
 import { renderVisitor as renderJavaScriptVisitor } from '@codama/renderers-js';
 
 import { processEnumsInDirectory } from './utils/convert-typescript-enums-to-const.ts';
+import {
+  createAccountIndicesVisitor,
+  injectAccountIndicesIntoFiles,
+} from './utils/generate-account-indices-visitor.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -45,6 +49,9 @@ async function main() {
   // Small delay to ensure files are written
   await new Promise((resolve) => setTimeout(resolve, 100));
   processEnumsInDirectory(jobsPath);
+  // Collect account indices from model and inject into files
+  const accountIndices = codamaJobs.accept(createAccountIndicesVisitor());
+  injectAccountIndicesIntoFiles(jobsPath, accountIndices);
 
   const codamaStaking = createFromRoot(rootNodeFromAnchor(anchorStakingIdl as AnchorIdl));
 
@@ -54,6 +61,9 @@ async function main() {
   console.log('Processing enums in staking...');
   await new Promise((resolve) => setTimeout(resolve, 100));
   processEnumsInDirectory(stakingPath);
+  // Collect account indices from model and inject into files
+  const stakingAccountIndices = codamaStaking.accept(createAccountIndicesVisitor());
+  injectAccountIndicesIntoFiles(stakingPath, stakingAccountIndices);
 
   const codamaMerkleDistributor = createFromRoot(
     rootNodeFromAnchor(merkleDistributorIdl as AnchorIdl)
@@ -71,8 +81,11 @@ async function main() {
   console.log('Processing enums in merkle_distributor...');
   await new Promise((resolve) => setTimeout(resolve, 100));
   processEnumsInDirectory(merkleDistributorPath);
+  // Collect account indices from model and inject into files
+  const merkleAccountIndices = codamaMerkleDistributor.accept(createAccountIndicesVisitor());
+  injectAccountIndicesIntoFiles(merkleDistributorPath, merkleAccountIndices);
 
-  console.log('✅ Client generation and enum conversion complete!');
+  console.log('✅ Client generation, enum conversion, and account indices complete!');
 }
 
 main().catch((err) => {

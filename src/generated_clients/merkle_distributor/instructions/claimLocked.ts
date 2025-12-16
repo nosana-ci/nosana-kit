@@ -33,6 +33,16 @@ import {
 import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const CLAIM_LOCKED_INSTRUCTION_ACCOUNTS = {
+  distributor: 0,
+  claimStatus: 1,
+  from: 2,
+  to: 3,
+  claimant: 4,
+  tokenProgram: 5,
+} as const;
+
+export type ClaimLockedInstructionAccountName = keyof typeof CLAIM_LOCKED_INSTRUCTION_ACCOUNTS;
 export const CLAIM_LOCKED_DISCRIMINATOR = new Uint8Array([
   34, 206, 181, 23, 11, 207, 147, 90,
 ]);
