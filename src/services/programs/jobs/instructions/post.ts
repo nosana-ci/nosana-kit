@@ -53,6 +53,8 @@ export async function post(
       payer: nosPayer,
       authority: wallet,
       ...staticAccounts,
+    }, {
+      programAddress: jobsProgram,
     });
   } catch (err) {
     const errorMessage = `Failed to create list instruction: ${err instanceof Error ? err.message : String(err)}`;

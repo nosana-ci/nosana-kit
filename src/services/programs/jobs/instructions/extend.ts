@@ -47,6 +47,8 @@ export async function extend(
       authority: wallet,
       user: associatedTokenAddress,
       ...staticAccounts,
+    }, {
+      programAddress: jobsProgram,
     });
   } catch (err) {
     const errorMessage = `Failed to create extend instruction: ${err instanceof Error ? err.message : String(err)}`;

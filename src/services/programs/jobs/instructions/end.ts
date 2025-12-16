@@ -53,6 +53,8 @@ export async function end(
       vault: vault,
       payer: payer, // Use payer from the job account
       authority: wallet,
+    }, {
+      programAddress: jobsProgram,
     });
   } catch (err) {
     const errorMessage = `Failed to create end instruction: ${err instanceof Error ? err.message : String(err)}`;
