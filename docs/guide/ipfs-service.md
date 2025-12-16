@@ -74,7 +74,7 @@ if (job.ipfsResult) {
 
 ## Utility Functions
 
-The SDK also exports utility functions for converting between Solana hash formats and IPFS CIDs:
+The SDK also exports utility functions for converting between Solana hash formats and IPFS CIDs.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';

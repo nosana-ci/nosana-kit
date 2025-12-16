@@ -4,7 +4,7 @@ The StakeProgram provides methods to interact with Nosana staking accounts on-ch
 
 ## Get a Single Stake Account
 
-Fetch a stake account by its address:
+Fetch a stake account by its address.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
@@ -24,7 +24,7 @@ console.log('Vault:', stake.vault);
 
 ## Get Multiple Stake Accounts
 
-Fetch multiple stake accounts by their addresses:
+Fetch multiple stake accounts by their addresses.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
@@ -42,7 +42,7 @@ stakes.forEach((stake) => {
 
 ## Get All Stake Accounts
 
-Fetch all stake accounts in the program:
+Fetch all stake accounts in the program.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
