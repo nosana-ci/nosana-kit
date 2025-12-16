@@ -36,16 +36,19 @@ export async function delist(
       deps.solana.pda([market, config.nosTokenAddress], jobsProgram),
     ]);
 
-    return client.getDelistInstruction({
-      job,
-      market,
-      vault,
-      deposit: payerATA, // Associated token address for the job's payer
-      payer,
-      authority: wallet,
-    }, {
-      programAddress: jobsProgram,
-    });
+    return client.getDelistInstruction(
+      {
+        job,
+        market,
+        vault,
+        deposit: payerATA, // Associated token address for the job's payer
+        payer,
+        authority: wallet,
+      },
+      {
+        programAddress: jobsProgram,
+      }
+    );
   } catch (err) {
     const errorMessage = `Failed to create delist instruction: ${err instanceof Error ? err.message : String(err)}`;
     deps.logger.error(errorMessage);

@@ -44,18 +44,21 @@ export async function end(
 
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
-    return client.getEndInstruction({
-      job,
-      market: market,
-      run: run.address,
-      deposit: payerATA, // ATA of the job payer
-      user: nodeATA, // ATA of the node (from run account)
-      vault: vault,
-      payer: payer, // Use payer from the job account
-      authority: wallet,
-    }, {
-      programAddress: jobsProgram,
-    });
+    return client.getEndInstruction(
+      {
+        job,
+        market: market,
+        run: run.address,
+        deposit: payerATA, // ATA of the job payer
+        user: nodeATA, // ATA of the node (from run account)
+        vault: vault,
+        payer: payer, // Use payer from the job account
+        authority: wallet,
+      },
+      {
+        programAddress: jobsProgram,
+      }
+    );
   } catch (err) {
     const errorMessage = `Failed to create end instruction: ${err instanceof Error ? err.message : String(err)}`;
     deps.logger.error(errorMessage);
