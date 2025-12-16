@@ -38,16 +38,21 @@ export async function extend(
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
     // Create the extend instruction
-    return client.getExtendInstruction({
-      job,
-      timeout: BigInt(currentTimeout) + BigInt(timeout),
-      market: market,
-      vault,
-      payer: nosPayer,
-      authority: wallet,
-      user: associatedTokenAddress,
-      ...staticAccounts,
-    });
+    return client.getExtendInstruction(
+      {
+        job,
+        timeout: BigInt(currentTimeout) + BigInt(timeout),
+        market: market,
+        vault,
+        payer: nosPayer,
+        authority: wallet,
+        user: associatedTokenAddress,
+        ...staticAccounts,
+      },
+      {
+        programAddress: jobsProgram,
+      }
+    );
   } catch (err) {
     const errorMessage = `Failed to create extend instruction: ${err instanceof Error ? err.message : String(err)}`;
     deps.logger.error(errorMessage);

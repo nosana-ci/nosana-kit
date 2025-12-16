@@ -42,18 +42,23 @@ export async function post(
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
     // Create the list instruction
-    return client.getListInstruction({
-      job: jobKey,
-      run: runKey,
-      market,
-      ipfsJob: bs58.decode(ipfsHash).subarray(2),
-      timeout,
-      user: associatedTokenAddress,
-      vault: vault,
-      payer: nosPayer,
-      authority: wallet,
-      ...staticAccounts,
-    });
+    return client.getListInstruction(
+      {
+        job: jobKey,
+        run: runKey,
+        market,
+        ipfsJob: bs58.decode(ipfsHash).subarray(2),
+        timeout,
+        user: associatedTokenAddress,
+        vault: vault,
+        payer: nosPayer,
+        authority: wallet,
+        ...staticAccounts,
+      },
+      {
+        programAddress: jobsProgram,
+      }
+    );
   } catch (err) {
     const errorMessage = `Failed to create list instruction: ${err instanceof Error ? err.message : String(err)}`;
     deps.logger.error(errorMessage);
