@@ -26,7 +26,8 @@ import {
   type ParsedWithdrawInstruction,
 } from '../instructions/index.js';
 
-export const NOSANA_STAKING_PROGRAM_ADDRESS = '' as Address<''>;
+export const NOSANA_STAKING_PROGRAM_ADDRESS =
+  'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE' as Address<'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE'>;
 
 export const NosanaStakingAccount = {
   SettingsAccount: "SettingsAccount",
@@ -198,7 +199,9 @@ export function identifyNosanaStakingInstruction(
   );
 }
 
-export type ParsedNosanaStakingInstruction<TProgram extends string = ''> =
+export type ParsedNosanaStakingInstruction<
+  TProgram extends string = 'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE',
+> =
   | ({
       instructionType: typeof NosanaStakingInstruction.Init;
     } & ParsedInitInstruction<TProgram>)
