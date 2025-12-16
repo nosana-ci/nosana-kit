@@ -551,7 +551,8 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
     > | null> {
       try {
         // Check if the account exists
-        const accountInfo = await rpc.getAccountInfo(ata).send();
+        // Use base64 encoding to avoid base58 128-byte limit error
+        const accountInfo = await rpc.getAccountInfo(ata, { encoding: 'base64' }).send();
         if (accountInfo.value !== null) {
           // Account already exists
           return null;
