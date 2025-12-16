@@ -558,7 +558,7 @@ describe('SolanaService', () => {
       const partiallySignedTx = await service.partiallySignTransaction(transactionMessage);
 
       const serialized = service.serializeTransaction(partiallySignedTx);
-      const deserialized = service.deserializeTransaction(serialized);
+      const deserialized = await service.deserializeTransaction(serialized);
 
       expect(deserialized).toBeDefined();
       expect(deserialized.messageBytes).toStrictEqual(partiallySignedTx.messageBytes);
@@ -584,7 +584,7 @@ describe('SolanaService', () => {
 
       // Serialize and deserialize to simulate receiving a transaction
       const serialized = service.serializeTransaction(partiallySignedTx);
-      const receivedTx = service.deserializeTransaction(serialized);
+      const receivedTx = await service.deserializeTransaction(serialized);
 
       const reSigned = await service.signTransactionWithSigners(receivedTx, [mockSigner as any]);
 
@@ -604,7 +604,7 @@ describe('SolanaService', () => {
 
       // Serialize and deserialize to simulate receiving a transaction
       const serialized = service.serializeTransaction(partiallySignedTx);
-      const receivedTx = service.deserializeTransaction(serialized);
+      const receivedTx = await service.deserializeTransaction(serialized);
 
       const decompiled = service.decompileTransaction(receivedTx);
 

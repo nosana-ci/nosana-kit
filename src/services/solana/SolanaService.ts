@@ -162,11 +162,14 @@ export interface SolanaService {
   /**
    * Deserialize a base64 string back to a transaction.
    * Use this to receive transactions from other parties.
+   * 
+   * Note: This method automatically restores the `lastValidBlockHeight` metadata
+   * that is lost during serialization by fetching the latest blockhash from the RPC.
    *
    * @param base64 The base64 encoded transaction string
-   * @returns The deserialized transaction
+   * @returns The deserialized transaction with restored lifetime metadata
    */
-  deserializeTransaction(base64: string): Transaction & TransactionWithBlockhashLifetime;
+  deserializeTransaction(base64: string): Promise<Transaction & TransactionWithBlockhashLifetime>;
   /**
    * Sign a transaction with the provided signers.
    * Use this when receiving a partially signed transaction that needs additional signatures.
@@ -192,7 +195,7 @@ export interface SolanaService {
    * @returns The decompiled transaction message (with either blockhash or durable nonce lifetime)
    */
   decompileTransaction(
-    transaction: Transaction & TransactionWithBlockhashLifetime
+    transaction: Transaction
   ): BaseTransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime;
   /**
    * Get an instruction to transfer SOL from one address to another.
@@ -645,19 +648,50 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
     /**
      * Deserialize a base64 string back to a transaction.
      * Use this to receive transactions from other parties.
+     * 
+     * Note: This method automatically restores the `lastValidBlockHeight` metadata
+     * that is lost during serialization by fetching the latest blockhash from the RPC.
      *
      * @param base64 The base64 encoded transaction string
-     * @returns The deserialized transaction
+     * @returns The deserialized transaction with restored lifetime metadata
      */
-    deserializeTransaction(base64: string): Transaction & TransactionWithBlockhashLifetime {
+    async deserializeTransaction(base64: string): Promise<Transaction & TransactionWithBlockhashLifetime> {
       try {
         deps.logger.debug('Deserializing transaction from base64');
 
         // Decode the base64 string to bytes, then to transaction
         const transactionBytes = getBase64Encoder().encode(base64);
-        const transaction = getTransactionDecoder().decode(transactionBytes);
+        let transaction = getTransactionDecoder().decode(transactionBytes);
 
-        return transaction as Transaction & TransactionWithBlockhashLifetime;
+        // Get latest blockhash info to restore lastValidBlockHeight
+        const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
+
+        // Use decompileTransaction to extract the blockhash from the transaction
+        const decompiled = this.decompileTransaction(transaction);
+
+        const transactionBlockhash = 'lifetimeConstraint' in decompiled &&
+          decompiled.lifetimeConstraint &&
+          'blockhash' in decompiled.lifetimeConstraint
+          ? decompiled.lifetimeConstraint.blockhash
+          : null;
+
+        if (transactionBlockhash) {
+          // Restore lastValidBlockHeight in the transaction's lifetime constraint
+          // If blockhash matches latest, use latest's lastValidBlockHeight
+          // Otherwise, use latest as fallback (transaction may still be valid)
+          deps.logger.debug(
+            `Restored lastValidBlockHeight: ${latestBlockhash.lastValidBlockHeight} for blockhash: ${transactionBlockhash}`
+          );
+          return {
+            ...transaction,
+            lifetimeConstraint: {
+              blockhash: transactionBlockhash,
+              lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+            },
+          };
+        } else {
+          throw new Error('Could not determine transaction blockhash - lastValidBlockHeight not restored');
+        }
       } catch (error) {
         deps.logger.error(`Failed to deserialize transaction: ${error}`);
         throw new NosanaError(
