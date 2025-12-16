@@ -70,7 +70,7 @@ console.log('Message signature:', messageSignature);
 
 // Validate message signature (requires validationString with message+signature, and publicKey)
 // Note: validationString typically contains both message and signature separated
-const validationString = `${messageToSign}:${signedMessage}`; // Format may vary
+const validationString = `${messageToSign}:${messageSignature}`; // Format may vary
 // Get publicKey from wallet (in real usage, extract from wallet's public key)
 const publicKey = new Uint8Array(32); // Placeholder - extract actual public key from wallet
 const isValid: boolean = client.authorization.validate(validationString, publicKey);
