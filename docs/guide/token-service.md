@@ -4,7 +4,7 @@ The TokenService provides methods to interact with token accounts on Solana. In 
 
 ## Get All Token Holders
 
-Fetch all accounts holding NOS tokens using a single RPC call:
+Fetch all accounts holding NOS tokens using a single RPC call.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';

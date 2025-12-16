@@ -37,7 +37,7 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 
 ## Logging
 
-Configure logging levels:
+Configure logging levels.
 
 ```ts twoslash
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';

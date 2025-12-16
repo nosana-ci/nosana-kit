@@ -52,7 +52,7 @@ const client3 = createNosanaClient(NosanaNetwork.MAINNET, {
 
 ## API Structure
 
-The API service provides access to three main APIs:
+The API service provides access to three main APIs.
 
 ```ts
 client.api?.jobs    // Jobs API
