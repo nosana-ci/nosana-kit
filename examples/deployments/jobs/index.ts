@@ -3,9 +3,6 @@ import { JobDefinition } from '../../../src';
 export const NGINX_JOB: JobDefinition = {
   version: '0.1',
   type: 'container',
-  meta: {
-    trigger: 'deployment-manager',
-  },
   ops: [
     {
       type: 'container/run',
@@ -22,9 +19,6 @@ export const NGINX_JOB: JobDefinition = {
 export const HELLO_JOB: JobDefinition = {
   version: '0.1',
   type: 'container',
-  meta: {
-    trigger: 'deployment-manager',
-  },
   ops: [
     {
       type: 'container/run',
