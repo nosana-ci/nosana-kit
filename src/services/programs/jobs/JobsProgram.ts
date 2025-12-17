@@ -54,6 +54,7 @@ export type { SimpleMonitorEvent, MonitorEvent } from './monitor/index.js';
 
 /**
  * Jobs program interface
+ * @group @nosana/kit
  */
 export interface JobsProgram {
   /**

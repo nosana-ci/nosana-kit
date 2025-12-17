@@ -28,6 +28,7 @@ function extractSignature(
  *
  * @param signer - The message signer to convert
  * @returns A SignMessageFn that can be used with createNosanaAuthorization
+ * @group @nosana/kit
  */
 export function walletToAuthorizationSigner(signer: MessageSigner): SignMessageFn {
   const signerAddress = signer.address;

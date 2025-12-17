@@ -1,0 +1,72 @@
+# Wallet Configuration
+
+The SDK supports universal wallet configuration through a unified `Wallet` type that must support both message and transaction signing (`MessageSigner & TransactionSigner`). This enables compatibility with both browser wallets (wallet-standard) and keypair-based wallets.
+
+## Wallet Requirements
+
+The wallet must implement both `MessageSigner` and `TransactionSigner` interfaces from `@solana/kit`. This allows the SDK to use the wallet for:
+
+- **Message signing** - For API authentication and authorization
+- **Transaction signing** - For on-chain operations
+
+## Browser Wallets (Wallet-Standard)
+
+Full support for wallet-standard compatible browser wallets (Phantom, Solflare, etc.).
+
+```ts
+import { createNosanaClient } from '@nosana/kit';
+import { useWalletAccountSigner } from '@nosana/solana-vue';
+
+// Create client
+const client = createNosanaClient();
+
+// Set browser wallet (wallet-standard compatible)
+client.wallet = useWalletAccountSigner(account, currentChain);
+```
+
+## Keypair Wallets
+
+Seamless support for keypair-based wallets.
+
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+
+// Create client
+const client = createNosanaClient();
+
+// Set keypair wallet
+const keypair = await generateKeyPairSigner();
+client.wallet = keypair;
+```
+
+## Configuration Options
+
+Wallets can be set at client initialization or dynamically assigned.
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+import type { Wallet } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+
+// Create wallet instances for examples
+const myWallet: Wallet = await generateKeyPairSigner();
+const anotherWallet: Wallet = await generateKeyPairSigner();
+
+// Option 1: Set wallet during initialization
+const client1 = createNosanaClient(NosanaNetwork.MAINNET, {
+  wallet: myWallet,
+});
+
+// Option 2: Set wallet dynamically
+const client2 = createNosanaClient();
+client2.wallet = myWallet;
+
+// Option 3: Change wallet at runtime
+client2.wallet = anotherWallet;
+```
+
+## Type Safety
+
+The SDK leverages `@solana/kit` types for compile-time safety, ensuring wallet compatibility before runtime.
+

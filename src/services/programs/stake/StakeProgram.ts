@@ -8,6 +8,7 @@ export type Stake = ConvertTypesForDb<programClient.StakeAccountArgs> & { addres
 
 /**
  * Stake program interface
+ * @group @nosana/kit
  */
 export interface StakeProgram {
   /**

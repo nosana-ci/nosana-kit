@@ -1,0 +1,55 @@
+/* Custom styles for the documentation site */
+
+/* Nosana Brand Colors */
+:root {
+  --vp-c-brand: #10E80C;
+  --vp-c-brand-1: #10E80C;
+  --vp-c-brand-2: #0FC90B;
+  --vp-c-brand-3: #0EAA0A;
+  --vp-c-brand-soft: rgba(16, 232, 12, 0.14);
+  /* Override code color to not use brand color - use neutral text color instead */
+  --vp-code-color: var(--vp-c-text-1);
+}
+
+.dark {
+  --vp-c-brand: #10E80C;
+  --vp-c-brand-1: #10E80C;
+  --vp-c-brand-2: #0FC90B;
+  --vp-c-brand-3: #0EAA0A;
+  --vp-c-brand-soft: rgba(16, 232, 12, 0.16);
+  /* Override code color to not use brand color - use neutral text color instead */
+  --vp-code-color: var(--vp-c-text-1);
+}
+
+/* Improve readability of API reference */
+.api-reference {
+  line-height: 1.6;
+}
+
+.api-reference h2 {
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  padding-bottom: 0.5rem;
+}
+
+.api-reference h3 {
+  margin-top: 1.5rem;
+}
+
+/* Override twoslash CSS for code elements that contain pre (code blocks) */
+/* Reset inline code styles when code contains a pre child */
+.vp-doc :not(pre) > code:has(> pre) {
+  border-radius: 0;
+  padding: 0;
+  background-color: transparent;
+  transition: none;
+  font-size: inherit;
+  color: inherit;
+}
+.vp-doc :not(pre) > code > pre {
+  border-radius: 8px;
+  padding: 15px;
+  overflow-x: auto;
+  background-color: var(--vp-code-bg);
+  transition: color 0.25s, background-color 0.5s;
+}

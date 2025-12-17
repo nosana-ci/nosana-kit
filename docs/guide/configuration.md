@@ -1,0 +1,49 @@
+# Configuration
+
+## Networks
+
+The SDK supports two networks:
+
+- **`NosanaNetwork.MAINNET`** - Production network (mainnet-beta)
+- **`NosanaNetwork.DEVNET`** - Development network (devnet)
+
+## Configuration Options
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, LogLevel } from '@nosana/kit';
+import { generateKeyPairSigner } from '@solana/kit';
+import type { Wallet } from '@nosana/kit';
+
+const myWallet: Wallet = await generateKeyPairSigner();
+
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  solana: {
+    cluster: 'mainnet-beta',
+    rpcEndpoint: 'https://api.mainnet-beta.solana.com',
+    commitment: 'confirmed',
+  },
+  ipfs: {
+    api: 'https://api.pinata.cloud',
+    jwt: 'your-pinata-jwt-token',
+    gateway: 'https://gateway.pinata.cloud/ipfs/',
+  },
+  api: {
+    apiKey: 'your-api-key', // Optional: API key for authentication
+  },
+  logLevel: 'debug',
+  wallet: myWallet, // Optional: Set wallet during initialization (must be a Wallet type)
+});
+```
+
+## Logging
+
+Configure logging levels.
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  logLevel: 'debug', // DEBUG | INFO | WARN | ERROR | NONE
+});
+```
+

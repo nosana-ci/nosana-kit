@@ -7,11 +7,13 @@ import { Logger } from './logger/Logger.js';
  * A wallet that can sign both messages and transactions.
  * This is a combination of MessageSigner and TransactionSigner,
  * allowing the wallet to be used for both message signing and transaction signing.
+ * @group @nosana/kit
  */
 export type Wallet = MessageSigner & TransactionSigner;
 
 /**
  * Dependencies for program services
+ * @group @nosana/kit
  */
 export interface ProgramDeps {
   logger: Logger;
