@@ -335,7 +335,6 @@ export type {
   LiteralString,
   Alias,
   Aliases,
-  Vault,
   Logistic,
   FlowState,
   FlowSecrets,
@@ -345,8 +344,9 @@ export type {
   Revision,
   SpreadMarker,
   RemoveIfEmptyMarker,
-  // Deployment
-  Deployment,
+  // Deployment (raw data types from OpenAPI schema)
+  Deployment as DeploymentRaw,
+  Vault as VaultRaw,
   DeploymentId,
   EndpointSecret,
   EndpointStatus,
@@ -411,6 +411,17 @@ export type {
   NosanaMarketsApi,
   Market as ApiMarket,
   MarketRequiredResources,
+  // Deployment API types (with methods - takes priority over types-module Deployment)
+  ApiDeployment,
+  Deployment,
+  CreateDeployment,
+  DeploymentCreateBody,
+  DeploymentState,
+  DeploymentJob,
+  Vault,
+  TopupVaultOptions,
+  DeploymentsApi,
+  ApiDeploymentsApi,
 } from '@nosana/api';
 
 // ============================================================================

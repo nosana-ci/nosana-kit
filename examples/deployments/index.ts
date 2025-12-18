@@ -1,9 +1,8 @@
 // @ts-nocheck
-import { NosanaClient } from '../../src/index.js';
+import { NosanaClient, type ApiDeployment, type Deployment } from '../../src/index.js';
 import { createTestClient } from './utils/createTestClient.js';
 import { createDeployment } from './create_deployment.js';
 import { HELLO_JOB } from './jobs/index.js';
-import { ApiDeployment, Deployment } from '@nosana/api';
 
 const sleep = (seconds: number) =>
   new Promise((resolve) => setTimeout(resolve, seconds * 1000));
