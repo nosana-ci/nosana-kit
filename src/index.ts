@@ -398,8 +398,6 @@ export type {
   CreateNosanaApiOptions,
   ApiKeyAuth,
   SignerAuth,
-  GenerateFn,
-  GenerateHeaders,
   ApiConfig,
   // Job API types
   NosanaJobsApi,
