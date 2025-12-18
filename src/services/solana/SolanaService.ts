@@ -35,6 +35,7 @@ import {
   TransactionPartialSigner,
   decompileTransactionMessage,
   getCompiledTransactionMessageDecoder,
+  assertIsTransactionWithinSizeLimit,
 } from '@solana/kit';
 import {
   estimateComputeUnitLimitFactory,
@@ -727,6 +728,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
         deps.logger.debug(
           `Signing transaction with ${signers.length} signer(s): ${signers.map((s) => s.address).join(', ')}`
         );
+        assertIsTransactionWithinSizeLimit(transaction);
 
         // Sign with each signer and merge signatures into the transaction
         // TransactionPartialSigner.signTransactions returns SignatureDictionary[] (not transactions)
@@ -735,8 +737,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
         for (const signer of signers) {
           // signTransactions returns an array of SignatureDictionary (one per transaction)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const [signatureDict] = await signer.signTransactions([transaction as any]);
+          const [signatureDict] = await signer.signTransactions([transaction]);
           // Merge the new signatures into our accumulated signatures
           updatedSignatures = { ...updatedSignatures, ...signatureDict };
         }
@@ -771,7 +772,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
      * @returns The decompiled transaction message (with either blockhash or durable nonce lifetime)
      */
     decompileTransaction(
-      transaction: Transaction & TransactionWithBlockhashLifetime
+      transaction: Transaction
     ): BaseTransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime {
       try {
         deps.logger.debug('Decompiling transaction to transaction message');
