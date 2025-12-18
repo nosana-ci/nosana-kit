@@ -86,6 +86,7 @@ export default defineConfig({
             { text: 'Staking', link: '/examples/staking' },
             { text: 'IPFS', link: '/examples/ipfs' },
             { text: 'Transactions', link: '/examples/transactions' },
+            { text: 'Partial Signing', link: '/examples/partial-signing' },
           ],
         },
       ],

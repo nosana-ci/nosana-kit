@@ -86,7 +86,6 @@ const client = createNosanaClient();
 // ---cut---
 import { JobState } from '@nosana/kit';
 import type { Job } from '@nosana/kit';
-
 import { address } from '@nosana/kit';
 
 // Get all running jobs
@@ -112,7 +111,6 @@ import { createNosanaClient, JobState } from '@nosana/kit';
 const client = createNosanaClient();
 // ---cut---
 import type { Job } from '@nosana/kit';
-
 // Get job and automatically check for associated run
 import { address } from '@nosana/kit';
 const job: Job = await client.jobs.get(address('job-address'), true);

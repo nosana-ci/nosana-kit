@@ -7,7 +7,6 @@ import { createNosanaClient } from '@nosana/kit';
 import type { Instruction, Signature } from '@solana/kit';
 const client = createNosanaClient();
 // ---cut---
-
 // Create an instruction
 import { address } from '@nosana/kit';
 const instruction: Instruction = await client.jobs.post({
@@ -28,7 +27,6 @@ import { createNosanaClient } from '@nosana/kit';
 import type { Instruction, Signature } from '@solana/kit';
 const client = createNosanaClient();
 // ---cut---
-
 // Create multiple instructions
 import { address } from '@nosana/kit';
 const instruction1: Instruction = await client.jobs.post({
@@ -55,7 +53,6 @@ import { createNosanaClient } from '@nosana/kit';
 import type { Instruction, Signature } from '@solana/kit';
 const client = createNosanaClient();
 // ---cut---
-
 // Build transaction from instructions
 import { address } from '@nosana/kit';
 const instruction: Instruction = await client.jobs.post({
@@ -81,7 +78,6 @@ import { createNosanaClient } from '@nosana/kit';
 import type { Instruction } from '@solana/kit';
 const client = createNosanaClient();
 // ---cut---
-
 // Get instruction to transfer SOL
 import { address } from '@nosana/kit';
 const transferSolIx: Instruction = await client.solana.transfer({
@@ -101,7 +97,6 @@ import { createNosanaClient } from '@nosana/kit';
 import type { Instruction } from '@solana/kit';
 const client = createNosanaClient();
 // ---cut---
-
 // Get transfer instruction(s)
 // Returns 1 or 2 instructions depending on whether recipient ATA exists
 import { address } from '@nosana/kit';
@@ -121,7 +116,6 @@ import { createNosanaClient } from '@nosana/kit';
 import type { Address } from '@nosana/kit';
 const client = createNosanaClient();
 // ---cut---
-
 // Derive program derived address
 import { address } from '@nosana/kit';
 const programAddress = address('program-address');

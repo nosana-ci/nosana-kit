@@ -7,7 +7,6 @@ import { createNosanaClient } from '@nosana/kit';
 const client = createNosanaClient();
 // ---cut---
 import type { Stake } from '@nosana/kit';
-
 // Get a single stake account
 import { address } from '@nosana/kit';
 const stake: Stake = await client.stake.get(address('stake-account-address'));
@@ -25,7 +24,6 @@ import { createNosanaClient } from '@nosana/kit';
 const client = createNosanaClient();
 // ---cut---
 import type { Stake } from '@nosana/kit';
-
 // Get all stake accounts
 const allStakes: Stake[] = await client.stake.all();
 
@@ -52,7 +50,6 @@ import { createNosanaClient } from '@nosana/kit';
 const client = createNosanaClient();
 // ---cut---
 import type { Stake, Address } from '@nosana/kit';
-
 import { address } from '@nosana/kit';
 const addresses: Address[] = [address('address1'), address('address2'), address('address3')];
 const stakes: Stake[] = await client.stake.multiple(addresses);

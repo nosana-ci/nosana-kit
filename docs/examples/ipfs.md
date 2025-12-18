@@ -49,7 +49,6 @@ import { createNosanaClient } from '@nosana/kit';
 const client = createNosanaClient();
 // ---cut---
 import type { Job } from '@nosana/kit';
-
 // Get a job
 import { address } from '@nosana/kit';
 const job: Job = await client.jobs.get(address('job-address'));

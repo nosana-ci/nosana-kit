@@ -53,3 +53,11 @@
   background-color: var(--vp-code-bg);
   transition: color 0.25s, background-color 0.5s;
 }
+
+/* Temporary fix for line numbers in twoslash blocks with ---cut--- directive
+ * Hides overflow to prevent extra blank lines from showing
+ * TODO: Proper fix that removes extra line number spans without DOM manipulation or CSS
+ */
+.vp-doc div[class*='language-'].line-numbers-mode {
+  overflow-y: hidden;
+}
