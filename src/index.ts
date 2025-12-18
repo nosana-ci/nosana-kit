@@ -30,11 +30,6 @@ export { createJobsProgram, JobState, MarketQueueType } from './services/program
  * @group @nosana/kit
  */
 export type { JobsProgram, Job, Market, Run } from './services/programs/jobs/index.js';
-// Export types - explicitly re-export NosanaNetwork from types to resolve ambiguity
-export * from '@nosana/types';
-export * from '@nosana/endpoints';
-export type * as api from '@nosana/api';
-
 
 /**
  * @group @nosana/kit
