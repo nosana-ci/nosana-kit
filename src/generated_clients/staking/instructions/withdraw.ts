@@ -33,6 +33,15 @@ import {
 import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const WITHDRAW_INSTRUCTION_ACCOUNTS = {
+  user: 0,
+  vault: 1,
+  stake: 2,
+  authority: 3,
+  tokenProgram: 4,
+} as const;
+
+export type WithdrawInstructionAccountName = keyof typeof WITHDRAW_INSTRUCTION_ACCOUNTS;
 export const WITHDRAW_DISCRIMINATOR = new Uint8Array([
   183, 18, 70, 156, 148, 109, 161, 34,
 ]);

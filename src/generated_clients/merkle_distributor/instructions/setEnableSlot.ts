@@ -34,6 +34,12 @@ import {
 import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const SET_ENABLE_SLOT_INSTRUCTION_ACCOUNTS = {
+  distributor: 0,
+  admin: 1,
+} as const;
+
+export type SetEnableSlotInstructionAccountName = keyof typeof SET_ENABLE_SLOT_INSTRUCTION_ACCOUNTS;
 export const SET_ENABLE_SLOT_DISCRIMINATOR = new Uint8Array([
   5, 52, 73, 33, 150, 115, 97, 206,
 ]);

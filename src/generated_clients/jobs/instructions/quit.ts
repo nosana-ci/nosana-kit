@@ -32,6 +32,14 @@ import {
 import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const QUIT_INSTRUCTION_ACCOUNTS = {
+  job: 0,
+  run: 1,
+  payer: 2,
+  authority: 3,
+} as const;
+
+export type QuitInstructionAccountName = keyof typeof QUIT_INSTRUCTION_ACCOUNTS;
 export const QUIT_DISCRIMINATOR = new Uint8Array([
   191, 103, 141, 240, 80, 129, 103, 153,
 ]);

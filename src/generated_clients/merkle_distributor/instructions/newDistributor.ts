@@ -39,6 +39,18 @@ import {
 import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const NEW_DISTRIBUTOR_INSTRUCTION_ACCOUNTS = {
+  distributor: 0,
+  clawbackReceiver: 1,
+  mint: 2,
+  tokenVault: 3,
+  admin: 4,
+  systemProgram: 5,
+  associatedTokenProgram: 6,
+  tokenProgram: 7,
+} as const;
+
+export type NewDistributorInstructionAccountName = keyof typeof NEW_DISTRIBUTOR_INSTRUCTION_ACCOUNTS;
 export const NEW_DISTRIBUTOR_DISCRIMINATOR = new Uint8Array([
   32, 139, 112, 171, 0, 2, 225, 155,
 ]);
