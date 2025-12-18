@@ -37,7 +37,7 @@ import {
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
-} from '@solana/kit';
+} from "@solana/kit";
 
 export const RUN_ACCOUNT_DISCRIMINATOR = new Uint8Array([
   194, 169, 110, 230, 235, 11, 225, 22,
@@ -69,26 +69,26 @@ export type RunAccountArgs = {
 export function getRunAccountEncoder(): FixedSizeEncoder<RunAccountArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['job', getAddressEncoder()],
-      ['node', getAddressEncoder()],
-      ['payer', getAddressEncoder()],
-      ['state', getU8Encoder()],
-      ['time', getI64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["job", getAddressEncoder()],
+      ["node", getAddressEncoder()],
+      ["payer", getAddressEncoder()],
+      ["state", getU8Encoder()],
+      ["time", getI64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: RUN_ACCOUNT_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: RUN_ACCOUNT_DISCRIMINATOR }),
   );
 }
 
 /** Gets the decoder for {@link RunAccount} account data. */
 export function getRunAccountDecoder(): FixedSizeDecoder<RunAccount> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['job', getAddressDecoder()],
-    ['node', getAddressDecoder()],
-    ['payer', getAddressDecoder()],
-    ['state', getU8Decoder()],
-    ['time', getI64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["job", getAddressDecoder()],
+    ["node", getAddressDecoder()],
+    ["payer", getAddressDecoder()],
+    ["state", getU8Decoder()],
+    ["time", getI64Decoder()],
   ]);
 }
 
@@ -101,24 +101,24 @@ export function getRunAccountCodec(): FixedSizeCodec<
 }
 
 export function decodeRunAccount<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress>,
 ): Account<RunAccount, TAddress>;
 export function decodeRunAccount<TAddress extends string = string>(
-  encodedAccount: MaybeEncodedAccount<TAddress>
+  encodedAccount: MaybeEncodedAccount<TAddress>,
 ): MaybeAccount<RunAccount, TAddress>;
 export function decodeRunAccount<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>,
 ): Account<RunAccount, TAddress> | MaybeAccount<RunAccount, TAddress> {
   return decodeAccount(
     encodedAccount as MaybeEncodedAccount<TAddress>,
-    getRunAccountDecoder()
+    getRunAccountDecoder(),
   );
 }
 
 export async function fetchRunAccount<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<Account<RunAccount, TAddress>> {
   const maybeAccount = await fetchMaybeRunAccount(rpc, address, config);
   assertAccountExists(maybeAccount);
@@ -128,7 +128,7 @@ export async function fetchRunAccount<TAddress extends string = string>(
 export async function fetchMaybeRunAccount<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<MaybeAccount<RunAccount, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
   return decodeRunAccount(maybeAccount);
@@ -137,7 +137,7 @@ export async function fetchMaybeRunAccount<TAddress extends string = string>(
 export async function fetchAllRunAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<Account<RunAccount>[]> {
   const maybeAccounts = await fetchAllMaybeRunAccount(rpc, addresses, config);
   assertAccountsExist(maybeAccounts);
@@ -147,7 +147,7 @@ export async function fetchAllRunAccount(
 export async function fetchAllMaybeRunAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<RunAccount>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeRunAccount(maybeAccount));

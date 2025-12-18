@@ -11,8 +11,8 @@ import {
   type Address,
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
-} from '@solana/kit';
-import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
+} from "@solana/kit";
+import { NOSANA_STAKING_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** AmountNotEnough: This amount is not enough. */
 export const NOSANA_STAKING_ERROR__AMOUNT_NOT_ENOUGH = 0x1770; // 6000
@@ -57,7 +57,7 @@ export type NosanaStakingError =
   | typeof NOSANA_STAKING_ERROR__NOT_UNSTAKED;
 
 let nosanaStakingErrorMessages: Record<NosanaStakingError, string> | undefined;
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   nosanaStakingErrorMessages = {
     [NOSANA_STAKING_ERROR__ALREADY_CLAIMED]: `This stake is already claimed.`,
     [NOSANA_STAKING_ERROR__ALREADY_INITIALIZED]: `This stake is already running.`,
@@ -76,13 +76,13 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export function getNosanaStakingErrorMessage(code: NosanaStakingError): string {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     return (nosanaStakingErrorMessages as Record<NosanaStakingError, string>)[
       code
     ];
   }
 
-  return 'Error message not available in production bundles.';
+  return "Error message not available in production bundles.";
 }
 
 export function isNosanaStakingError<
@@ -92,13 +92,13 @@ export function isNosanaStakingError<
   transactionMessage: {
     instructions: Record<number, { programAddress: Address }>;
   },
-  code?: TProgramErrorCode
+  code?: TProgramErrorCode,
 ): error is SolanaError<typeof SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM> &
   Readonly<{ context: Readonly<{ code: TProgramErrorCode }> }> {
   return isProgramError<TProgramErrorCode>(
     error,
     transactionMessage,
     NOSANA_STAKING_PROGRAM_ADDRESS,
-    code
+    code,
   );
 }

@@ -11,8 +11,8 @@ import {
   type Address,
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** InsufficientUnlockedTokens: Insufficient unlocked tokens */
 export const MERKLE_DISTRIBUTOR_ERROR__INSUFFICIENT_UNLOCKED_TOKENS = 0x1770; // 6000
@@ -86,7 +86,7 @@ export type MerkleDistributorError =
 let merkleDistributorErrorMessages:
   | Record<MerkleDistributorError, string>
   | undefined;
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   merkleDistributorErrorMessages = {
     [MERKLE_DISTRIBUTOR_ERROR__ARITHMETIC_ERROR]: `Arithmetic Error (overflow/underflow)`,
     [MERKLE_DISTRIBUTOR_ERROR__CANNOT_CLOSE_CLAIM_STATUS]: `Cannot close claim status`,
@@ -114,15 +114,15 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export function getMerkleDistributorErrorMessage(
-  code: MerkleDistributorError
+  code: MerkleDistributorError,
 ): string {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     return (
       merkleDistributorErrorMessages as Record<MerkleDistributorError, string>
     )[code];
   }
 
-  return 'Error message not available in production bundles.';
+  return "Error message not available in production bundles.";
 }
 
 export function isMerkleDistributorError<
@@ -132,13 +132,13 @@ export function isMerkleDistributorError<
   transactionMessage: {
     instructions: Record<number, { programAddress: Address }>;
   },
-  code?: TProgramErrorCode
+  code?: TProgramErrorCode,
 ): error is SolanaError<typeof SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM> &
   Readonly<{ context: Readonly<{ code: TProgramErrorCode }> }> {
   return isProgramError<TProgramErrorCode>(
     error,
     transactionMessage,
     MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS,
-    code
+    code,
   );
 }

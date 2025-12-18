@@ -26,9 +26,9 @@ import {
   type ReadonlyAccount,
   type ReadonlyUint8Array,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const CLEAN_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -72,14 +72,14 @@ export type CleanInstructionDataArgs = {};
 
 export function getCleanInstructionDataEncoder(): FixedSizeEncoder<CleanInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: CLEAN_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: CLEAN_DISCRIMINATOR }),
   );
 }
 
 export function getCleanInstructionDataDecoder(): FixedSizeDecoder<CleanInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
   ]);
 }
 
@@ -89,7 +89,7 @@ export function getCleanInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getCleanInstructionDataEncoder(),
-    getCleanInstructionDataDecoder()
+    getCleanInstructionDataDecoder(),
   );
 }
 
@@ -110,7 +110,7 @@ export function getCleanInstruction<
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
   input: CleanInput<TAccountJob, TAccountMarket, TAccountPayer>,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): CleanInstruction<
   TProgramAddress,
   TAccountJob,
@@ -131,7 +131,7 @@ export function getCleanInstruction<
     ResolvedAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -167,11 +167,11 @@ export function parseCleanInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCleanInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

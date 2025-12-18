@@ -12,7 +12,7 @@ import {
   getBytesEncoder,
   type Address,
   type ReadonlyUint8Array,
-} from '@solana/kit';
+} from "@solana/kit";
 import {
   type ParsedClaimLockedInstruction,
   type ParsedClawbackInstruction,
@@ -23,10 +23,10 @@ import {
   type ParsedSetAdminInstruction,
   type ParsedSetClawbackReceiverInstruction,
   type ParsedSetEnableSlotInstruction,
-} from '../instructions/index.js';
+} from "../instructions/index.js";
 
 export const MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS =
-  'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425' as Address<'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425'>;
+  "merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425" as Address<"merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425">;
 
 export const MerkleDistributorAccount = {
   ClaimStatus: "ClaimStatus",
@@ -35,16 +35,16 @@ export const MerkleDistributorAccount = {
 export type MerkleDistributorAccount = (typeof MerkleDistributorAccount)[keyof typeof MerkleDistributorAccount];
 
 export function identifyMerkleDistributorAccount(
-  account: { data: ReadonlyUint8Array } | ReadonlyUint8Array
+  account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
 ): MerkleDistributorAccount {
-  const data = 'data' in account ? account.data : account;
+  const data = "data" in account ? account.data : account;
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([22, 183, 249, 157, 247, 95, 150, 96])
+        new Uint8Array([22, 183, 249, 157, 247, 95, 150, 96]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorAccount.ClaimStatus;
@@ -53,15 +53,15 @@ export function identifyMerkleDistributorAccount(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([77, 119, 139, 70, 84, 247, 12, 26])
+        new Uint8Array([77, 119, 139, 70, 84, 247, 12, 26]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorAccount.MerkleDistributor;
   }
   throw new Error(
-    'The provided account could not be identified as a merkleDistributor account.'
+    "The provided account could not be identified as a merkleDistributor account.",
   );
 }
 
@@ -79,16 +79,16 @@ export const MerkleDistributorInstruction = {
 export type MerkleDistributorInstruction = (typeof MerkleDistributorInstruction)[keyof typeof MerkleDistributorInstruction];
 
 export function identifyMerkleDistributorInstruction(
-  instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array
+  instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
 ): MerkleDistributorInstruction {
-  const data = 'data' in instruction ? instruction.data : instruction;
+  const data = "data" in instruction ? instruction.data : instruction;
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([32, 139, 112, 171, 0, 2, 225, 155])
+        new Uint8Array([32, 139, 112, 171, 0, 2, 225, 155]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorInstruction.NewDistributor;
@@ -97,9 +97,9 @@ export function identifyMerkleDistributorInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([202, 56, 180, 143, 46, 104, 106, 112])
+        new Uint8Array([202, 56, 180, 143, 46, 104, 106, 112]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorInstruction.CloseDistributor;
@@ -108,9 +108,9 @@ export function identifyMerkleDistributorInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([163, 214, 191, 165, 245, 188, 17, 185])
+        new Uint8Array([163, 214, 191, 165, 245, 188, 17, 185]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorInstruction.CloseClaimStatus;
@@ -119,9 +119,9 @@ export function identifyMerkleDistributorInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([5, 52, 73, 33, 150, 115, 97, 206])
+        new Uint8Array([5, 52, 73, 33, 150, 115, 97, 206]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorInstruction.SetEnableSlot;
@@ -130,9 +130,9 @@ export function identifyMerkleDistributorInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([78, 177, 98, 123, 210, 21, 187, 83])
+        new Uint8Array([78, 177, 98, 123, 210, 21, 187, 83]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorInstruction.NewClaim;
@@ -141,9 +141,9 @@ export function identifyMerkleDistributorInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([34, 206, 181, 23, 11, 207, 147, 90])
+        new Uint8Array([34, 206, 181, 23, 11, 207, 147, 90]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorInstruction.ClaimLocked;
@@ -152,9 +152,9 @@ export function identifyMerkleDistributorInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([111, 92, 142, 79, 33, 234, 82, 27])
+        new Uint8Array([111, 92, 142, 79, 33, 234, 82, 27]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorInstruction.Clawback;
@@ -163,9 +163,9 @@ export function identifyMerkleDistributorInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([153, 217, 34, 20, 19, 29, 229, 75])
+        new Uint8Array([153, 217, 34, 20, 19, 29, 229, 75]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorInstruction.SetClawbackReceiver;
@@ -174,20 +174,20 @@ export function identifyMerkleDistributorInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([251, 163, 0, 52, 91, 194, 187, 92])
+        new Uint8Array([251, 163, 0, 52, 91, 194, 187, 92]),
       ),
-      0
+      0,
     )
   ) {
     return MerkleDistributorInstruction.SetAdmin;
   }
   throw new Error(
-    'The provided instruction could not be identified as a merkleDistributor instruction.'
+    "The provided instruction could not be identified as a merkleDistributor instruction.",
   );
 }
 
 export type ParsedMerkleDistributorInstruction<
-  TProgram extends string = 'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425',
+  TProgram extends string = "merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425",
 > =
   | ({
       instructionType: typeof MerkleDistributorInstruction.NewDistributor;

@@ -28,9 +28,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const COMPLETE_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -74,17 +74,17 @@ export type CompleteInstructionDataArgs = { ipfsResult: ReadonlyUint8Array };
 export function getCompleteInstructionDataEncoder(): FixedSizeEncoder<CompleteInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['ipfsResult', fixEncoderSize(getBytesEncoder(), 32)],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["ipfsResult", fixEncoderSize(getBytesEncoder(), 32)],
     ]),
-    (value) => ({ ...value, discriminator: COMPLETE_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: COMPLETE_DISCRIMINATOR }),
   );
 }
 
 export function getCompleteInstructionDataDecoder(): FixedSizeDecoder<CompleteInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['ipfsResult', fixDecoderSize(getBytesDecoder(), 32)],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["ipfsResult", fixDecoderSize(getBytesDecoder(), 32)],
   ]);
 }
 
@@ -94,7 +94,7 @@ export function getCompleteInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getCompleteInstructionDataEncoder(),
-    getCompleteInstructionDataDecoder()
+    getCompleteInstructionDataDecoder(),
   );
 }
 
@@ -104,7 +104,7 @@ export type CompleteInput<
 > = {
   job: Address<TAccountJob>;
   authority: TransactionSigner<TAccountAuthority>;
-  ipfsResult: CompleteInstructionDataArgs['ipfsResult'];
+  ipfsResult: CompleteInstructionDataArgs["ipfsResult"];
 };
 
 export function getCompleteInstruction<
@@ -113,7 +113,7 @@ export function getCompleteInstruction<
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
   input: CompleteInput<TAccountJob, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): CompleteInstruction<TProgramAddress, TAccountJob, TAccountAuthority> {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
@@ -131,14 +131,14 @@ export function getCompleteInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
       getAccountMeta(accounts.authority),
     ],
     data: getCompleteInstructionDataEncoder().encode(
-      args as CompleteInstructionDataArgs
+      args as CompleteInstructionDataArgs,
     ),
     programAddress,
   } as CompleteInstruction<TProgramAddress, TAccountJob, TAccountAuthority>);
@@ -162,11 +162,11 @@ export function parseCompleteInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCompleteInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

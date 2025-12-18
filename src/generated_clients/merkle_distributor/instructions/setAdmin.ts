@@ -28,9 +28,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const SET_ADMIN_INSTRUCTION_ACCOUNTS = {
   distributor: 0,
@@ -77,14 +77,14 @@ export type SetAdminInstructionDataArgs = {};
 
 export function getSetAdminInstructionDataEncoder(): FixedSizeEncoder<SetAdminInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: SET_ADMIN_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: SET_ADMIN_DISCRIMINATOR }),
   );
 }
 
 export function getSetAdminInstructionDataDecoder(): FixedSizeDecoder<SetAdminInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
   ]);
 }
 
@@ -94,7 +94,7 @@ export function getSetAdminInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getSetAdminInstructionDataEncoder(),
-    getSetAdminInstructionDataDecoder()
+    getSetAdminInstructionDataDecoder(),
   );
 }
 
@@ -118,7 +118,7 @@ export function getSetAdminInstruction<
   TProgramAddress extends Address = typeof MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS,
 >(
   input: SetAdminInput<TAccountDistributor, TAccountAdmin, TAccountNewAdmin>,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): SetAdminInstruction<
   TProgramAddress,
   TAccountDistributor,
@@ -140,7 +140,7 @@ export function getSetAdminInstruction<
     ResolvedAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.distributor),
@@ -179,11 +179,11 @@ export function parseSetAdminInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetAdminInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

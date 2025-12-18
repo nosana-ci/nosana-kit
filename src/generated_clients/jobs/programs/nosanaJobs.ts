@@ -12,7 +12,7 @@ import {
   getBytesEncoder,
   type Address,
   type ReadonlyUint8Array,
-} from '@solana/kit';
+} from "@solana/kit";
 import {
   type ParsedAssignInstruction,
   type ParsedClaimInstruction,
@@ -33,10 +33,10 @@ import {
   type ParsedStopInstruction,
   type ParsedUpdateInstruction,
   type ParsedWorkInstruction,
-} from '../instructions/index.js';
+} from "../instructions/index.js";
 
 export const NOSANA_JOBS_PROGRAM_ADDRESS =
-  'nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM' as Address<'nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM'>;
+  "nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM" as Address<"nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM">;
 
 export const NosanaJobsAccount = {
   MarketAccount: "MarketAccount",
@@ -46,16 +46,16 @@ export const NosanaJobsAccount = {
 export type NosanaJobsAccount = (typeof NosanaJobsAccount)[keyof typeof NosanaJobsAccount];
 
 export function identifyNosanaJobsAccount(
-  account: { data: ReadonlyUint8Array } | ReadonlyUint8Array
+  account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
 ): NosanaJobsAccount {
-  const data = 'data' in account ? account.data : account;
+  const data = "data" in account ? account.data : account;
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([201, 78, 187, 225, 240, 198, 201, 251])
+        new Uint8Array([201, 78, 187, 225, 240, 198, 201, 251]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsAccount.MarketAccount;
@@ -64,9 +64,9 @@ export function identifyNosanaJobsAccount(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([91, 16, 162, 5, 45, 210, 125, 65])
+        new Uint8Array([91, 16, 162, 5, 45, 210, 125, 65]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsAccount.JobAccount;
@@ -75,15 +75,15 @@ export function identifyNosanaJobsAccount(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([194, 169, 110, 230, 235, 11, 225, 22])
+        new Uint8Array([194, 169, 110, 230, 235, 11, 225, 22]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsAccount.RunAccount;
   }
   throw new Error(
-    'The provided account could not be identified as a nosanaJobs account.'
+    "The provided account could not be identified as a nosanaJobs account.",
   );
 }
 
@@ -111,16 +111,16 @@ export const NosanaJobsInstruction = {
 export type NosanaJobsInstruction = (typeof NosanaJobsInstruction)[keyof typeof NosanaJobsInstruction];
 
 export function identifyNosanaJobsInstruction(
-  instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array
+  instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
 ): NosanaJobsInstruction {
-  const data = 'data' in instruction ? instruction.data : instruction;
+  const data = "data" in instruction ? instruction.data : instruction;
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([228, 220, 155, 71, 199, 189, 60, 45])
+        new Uint8Array([228, 220, 155, 71, 199, 189, 60, 45]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Open;
@@ -129,9 +129,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([219, 200, 88, 176, 158, 63, 253, 127])
+        new Uint8Array([219, 200, 88, 176, 158, 63, 253, 127]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Update;
@@ -140,9 +140,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([98, 165, 201, 177, 108, 65, 206, 96])
+        new Uint8Array([98, 165, 201, 177, 108, 65, 206, 96]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Close;
@@ -151,9 +151,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([202, 182, 185, 142, 208, 161, 145, 189])
+        new Uint8Array([202, 182, 185, 142, 208, 161, 145, 189]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.CloseAdmin;
@@ -162,9 +162,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([73, 66, 125, 203, 81, 41, 64, 135])
+        new Uint8Array([73, 66, 125, 203, 81, 41, 64, 135]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Assign;
@@ -173,9 +173,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([54, 174, 193, 67, 17, 41, 132, 38])
+        new Uint8Array([54, 174, 193, 67, 17, 41, 132, 38]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.List;
@@ -184,9 +184,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([55, 136, 205, 107, 107, 173, 4, 31])
+        new Uint8Array([55, 136, 205, 107, 107, 173, 4, 31]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Delist;
@@ -195,9 +195,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([108, 216, 38, 58, 109, 146, 116, 17])
+        new Uint8Array([108, 216, 38, 58, 109, 146, 116, 17]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Recover;
@@ -206,9 +206,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([228, 127, 0, 1, 227, 154, 54, 168])
+        new Uint8Array([228, 127, 0, 1, 227, 154, 54, 168]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Extend;
@@ -217,9 +217,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([180, 160, 249, 217, 194, 121, 70, 16])
+        new Uint8Array([180, 160, 249, 217, 194, 121, 70, 16]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.End;
@@ -228,9 +228,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([15, 67, 45, 195, 215, 137, 229, 47])
+        new Uint8Array([15, 67, 45, 195, 215, 137, 229, 47]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Work;
@@ -239,9 +239,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([42, 133, 32, 60, 171, 253, 184, 155])
+        new Uint8Array([42, 133, 32, 60, 171, 253, 184, 155]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Stop;
@@ -250,9 +250,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([62, 198, 214, 193, 213, 159, 108, 210])
+        new Uint8Array([62, 198, 214, 193, 213, 159, 108, 210]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Claim;
@@ -261,9 +261,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([0, 77, 224, 147, 136, 25, 88, 76])
+        new Uint8Array([0, 77, 224, 147, 136, 25, 88, 76]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Complete;
@@ -272,9 +272,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([67, 74, 170, 132, 125, 233, 182, 37])
+        new Uint8Array([67, 74, 170, 132, 125, 233, 182, 37]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Finish;
@@ -283,9 +283,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([191, 103, 141, 240, 80, 129, 103, 153])
+        new Uint8Array([191, 103, 141, 240, 80, 129, 103, 153]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Quit;
@@ -294,9 +294,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([103, 238, 110, 8, 182, 20, 56, 196])
+        new Uint8Array([103, 238, 110, 8, 182, 20, 56, 196]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.QuitAdmin;
@@ -305,9 +305,9 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([250, 191, 56, 128, 150, 251, 1, 103])
+        new Uint8Array([250, 191, 56, 128, 150, 251, 1, 103]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.Clean;
@@ -316,20 +316,20 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([245, 90, 188, 68, 253, 235, 171, 105])
+        new Uint8Array([245, 90, 188, 68, 253, 235, 171, 105]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaJobsInstruction.CleanAdmin;
   }
   throw new Error(
-    'The provided instruction could not be identified as a nosanaJobs instruction.'
+    "The provided instruction could not be identified as a nosanaJobs instruction.",
   );
 }
 
 export type ParsedNosanaJobsInstruction<
-  TProgram extends string = 'nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM',
+  TProgram extends string = "nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM",
 > =
   | ({
       instructionType: typeof NosanaJobsInstruction.Open;

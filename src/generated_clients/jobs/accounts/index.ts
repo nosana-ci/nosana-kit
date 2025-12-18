@@ -6,6 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from './jobAccount.js';
-export * from './marketAccount.js';
-export * from './runAccount.js';
+export * from "./jobAccount.js";
+export * from "./marketAccount.js";
+export * from "./runAccount.js";

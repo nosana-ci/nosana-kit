@@ -31,9 +31,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const EXTEND_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -68,9 +68,8 @@ export type ExtendInstruction<
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
   TAccountRewardsProgram extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -120,17 +119,17 @@ export type ExtendInstructionDataArgs = { timeout: number | bigint };
 export function getExtendInstructionDataEncoder(): FixedSizeEncoder<ExtendInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['timeout', getI64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["timeout", getI64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: EXTEND_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: EXTEND_DISCRIMINATOR }),
   );
 }
 
 export function getExtendInstructionDataDecoder(): FixedSizeDecoder<ExtendInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['timeout', getI64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["timeout", getI64Decoder()],
   ]);
 }
 
@@ -140,7 +139,7 @@ export function getExtendInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getExtendInstructionDataEncoder(),
-    getExtendInstructionDataDecoder()
+    getExtendInstructionDataDecoder(),
   );
 }
 
@@ -166,7 +165,7 @@ export type ExtendInput<
   payer: TransactionSigner<TAccountPayer>;
   rewardsProgram: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  timeout: ExtendInstructionDataArgs['timeout'];
+  timeout: ExtendInstructionDataArgs["timeout"];
 };
 
 export function getExtendInstruction<
@@ -194,7 +193,7 @@ export function getExtendInstruction<
     TAccountRewardsProgram,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): ExtendInstruction<
   TProgramAddress,
   TAccountJob,
@@ -238,10 +237,10 @@ export function getExtendInstruction<
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -256,7 +255,7 @@ export function getExtendInstruction<
       getAccountMeta(accounts.tokenProgram),
     ],
     data: getExtendInstructionDataEncoder().encode(
-      args as ExtendInstructionDataArgs
+      args as ExtendInstructionDataArgs,
     ),
     programAddress,
   } as ExtendInstruction<
@@ -300,11 +299,11 @@ export function parseExtendInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedExtendInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 10) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

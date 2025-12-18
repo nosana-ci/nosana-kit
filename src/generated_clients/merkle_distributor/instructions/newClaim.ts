@@ -33,9 +33,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const NEW_CLAIM_INSTRUCTION_ACCOUNTS = {
   distributor: 0,
@@ -63,12 +63,10 @@ export type NewClaimInstruction<
   TAccountFrom extends string | AccountMeta<string> = string,
   TAccountTo extends string | AccountMeta<string> = string,
   TAccountClaimant extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = '11111111111111111111111111111111',
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -114,21 +112,21 @@ export type NewClaimInstructionDataArgs = {
 export function getNewClaimInstructionDataEncoder(): Encoder<NewClaimInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['amountUnlocked', getU64Encoder()],
-      ['amountLocked', getU64Encoder()],
-      ['proof', getArrayEncoder(fixEncoderSize(getBytesEncoder(), 32))],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["amountUnlocked", getU64Encoder()],
+      ["amountLocked", getU64Encoder()],
+      ["proof", getArrayEncoder(fixEncoderSize(getBytesEncoder(), 32))],
     ]),
-    (value) => ({ ...value, discriminator: NEW_CLAIM_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: NEW_CLAIM_DISCRIMINATOR }),
   );
 }
 
 export function getNewClaimInstructionDataDecoder(): Decoder<NewClaimInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['amountUnlocked', getU64Decoder()],
-    ['amountLocked', getU64Decoder()],
-    ['proof', getArrayDecoder(fixDecoderSize(getBytesDecoder(), 32))],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["amountUnlocked", getU64Decoder()],
+    ["amountLocked", getU64Decoder()],
+    ["proof", getArrayDecoder(fixDecoderSize(getBytesDecoder(), 32))],
   ]);
 }
 
@@ -138,7 +136,7 @@ export function getNewClaimInstructionDataCodec(): Codec<
 > {
   return combineCodec(
     getNewClaimInstructionDataEncoder(),
-    getNewClaimInstructionDataDecoder()
+    getNewClaimInstructionDataDecoder(),
   );
 }
 
@@ -165,9 +163,9 @@ export type NewClaimInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   /** The [System] program. */
   systemProgram?: Address<TAccountSystemProgram>;
-  amountUnlocked: NewClaimInstructionDataArgs['amountUnlocked'];
-  amountLocked: NewClaimInstructionDataArgs['amountLocked'];
-  proof: NewClaimInstructionDataArgs['proof'];
+  amountUnlocked: NewClaimInstructionDataArgs["amountUnlocked"];
+  amountLocked: NewClaimInstructionDataArgs["amountLocked"];
+  proof: NewClaimInstructionDataArgs["proof"];
 };
 
 export function getNewClaimInstruction<
@@ -189,7 +187,7 @@ export function getNewClaimInstruction<
     TAccountTokenProgram,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): NewClaimInstruction<
   TProgramAddress,
   TAccountDistributor,
@@ -225,14 +223,14 @@ export function getNewClaimInstruction<
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
-      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.distributor),
@@ -244,7 +242,7 @@ export function getNewClaimInstruction<
       getAccountMeta(accounts.systemProgram),
     ],
     data: getNewClaimInstructionDataEncoder().encode(
-      args as NewClaimInstructionDataArgs
+      args as NewClaimInstructionDataArgs,
     ),
     programAddress,
   } as NewClaimInstruction<
@@ -289,11 +287,11 @@ export function parseNewClaimInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedNewClaimInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

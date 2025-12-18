@@ -37,7 +37,7 @@ import {
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
-} from '@solana/kit';
+} from "@solana/kit";
 
 export const CLAIM_STATUS_DISCRIMINATOR = new Uint8Array([
   22, 183, 249, 157, 247, 95, 150, 96,
@@ -45,7 +45,7 @@ export const CLAIM_STATUS_DISCRIMINATOR = new Uint8Array([
 
 export function getClaimStatusDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CLAIM_STATUS_DISCRIMINATOR
+    CLAIM_STATUS_DISCRIMINATOR,
   );
 }
 
@@ -89,30 +89,30 @@ export type ClaimStatusArgs = {
 export function getClaimStatusEncoder(): FixedSizeEncoder<ClaimStatusArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['claimant', getAddressEncoder()],
-      ['lockedAmount', getU64Encoder()],
-      ['lockedAmountWithdrawn', getU64Encoder()],
-      ['unlockedAmount', getU64Encoder()],
-      ['unlockedAmountClaimed', getU64Encoder()],
-      ['closable', getBooleanEncoder()],
-      ['distributor', getAddressEncoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["claimant", getAddressEncoder()],
+      ["lockedAmount", getU64Encoder()],
+      ["lockedAmountWithdrawn", getU64Encoder()],
+      ["unlockedAmount", getU64Encoder()],
+      ["unlockedAmountClaimed", getU64Encoder()],
+      ["closable", getBooleanEncoder()],
+      ["distributor", getAddressEncoder()],
     ]),
-    (value) => ({ ...value, discriminator: CLAIM_STATUS_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: CLAIM_STATUS_DISCRIMINATOR }),
   );
 }
 
 /** Gets the decoder for {@link ClaimStatus} account data. */
 export function getClaimStatusDecoder(): FixedSizeDecoder<ClaimStatus> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['claimant', getAddressDecoder()],
-    ['lockedAmount', getU64Decoder()],
-    ['lockedAmountWithdrawn', getU64Decoder()],
-    ['unlockedAmount', getU64Decoder()],
-    ['unlockedAmountClaimed', getU64Decoder()],
-    ['closable', getBooleanDecoder()],
-    ['distributor', getAddressDecoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["claimant", getAddressDecoder()],
+    ["lockedAmount", getU64Decoder()],
+    ["lockedAmountWithdrawn", getU64Decoder()],
+    ["unlockedAmount", getU64Decoder()],
+    ["unlockedAmountClaimed", getU64Decoder()],
+    ["closable", getBooleanDecoder()],
+    ["distributor", getAddressDecoder()],
   ]);
 }
 
@@ -125,24 +125,24 @@ export function getClaimStatusCodec(): FixedSizeCodec<
 }
 
 export function decodeClaimStatus<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress>,
 ): Account<ClaimStatus, TAddress>;
 export function decodeClaimStatus<TAddress extends string = string>(
-  encodedAccount: MaybeEncodedAccount<TAddress>
+  encodedAccount: MaybeEncodedAccount<TAddress>,
 ): MaybeAccount<ClaimStatus, TAddress>;
 export function decodeClaimStatus<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>,
 ): Account<ClaimStatus, TAddress> | MaybeAccount<ClaimStatus, TAddress> {
   return decodeAccount(
     encodedAccount as MaybeEncodedAccount<TAddress>,
-    getClaimStatusDecoder()
+    getClaimStatusDecoder(),
   );
 }
 
 export async function fetchClaimStatus<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<Account<ClaimStatus, TAddress>> {
   const maybeAccount = await fetchMaybeClaimStatus(rpc, address, config);
   assertAccountExists(maybeAccount);
@@ -152,7 +152,7 @@ export async function fetchClaimStatus<TAddress extends string = string>(
 export async function fetchMaybeClaimStatus<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<MaybeAccount<ClaimStatus, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
   return decodeClaimStatus(maybeAccount);
@@ -161,7 +161,7 @@ export async function fetchMaybeClaimStatus<TAddress extends string = string>(
 export async function fetchAllClaimStatus(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<Account<ClaimStatus>[]> {
   const maybeAccounts = await fetchAllMaybeClaimStatus(rpc, addresses, config);
   assertAccountsExist(maybeAccounts);
@@ -171,7 +171,7 @@ export async function fetchAllClaimStatus(
 export async function fetchAllMaybeClaimStatus(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ClaimStatus>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeClaimStatus(maybeAccount));

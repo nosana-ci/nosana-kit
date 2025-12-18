@@ -35,9 +35,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const NEW_DISTRIBUTOR_INSTRUCTION_ACCOUNTS = {
   distributor: 0,
@@ -57,7 +57,7 @@ export const NEW_DISTRIBUTOR_DISCRIMINATOR = new Uint8Array([
 
 export function getNewDistributorDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    NEW_DISTRIBUTOR_DISCRIMINATOR
+    NEW_DISTRIBUTOR_DISCRIMINATOR,
   );
 }
 
@@ -68,13 +68,11 @@ export type NewDistributorInstruction<
   TAccountMint extends string | AccountMeta<string> = string,
   TAccountTokenVault extends string | AccountMeta<string> = string,
   TAccountAdmin extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = '11111111111111111111111111111111',
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TAccountAssociatedTokenProgram extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -137,33 +135,33 @@ export type NewDistributorInstructionDataArgs = {
 export function getNewDistributorInstructionDataEncoder(): FixedSizeEncoder<NewDistributorInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['version', getU64Encoder()],
-      ['root', fixEncoderSize(getBytesEncoder(), 32)],
-      ['maxTotalClaim', getU64Encoder()],
-      ['maxNumNodes', getU64Encoder()],
-      ['startVestingTs', getI64Encoder()],
-      ['endVestingTs', getI64Encoder()],
-      ['clawbackStartTs', getI64Encoder()],
-      ['enableSlot', getU64Encoder()],
-      ['closable', getBooleanEncoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["version", getU64Encoder()],
+      ["root", fixEncoderSize(getBytesEncoder(), 32)],
+      ["maxTotalClaim", getU64Encoder()],
+      ["maxNumNodes", getU64Encoder()],
+      ["startVestingTs", getI64Encoder()],
+      ["endVestingTs", getI64Encoder()],
+      ["clawbackStartTs", getI64Encoder()],
+      ["enableSlot", getU64Encoder()],
+      ["closable", getBooleanEncoder()],
     ]),
-    (value) => ({ ...value, discriminator: NEW_DISTRIBUTOR_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: NEW_DISTRIBUTOR_DISCRIMINATOR }),
   );
 }
 
 export function getNewDistributorInstructionDataDecoder(): FixedSizeDecoder<NewDistributorInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['version', getU64Decoder()],
-    ['root', fixDecoderSize(getBytesDecoder(), 32)],
-    ['maxTotalClaim', getU64Decoder()],
-    ['maxNumNodes', getU64Decoder()],
-    ['startVestingTs', getI64Decoder()],
-    ['endVestingTs', getI64Decoder()],
-    ['clawbackStartTs', getI64Decoder()],
-    ['enableSlot', getU64Decoder()],
-    ['closable', getBooleanDecoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["version", getU64Decoder()],
+    ["root", fixDecoderSize(getBytesDecoder(), 32)],
+    ["maxTotalClaim", getU64Decoder()],
+    ["maxNumNodes", getU64Decoder()],
+    ["startVestingTs", getI64Decoder()],
+    ["endVestingTs", getI64Decoder()],
+    ["clawbackStartTs", getI64Decoder()],
+    ["enableSlot", getU64Decoder()],
+    ["closable", getBooleanDecoder()],
   ]);
 }
 
@@ -173,7 +171,7 @@ export function getNewDistributorInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getNewDistributorInstructionDataEncoder(),
-    getNewDistributorInstructionDataDecoder()
+    getNewDistributorInstructionDataDecoder(),
   );
 }
 
@@ -209,15 +207,15 @@ export type NewDistributorInput<
   associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
   /** The [Token] program. */
   tokenProgram?: Address<TAccountTokenProgram>;
-  version: NewDistributorInstructionDataArgs['version'];
-  root: NewDistributorInstructionDataArgs['root'];
-  maxTotalClaim: NewDistributorInstructionDataArgs['maxTotalClaim'];
-  maxNumNodes: NewDistributorInstructionDataArgs['maxNumNodes'];
-  startVestingTs: NewDistributorInstructionDataArgs['startVestingTs'];
-  endVestingTs: NewDistributorInstructionDataArgs['endVestingTs'];
-  clawbackStartTs: NewDistributorInstructionDataArgs['clawbackStartTs'];
-  enableSlot: NewDistributorInstructionDataArgs['enableSlot'];
-  closable: NewDistributorInstructionDataArgs['closable'];
+  version: NewDistributorInstructionDataArgs["version"];
+  root: NewDistributorInstructionDataArgs["root"];
+  maxTotalClaim: NewDistributorInstructionDataArgs["maxTotalClaim"];
+  maxNumNodes: NewDistributorInstructionDataArgs["maxNumNodes"];
+  startVestingTs: NewDistributorInstructionDataArgs["startVestingTs"];
+  endVestingTs: NewDistributorInstructionDataArgs["endVestingTs"];
+  clawbackStartTs: NewDistributorInstructionDataArgs["clawbackStartTs"];
+  enableSlot: NewDistributorInstructionDataArgs["enableSlot"];
+  closable: NewDistributorInstructionDataArgs["closable"];
 };
 
 export function getNewDistributorInstruction<
@@ -241,7 +239,7 @@ export function getNewDistributorInstruction<
     TAccountAssociatedTokenProgram,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): NewDistributorInstruction<
   TProgramAddress,
   TAccountDistributor,
@@ -285,14 +283,14 @@ export function getNewDistributorInstruction<
   // Resolve default values.
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
-      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.distributor),
@@ -305,7 +303,7 @@ export function getNewDistributorInstruction<
       getAccountMeta(accounts.tokenProgram),
     ],
     data: getNewDistributorInstructionDataEncoder().encode(
-      args as NewDistributorInstructionDataArgs
+      args as NewDistributorInstructionDataArgs,
     ),
     programAddress,
   } as NewDistributorInstruction<
@@ -359,11 +357,11 @@ export function parseNewDistributorInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedNewDistributorInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {
