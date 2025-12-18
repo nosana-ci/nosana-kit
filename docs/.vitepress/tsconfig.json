@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "typeRoots": ["../../node_modules/@types", "../../node_modules"]
+  },
+  "include": [
+    "../../src/**/*",
+    "../../dist/**/*.d.ts",
+    "**/*.ts",
+    "**/*.vue"
+  ],
+  "exclude": [
+    "node_modules",
+    "../../node_modules",
+    "../../tests"
+  ]
+}

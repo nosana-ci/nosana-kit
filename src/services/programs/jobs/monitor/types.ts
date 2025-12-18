@@ -2,6 +2,7 @@ import type { Job, Market, Run } from '../JobsProgram.js';
 
 /**
  * Monitor event type constants
+ * @group @nosana/kit
  */
 export const MonitorEventType = {
   JOB: 'job',
@@ -13,6 +14,7 @@ export type MonitorEventType = (typeof MonitorEventType)[keyof typeof MonitorEve
 
 /**
  * Simple monitor event (run accounts are auto-merged into job events)
+ * @group @nosana/kit
  */
 export type SimpleMonitorEvent =
   | { type: typeof MonitorEventType.JOB; data: Job }
@@ -20,5 +22,6 @@ export type SimpleMonitorEvent =
 
 /**
  * Event types for monitoring (extends SimpleMonitorEvent with run events)
+ * @group @nosana/kit
  */
 export type MonitorEvent = SimpleMonitorEvent | { type: typeof MonitorEventType.RUN; data: Run };

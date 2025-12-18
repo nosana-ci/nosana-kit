@@ -21,6 +21,7 @@ import type { ProgramDeps } from './types.js';
 /**
  * The Nosana client interface. Contains all the services and programs
  * needed to interact with the Nosana network.
+ * @group @nosana/kit
  */
 export interface NosanaClient {
   readonly config: ClientConfig;

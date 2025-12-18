@@ -31,6 +31,7 @@ import type { SolanaService } from '../solana/index.js';
 
 /**
  * Dependencies for TokenService
+ * @group @nosana/kit
  */
 export interface TokenServiceDeps {
   logger: Logger;
@@ -40,6 +41,7 @@ export interface TokenServiceDeps {
 
 /**
  * Config for TokenService
+ * @group @nosana/kit
  */
 export interface TokenServiceConfig {
   tokenAddress: Address;
@@ -47,6 +49,7 @@ export interface TokenServiceConfig {
 
 /**
  * TokenService interface
+ * @group @nosana/kit
  */
 export interface TokenService {
   getAllTokenHolders(options?: {

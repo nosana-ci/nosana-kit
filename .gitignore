@@ -29,7 +29,10 @@ yarn-error.log*
 .DS_Store
 Thumbs.db 
 
-# Examples
-examples/node/accounts.json
-v2
-testsv2
+# VitePress build output
+docs/.vitepress/dist/
+# VitePress cache
+docs/.vitepress/cache/
+
+# Generated API docs
+docs/api/

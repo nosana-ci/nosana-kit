@@ -9,6 +9,7 @@ export type ConvertBigIntToNumber<T> = {
 
 /**
  * Type helper to convert bigint to number and ReadonlyUint8Array to string
+ * @group @nosana/kit
  */
 export type ConvertTypesForDb<T> = {
   [K in keyof T]: T[K] extends bigint

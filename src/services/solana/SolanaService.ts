@@ -73,6 +73,7 @@ function estimateAndSetComputeUnitLimitFactory(
 
 /**
  * Dependencies for SolanaService
+ * @group @nosana/kit
  */
 export interface SolanaServiceDeps {
   logger: Logger;
@@ -81,6 +82,7 @@ export interface SolanaServiceDeps {
 
 /**
  * Solana service interface
+ * @group @nosana/kit
  */
 export interface SolanaService {
   readonly config: SolanaConfig;
@@ -233,6 +235,7 @@ export interface SolanaService {
 
 /**
  * Creates a Solana service instance.
+ * @group @nosana/kit
  */
 export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfig): SolanaService {
   if (!config.rpcEndpoint) {
