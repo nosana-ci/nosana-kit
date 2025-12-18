@@ -35,7 +35,7 @@ import {
   TransactionPartialSigner,
   decompileTransactionMessage,
   getCompiledTransactionMessageDecoder,
-  TransactionWithinSizeLimit,
+  assertIsTransactionWithinSizeLimit,
 } from '@solana/kit';
 import {
   estimateComputeUnitLimitFactory,
@@ -183,7 +183,7 @@ export interface SolanaService {
    * @returns The signed transaction with additional signatures
    */
   signTransactionWithSigners(
-    transaction: Transaction & TransactionWithBlockhashLifetime & TransactionWithinSizeLimit,
+    transaction: Transaction & TransactionWithBlockhashLifetime,
     signers: TransactionPartialSigner[]
   ): Promise<SendableTransaction & Transaction & TransactionWithBlockhashLifetime>;
   /**
@@ -721,13 +721,14 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
      * @returns The signed transaction with additional signatures
      */
     async signTransactionWithSigners(
-      transaction: Transaction & TransactionWithBlockhashLifetime & TransactionWithinSizeLimit,
+      transaction: Transaction & TransactionWithBlockhashLifetime,
       signers: TransactionPartialSigner[]
     ): Promise<SendableTransaction & Transaction & TransactionWithBlockhashLifetime> {
       try {
         deps.logger.debug(
           `Signing transaction with ${signers.length} signer(s): ${signers.map((s) => s.address).join(', ')}`
         );
+        assertIsTransactionWithinSizeLimit(transaction);
 
         // Sign with each signer and merge signatures into the transaction
         // TransactionPartialSigner.signTransactions returns SignatureDictionary[] (not transactions)
@@ -771,7 +772,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
      * @returns The decompiled transaction message (with either blockhash or durable nonce lifetime)
      */
     decompileTransaction(
-      transaction: Transaction & TransactionWithBlockhashLifetime
+      transaction: Transaction
     ): BaseTransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime {
       try {
         deps.logger.debug('Decompiling transaction to transaction message');
