@@ -6,5 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from './claimStatus.js';
-export * from './merkleDistributor.js';
+export * from "./claimStatus.js";
+export * from "./merkleDistributor.js";

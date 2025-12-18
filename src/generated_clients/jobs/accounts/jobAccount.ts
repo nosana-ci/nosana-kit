@@ -39,7 +39,7 @@ import {
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
-} from '@solana/kit';
+} from "@solana/kit";
 
 export const JOB_ACCOUNT_DISCRIMINATOR = new Uint8Array([
   91, 16, 162, 5, 45, 210, 125, 65,
@@ -83,38 +83,38 @@ export type JobAccountArgs = {
 export function getJobAccountEncoder(): FixedSizeEncoder<JobAccountArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['ipfsJob', fixEncoderSize(getBytesEncoder(), 32)],
-      ['ipfsResult', fixEncoderSize(getBytesEncoder(), 32)],
-      ['market', getAddressEncoder()],
-      ['node', getAddressEncoder()],
-      ['payer', getAddressEncoder()],
-      ['price', getU64Encoder()],
-      ['project', getAddressEncoder()],
-      ['state', getU8Encoder()],
-      ['timeEnd', getI64Encoder()],
-      ['timeStart', getI64Encoder()],
-      ['timeout', getI64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["ipfsJob", fixEncoderSize(getBytesEncoder(), 32)],
+      ["ipfsResult", fixEncoderSize(getBytesEncoder(), 32)],
+      ["market", getAddressEncoder()],
+      ["node", getAddressEncoder()],
+      ["payer", getAddressEncoder()],
+      ["price", getU64Encoder()],
+      ["project", getAddressEncoder()],
+      ["state", getU8Encoder()],
+      ["timeEnd", getI64Encoder()],
+      ["timeStart", getI64Encoder()],
+      ["timeout", getI64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: JOB_ACCOUNT_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: JOB_ACCOUNT_DISCRIMINATOR }),
   );
 }
 
 /** Gets the decoder for {@link JobAccount} account data. */
 export function getJobAccountDecoder(): FixedSizeDecoder<JobAccount> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['ipfsJob', fixDecoderSize(getBytesDecoder(), 32)],
-    ['ipfsResult', fixDecoderSize(getBytesDecoder(), 32)],
-    ['market', getAddressDecoder()],
-    ['node', getAddressDecoder()],
-    ['payer', getAddressDecoder()],
-    ['price', getU64Decoder()],
-    ['project', getAddressDecoder()],
-    ['state', getU8Decoder()],
-    ['timeEnd', getI64Decoder()],
-    ['timeStart', getI64Decoder()],
-    ['timeout', getI64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["ipfsJob", fixDecoderSize(getBytesDecoder(), 32)],
+    ["ipfsResult", fixDecoderSize(getBytesDecoder(), 32)],
+    ["market", getAddressDecoder()],
+    ["node", getAddressDecoder()],
+    ["payer", getAddressDecoder()],
+    ["price", getU64Decoder()],
+    ["project", getAddressDecoder()],
+    ["state", getU8Decoder()],
+    ["timeEnd", getI64Decoder()],
+    ["timeStart", getI64Decoder()],
+    ["timeout", getI64Decoder()],
   ]);
 }
 
@@ -127,24 +127,24 @@ export function getJobAccountCodec(): FixedSizeCodec<
 }
 
 export function decodeJobAccount<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress>,
 ): Account<JobAccount, TAddress>;
 export function decodeJobAccount<TAddress extends string = string>(
-  encodedAccount: MaybeEncodedAccount<TAddress>
+  encodedAccount: MaybeEncodedAccount<TAddress>,
 ): MaybeAccount<JobAccount, TAddress>;
 export function decodeJobAccount<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>,
 ): Account<JobAccount, TAddress> | MaybeAccount<JobAccount, TAddress> {
   return decodeAccount(
     encodedAccount as MaybeEncodedAccount<TAddress>,
-    getJobAccountDecoder()
+    getJobAccountDecoder(),
   );
 }
 
 export async function fetchJobAccount<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<Account<JobAccount, TAddress>> {
   const maybeAccount = await fetchMaybeJobAccount(rpc, address, config);
   assertAccountExists(maybeAccount);
@@ -154,7 +154,7 @@ export async function fetchJobAccount<TAddress extends string = string>(
 export async function fetchMaybeJobAccount<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<MaybeAccount<JobAccount, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
   return decodeJobAccount(maybeAccount);
@@ -163,7 +163,7 @@ export async function fetchMaybeJobAccount<TAddress extends string = string>(
 export async function fetchAllJobAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<Account<JobAccount>[]> {
   const maybeAccounts = await fetchAllMaybeJobAccount(rpc, addresses, config);
   assertAccountsExist(maybeAccounts);
@@ -173,7 +173,7 @@ export async function fetchAllJobAccount(
 export async function fetchAllMaybeJobAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<JobAccount>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeJobAccount(maybeAccount));

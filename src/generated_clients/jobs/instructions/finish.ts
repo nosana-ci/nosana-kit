@@ -29,9 +29,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const FINISH_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -68,9 +68,8 @@ export type FinishInstruction<
   TAccountPayerRun extends string | AccountMeta<string> = string,
   TAccountProject extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -120,17 +119,17 @@ export type FinishInstructionDataArgs = { ipfsResult: ReadonlyUint8Array };
 export function getFinishInstructionDataEncoder(): FixedSizeEncoder<FinishInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['ipfsResult', fixEncoderSize(getBytesEncoder(), 32)],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["ipfsResult", fixEncoderSize(getBytesEncoder(), 32)],
     ]),
-    (value) => ({ ...value, discriminator: FINISH_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: FINISH_DISCRIMINATOR }),
   );
 }
 
 export function getFinishInstructionDataDecoder(): FixedSizeDecoder<FinishInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['ipfsResult', fixDecoderSize(getBytesDecoder(), 32)],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["ipfsResult", fixDecoderSize(getBytesDecoder(), 32)],
   ]);
 }
 
@@ -140,7 +139,7 @@ export function getFinishInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getFinishInstructionDataEncoder(),
-    getFinishInstructionDataDecoder()
+    getFinishInstructionDataDecoder(),
   );
 }
 
@@ -168,7 +167,7 @@ export type FinishInput<
   project: Address<TAccountProject>;
   authority: TransactionSigner<TAccountAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  ipfsResult: FinishInstructionDataArgs['ipfsResult'];
+  ipfsResult: FinishInstructionDataArgs["ipfsResult"];
 };
 
 export function getFinishInstruction<
@@ -198,7 +197,7 @@ export function getFinishInstruction<
     TAccountAuthority,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): FinishInstruction<
   TProgramAddress,
   TAccountJob,
@@ -241,10 +240,10 @@ export function getFinishInstruction<
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -260,7 +259,7 @@ export function getFinishInstruction<
       getAccountMeta(accounts.tokenProgram),
     ],
     data: getFinishInstructionDataEncoder().encode(
-      args as FinishInstructionDataArgs
+      args as FinishInstructionDataArgs,
     ),
     programAddress,
   } as FinishInstruction<
@@ -306,11 +305,11 @@ export function parseFinishInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedFinishInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

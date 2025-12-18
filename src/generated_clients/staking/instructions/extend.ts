@@ -30,9 +30,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_STAKING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const EXTEND_INSTRUCTION_ACCOUNTS = {
   stake: 0,
@@ -78,17 +78,17 @@ export type ExtendInstructionDataArgs = { duration: number | bigint };
 export function getExtendInstructionDataEncoder(): FixedSizeEncoder<ExtendInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['duration', getU64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["duration", getU64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: EXTEND_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: EXTEND_DISCRIMINATOR }),
   );
 }
 
 export function getExtendInstructionDataDecoder(): FixedSizeDecoder<ExtendInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['duration', getU64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["duration", getU64Decoder()],
   ]);
 }
 
@@ -98,7 +98,7 @@ export function getExtendInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getExtendInstructionDataEncoder(),
-    getExtendInstructionDataDecoder()
+    getExtendInstructionDataDecoder(),
   );
 }
 
@@ -108,7 +108,7 @@ export type ExtendInput<
 > = {
   stake: Address<TAccountStake>;
   authority: TransactionSigner<TAccountAuthority>;
-  duration: ExtendInstructionDataArgs['duration'];
+  duration: ExtendInstructionDataArgs["duration"];
 };
 
 export function getExtendInstruction<
@@ -117,7 +117,7 @@ export function getExtendInstruction<
   TProgramAddress extends Address = typeof NOSANA_STAKING_PROGRAM_ADDRESS,
 >(
   input: ExtendInput<TAccountStake, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): ExtendInstruction<TProgramAddress, TAccountStake, TAccountAuthority> {
   // Program address.
   const programAddress =
@@ -136,14 +136,14 @@ export function getExtendInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.stake),
       getAccountMeta(accounts.authority),
     ],
     data: getExtendInstructionDataEncoder().encode(
-      args as ExtendInstructionDataArgs
+      args as ExtendInstructionDataArgs,
     ),
     programAddress,
   } as ExtendInstruction<TProgramAddress, TAccountStake, TAccountAuthority>);
@@ -167,11 +167,11 @@ export function parseExtendInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedExtendInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

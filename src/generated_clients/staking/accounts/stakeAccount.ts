@@ -41,7 +41,7 @@ import {
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
-} from '@solana/kit';
+} from "@solana/kit";
 
 export const STAKE_ACCOUNT_DISCRIMINATOR = new Uint8Array([
   80, 158, 67, 124, 50, 189, 192, 255,
@@ -49,7 +49,7 @@ export const STAKE_ACCOUNT_DISCRIMINATOR = new Uint8Array([
 
 export function getStakeAccountDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    STAKE_ACCOUNT_DISCRIMINATOR
+    STAKE_ACCOUNT_DISCRIMINATOR,
   );
 }
 
@@ -78,30 +78,30 @@ export type StakeAccountArgs = {
 export function getStakeAccountEncoder(): FixedSizeEncoder<StakeAccountArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['amount', getU64Encoder()],
-      ['authority', getAddressEncoder()],
-      ['duration', getU64Encoder()],
-      ['timeUnstake', getI64Encoder()],
-      ['vault', getAddressEncoder()],
-      ['vaultBump', getU8Encoder()],
-      ['xnos', getU128Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["amount", getU64Encoder()],
+      ["authority", getAddressEncoder()],
+      ["duration", getU64Encoder()],
+      ["timeUnstake", getI64Encoder()],
+      ["vault", getAddressEncoder()],
+      ["vaultBump", getU8Encoder()],
+      ["xnos", getU128Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: STAKE_ACCOUNT_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: STAKE_ACCOUNT_DISCRIMINATOR }),
   );
 }
 
 /** Gets the decoder for {@link StakeAccount} account data. */
 export function getStakeAccountDecoder(): FixedSizeDecoder<StakeAccount> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['amount', getU64Decoder()],
-    ['authority', getAddressDecoder()],
-    ['duration', getU64Decoder()],
-    ['timeUnstake', getI64Decoder()],
-    ['vault', getAddressDecoder()],
-    ['vaultBump', getU8Decoder()],
-    ['xnos', getU128Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["amount", getU64Decoder()],
+    ["authority", getAddressDecoder()],
+    ["duration", getU64Decoder()],
+    ["timeUnstake", getI64Decoder()],
+    ["vault", getAddressDecoder()],
+    ["vaultBump", getU8Decoder()],
+    ["xnos", getU128Decoder()],
   ]);
 }
 
@@ -114,24 +114,24 @@ export function getStakeAccountCodec(): FixedSizeCodec<
 }
 
 export function decodeStakeAccount<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress>,
 ): Account<StakeAccount, TAddress>;
 export function decodeStakeAccount<TAddress extends string = string>(
-  encodedAccount: MaybeEncodedAccount<TAddress>
+  encodedAccount: MaybeEncodedAccount<TAddress>,
 ): MaybeAccount<StakeAccount, TAddress>;
 export function decodeStakeAccount<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>,
 ): Account<StakeAccount, TAddress> | MaybeAccount<StakeAccount, TAddress> {
   return decodeAccount(
     encodedAccount as MaybeEncodedAccount<TAddress>,
-    getStakeAccountDecoder()
+    getStakeAccountDecoder(),
   );
 }
 
 export async function fetchStakeAccount<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<Account<StakeAccount, TAddress>> {
   const maybeAccount = await fetchMaybeStakeAccount(rpc, address, config);
   assertAccountExists(maybeAccount);
@@ -141,7 +141,7 @@ export async function fetchStakeAccount<TAddress extends string = string>(
 export async function fetchMaybeStakeAccount<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<MaybeAccount<StakeAccount, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
   return decodeStakeAccount(maybeAccount);
@@ -150,7 +150,7 @@ export async function fetchMaybeStakeAccount<TAddress extends string = string>(
 export async function fetchAllStakeAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<Account<StakeAccount>[]> {
   const maybeAccounts = await fetchAllMaybeStakeAccount(rpc, addresses, config);
   assertAccountsExist(maybeAccounts);
@@ -160,7 +160,7 @@ export async function fetchAllStakeAccount(
 export async function fetchAllMaybeStakeAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<StakeAccount>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeStakeAccount(maybeAccount));

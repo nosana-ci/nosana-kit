@@ -6,5 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from './settingsAccount.js';
-export * from './stakeAccount.js';
+export * from "./settingsAccount.js";
+export * from "./stakeAccount.js";

@@ -29,9 +29,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const CLOSE_CLAIM_STATUS_INSTRUCTION_ACCOUNTS = {
   claimStatus: 0,
@@ -47,7 +47,7 @@ export const CLOSE_CLAIM_STATUS_DISCRIMINATOR = new Uint8Array([
 
 export function getCloseClaimStatusDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CLOSE_CLAIM_STATUS_DISCRIMINATOR
+    CLOSE_CLAIM_STATUS_DISCRIMINATOR,
   );
 }
 
@@ -87,14 +87,14 @@ export type CloseClaimStatusInstructionDataArgs = {};
 
 export function getCloseClaimStatusInstructionDataEncoder(): FixedSizeEncoder<CloseClaimStatusInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: CLOSE_CLAIM_STATUS_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: CLOSE_CLAIM_STATUS_DISCRIMINATOR }),
   );
 }
 
 export function getCloseClaimStatusInstructionDataDecoder(): FixedSizeDecoder<CloseClaimStatusInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
   ]);
 }
 
@@ -104,7 +104,7 @@ export function getCloseClaimStatusInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getCloseClaimStatusInstructionDataEncoder(),
-    getCloseClaimStatusInstructionDataDecoder()
+    getCloseClaimStatusInstructionDataDecoder(),
   );
 }
 
@@ -133,7 +133,7 @@ export function getCloseClaimStatusInstruction<
     TAccountAdmin,
     TAccountDistributor
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): CloseClaimStatusInstruction<
   TProgramAddress,
   TAccountClaimStatus,
@@ -157,7 +157,7 @@ export function getCloseClaimStatusInstruction<
     ResolvedAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.claimStatus),
@@ -196,11 +196,11 @@ export function parseCloseClaimStatusInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCloseClaimStatusInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

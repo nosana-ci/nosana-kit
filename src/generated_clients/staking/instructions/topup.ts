@@ -31,9 +31,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_STAKING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const TOPUP_INSTRUCTION_ACCOUNTS = {
   user: 0,
@@ -58,9 +58,8 @@ export type TopupInstruction<
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountStake extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -96,17 +95,17 @@ export type TopupInstructionDataArgs = { amount: number | bigint };
 export function getTopupInstructionDataEncoder(): FixedSizeEncoder<TopupInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['amount', getU64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["amount", getU64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: TOPUP_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: TOPUP_DISCRIMINATOR }),
   );
 }
 
 export function getTopupInstructionDataDecoder(): FixedSizeDecoder<TopupInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['amount', getU64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["amount", getU64Decoder()],
   ]);
 }
 
@@ -116,7 +115,7 @@ export function getTopupInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getTopupInstructionDataEncoder(),
-    getTopupInstructionDataDecoder()
+    getTopupInstructionDataDecoder(),
   );
 }
 
@@ -132,7 +131,7 @@ export type TopupInput<
   stake: Address<TAccountStake>;
   authority: TransactionSigner<TAccountAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  amount: TopupInstructionDataArgs['amount'];
+  amount: TopupInstructionDataArgs["amount"];
 };
 
 export function getTopupInstruction<
@@ -150,7 +149,7 @@ export function getTopupInstruction<
     TAccountAuthority,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): TopupInstruction<
   TProgramAddress,
   TAccountUser,
@@ -182,10 +181,10 @@ export function getTopupInstruction<
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.user),
@@ -195,7 +194,7 @@ export function getTopupInstruction<
       getAccountMeta(accounts.tokenProgram),
     ],
     data: getTopupInstructionDataEncoder().encode(
-      args as TopupInstructionDataArgs
+      args as TopupInstructionDataArgs,
     ),
     programAddress,
   } as TopupInstruction<
@@ -229,11 +228,11 @@ export function parseTopupInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedTopupInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

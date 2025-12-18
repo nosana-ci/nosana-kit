@@ -29,9 +29,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const SET_CLAWBACK_RECEIVER_INSTRUCTION_ACCOUNTS = {
   distributor: 0,
@@ -46,7 +46,7 @@ export const SET_CLAWBACK_RECEIVER_DISCRIMINATOR = new Uint8Array([
 
 export function getSetClawbackReceiverDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    SET_CLAWBACK_RECEIVER_DISCRIMINATOR
+    SET_CLAWBACK_RECEIVER_DISCRIMINATOR,
   );
 }
 
@@ -82,17 +82,17 @@ export type SetClawbackReceiverInstructionDataArgs = {};
 
 export function getSetClawbackReceiverInstructionDataEncoder(): FixedSizeEncoder<SetClawbackReceiverInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
     (value) => ({
       ...value,
       discriminator: SET_CLAWBACK_RECEIVER_DISCRIMINATOR,
-    })
+    }),
   );
 }
 
 export function getSetClawbackReceiverInstructionDataDecoder(): FixedSizeDecoder<SetClawbackReceiverInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
   ]);
 }
 
@@ -102,7 +102,7 @@ export function getSetClawbackReceiverInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getSetClawbackReceiverInstructionDataEncoder(),
-    getSetClawbackReceiverInstructionDataDecoder()
+    getSetClawbackReceiverInstructionDataDecoder(),
   );
 }
 
@@ -130,7 +130,7 @@ export function getSetClawbackReceiverInstruction<
     TAccountNewClawbackAccount,
     TAccountAdmin
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): SetClawbackReceiverInstruction<
   TProgramAddress,
   TAccountDistributor,
@@ -155,7 +155,7 @@ export function getSetClawbackReceiverInstruction<
     ResolvedAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.distributor),
@@ -194,11 +194,11 @@ export function parseSetClawbackReceiverInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetClawbackReceiverInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {
@@ -214,7 +214,7 @@ export function parseSetClawbackReceiverInstruction<
       admin: getNextAccount(),
     },
     data: getSetClawbackReceiverInstructionDataDecoder().decode(
-      instruction.data
+      instruction.data,
     ),
   };
 }

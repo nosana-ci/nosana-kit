@@ -12,7 +12,7 @@ import {
   getBytesEncoder,
   type Address,
   type ReadonlyUint8Array,
-} from '@solana/kit';
+} from "@solana/kit";
 import {
   type ParsedCloseInstruction,
   type ParsedExtendInstruction,
@@ -24,10 +24,10 @@ import {
   type ParsedUnstakeInstruction,
   type ParsedUpdateSettingsInstruction,
   type ParsedWithdrawInstruction,
-} from '../instructions/index.js';
+} from "../instructions/index.js";
 
 export const NOSANA_STAKING_PROGRAM_ADDRESS =
-  'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE' as Address<'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE'>;
+  "nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE" as Address<"nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE">;
 
 export const NosanaStakingAccount = {
   SettingsAccount: "SettingsAccount",
@@ -36,16 +36,16 @@ export const NosanaStakingAccount = {
 export type NosanaStakingAccount = (typeof NosanaStakingAccount)[keyof typeof NosanaStakingAccount];
 
 export function identifyNosanaStakingAccount(
-  account: { data: ReadonlyUint8Array } | ReadonlyUint8Array
+  account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
 ): NosanaStakingAccount {
-  const data = 'data' in account ? account.data : account;
+  const data = "data" in account ? account.data : account;
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([63, 89, 203, 155, 76, 237, 115, 58])
+        new Uint8Array([63, 89, 203, 155, 76, 237, 115, 58]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingAccount.SettingsAccount;
@@ -54,15 +54,15 @@ export function identifyNosanaStakingAccount(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([80, 158, 67, 124, 50, 189, 192, 255])
+        new Uint8Array([80, 158, 67, 124, 50, 189, 192, 255]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingAccount.StakeAccount;
   }
   throw new Error(
-    'The provided account could not be identified as a nosanaStaking account.'
+    "The provided account could not be identified as a nosanaStaking account.",
   );
 }
 
@@ -81,16 +81,16 @@ export const NosanaStakingInstruction = {
 export type NosanaStakingInstruction = (typeof NosanaStakingInstruction)[keyof typeof NosanaStakingInstruction];
 
 export function identifyNosanaStakingInstruction(
-  instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array
+  instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
 ): NosanaStakingInstruction {
-  const data = 'data' in instruction ? instruction.data : instruction;
+  const data = "data" in instruction ? instruction.data : instruction;
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([220, 59, 207, 236, 108, 250, 47, 100])
+        new Uint8Array([220, 59, 207, 236, 108, 250, 47, 100]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingInstruction.Init;
@@ -99,9 +99,9 @@ export function identifyNosanaStakingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([206, 176, 202, 18, 200, 209, 179, 108])
+        new Uint8Array([206, 176, 202, 18, 200, 209, 179, 108]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingInstruction.Stake;
@@ -110,9 +110,9 @@ export function identifyNosanaStakingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([90, 95, 107, 42, 205, 124, 50, 225])
+        new Uint8Array([90, 95, 107, 42, 205, 124, 50, 225]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingInstruction.Unstake;
@@ -121,9 +121,9 @@ export function identifyNosanaStakingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([97, 161, 241, 167, 6, 32, 213, 53])
+        new Uint8Array([97, 161, 241, 167, 6, 32, 213, 53]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingInstruction.Restake;
@@ -132,9 +132,9 @@ export function identifyNosanaStakingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([126, 42, 49, 78, 225, 151, 99, 77])
+        new Uint8Array([126, 42, 49, 78, 225, 151, 99, 77]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingInstruction.Topup;
@@ -143,9 +143,9 @@ export function identifyNosanaStakingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([228, 127, 0, 1, 227, 154, 54, 168])
+        new Uint8Array([228, 127, 0, 1, 227, 154, 54, 168]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingInstruction.Extend;
@@ -154,9 +154,9 @@ export function identifyNosanaStakingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([98, 165, 201, 177, 108, 65, 206, 96])
+        new Uint8Array([98, 165, 201, 177, 108, 65, 206, 96]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingInstruction.Close;
@@ -165,9 +165,9 @@ export function identifyNosanaStakingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([183, 18, 70, 156, 148, 109, 161, 34])
+        new Uint8Array([183, 18, 70, 156, 148, 109, 161, 34]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingInstruction.Withdraw;
@@ -176,9 +176,9 @@ export function identifyNosanaStakingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([204, 141, 18, 161, 8, 177, 92, 142])
+        new Uint8Array([204, 141, 18, 161, 8, 177, 92, 142]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingInstruction.Slash;
@@ -187,20 +187,20 @@ export function identifyNosanaStakingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([81, 166, 51, 213, 158, 84, 157, 108])
+        new Uint8Array([81, 166, 51, 213, 158, 84, 157, 108]),
       ),
-      0
+      0,
     )
   ) {
     return NosanaStakingInstruction.UpdateSettings;
   }
   throw new Error(
-    'The provided instruction could not be identified as a nosanaStaking instruction.'
+    "The provided instruction could not be identified as a nosanaStaking instruction.",
   );
 }
 
 export type ParsedNosanaStakingInstruction<
-  TProgram extends string = 'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE',
+  TProgram extends string = "nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE",
 > =
   | ({
       instructionType: typeof NosanaStakingInstruction.Init;

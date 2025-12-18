@@ -33,7 +33,7 @@ import {
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
-} from '@solana/kit';
+} from "@solana/kit";
 
 export const SETTINGS_ACCOUNT_DISCRIMINATOR = new Uint8Array([
   63, 89, 203, 155, 76, 237, 115, 58,
@@ -41,7 +41,7 @@ export const SETTINGS_ACCOUNT_DISCRIMINATOR = new Uint8Array([
 
 export function getSettingsAccountDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    SETTINGS_ACCOUNT_DISCRIMINATOR
+    SETTINGS_ACCOUNT_DISCRIMINATOR,
   );
 }
 
@@ -57,20 +57,20 @@ export type SettingsAccountArgs = { authority: Address; tokenAccount: Address };
 export function getSettingsAccountEncoder(): FixedSizeEncoder<SettingsAccountArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['authority', getAddressEncoder()],
-      ['tokenAccount', getAddressEncoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["authority", getAddressEncoder()],
+      ["tokenAccount", getAddressEncoder()],
     ]),
-    (value) => ({ ...value, discriminator: SETTINGS_ACCOUNT_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: SETTINGS_ACCOUNT_DISCRIMINATOR }),
   );
 }
 
 /** Gets the decoder for {@link SettingsAccount} account data. */
 export function getSettingsAccountDecoder(): FixedSizeDecoder<SettingsAccount> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['authority', getAddressDecoder()],
-    ['tokenAccount', getAddressDecoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["authority", getAddressDecoder()],
+    ["tokenAccount", getAddressDecoder()],
   ]);
 }
 
@@ -83,26 +83,26 @@ export function getSettingsAccountCodec(): FixedSizeCodec<
 }
 
 export function decodeSettingsAccount<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress>,
 ): Account<SettingsAccount, TAddress>;
 export function decodeSettingsAccount<TAddress extends string = string>(
-  encodedAccount: MaybeEncodedAccount<TAddress>
+  encodedAccount: MaybeEncodedAccount<TAddress>,
 ): MaybeAccount<SettingsAccount, TAddress>;
 export function decodeSettingsAccount<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>,
 ):
   | Account<SettingsAccount, TAddress>
   | MaybeAccount<SettingsAccount, TAddress> {
   return decodeAccount(
     encodedAccount as MaybeEncodedAccount<TAddress>,
-    getSettingsAccountDecoder()
+    getSettingsAccountDecoder(),
   );
 }
 
 export async function fetchSettingsAccount<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<Account<SettingsAccount, TAddress>> {
   const maybeAccount = await fetchMaybeSettingsAccount(rpc, address, config);
   assertAccountExists(maybeAccount);
@@ -114,7 +114,7 @@ export async function fetchMaybeSettingsAccount<
 >(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<MaybeAccount<SettingsAccount, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
   return decodeSettingsAccount(maybeAccount);
@@ -123,12 +123,12 @@ export async function fetchMaybeSettingsAccount<
 export async function fetchAllSettingsAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<Account<SettingsAccount>[]> {
   const maybeAccounts = await fetchAllMaybeSettingsAccount(
     rpc,
     addresses,
-    config
+    config,
   );
   assertAccountsExist(maybeAccounts);
   return maybeAccounts;
@@ -137,11 +137,11 @@ export async function fetchAllSettingsAccount(
 export async function fetchAllMaybeSettingsAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<SettingsAccount>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) =>
-    decodeSettingsAccount(maybeAccount)
+    decodeSettingsAccount(maybeAccount),
   );
 }
 

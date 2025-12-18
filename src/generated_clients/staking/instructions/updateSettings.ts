@@ -29,9 +29,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_STAKING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const UPDATE_SETTINGS_INSTRUCTION_ACCOUNTS = {
   newAuthority: 0,
@@ -47,7 +47,7 @@ export const UPDATE_SETTINGS_DISCRIMINATOR = new Uint8Array([
 
 export function getUpdateSettingsDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    UPDATE_SETTINGS_DISCRIMINATOR
+    UPDATE_SETTINGS_DISCRIMINATOR,
   );
 }
 
@@ -87,14 +87,14 @@ export type UpdateSettingsInstructionDataArgs = {};
 
 export function getUpdateSettingsInstructionDataEncoder(): FixedSizeEncoder<UpdateSettingsInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: UPDATE_SETTINGS_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: UPDATE_SETTINGS_DISCRIMINATOR }),
   );
 }
 
 export function getUpdateSettingsInstructionDataDecoder(): FixedSizeDecoder<UpdateSettingsInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
   ]);
 }
 
@@ -104,7 +104,7 @@ export function getUpdateSettingsInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getUpdateSettingsInstructionDataEncoder(),
-    getUpdateSettingsInstructionDataDecoder()
+    getUpdateSettingsInstructionDataDecoder(),
   );
 }
 
@@ -133,7 +133,7 @@ export function getUpdateSettingsInstruction<
     TAccountSettings,
     TAccountAuthority
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): UpdateSettingsInstruction<
   TProgramAddress,
   TAccountNewAuthority,
@@ -157,7 +157,7 @@ export function getUpdateSettingsInstruction<
     ResolvedAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.newAuthority),
@@ -196,11 +196,11 @@ export function parseUpdateSettingsInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateSettingsInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {
