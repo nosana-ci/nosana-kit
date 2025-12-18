@@ -183,7 +183,7 @@ export interface SolanaService {
    * @returns The signed transaction with additional signatures
    */
   signTransactionWithSigners(
-    transaction: Transaction & TransactionWithBlockhashLifetime,
+    transaction: Transaction & TransactionWithBlockhashLifetime & TransactionWithinSizeLimit,
     signers: TransactionPartialSigner[]
   ): Promise<SendableTransaction & Transaction & TransactionWithBlockhashLifetime>;
   /**

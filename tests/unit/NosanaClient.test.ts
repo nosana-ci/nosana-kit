@@ -5,7 +5,6 @@ import { SignerFactory } from '../setup/index.js';
 import { createNosanaClient } from '../../src/index.js';
 import { DEFAULT_CONFIGS } from '../../src/config/defaultConfigs.js';
 import { ErrorCodes, NosanaError } from '../../src/errors/NosanaError.js';
-import { NosanaAuthorization } from '@nosana/authorization';
 
 // Mock the @nosana/api module to verify createNosanaApi calls
 const mockCreateNosanaApi = vi.fn();
@@ -261,7 +260,7 @@ describe('NosanaClient', () => {
             getBalance: expect.any(Function),
             transferTokensToRecipient: expect.any(Function),
             deserializeSignSendAndConfirmTransaction: expect.any(Function),
-          }
+          },
         }),
         undefined
       );
