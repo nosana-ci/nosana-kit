@@ -41,6 +41,13 @@ import {
 import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const UPDATE_INSTRUCTION_ACCOUNTS = {
+  market: 0,
+  accessKey: 1,
+  authority: 2,
+} as const;
+
+export type UpdateInstructionAccountName = keyof typeof UPDATE_INSTRUCTION_ACCOUNTS;
 export const UPDATE_DISCRIMINATOR = new Uint8Array([
   219, 200, 88, 176, 158, 63, 253, 127,
 ]);

@@ -32,6 +32,12 @@ import {
 import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const COMPLETE_INSTRUCTION_ACCOUNTS = {
+  job: 0,
+  authority: 1,
+} as const;
+
+export type CompleteInstructionAccountName = keyof typeof COMPLETE_INSTRUCTION_ACCOUNTS;
 export const COMPLETE_DISCRIMINATOR = new Uint8Array([
   0, 77, 224, 147, 136, 25, 88, 76,
 ]);

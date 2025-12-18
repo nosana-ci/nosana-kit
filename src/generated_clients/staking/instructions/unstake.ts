@@ -33,6 +33,13 @@ import {
 import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const UNSTAKE_INSTRUCTION_ACCOUNTS = {
+  stake: 0,
+  reward: 1,
+  authority: 2,
+} as const;
+
+export type UnstakeInstructionAccountName = keyof typeof UNSTAKE_INSTRUCTION_ACCOUNTS;
 export const UNSTAKE_DISCRIMINATOR = new Uint8Array([
   90, 95, 107, 42, 205, 124, 50, 225,
 ]);

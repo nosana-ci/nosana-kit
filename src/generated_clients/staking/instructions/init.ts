@@ -33,6 +33,14 @@ import {
 import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const INIT_INSTRUCTION_ACCOUNTS = {
+  settings: 0,
+  authority: 1,
+  systemProgram: 2,
+  rent: 3,
+} as const;
+
+export type InitInstructionAccountName = keyof typeof INIT_INSTRUCTION_ACCOUNTS;
 export const INIT_DISCRIMINATOR = new Uint8Array([
   220, 59, 207, 236, 108, 250, 47, 100,
 ]);

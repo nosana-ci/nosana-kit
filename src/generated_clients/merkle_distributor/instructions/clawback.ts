@@ -33,6 +33,16 @@ import {
 import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const CLAWBACK_INSTRUCTION_ACCOUNTS = {
+  distributor: 0,
+  from: 1,
+  to: 2,
+  claimant: 3,
+  systemProgram: 4,
+  tokenProgram: 5,
+} as const;
+
+export type ClawbackInstructionAccountName = keyof typeof CLAWBACK_INSTRUCTION_ACCOUNTS;
 export const CLAWBACK_DISCRIMINATOR = new Uint8Array([
   111, 92, 142, 79, 33, 234, 82, 27,
 ]);

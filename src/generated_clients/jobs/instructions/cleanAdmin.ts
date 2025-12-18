@@ -32,6 +32,13 @@ import {
 import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const CLEAN_ADMIN_INSTRUCTION_ACCOUNTS = {
+  job: 0,
+  payer: 1,
+  authority: 2,
+} as const;
+
+export type CleanAdminInstructionAccountName = keyof typeof CLEAN_ADMIN_INSTRUCTION_ACCOUNTS;
 export const CLEAN_ADMIN_DISCRIMINATOR = new Uint8Array([
   245, 90, 188, 68, 253, 235, 171, 105,
 ]);

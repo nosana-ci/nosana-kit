@@ -35,6 +35,15 @@ import {
 import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const TOPUP_INSTRUCTION_ACCOUNTS = {
+  user: 0,
+  vault: 1,
+  stake: 2,
+  authority: 3,
+  tokenProgram: 4,
+} as const;
+
+export type TopupInstructionAccountName = keyof typeof TOPUP_INSTRUCTION_ACCOUNTS;
 export const TOPUP_DISCRIMINATOR = new Uint8Array([
   126, 42, 49, 78, 225, 151, 99, 77,
 ]);

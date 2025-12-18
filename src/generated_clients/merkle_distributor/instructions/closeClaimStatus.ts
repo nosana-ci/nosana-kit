@@ -33,6 +33,14 @@ import {
 import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
 
+export const CLOSE_CLAIM_STATUS_INSTRUCTION_ACCOUNTS = {
+  claimStatus: 0,
+  claimant: 1,
+  admin: 2,
+  distributor: 3,
+} as const;
+
+export type CloseClaimStatusInstructionAccountName = keyof typeof CLOSE_CLAIM_STATUS_INSTRUCTION_ACCOUNTS;
 export const CLOSE_CLAIM_STATUS_DISCRIMINATOR = new Uint8Array([
   163, 214, 191, 165, 245, 188, 17, 185,
 ]);
