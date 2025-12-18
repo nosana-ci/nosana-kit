@@ -344,7 +344,9 @@ export type {
   Revision,
   SpreadMarker,
   RemoveIfEmptyMarker,
-  // Deployment (data types only - API types exported below take priority)
+  // Deployment (raw data types from OpenAPI schema)
+  Deployment as DeploymentRaw,
+  Vault as VaultRaw,
   DeploymentId,
   EndpointSecret,
   EndpointStatus,
