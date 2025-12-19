@@ -172,7 +172,6 @@ export function createMerkleDistributorProgram(
   function transformClaimStatusAccount(
     claimStatusAccount: Account<programClient.ClaimStatus>
   ): ClaimStatus {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { discriminator: _, ...claimStatusAccountData } = claimStatusAccount.data;
 
     return {
