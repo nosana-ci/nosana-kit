@@ -4,7 +4,7 @@
 Are you looking for how to run inference using the API, SDK or Dashboard with Nosana Credits? The easiest place to start is [learn.nosana.com](https://learn.nosana.com).
 :::
 
-The Nosana Network is a platform for running [AI inference workloads](https://www.oracle.com/artificial-intelligence/ai-inference/#:~:text=AI%20inference%20is%20when%20an,way%20that%20mimics%20human%20abilities). In this tutorial we will show you how to post jobs directly on the blockchain using the Nosana CLI. For this you need a Solana wallet with a bit of NOS and SOL. If you want to create deployments using your Nosana account & credits, please see [learn.nosana.com/](https://learn.nosana.com/).
+The Nosana Network is a platform for running [AI inference workloads](https://www.oracle.com/artificial-intelligence/ai-inference/#:~:text=AI%20inference%20is%20when%20an,way%20that%20mimics%20human%20abilities). In this tutorial we will show you how to post jobs directly on the blockchain using the Nosana CLI. For this you need a Solana wallet with a bit of NOS and SOL.
 
 We'll start with a simple hello world program and afterwards build on these concepts to create a fully working endpoint.
 

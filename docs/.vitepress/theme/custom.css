@@ -2,10 +2,10 @@
 
 /* Nosana Brand Colors */
 :root {
-  --vp-c-brand: #10E80C;
-  --vp-c-brand-1: #10E80C;
-  --vp-c-brand-2: #0FC90B;
-  --vp-c-brand-3: #0EAA0A;
+  --vp-c-brand: #0EAA0A;
+  --vp-c-brand-1: #0EAA0A;
+  --vp-c-brand-2: #0C8A08;
+  --vp-c-brand-3: #0A6A06;
   --vp-c-brand-soft: rgba(16, 232, 12, 0.14);
   /* Override code color to not use brand color - use neutral text color instead */
   --vp-code-color: #da1039;
@@ -64,4 +64,39 @@
 
 .plugin-tabs--tab-list {
   white-space: nowrap;
+}
+
+.custom-block.info code {
+  color: var(--vp-code-color);
+}
+
+/* Override glossary term color to use default text color */
+.glossary-term {
+  display: initial !important;
+  border-bottom: 1px dotted;
+  text-decoration: initial !important;
+  color: inherit !important;
+}
+
+/* Hide glossary tooltips in headers */
+.vp-doc h1 .glossary-term,
+.vp-doc h2 .glossary-term,
+.vp-doc h3 .glossary-term,
+.vp-doc h4 .glossary-term,
+.vp-doc h5 .glossary-term,
+.vp-doc h6 .glossary-term,
+.vp-doc a .glossary-term {
+  pointer-events: initial !important;
+  border-bottom: initial !important;
+  cursor: inherit !important;
+}
+
+.vp-doc h1 .glossary-term .glossary-tooltip,
+.vp-doc h2 .glossary-term .glossary-tooltip,
+.vp-doc h3 .glossary-term .glossary-tooltip,
+.vp-doc h4 .glossary-term .glossary-tooltip,
+.vp-doc h5 .glossary-term .glossary-tooltip,
+.vp-doc h6 .glossary-term .glossary-tooltip,
+.vp-doc a .glossary-term .glossary-tooltip {
+  display: none !important;
 }

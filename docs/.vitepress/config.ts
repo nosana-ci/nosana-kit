@@ -2,7 +2,9 @@ import { defineConfig } from 'vitepress';
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash';
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs';
 import { withMermaid } from 'vitepress-plugin-mermaid';
+import { markdownGlossaryPlugin } from 'vitepress-plugin-glossary';
 import chartPlugin from './plugins/chart';
+import glossary from './glossary.json';
 
 // Generate API sidebar from TypeDoc output organized by package groups
 function getApiSidebar() {
@@ -46,18 +48,15 @@ export default withMermaid(defineConfig({
           { text: 'SDK Reference', link: '/api/' },
         ]
       },
-      { text: 'Smart Contracts', link: '/protocols/start' },
+      { text: 'Host GPUs', link: '/hosts/grid' },
       {
-        text: 'Host GPUs',
+        text: 'CLI',
         items: [
-          { text: 'Getting Started', link: '/hosts/grid' },
-          { text: 'Ubuntu Setup', link: '/hosts/grid-ubuntu' },
-          { text: 'Running the Host', link: '/hosts/grid-run' },
-          { text: 'Troubleshooting', link: '/hosts/troubleshoot' },
+          { text: 'Run Inference', link: '/inference/quick_start' },
         ]
       },
-      { text: 'Run Inference', link: '/inference/quick_start' },
-      { text: 'Wallet', link: '/wallet/token' },
+      { text: 'Wallet', link: '/wallet' },
+      { text: 'Protocol Contracts', link: '/protocols/start' },
     ],
 
     sidebar: {
@@ -130,7 +129,6 @@ export default withMermaid(defineConfig({
             { text: 'Writing a Job', link: '/inference/writing_a_job' },
             { text: 'Models', link: '/inference/models' },
             { text: 'Literals', link: '/inference/literals' },
-            { text: 'Tutorial Hub', link: '/inference/tutorialHub' },
             {
               text: 'Examples',
               items: [
@@ -151,7 +149,7 @@ export default withMermaid(defineConfig({
       ],
       '/protocols/': [
         {
-          text: 'Smart Contracts',
+          text: 'Protocol Contracts',
           items: [
             { text: 'Getting Started', link: '/protocols/start' },
             { text: 'Staking', link: '/protocols/staking' },
@@ -167,8 +165,7 @@ export default withMermaid(defineConfig({
         {
           text: 'Wallet',
           items: [
-            { text: 'Token', link: '/wallet/token' },
-            { text: 'Key', link: '/wallet/key' },
+            { text: 'Wallet', link: '/wallet' },
           ],
         },
       ],
@@ -190,9 +187,14 @@ export default withMermaid(defineConfig({
     languages: ['ts', 'typescript', 'tsx', 'js', 'javascript', 'json', 'bash', 'shell'],
     // Tabs plugin for VuePress-style tabs syntax
     // Chart plugin for Chart.js charts
+    // Glossary plugin for automatic term linking
     config(md) {
       md.use(tabsMarkdownPlugin);
       md.use(chartPlugin);
+      md.use(markdownGlossaryPlugin, {
+        glossary: glossary,
+        firstOccurrenceOnly: false
+      });
     },
   },
 

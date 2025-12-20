@@ -28,9 +28,8 @@ These guides are instructing you on how to establish your GPU Host and partake i
 
 [Ubuntu](/hosts/grid-ubuntu): If you're running Ubuntu, a popular distribution of Linux, you should follow this guide.
 
-
 ## Advanced (optional)
-## Launching the GPU Host with Custom Parameters
+### Launching the GPU Host with Custom Parameters
 
 You can manually launch the GPU Host to modify certain parameters:
 * Use the `--podman` parameter to direct to your Podman service socket file if it's located elsewhere.
