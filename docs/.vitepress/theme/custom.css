@@ -8,7 +8,7 @@
   --vp-c-brand-3: #0EAA0A;
   --vp-c-brand-soft: rgba(16, 232, 12, 0.14);
   /* Override code color to not use brand color - use neutral text color instead */
-  --vp-code-color: var(--vp-c-text-1);
+  --vp-code-color: #da1039;
 }
 
 .dark {
@@ -18,7 +18,7 @@
   --vp-c-brand-3: #0EAA0A;
   --vp-c-brand-soft: rgba(16, 232, 12, 0.16);
   /* Override code color to not use brand color - use neutral text color instead */
-  --vp-code-color: var(--vp-c-text-1);
+  --vp-code-color: #da1039;
 }
 
 /* Improve readability of API reference */
@@ -60,4 +60,8 @@
  */
 .vp-doc div[class*='language-'].line-numbers-mode {
   overflow-y: hidden;
+}
+
+.plugin-tabs--tab-list {
+  white-space: nowrap;
 }

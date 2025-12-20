@@ -2,33 +2,21 @@
 
 ## Install the Package
 
-<Tabs :items="[
-  { label: 'npm' },
-  { label: 'yarn' },
-  { label: 'pnpm' }
-]">
-  <template #tab-0>
+::: code-group
 
-```bash
+```bash [npm]
 npm install @nosana/kit
 ```
 
-  </template>
-  <template #tab-1>
-
-```bash
+```bash [yarn]
 yarn add @nosana/kit
 ```
 
-  </template>
-  <template #tab-2>
-
-```bash
+```bash [pnpm]
 pnpm add @nosana/kit
 ```
 
-  </template>
-</Tabs>
+:::
 
 ## Requirements
 
