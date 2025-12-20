@@ -68,6 +68,7 @@
     "eslint-plugin-import": "^2.32.0",
     "floating-vue": "^5.2.2",
     "markdown-it-container": "^4.0.0",
+    "markdown-it-mathjax3": "^4.3.2",
     "prettier": "^3.7.4",
     "ts-node": "^10.9.2",
     "typedoc": "^0.28.14",

@@ -182,6 +182,7 @@ export default withMermaid(defineConfig({
   },
 
   markdown: {
+    math: true,
     // Enhanced code block features
     lineNumbers: true,
     // Twoslash transformer for type hover information
