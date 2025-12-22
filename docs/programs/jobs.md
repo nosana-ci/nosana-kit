@@ -1101,7 +1101,7 @@ The total size of this account is `257` bytes.
 | `market`                    | `publicKey`                 | `32`    | `72`    | The [MarketAccount](#market-account) address.                                                     |
 | `node`                      | `publicKey`                 | `32`    | `104`   | The node that runs this job.                                                                      |
 | `payer`                     | `publicKey`                 | `32`    | `136`   | The paying identy for the rent.                                                                   |
-| `price`                     | `u64`                       | `8`     | `168`   | The price in [$NOS](/tokens/token).                                                               |
+| `price`                     | `u64`                       | `8`     | `168`   | The price in [$NOS](/programs/token).                                                               |
 | `project`                   | `publicKey`                 | `32`    | `176`   | The project that listed this job.                                                                 |
 | `state`                     | `u8`                        | `1`     | `208`   | n/a                                                                                               |
 | `timeEnd`                   | `i64`                       | `16`    | `209`   | The unix time this job has finished running.                                                      |

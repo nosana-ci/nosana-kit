@@ -6,7 +6,7 @@
 - **Nosana Nodes**: Jobs run on different Nosana nodes, which are represented as Solana addresses in the Nosana explorer. Each node contributes its GPU resources to execute the jobs.
 - **GPU Markets**: Different types of GPUs available in the network are categorized into various markets. Each market supports specific job requirements based on the type of GPU.
 
-![Nosana Job Workflow](./nosana_job_workflow.png)
+![Nosana Job Workflow](/inference/nosana_job_workflow.png)
 
 ## Execution Flow
 
@@ -21,5 +21,5 @@ These steps describe how submitting an inference job to the Nosana network.
 ## Examples
 
 Nosana is a fully permissionless network, which means that whatever model you want to run in our network you can!
-For examples you can take a look at the [Examples Catalog](../inference/examples/) or visit: [Nosana Templates](https://github.com/nosana-ci/pipeline-templates/tree/main/templates) on GitHub.
+For examples you can take a look at the [Examples Catalog](/inference/examples/) or visit: [Nosana Templates](https://github.com/nosana-ci/pipeline-templates/tree/main/templates) on GitHub.
 Some examples of which models you can run and links can be found in the following table:

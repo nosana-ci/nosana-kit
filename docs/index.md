@@ -13,16 +13,16 @@ hero:
       text: Host GPUs
       link: /hosts/grid
     - theme: alt
-      text: Run Inference (CLI)
-      link: /inference/quick_start
+      text: Run Jobs
+      link: /jobs/
 
 features:
   - title: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg> TypeScript KIT'
     details: Simple, intuitive SDK designed for developers. Get started in minutes with comprehensive TypeScript support.
     link: /guide/quick-start
-  - title: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Protocol Contracts'
-    details: Learn how to use the Nosana Protocol Contracts - staking, jobs, nodes, pools, and rewards.
-    link: /protocols/start
+  - title: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Programs'
+    details: Learn how to use the Nosana Programs - staking, jobs, nodes, pools, and rewards.
+    link: /programs/start
   - title: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> AI Inference'
     details: Get started running your AI workloads on the Nosana Network using the CLI.
     link: /inference/quick_start
@@ -64,19 +64,36 @@ console.log('Job state:', job.state);
 
 == For Blockchain Developers
 
-Learn how to use the Nosana Protocol Contracts - [Protocol Contracts Documentation](/protocols/start)
+The Nosana Programs are Solana smart contracts that power the decentralized GPU network. Interact with staking, jobs, nodes, pools, and rewards programs directly on-chain.
+
+Start with our [Programs Documentation](/programs/start) to learn about:
+
+- **Staking**: Stake NOS tokens to earn xNOS and participate in governance
+- **Jobs**: Post and manage compute jobs on the marketplace
+- **Nodes**: Register GPU nodes to participate in the network
+- **Pools**: Join vesting pools for token distribution
+- **Rewards**: Earn rewards for network participation
 
 == For GPU Hosts
 
-Get started earning $NOS by joining our Nosana Grid - [Host GPUs Guide](/hosts/grid)
+Earn $NOS by contributing your GPU resources to the Nosana Network. As a GPU Host, you run the Nosana Node software to connect your hardware to the decentralized marketplace.
 
-== For AI Inference
+Get started with our [Host GPUs Guide](/hosts/grid):
 
-Run AI workloads on the Nosana Network - [Inference Quick Start](/inference/quick_start)
+**Requirements:**
+- NVIDIA GPU (compatible with CUDA)
+- 12GB+ RAM
+- 256GB+ NVMe SSD
+- Ubuntu 20.04+ (Linux recommended)
+
+```bash
+# Install and run the Nosana Node
+bash <(wget -qO- https://nosana.com/start.sh)
+```
 
 :::
 
 ::: info
-Are you looking for how to run inference using the API, SDK or Dashboard with Nosana Credits? The easiest place to start is [learn.nosana.com](https://learn.nosana.com).
+Are you looking for how to run inference using the API or Dashboard with Nosana Credits? The easiest place to start is [learn.nosana.com](https://learn.nosana.com).
 :::
 

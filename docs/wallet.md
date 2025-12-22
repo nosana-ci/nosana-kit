@@ -113,5 +113,5 @@ Please take note of the official Nosana Token address: [nosXBVoaCTtYdLvKY6Csb4AC
 
 ## Token Protocol
 
-To read more about how the Nosana NOS Token protocol, please continue reading the [NOS Token Protocol Page](./protocols/token.md)
+To read more about how the Nosana NOS Token protocol, please continue reading the [NOS Token Protocol Page](./programs/token.md)
 

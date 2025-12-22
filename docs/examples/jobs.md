@@ -2,6 +2,8 @@
 
 ## Create and Post a Job
 
+To post a job, you need to create a [job definition](/jobs/job-definition/intro) that describes what you want to run. The job definition is a JSON object that specifies container images, commands, and resource requirements.
+
 ```ts twoslash
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 import type { Instruction } from '@solana/kit';
@@ -11,6 +13,7 @@ const client = createNosanaClient(NosanaNetwork.DEVNET);
 client.wallet = await generateKeyPairSigner();
 
 // First, pin job definition to IPFS
+// Learn more about job definition structure: /jobs/job-definition/intro
 const ipfsHash: string = await client.ipfs.pin({
   version: '0.1',
   type: 'container',

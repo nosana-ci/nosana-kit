@@ -1,7 +1,7 @@
 # Getting Started
 
 ::: info
-Are you looking for how to run inference using the API, SDK or Dashboard with Nosana Credits? The easiest place to start is [learn.nosana.com](https://learn.nosana.com).
+Are you looking for how to run inference using the API or Dashboard with Nosana Credits? The easiest place to start is [learn.nosana.com](https://learn.nosana.com).
 :::
 
 The Nosana Network is a platform for running [AI inference workloads](https://www.oracle.com/artificial-intelligence/ai-inference/#:~:text=AI%20inference%20is%20when%20an,way%20that%20mimics%20human%20abilities). In this tutorial we will show you how to post jobs directly on the blockchain using the Nosana CLI. For this you need a Solana wallet with a bit of NOS and SOL.
@@ -128,4 +128,4 @@ Run the following command to get the result of the job:
 nosana job get FQTP2F5hNP2rNGUtQm4Annrx462PgxPcSA6ND6ToPTxH
 ```
 
-Next, we will learn how to create a Nosana Job schema to access Nosana's powerful features, such as using GPUs and spinning up an instance to connect to an endpoint.
+Next, we will learn how to create a Nosana Job Definition to access Nosana's powerful features, such as using GPUs and spinning up an instance to connect to an endpoint. Learn more about the [Job Definition](/jobs/job-definition/intro) structure and capabilities.

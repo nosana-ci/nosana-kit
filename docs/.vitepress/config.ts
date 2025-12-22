@@ -39,7 +39,6 @@ export default withMermaid(defineConfig({
   base: '/',
   themeConfig: {
     nav: [
-      { text: 'Home', link: '/' },
       {
         text: 'Kit',
         items: [
@@ -48,15 +47,11 @@ export default withMermaid(defineConfig({
           { text: 'SDK Reference', link: '/api/' },
         ]
       },
+      { text: 'Jobs', link: '/jobs/' },
       { text: 'Host GPUs', link: '/hosts/grid' },
-      {
-        text: 'CLI',
-        items: [
-          { text: 'Run Inference', link: '/inference/quick_start' },
-        ]
-      },
+      { text: 'CLI', link: '/inference/quick_start' },
       { text: 'Wallet', link: '/wallet' },
-      { text: 'Protocol Contracts', link: '/protocols/start' },
+      { text: 'Programs', link: '/programs/start' },
     ],
 
     sidebar: {
@@ -121,17 +116,46 @@ export default withMermaid(defineConfig({
           ],
         },
       ],
+      '/jobs/': [
+        {
+          text: 'Jobs',
+          items: [
+            { text: 'Introduction', link: '/jobs/' },
+            { text: 'Job Execution Flow', link: '/jobs/job_execution_flow' },
+            {
+              text: 'Job Definition',
+              items: [
+                { text: 'Intro', link: '/jobs/job-definition/intro' },
+                { text: 'Schema', link: '/jobs/job-definition/schema' },
+                { text: 'Health Checks', link: '/jobs/job-definition/health-checks' },
+                { text: 'Literals (Pipeline)', link: '/jobs/job-definition/literals' },
+                {
+                  text: 'Resources',
+                  items: [
+                    { text: 'Overview', link: '/jobs/job-definition/resources' },
+                    { text: 'S3 Resources', link: '/jobs/job-definition/s3' },
+                    { text: 'HuggingFace Resources', link: '/jobs/job-definition/huggingface' },
+                    { text: 'Cached Resources', link: '/jobs/job-definition/cached-resources' },
+                  ],
+                },
+                { text: 'Confidential Jobs', link: '/jobs/job-definition/confidential' },
+                { text: 'Services', link: '/jobs/job-definition/services' },
+              ],
+            },
+          ],
+        },
+      ],
       '/inference/': [
         {
           text: 'Run Inference (CLI)',
           items: [
             { text: 'Quick Start', link: '/inference/quick_start' },
-            { text: 'Writing a Job', link: '/inference/writing_a_job' },
-            { text: 'Models', link: '/inference/models' },
-            { text: 'Literals', link: '/inference/literals' },
+            { text: 'GPU Markets', link: '/inference/gpu-markets' },
+            { text: 'Endpoints', link: '/inference/endpoints' },
             {
               text: 'Examples',
               items: [
+                { text: 'Examples Catalog', link: '/inference/examples/' },
                 { text: 'Hello World', link: '/inference/examples/hello_world' },
                 { text: 'Jupyter', link: '/inference/examples/jupyter' },
                 { text: 'Open WebUI', link: '/inference/examples/open_webui' },
@@ -147,17 +171,17 @@ export default withMermaid(defineConfig({
           ],
         },
       ],
-      '/protocols/': [
+      '/programs/': [
         {
-          text: 'Protocol Contracts',
+          text: 'Programs',
           items: [
-            { text: 'Getting Started', link: '/protocols/start' },
-            { text: 'Staking', link: '/protocols/staking' },
-            { text: 'Rewards', link: '/protocols/rewards' },
-            { text: 'Pools', link: '/protocols/pools' },
-            { text: 'Jobs', link: '/protocols/jobs' },
-            { text: 'Nodes', link: '/protocols/nodes' },
-            { text: 'Token', link: '/protocols/token' },
+            { text: 'Getting Started', link: '/programs/start' },
+            { text: 'Staking', link: '/programs/staking' },
+            { text: 'Rewards', link: '/programs/rewards' },
+            { text: 'Pools', link: '/programs/pools' },
+            { text: 'Jobs', link: '/programs/jobs' },
+            { text: 'Nodes', link: '/programs/nodes' },
+            { text: 'Token', link: '/programs/token' },
           ],
         },
       ],

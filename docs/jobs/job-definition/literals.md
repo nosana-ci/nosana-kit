@@ -1,3 +1,7 @@
+---
+title: Literals (Pipeline)
+---
+
 # Literals (Pipeline)
 
 Pipelines allow you to wire outputs from earlier ops into the inputs of later ones without hardcoding values. You do this by placing string literals inside any `args` field. At runtime, the TaskManager interpolates those literals against its global store and returns a new `Operation<T>` with `args` fully substituted. Only `args` are modified; `type`, `id`, and `results` are preserved.
@@ -479,3 +483,4 @@ This means you don't have to hand-convert arrays to strings. The system "does th
   "cmd": "4 3"
 }
 ```
+

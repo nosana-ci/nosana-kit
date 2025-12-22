@@ -90,7 +90,7 @@ let tx = await program.methods
 ### Stake
 
 Create a [StakeAccount](#stake-account) and [VaultAccount](#vault-account).
-Stake `amount` of [NOS](/tokens/token) tokens for `duration` fo seconds.
+Stake `amount` of [NOS](/programs/token) tokens for `duration` fo seconds.
 
 #### Account Info
 
@@ -238,7 +238,7 @@ let tx = await program.methods
 == Topup
 ### Topup
 
-Top-up `amount` of [NOS](/tokens/token) of a [StakeAccount](#stake-account).
+Top-up `amount` of [NOS](/programs/token) of a [StakeAccount](#stake-account).
 
 #### Account Info
 
@@ -390,7 +390,7 @@ let tx = await program.methods
 == Withdraw
 ### Withdraw
 
-Withdraw  [NOS](/tokens/token) that is released after an [unstake](#unstake)
+Withdraw  [NOS](/programs/token) that is released after an [unstake](#unstake)
 
 #### Account Info
 
@@ -436,7 +436,7 @@ let tx = await program.methods
 == Slash
 ### Slash
 
-Reduce a [StakeAccount](#stake-account)'s [NOS](/tokens/token) tokens.
+Reduce a [StakeAccount](#stake-account)'s [NOS](/programs/token) tokens.
 Slashing is a feature used by the Nosana Protocol to punish bad actors.
 
 #### Account Info
@@ -742,7 +742,7 @@ flowchart TB
 
 For people that like to know exactly how Nosana calculate a stakers's $xNOS$ score,
 we've written it down as a function $f(NOS) = xNOS$.
-Where $NOS$ denotes the number of [Nosana Tokens](/tokens/token) a staker has staked in the Nosana Staking Program.
+Where $NOS$ denotes the number of [Nosana Tokens](/programs/token) a staker has staked in the Nosana Staking Program.
 
 $$
 \begin{aligned}
