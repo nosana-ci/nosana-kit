@@ -165,6 +165,8 @@ async post(params: {
 
 Create a list instruction for posting a job to a market. Returns an instruction that must be submitted to the network.
 
+The `ipfsHash` parameter should contain the IPFS hash of your [job definition](/jobs/job-definition/intro), which describes what container to run, what commands to execute, and what resources are needed.
+
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
 import type { Wallet } from '@nosana/kit';

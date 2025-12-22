@@ -4,27 +4,19 @@ This page demonstrates common patterns for using Nosana Kit.
 
 ## Initialize Client
 
-<Tabs :items="[
-  { label: 'Mainnet (Default)' },
-  { label: 'Custom Configuration' }
-]">
-  <template #tab-0>
+::: code-group
 
-```ts twoslash
+```ts [Mainnet (Default)]
 import { createNosanaClient } from '@nosana/kit';
 const client = createNosanaClient();
 ```
 
-  </template>
-  <template #tab-1>
-
-```ts twoslash
+```ts [Custom Configuration]
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 const client = createNosanaClient(NosanaNetwork.DEVNET);
 ```
 
-  </template>
-</Tabs>
+:::
 
 ::: tip
 
@@ -57,13 +49,9 @@ const client = createNosanaClient();
 <Card title="Wallet Configuration">
   A wallet is required for signing transactions. You can set it during client initialization or dynamically.
 
-<Tabs :items="[
-  { label: 'During Initialization' },
-  { label: 'Dynamic Assignment' }
-]">
-  <template #tab-0>
+::: code-group
 
-```ts twoslash
+```ts [During Initialization]
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 import { generateKeyPairSigner } from '@solana/kit';
 import type { Wallet } from '@nosana/kit';
@@ -75,10 +63,7 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 });
 ```
 
-  </template>
-  <template #tab-1>
-
-```ts twoslash
+```ts [Dynamic Assignment]
 import { Wallet, createNosanaClient, address } from '@nosana/kit';
 import { generateKeyPairSigner } from '@solana/kit';
 
@@ -97,8 +82,7 @@ const instruction = await client.jobs.post({
 await client.solana.buildSignAndSend(instruction);
 ```
 
-  </template>
-</Tabs>
+:::
 </Card>
 
 ::: warning
