@@ -3,13 +3,14 @@ import container from 'markdown-it-container';
 
 const chartPlugin: PluginSimple = (md) => {
   // Store original fence renderer
-  const defaultFenceRender = md.renderer.rules.fence || 
+  const defaultFenceRender =
+    md.renderer.rules.fence ||
     ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
 
   // Override fence renderer to handle JSON inside chart containers
   md.renderer.rules.fence = (tokens, idx, options, env, self) => {
     const token = tokens[idx];
-    
+
     // Check if we're inside a chart container
     if (env.chartContainer && token.info.trim() === 'json') {
       const jsonContent = token.content.trim();
@@ -37,7 +38,7 @@ const chartPlugin: PluginSimple = (md) => {
         return defaultFenceRender(tokens, idx, options, env, self);
       }
     }
-    
+
     return defaultFenceRender(tokens, idx, options, env, self);
   };
 
@@ -50,7 +51,7 @@ const chartPlugin: PluginSimple = (md) => {
       const token = tokens[idx];
       const match = token.info.trim().match(/^chart\s*(.*)$/);
       const title = match ? match[1] : '';
-      
+
       if (token.nesting === 1) {
         // Opening tag - set flag in environment
         if (!env.chartContainer) {
@@ -66,4 +67,3 @@ const chartPlugin: PluginSimple = (md) => {
 };
 
 export default chartPlugin;
-
