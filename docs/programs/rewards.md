@@ -158,7 +158,7 @@ let tx = await program.methods
 == Add Fee
 ### Add Fee
 
-Send [NOS](/tokens/token) to the [VaultAccount](#vault-account).
+Send [NOS](/programs/token) to the [VaultAccount](#vault-account).
 
 #### Account Info
 
