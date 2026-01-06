@@ -39,6 +39,7 @@ export default withMermaid(
     description: 'Complete documentation for the Nosana Network - SDK, protocols, and guides',
     base: '/',
     themeConfig: {
+      siteTitle: false,
       nav: [
         {
           text: 'Kit',

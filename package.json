@@ -69,6 +69,7 @@
 =======
 >>>>>>> switch to pnpm with separete package.json for docs
     "prettier": "^3.7.4",
+    "sass-embedded": "^1.97.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16",
