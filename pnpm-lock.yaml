@@ -45,6 +45,9 @@ importers:
       '@codama/renderers-js':
         specifier: ^1.5.5
         version: 1.5.5(typescript@5.9.3)
+      '@codama/visitors-core':
+        specifier: ^1.5.0
+        version: 1.5.0
       '@nosana/kit':
         specifier: file:.
         version: file:(@types/node@20.19.27)(typescript@5.9.3)(ws@8.19.0)
