@@ -3,7 +3,7 @@
     "target": "ES2020",
     "module": "ESNext",
     "lib": ["ES2020", "DOM"],
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -12,11 +12,7 @@
     "noEmit": true,
     "strict": true,
     "types": ["node"],
-    "typeRoots": ["../../node_modules/@types", "../../node_modules"],
-    "baseUrl": "../..",
-    "paths": {
-      "@nosana/kit": ["./dist/index.d.ts"]
-    }
+    "typeRoots": ["../../node_modules/@types", "../../node_modules", "../node_modules/@types", "../node_modules"]
   },
   "include": [
     "../../dist/**/*.d.ts",
