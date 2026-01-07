@@ -1,5 +1,6 @@
 import { ApiConfig } from '@nosana/api';
 import type { IPFSConfig } from '@nosana/ipfs';
+import type { AuthorizationStore } from '@nosana/authorization';
 import type { Address, TransactionSigner } from '@solana/kit';
 
 import type { Wallet } from '../types.js';
@@ -43,6 +44,7 @@ export interface ProgramConfig {
 
 export interface APIConfig extends ApiConfig {
   apiKey?: string;
+  authorizationStore?: Omit<AuthorizationStore, 'identifier'>; // identifier will be set to wallet address
 }
 
 export interface ClientConfig {
