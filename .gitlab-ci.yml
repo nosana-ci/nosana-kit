@@ -3,7 +3,7 @@
 #  | | | | (_) \__ \ (_| | | | | (_| |
 #  |_| |_|\___/|___/\__,_|_| |_|\__,_|
 
-image: node:22.8.0
+image: node:22.21.1
 
 include:
   - project: nosana-ci/tools/cicd/gitlab-ci
