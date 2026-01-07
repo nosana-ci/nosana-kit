@@ -117,21 +117,19 @@ export function createNosanaClient(
     api: NosanaClient['api'];
   } => {
     // Create authorization store with identifier if provided
-    const authorizationStore = config.api?.authorizationStore && wallet
-      ? {
-          identifier: wallet.address.toString(),
-          actions: config.api.authorizationStore.actions,
-        }
-      : undefined;
+    const authorizationStore =
+      config.api?.authorizationStore && wallet
+        ? {
+            identifier: wallet.address.toString(),
+            actions: config.api.authorizationStore.actions,
+          }
+        : undefined;
 
     // Create authorization module with store if provided
     const authorization = wallet
-      ? (authorizationStore
-          ? createNosanaAuthorization(
-              walletToAuthorizationSigner(wallet),
-              authorizationStore
-            )
-          : createNosanaAuthorization(walletToAuthorizationSigner(wallet)))
+      ? authorizationStore
+        ? createNosanaAuthorization(walletToAuthorizationSigner(wallet), authorizationStore)
+        : createNosanaAuthorization(walletToAuthorizationSigner(wallet))
       : createNosanaAuthorization();
 
     const apiDeps: NosanaApiDeps = { authorization, solana, nos };
