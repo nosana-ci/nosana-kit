@@ -1,5 +1,6 @@
 import { ApiConfig } from '@nosana/api';
 import type { IPFSConfig } from '@nosana/ipfs';
+import type { AuthorizationStore } from '@nosana/authorization';
 import type { Address, TransactionSigner } from '@solana/kit';
 
 import type { Wallet } from '../types.js';
@@ -52,6 +53,9 @@ export interface ClientConfig {
   ipfs: IPFSConfig;
   programs: ProgramConfig;
   api?: APIConfig;
+  authorization?: {
+    store: AuthorizationStore['actions'];
+  };
 }
 
 export interface PartialClientConfig {
