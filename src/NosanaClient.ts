@@ -116,8 +116,8 @@ export function createNosanaClient(
     authorization: NosanaAuthorization;
     api: NosanaClient['api'];
   } => {
-    const authorizationStore = config.authorization?.store ? {
-      identifier: wallet?.address.toString() || '',
+    const authorizationStore = wallet && config.authorization?.store ? {
+      identifier: wallet.address.toString(),
       actions: config.authorization.store,
     } : undefined;
 
