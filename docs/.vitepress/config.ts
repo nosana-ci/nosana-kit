@@ -207,7 +207,16 @@ export default withMermaid(
       // Enhanced code block features
       lineNumbers: true,
       // Twoslash transformer for type hover information
-      codeTransformers: [transformerTwoslash()],
+      codeTransformers: [
+        transformerTwoslash({
+          twoslashOptions: {
+            compilerOptions: {
+              skipLibCheck: true,
+              skipDefaultLibCheck: true,
+            },
+          },
+        }),
+      ],
       languages: ['ts', 'typescript', 'tsx', 'js', 'javascript', 'json', 'bash', 'shell'],
       // Tabs plugin for VuePress-style tabs syntax
       // Chart plugin for Chart.js charts

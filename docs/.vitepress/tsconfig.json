@@ -1,17 +1,24 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "target": "ES2020",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "lib": ["ES2020", "DOM"],
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "noEmit": true,
+    "strict": true,
     "types": ["node"],
-    "typeRoots": ["../../node_modules/@types", "../../node_modules"]
+    "typeRoots": ["../../node_modules/@types", "../../node_modules"],
+    "baseUrl": "../..",
+    "paths": {
+      "@nosana/kit": ["./dist/index.d.ts"]
+    }
   },
   "include": [
-    "../../src/**/*",
     "../../dist/**/*.d.ts",
     "**/*.ts",
     "**/*.vue"
@@ -19,6 +26,7 @@
   "exclude": [
     "node_modules",
     "../../node_modules",
-    "../../tests"
+    "../../tests",
+    "../../src"
   ]
 }

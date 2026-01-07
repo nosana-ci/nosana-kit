@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "vitepress dev .",
-    "build": "pnpm run api && vitepress build .",
+    "build": "pnpm run api && NODE_OPTIONS='--max-old-space-size=4096' vitepress build .",
     "api": "cd .. && typedoc",
     "preview": "vitepress preview ."
   },
