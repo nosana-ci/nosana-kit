@@ -44,7 +44,6 @@ export interface ProgramConfig {
 
 export interface APIConfig extends ApiConfig {
   apiKey?: string;
-  authorizationStore?: Omit<AuthorizationStore, 'identifier'>; // identifier will be set to wallet address
 }
 
 export interface ClientConfig {
@@ -54,6 +53,9 @@ export interface ClientConfig {
   ipfs: IPFSConfig;
   programs: ProgramConfig;
   api?: APIConfig;
+  authorization?: {
+    store: AuthorizationStore["actions"];
+  }
 }
 
 export interface PartialClientConfig {
