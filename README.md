@@ -14,6 +14,7 @@ npm install @nosana/kit
 
 - Node.js >= 20.18.0
 - TypeScript >= 5.3.0 (for development)
+- pnpm >= 9.15.0 (for development)
 
 ## Quick Start
 
@@ -1219,29 +1220,66 @@ The SDK includes comprehensive test coverage.
 
 ```bash
 # Run tests
-npm test
+pnpm test
 
 # Run tests in watch mode
-npm run test:watch
+pnpm run test:watch
 
 # Generate coverage report
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 ## Development
 
+This project uses **pnpm workspaces** with a monorepo structure:
+- **Root package** (`@nosana/kit`) - The main SDK
+- **Docs package** (`@nosana/docs`) - Documentation site (VitePress)
+
+### Setup
+
 ```bash
+# Install dependencies for all workspace packages
+pnpm install
+
 # Build the SDK
-npm run build
+pnpm run build
 
 # Lint code
-npm run lint
+pnpm run lint
 
 # Format code
-npm run format
+pnpm run format:fix
 
 # Generate Solana program clients
-npm run generate-clients
+pnpm run generate-clients
+```
+
+### Documentation Development
+
+The documentation is in a separate workspace package:
+
+```bash
+# Start docs dev server
+pnpm --filter @nosana/docs dev
+
+# Build docs
+pnpm --filter @nosana/docs build
+
+# Preview built docs
+pnpm --filter @nosana/docs preview
+```
+
+Or work directly in the docs package:
+
+```bash
+# Navigate to docs
+cd docs
+
+# Start dev server
+pnpm dev
+
+# Build docs
+pnpm build
 ```
 
 ## TypeScript Support
