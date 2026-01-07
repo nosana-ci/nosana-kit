@@ -54,8 +54,8 @@ export interface ClientConfig {
   programs: ProgramConfig;
   api?: APIConfig;
   authorization?: {
-    store: AuthorizationStore["actions"];
-  }
+    store: AuthorizationStore['actions'];
+  };
 }
 
 export interface PartialClientConfig {
