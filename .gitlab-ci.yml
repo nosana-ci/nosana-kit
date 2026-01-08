@@ -5,6 +5,11 @@
 
 image: node:22.21.1
 
+before_script:
+  - corepack enable
+  - npm install -g corepack@latest
+  - corepack prepare pnpm@9.15.0 --activate
+
 include:
   - project: nosana-ci/tools/cicd/gitlab-ci
     file: templates/semver.yml
@@ -12,8 +17,8 @@ include:
 check-generated-clients:
   stage: test
   script:
-    - npm ci
-    - npm run generate-clients
+    - pnpm install --frozen-lockfile
+    - pnpm run generate-clients
     - |
       if [ -n "$(git status --porcelain)" ]; then
         echo "❌ Generated clients are out of date. Please run 'npm run generate-clients' and commit the changes."
@@ -29,8 +34,8 @@ check-generated-clients:
 npm format:
   stage: test
   script:
-    - npm ci
-    - npm run format
+    - pnpm install --frozen-lockfile
+    - pnpm run format
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -38,8 +43,8 @@ npm format:
 npm lint:
   stage: test
   script:
-    - npm ci
-    - npm run lint
+    - pnpm install --frozen-lockfile
+    - pnpm run lint
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -47,8 +52,8 @@ npm lint:
 npm test:
   stage: test
   script:
-    - npm ci
-    - npm test
+    - pnpm install --frozen-lockfile
+    - pnpm test
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -56,9 +61,10 @@ npm test:
 docs build:
   stage: build
   script:
-    - npm ci
-    - npm run build
-    - npm run docs:build
+    - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" package.json
+    - pnpm install --frozen-lockfile
+    - pnpm run build
+    - pnpm --filter @nosana/docs run build
   artifacts:
     paths:
       - docs/.vitepress/dist
@@ -78,9 +84,9 @@ npm publish prod:
   stage: deploy
   script:
     - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" package.json
-    - npm ci
-    - npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
-    - npm run publish:public
+    - pnpm install --frozen-lockfile
+    - pnpm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
+    - pnpm run publish:public
   when: manual
   rules:
     - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"

@@ -1,17 +1,20 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "target": "ES2020",
     "module": "ESNext",
+    "lib": ["ES2020", "DOM"],
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "noEmit": true,
+    "strict": true,
     "types": ["node"],
-    "typeRoots": ["../../node_modules/@types", "../../node_modules"]
+    "typeRoots": ["../../node_modules/@types", "../../node_modules", "../node_modules/@types", "../node_modules"]
   },
   "include": [
-    "../../src/**/*",
     "../../dist/**/*.d.ts",
     "**/*.ts",
     "**/*.vue"
@@ -19,6 +22,7 @@
   "exclude": [
     "node_modules",
     "../../node_modules",
-    "../../tests"
+    "../../tests",
+    "../../src"
   ]
 }

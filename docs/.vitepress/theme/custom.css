@@ -100,3 +100,8 @@
 .vp-doc a .glossary-term .glossary-tooltip {
   display: none !important;
 }
+.glossary-tooltip {
+  width: max-content;
+  max-width: 300px;
+  white-space: normal !important;
+}
