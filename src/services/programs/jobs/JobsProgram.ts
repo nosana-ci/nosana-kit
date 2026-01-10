@@ -129,7 +129,24 @@ export interface JobsProgram {
   /**
    * Stop a running job
    */
-  end(params: { job: Address }): Promise<ReturnType<typeof programClient.getEndInstruction>>;
+  end: Instructions.End;
+  /**
+   * Enters the MarketAccount queue, or create a RunAccount.
+   */
+  work: Instructions.Work;
+  /**
+   * Complete a job that has been stopped.
+   */
+  finish: Instructions.Finish;
+  /**
+   * Post the result for a JobAccount to finish it and get paid.
+   */
+  complete: Instructions.Complete;
+  /**
+   * Quit a JobAccount that you have started.
+   */
+  quit: Instructions.Quit;
+
 
   /**
    * Monitor program account updates using async iterators.
@@ -620,6 +637,18 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     async end(params) {
       return Instructions.end(params, createInstructionsHelper(this.get, this.runs));
     },
+    async finish(params) {
+      return Instructions.finish(params, createInstructionsHelper(this.get, this.runs));
+    },
+    async complete(params) {
+      return Instructions.complete(params, createInstructionsHelper(this.get, this.runs));
+    },
+    async quit(params) {
+      return Instructions.quit(params, createInstructionsHelper(this.get, this.runs));
+    },
+    async work(params) {
+      return Instructions.work(params, createInstructionsHelper(this.get, this.runs));
+    }
     /**
      * Monitor program account updates using async iterators.
      * Automatically merges run account data into job account updates.
