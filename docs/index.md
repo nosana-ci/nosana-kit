@@ -8,13 +8,13 @@ hero:
   actions:
     - theme: brand
       text: Get Started
+      link: /about/getting-started
+    - theme: alt
+      text: Deployments
       link: /deployments/intro
     - theme: alt
       text: API
       link: /api/intro
-    - theme: alt
-      text: Deployments
-      link: /deployments/intro
 
 features:
   - title: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg> Deployments'
@@ -37,87 +37,101 @@ features:
     link: /kit/quick-start
 ---
 
-## Getting Started
+## Documentation Overview
 
-Discover the expansive realm of Nosana through our documentation. Whether you're deploying AI workloads with the API, building with the SDK, or contributing as a GPU host, we have guides for every use case.
+Explore our documentation organized by what you want to accomplish:
 
-:::tabs
+<div class="doc-overview">
 
-== Using Nosana API (Recommended)
+<div class="doc-section">
 
-The easiest way to get started is using the Nosana API with credits. Create deployments, manage jobs, and run AI workloads without managing wallets or blockchain transactions.
+### Deploy AI Workloads
 
-Start with our [Deployments Guide](/deployments/intro):
+- **[Getting Started](/about/getting-started)** - Choose your deployment method
+- **[Deployments Guide](/deployments/intro)** - Create and manage deployments
+- **[API Documentation](/api/intro)** - REST API and TypeScript SDK
+- **[Job Definitions](/deployments/jobs/job-definition/intro)** - Define container workloads
+- **[My First Deployment](/deployments/my-first-deployment)** - Step-by-step tutorial
 
-- **Deployments**: Create and manage long-running workloads
-- **Job Definitions**: Define your container workloads
-- **API & SDK**: Use the REST API or TypeScript SDK
-- **Guides**: Step-by-step tutorials for common scenarios
+</div>
 
-```bash
-# Install the Nosana SDK
-npm install @nosana/kit
-```
+<div class="doc-section">
 
-```ts
-import { createNosanaClient } from '@nosana/kit';
+### Host GPUs
 
-const client = createNosanaClient({
-  api: {
-    apiKey: process.env.NOSANA_API_KEY,
-  },
-});
-```
+- **[Host GPUs Guide](/hosts/grid)** - Join the network as a GPU provider
+- **[Ubuntu Setup](/hosts/grid-ubuntu)** - System setup instructions
+- **[Running the Host](/hosts/grid-run)** - Start hosting GPUs
+- **[Troubleshooting](/hosts/troubleshoot)** - Common issues and solutions
 
-== Advanced: TypeScript SDK
+</div>
 
-For direct blockchain interaction, use the Nosana SDK to interact with Solana programs directly.
+<div class="doc-section">
 
-Start with our [SDK Guide](/kit/quick-start):
+### Developer Resources
 
-```bash
-npm install @nosana/kit
-```
+- **[SDK Documentation](/kit/)** - TypeScript SDK for blockchain interaction
+- **[SDK Reference](/kit/reference/)** - Complete SDK reference
+- **[CLI Documentation](/inference/quick_start)** - Command-line interface
+- **[Programs Documentation](/programs/start)** - Solana smart contracts
+- **[Examples](/kit/examples/)** - Code examples and tutorials
 
-```ts twoslash
-import { createNosanaClient, NosanaNetwork, address } from '@nosana/kit';
+</div>
 
-// Initialize with mainnet defaults
-const client = createNosanaClient();
+<div class="doc-section">
 
-// Fetch a job by address
-const job = await client.jobs.get(address('job-address'));
-console.log('Job state:', job.state);
-```
+### Learn More
 
-== Advanced: Blockchain Programs
+- **[Key Concepts](/about/key-concepts)** - Core concepts explained
+- **[Glossary](/about/glossary)** - Terminology reference
+- **[GPU Markets](/deployments/gpu-markets)** - Available compute resources
+- **[Solana Wallet](/wallet)** - Wallet setup and configuration
+- **[Discord Community](https://discord.gg/nosana-ai)** - Get help and join the community
 
-The Nosana Programs are Solana smart contracts that power the decentralized GPU network. Interact with staking, jobs, nodes, pools, and rewards programs directly on-chain.
+</div>
 
-Start with our [Programs Documentation](/programs/start) to learn about:
+</div>
 
-- **Staking**: Stake NOS tokens to earn xNOS and participate in governance
-- **Jobs**: Post and manage compute jobs on the marketplace
-- **Nodes**: Register GPU nodes to participate in the network
-- **Pools**: Join vesting pools for token distribution
-- **Rewards**: Earn rewards for network participation
+<style>
+.doc-overview {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
 
-== For GPU Hosts
+@media (max-width: 768px) {
+  .doc-overview {
+    grid-template-columns: 1fr;
+  }
+}
 
-Earn $NOS by contributing your GPU resources to the Nosana Network. As a GPU Host, you run the Nosana Node software to connect your hardware to the decentralized marketplace.
+.doc-section {
+  padding: 1.5rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+}
 
-Get started with our [Host GPUs Guide](/hosts/grid):
+.doc-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
 
-**Requirements:**
-- NVIDIA GPU (compatible with CUDA)
-- 12GB+ RAM
-- 256GB+ NVMe SSD
-- Ubuntu 20.04+ (Linux recommended)
+.doc-section ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
 
-```bash
-# Install and run the Nosana Node
-bash <(wget -qO- https://nosana.com/start.sh)
-```
+.doc-section li {
+  margin: 0.75rem 0;
+  line-height: 1.6;
+}
 
-:::
+.doc-section a {
+  font-weight: 500;
+}
+</style>
 

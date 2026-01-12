@@ -6,32 +6,10 @@ import { markdownGlossaryPlugin } from 'vitepress-plugin-glossary';
 import chartPlugin from './plugins/chart';
 import glossary from './glossary.json';
 
-// Generate SDK Reference sidebar from TypeDoc output organized by package groups
+// Generate SDK Reference sidebar - simplified to single link
 function getSdkReferenceSidebar() {
-  // Define package groups in the order we want them displayed
-  const packageGroups = [
-    { title: '@nosana/kit', anchor: 'nosana-kit' },
-    { title: '@nosana/authorization', anchor: 'nosana-authorization' },
-    { title: '@nosana/ipfs', anchor: 'nosana-ipfs' },
-    { title: '@nosana/endpoints', anchor: 'nosana-endpoints' },
-    { title: '@nosana/api', anchor: 'nosana-api' },
-    { title: '@nosana/types', anchor: 'nosana-types' },
-    { title: '@solana/kit', anchor: 'solana-kit' },
-  ];
-
   return [
-    {
-      text: 'SDK Reference',
-      collapsible: true,
-      collapsed: true,
-      items: [
-        { text: 'Overview', link: '/kit/reference/' },
-        ...packageGroups.map((pkg) => ({
-          text: pkg.title,
-          link: `/kit/reference/#${pkg.anchor}`,
-        })),
-      ],
-    },
+    { text: 'SDK Reference', link: '/kit/reference/' },
   ];
 }
 
@@ -46,9 +24,9 @@ export default withMermaid(
         { text: 'About', link: '/about/introduction' },
         { text: 'Deployments', link: '/deployments/intro' },
         { text: 'API', link: '/api/intro' },
-        { text: 'Host GPUs', link: '/hosts/grid' },
         { text: 'SDK', link: '/kit/' },
         { text: 'CLI', link: '/inference/quick_start' },
+        { text: 'Host GPUs', link: '/hosts/grid' },
         { text: 'Programs', link: '/programs/start' },
       ],
 
@@ -139,6 +117,7 @@ export default withMermaid(
             text: 'About',
             items: [
               { text: 'Introduction', link: '/about/introduction' },
+              { text: 'Getting Started', link: '/about/getting-started' },
               { text: 'Key Concepts', link: '/about/key-concepts' },
               { text: 'Glossary', link: '/about/glossary' },
             ],

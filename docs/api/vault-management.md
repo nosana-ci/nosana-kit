@@ -246,4 +246,4 @@ When using wallet authentication, you have access to these vault management endp
 2. **Top Up Before Running**: Add funds to your vault before starting deployments to avoid interruptions
 3. **Withdraw Unused Funds**: Periodically withdraw unused funds from vaults back to your wallet
 4. **Use Separate Vaults**: Consider creating separate vaults for different projects or environments
-
+  

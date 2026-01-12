@@ -1,8 +1,8 @@
 ---
-title: Intro
+title: Nosana API
 ---
 
-# API
+# Nosana API
 
 Nosana exposes both a REST HTTP API and a typed TypeScript SDK so you can create and manage deployments from whatever environment fits your workflow.
 

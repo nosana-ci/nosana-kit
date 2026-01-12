@@ -4,7 +4,7 @@ Welcome to the Nosana Kit SDK documentation. This section covers everything you 
 
 ## Quick Links
 
-- **[SDK Reference](/kit/reference/)** - Complete API reference documentation
+- **[SDK Reference](/kit/reference/)** - Complete SDK reference documentation
 - **[Examples](/kit/examples/)** - Practical code examples and use cases
 
 ## Getting Started
