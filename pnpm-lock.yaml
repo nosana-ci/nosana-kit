@@ -48,6 +48,9 @@ importers:
       '@codama/visitors-core':
         specifier: ^1.5.0
         version: 1.5.0
+      '@eslint/js':
+        specifier: ^9.39.2
+        version: 9.39.2
       '@nosana/kit':
         specifier: file:.
         version: file:(@types/node@20.19.27)(typescript@5.9.3)(ws@8.19.0)
