@@ -53,7 +53,7 @@ importers:
         version: 9.39.2
       '@nosana/kit':
         specifier: file:.
-        version: file:(@types/node@20.19.28)(typescript@5.9.3)(ws@8.19.0)
+        version: file:(@types/node@20.19.28)(typescript@5.9.3)
       '@prettier/sync':
         specifier: ^0.6.1
         version: 0.6.1(prettier@3.7.4)
@@ -656,11 +656,6 @@ packages:
   '@nosana/kit@file:':
     resolution: {directory: '', type: directory}
     engines: {node: '>=20.18.0'}
-    peerDependencies:
-      ws: ^8.18.0
-    peerDependenciesMeta:
-      ws:
-        optional: true
 
   '@nosana/types@0.1.8':
     resolution: {integrity: sha512-yNdtCePYAX8jLQ0lbneVgH5zyF+sgqKWIygZjBREBAMQo1pYXOv1pHlDpvW1o9mbN3gud40yiWvulqzD9GwOug==}
@@ -4387,7 +4382,7 @@ snapshots:
     dependencies:
       bs58: 5.0.0
 
-  '@nosana/kit@file:(@types/node@20.19.28)(typescript@5.9.3)(ws@8.19.0)':
+  '@nosana/kit@file:(@types/node@20.19.28)(typescript@5.9.3)':
     dependencies:
       '@nosana/api': 0.1.7(@types/node@20.19.28)(typescript@5.9.3)
       '@nosana/authorization': 0.1.7
@@ -4399,8 +4394,6 @@ snapshots:
       '@solana-program/token': 0.9.0(@solana/kit@5.3.0(typescript@5.9.3))
       '@solana/kit': 5.3.0(typescript@5.9.3)
       bs58: 6.0.0
-    optionalDependencies:
-      ws: 8.19.0
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
