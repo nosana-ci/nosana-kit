@@ -9,8 +9,8 @@ const METHOD_SIGNATURE_COLUMN_WIDTH = 72;
 /** @type {import("prettier").Options | null} */
 const prettierConfig = prettier.resolveConfig(import.meta.dirname);
 
-// Load index page templates (stored outside docs/api/ to avoid being overwritten)
-const TEMPLATES_DIR = join(import.meta.dirname, 'docs', '.api-templates');
+// Load index page templates (stored outside docs/kit/reference/ to avoid being overwritten)
+const TEMPLATES_DIR = join(import.meta.dirname, 'docs', 'kit/.reference-templates');
 const INDEX_INTRO = readFileSync(join(TEMPLATES_DIR, 'intro.md'), 'utf8');
 const INDEX_FOOTER = readFileSync(join(TEMPLATES_DIR, 'footer.md'), 'utf8');
 
@@ -57,7 +57,10 @@ function splitTableByKind(tableContent) {
         if (!kindGroups.has(foundKind.kind)) {
             kindGroups.set(foundKind.kind, { singular: foundKind.singular, rows: [] });
         }
-        kindGroups.get(foundKind.kind).rows.push(row);
+        const group = kindGroups.get(foundKind.kind);
+        if (group) {
+            group.rows.push(row);
+        }
     }
     
     // Build output with subheadings for each kind
@@ -91,14 +94,11 @@ function addKindSubheadings(content) {
     });
 }
 
-class NosanaDocsMarkdownTheme extends td.MarkdownTheme {
-    /** @param {td.MarkdownPageEvent<import('typedoc').Reflection>} page */
-    getRenderContext(page) {
-        return new NosanaDocsThemeRenderContext(this, page, this.application.options);
-    }
-}
+// Ensure we're using the MarkdownTheme from the same instance
+const MarkdownTheme = td.MarkdownTheme;
+const MarkdownThemeContext = td.MarkdownThemeContext;
 
-class NosanaDocsThemeRenderContext extends td.MarkdownThemeContext {
+class NosanaDocsThemeRenderContext extends MarkdownThemeContext {
     /** @param {ConstructorParameters<typeof td.MarkdownThemeContext>} args */
     constructor(...args) {
         super(...args);
@@ -119,13 +119,40 @@ class NosanaDocsThemeRenderContext extends td.MarkdownThemeContext {
 
 /** @param {td.MarkdownApplication} app */
 export function load(app) {
-    // Use this theme name in typedoc.json or when using the CLI
-    app.renderer.defineTheme('nosana-docs-theme', NosanaDocsMarkdownTheme);
+    // Get the MarkdownTheme constructor from the default 'markdown' theme
+    // that was registered by typedoc-plugin-markdown. This ensures we use
+    // the exact same MarkdownTheme class that the plugin will check instanceof against
+    const renderer = app.renderer;
+    
+    // Access the themes map to get the default markdown theme constructor
+    // @ts-ignore - themes is private but we need it to get the correct MarkdownTheme
+    const themes = renderer.themes;
+    // @ts-ignore
+    const defaultMarkdownThemeCtor = themes?.get('markdown');
+    
+    // Use the default markdown theme's constructor as the base class
+    // This ensures instanceof checks will pass
+    // @ts-ignore - TypeScript doesn't know this is a constructor, but it is at runtime
+    const BaseMarkdownTheme = defaultMarkdownThemeCtor || MarkdownTheme;
+    
+    // Create our theme class extending the correct MarkdownTheme
+    // @ts-ignore - TypeScript type checking, but runtime will work correctly
+    class NosanaDocsMarkdownTheme extends BaseMarkdownTheme {
+        /** @param {td.MarkdownPageEvent<import('typedoc').Reflection>} page */
+        getRenderContext(page) {
+            // @ts-ignore
+            return new NosanaDocsThemeRenderContext(this, page, this.application.options);
+        }
+    }
+    
+    // Register the theme
+    // @ts-ignore
+    renderer.defineTheme('nosana-docs-theme', NosanaDocsMarkdownTheme);
 
     // Set Markdown frontmatter for each page
     app.renderer.on(td.MarkdownPageEvent.BEGIN, page => {
         page.frontmatter = {
-            title: page.url === 'index.md' ? 'API Reference' : page.model.name,
+            title: page.url === 'index.md' ? 'SDK Reference' : page.model.name,
             // Disable prev/next navigation for API pages (they're reference docs, not sequential)
             prev: false,
             next: false,
@@ -138,7 +165,7 @@ export function load(app) {
 
         // Rewrite links to be root relative for VitePress
         page.contents = page.contents.replace(/]\(((?:[^/)]+\/)*[^/)]+)\.md([^)]*)?\)/gm, (_, path, suffix) => {
-            const rootRelativeUrl = resolve('/api', dirname(page.url), path);
+            const rootRelativeUrl = resolve('/kit/reference', dirname(page.url), path);
             return `](${rootRelativeUrl}${suffix ?? ''})`;
         });
 

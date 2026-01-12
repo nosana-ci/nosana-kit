@@ -6,8 +6,8 @@ import { markdownGlossaryPlugin } from 'vitepress-plugin-glossary';
 import chartPlugin from './plugins/chart';
 import glossary from './glossary.json';
 
-// Generate API sidebar from TypeDoc output organized by package groups
-function getApiSidebar() {
+// Generate SDK Reference sidebar from TypeDoc output organized by package groups
+function getSdkReferenceSidebar() {
   // Define package groups in the order we want them displayed
   const packageGroups = [
     { title: '@nosana/kit', anchor: 'nosana-kit' },
@@ -22,11 +22,13 @@ function getApiSidebar() {
   return [
     {
       text: 'SDK Reference',
+      collapsible: true,
+      collapsed: true,
       items: [
-        { text: 'Overview', link: '/api/' },
+        { text: 'Overview', link: '/kit/reference/' },
         ...packageGroups.map((pkg) => ({
           text: pkg.title,
-          link: `/api/#${pkg.anchor}`,
+          link: `/kit/reference/#${pkg.anchor}`,
         })),
       ],
     },
@@ -41,72 +43,163 @@ export default withMermaid(
     themeConfig: {
       siteTitle: false,
       nav: [
-        {
-          text: 'Kit',
-          items: [
-            { text: 'Guide', link: '/guide/' },
-            { text: 'Examples', link: '/examples/' },
-            { text: 'SDK Reference', link: '/api/' },
-          ],
-        },
-        { text: 'Jobs', link: '/jobs/' },
+        { text: 'About', link: '/about/introduction' },
+        { text: 'Deployments', link: '/deployments/intro' },
+        { text: 'API', link: '/api/intro' },
         { text: 'Host GPUs', link: '/hosts/grid' },
+        { text: 'SDK', link: '/kit/' },
         { text: 'CLI', link: '/inference/quick_start' },
-        { text: 'Wallet', link: '/wallet' },
         { text: 'Programs', link: '/programs/start' },
       ],
 
       sidebar: {
-        '/guide/': [
+        '/deployments/': [
+          {
+            text: 'Deployments',
+            items: [
+              { text: 'Introduction', link: '/deployments/intro' },
+              { text: 'Strategies', link: '/deployments/strategies' },
+              { text: 'GPU Markets', link: '/deployments/gpu-markets' },
+              { text: 'Options', link: '/deployments/options' },
+            ],
+          },
+          {
+            text: 'Guides',
+            items: [
+              { text: 'My First Deployment', link: '/deployments/my-first-deployment' },
+              { text: 'Deploy DeepSeek Model', link: '/deployments/deploy-deepseek-model' },
+            ],
+          },
+          {
+            text: 'Jobs',
+            items: [
+              { text: 'Introduction', link: '/deployments/jobs/' },
+              { text: 'Job Execution Flow', link: '/deployments/jobs/job_execution_flow' },
+              {
+                text: 'Job Definition',
+                items: [
+                  { text: 'Intro', link: '/deployments/jobs/job-definition/intro' },
+                  { text: 'Schema', link: '/deployments/jobs/job-definition/schema' },
+                  { text: 'Health Checks', link: '/deployments/jobs/job-definition/health-checks' },
+                  { text: 'Literals (Pipeline)', link: '/deployments/jobs/job-definition/literals' },
+                  {
+                    text: 'Resources',
+                    collapsed: true,
+                    items: [
+                      { text: 'Overview', link: '/deployments/jobs/job-definition/resources' },
+                      { text: 'S3 Resources', link: '/deployments/jobs/job-definition/s3' },
+                      { text: 'HuggingFace Resources', link: '/deployments/jobs/job-definition/huggingface' },
+                      { text: 'Cached Resources', link: '/deployments/jobs/job-definition/cached-resources' },
+                    ],
+                  },
+                  { text: 'Confidential Jobs', link: '/deployments/jobs/job-definition/confidential' },
+                  { text: 'Services', link: '/deployments/jobs/job-definition/services' },
+                ],
+              },
+            ],
+          },
+        ],
+        '/api/': [
+          {
+            text: 'Nosana API',
+            items: [
+              { text: 'Introduction', link: '/api/intro' },
+            ],
+          },
+          {
+            text: 'Guides',
+            items: [
+              { text: 'Get API Key', link: '/api/get-api-key' },
+              { text: 'Wallet Authentication', link: '/api/wallet-authentication' },
+            ],
+          },
+          {
+            text: 'Reference',
+            items: [
+              { text: 'Create Deployments', link: '/api/create-deployments' },
+              { text: 'Manage Deployments', link: '/api/manage-deployments' },
+              { text: 'Vault Management', link: '/api/vault-management' },
+              { text: 'Jobs', link: '/api/jobs' },
+              { text: 'Markets', link: '/api/markets' },
+              { text: 'Credits', link: '/api/credits' },
+            ],
+          },
+        ],
+        '/guides/': [
+          {
+            text: 'Guides',
+            items: [
+              { text: 'My First Deployment', link: '/guides/my-first-deployment' },
+              { text: 'Deploy DeepSeek Model', link: '/guides/deploy-deepseek-model' },
+            ],
+          },
+        ],
+        '/about/': [
+          {
+            text: 'About',
+            items: [
+              { text: 'Introduction', link: '/about/introduction' },
+              { text: 'Key Concepts', link: '/about/key-concepts' },
+              { text: 'Glossary', link: '/about/glossary' },
+            ],
+          },
+        ],
+        '/kit/': [
           {
             text: 'Getting Started',
             items: [
-              { text: 'Installation', link: '/guide/installation' },
-              { text: 'Quick Start', link: '/guide/quick-start' },
-              { text: 'Configuration', link: '/guide/configuration' },
+              { text: 'Overview', link: '/kit/' },
+              { text: 'Installation', link: '/kit/installation' },
+              { text: 'Quick Start', link: '/kit/quick-start' },
+              { text: 'Configuration', link: '/kit/configuration' },
             ],
           },
           {
             text: 'Core Concepts',
             items: [
-              { text: 'Architecture', link: '/guide/architecture' },
-              { text: 'Wallet Configuration', link: '/guide/wallet' },
-              { text: 'Error Handling', link: '/guide/error-handling' },
+              { text: 'Architecture', link: '/kit/architecture' },
+              { text: 'Wallet Configuration', link: '/kit/wallet' },
+              { text: 'Error Handling', link: '/kit/error-handling' },
             ],
           },
           {
             text: 'Programs',
+            collapsible: true,
+            collapsed: true,
             items: [
-              { text: 'Jobs Program', link: '/guide/jobs-program' },
-              { text: 'Staking Program', link: '/guide/staking-program' },
-              { text: 'Merkle Distributor', link: '/guide/merkle-distributor' },
+              { text: 'Jobs Program', link: '/kit/jobs-program' },
+              { text: 'Staking Program', link: '/kit/staking-program' },
+              { text: 'Merkle Distributor', link: '/kit/merkle-distributor' },
             ],
           },
           {
             text: 'Services',
+            collapsible: true,
+            collapsed: true,
             items: [
-              { text: 'Solana Service', link: '/guide/solana-service' },
-              { text: 'IPFS Service', link: '/guide/ipfs-service' },
-              { text: 'Token Service', link: '/guide/token-service' },
-              { text: 'API Service', link: '/guide/api-service' },
-              { text: 'Authorization Service', link: '/guide/authorization-service' },
+              { text: 'Solana Service', link: '/kit/solana-service' },
+              { text: 'IPFS Service', link: '/kit/ipfs-service' },
+              { text: 'Token Service', link: '/kit/token-service' },
+              { text: 'API Service', link: '/kit/api-service' },
+              { text: 'Authorization Service', link: '/kit/authorization-service' },
             ],
           },
-        ],
-        '/examples/': [
           {
             text: 'Examples',
+            collapsible: true,
+            collapsed: true,
             items: [
-              { text: 'Basic Usage', link: '/examples/basic-usage' },
-              { text: 'Jobs', link: '/examples/jobs' },
-              { text: 'Staking', link: '/examples/staking' },
-              { text: 'IPFS', link: '/examples/ipfs' },
-              { text: 'Transactions', link: '/examples/transactions' },
-              { text: 'Partial Signing', link: '/examples/partial-signing' },
+              { text: 'Overview', link: '/kit/examples/' },
+              { text: 'Basic Usage', link: '/kit/examples/basic-usage' },
+              { text: 'Jobs', link: '/kit/examples/jobs' },
+              { text: 'Staking', link: '/kit/examples/staking' },
+              { text: 'IPFS', link: '/kit/examples/ipfs' },
+              { text: 'Transactions', link: '/kit/examples/transactions' },
+              { text: 'Partial Signing', link: '/kit/examples/partial-signing' },
             ],
           },
+          ...getSdkReferenceSidebar(),
         ],
-        '/api/': getApiSidebar(),
         '/hosts/': [
           {
             text: 'Host GPUs',
@@ -115,35 +208,6 @@ export default withMermaid(
               { text: 'Ubuntu Setup', link: '/hosts/grid-ubuntu' },
               { text: 'Running the Host', link: '/hosts/grid-run' },
               { text: 'Troubleshooting', link: '/hosts/troubleshoot' },
-            ],
-          },
-        ],
-        '/jobs/': [
-          {
-            text: 'Jobs',
-            items: [
-              { text: 'Introduction', link: '/jobs/' },
-              { text: 'Job Execution Flow', link: '/jobs/job_execution_flow' },
-              {
-                text: 'Job Definition',
-                items: [
-                  { text: 'Intro', link: '/jobs/job-definition/intro' },
-                  { text: 'Schema', link: '/jobs/job-definition/schema' },
-                  { text: 'Health Checks', link: '/jobs/job-definition/health-checks' },
-                  { text: 'Literals (Pipeline)', link: '/jobs/job-definition/literals' },
-                  {
-                    text: 'Resources',
-                    items: [
-                      { text: 'Overview', link: '/jobs/job-definition/resources' },
-                      { text: 'S3 Resources', link: '/jobs/job-definition/s3' },
-                      { text: 'HuggingFace Resources', link: '/jobs/job-definition/huggingface' },
-                      { text: 'Cached Resources', link: '/jobs/job-definition/cached-resources' },
-                    ],
-                  },
-                  { text: 'Confidential Jobs', link: '/jobs/job-definition/confidential' },
-                  { text: 'Services', link: '/jobs/job-definition/services' },
-                ],
-              },
             ],
           },
         ],
@@ -226,7 +290,7 @@ export default withMermaid(
         md.use(chartPlugin);
         md.use(markdownGlossaryPlugin, {
           glossary: glossary,
-          firstOccurrenceOnly: false,
+          firstOccurrenceOnly: true,
         });
       },
     },

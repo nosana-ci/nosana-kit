@@ -51,7 +51,7 @@ The `client` object is typed as `NosanaClient`, which provides full TypeScript a
 
 ## Next Steps
 
-- Learn about [Configuration](/guide/configuration) to customize your client
-- Explore the [Jobs Program](/guide/jobs-program) for more advanced usage
-- Check out [Examples](/examples/) for real-world use cases
+- Learn about [Configuration](/kit/configuration) to customize your client
+- Explore the [Jobs Program](/kit/jobs-program) for more advanced usage
+- Check out [Examples](/kit/examples/) for real-world use cases
 

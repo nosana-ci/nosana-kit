@@ -11,6 +11,8 @@ import Layout from './Layout.vue';
 import Card from '../components/Card.vue';
 import Chart from '../components/Chart.vue';
 import GlossaryList from '../components/GlossaryList.vue';
+import GPUMarkets from '../components/GPUMarkets.vue';
+import FontIcon from '../components/FontIcon.vue';
 
 export default {
   extends: DefaultTheme,
@@ -26,5 +28,7 @@ export default {
     app.component('Card', Card);
     app.component('Chart', Chart);
     app.component('GlossaryList', GlossaryList);
+    app.component('GPUMarkets', GPUMarkets);
+    app.component('FontIcon', FontIcon);
   },
 } satisfies Theme;

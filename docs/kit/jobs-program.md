@@ -194,7 +194,7 @@ await client.solana.buildSignAndSend(instruction);
 
 ## Real-time Monitoring
 
-The SDK provides monitoring methods using async iterators for real-time account updates via WebSocket. See the [Examples](/examples/jobs) section for detailed monitoring examples.
+The SDK provides monitoring methods using async iterators for real-time account updates via WebSocket. See the [Examples](/kit/examples/jobs) section for detailed monitoring examples.
 
 ## Account Types
 

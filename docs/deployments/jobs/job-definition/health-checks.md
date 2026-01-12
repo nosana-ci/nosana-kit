@@ -2,6 +2,8 @@
 title: Health Checks
 ---
 
+# Health Checks
+
 In this section we will go through the steps of creating an image with the health check functionality. The health check functionality is available in the job definition to provide you an interface to check the liveliness of your service. In this example it is implemented using a simple Node.JS HTTP server, that will return an HTTP response with status code 200, and a simple json.
 
 ```json

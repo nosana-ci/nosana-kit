@@ -22,8 +22,8 @@ Jobs are defined using a JSON format called the **Job Definition**, which provid
 
 To get started with jobs on Nosana:
 
-1. **[Job Execution Flow](/jobs/job_execution_flow)** - Learn how jobs are executed on the network
-2. **[Job Definition](/jobs/job-definition/intro)** - Understand the structure and options available in job definitions
+1. **[Job Execution Flow](/deployments/jobs/job_execution_flow)** - Learn how jobs are executed on the network
+2. **[Job Definition](/deployments/jobs/job-definition/intro)** - Understand the structure and options available in job definitions
 
 ## Deployments
 

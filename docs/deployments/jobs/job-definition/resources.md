@@ -2,6 +2,8 @@
 title: Resources
 ---
 
+# Resources
+
 Nosana Nodes can cache resources they need to run a job. This is useful, because the main bottle neck to spinning up a job is downloading the assets to start the job like docker images and model files.
 
 You can use the `resources` property of the Nosana Job Definition to load external resources into your jobs. Nosana supports several resource types:

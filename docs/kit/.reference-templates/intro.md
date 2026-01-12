@@ -1,4 +1,4 @@
-Welcome to the Nosana Kit API Reference! This documentation is automatically generated from the source code using TypeDoc.
+Welcome to the Nosana Kit SDK Reference! This documentation is automatically generated from the source code using TypeDoc.
 
 ## Need Help?
 

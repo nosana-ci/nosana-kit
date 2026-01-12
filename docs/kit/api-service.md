@@ -93,3 +93,7 @@ client2.wallet = undefined; // API becomes undefined
 client2.wallet = anotherWallet; // API is recreated with new wallet
 ```
 
+## API Documentation
+
+For detailed information about using the Nosana API, see the [Nosana API documentation](/api/intro).
+

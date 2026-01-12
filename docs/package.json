@@ -13,10 +13,15 @@
     "@nosana/kit": "workspace:*"
   },
   "devDependencies": {
+    "@braintree/sanitize-url": "^6.0.0",
     "@shikijs/twoslash": "^3.20.0",
     "@shikijs/vitepress-twoslash": "^3.20.0",
     "@vue/repl": "^4.0.0",
     "chart.js": "^4.5.1",
+    "cytoscape": "^3.32.0",
+    "cytoscape-cose-bilkent": "^4.1.0",
+    "dayjs": "^1.11.19",
+    "debug": "^4.4.3",
     "floating-vue": "^5.2.2",
     "markdown-it-container": "^4.0.0",
     "markdown-it-mathjax3": "^5.0.0",

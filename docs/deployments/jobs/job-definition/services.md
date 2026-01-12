@@ -2,6 +2,8 @@
 title: Services
 ---
 
+# Services
+
 A **service** is any long‑running process that listens on a network port and responds to requests.
 
 ## Single Service
@@ -429,23 +431,4 @@ Execution flow:
 - Services can run independently  
 - You need complex orchestration
 - Better fault tolerance needed
-
-## Troubleshooting
-
-| Symptom                   | Likely Cause                                 | Fix                                                        |
-| ------------------------- | -------------------------------------------- | ---------------------------------------------------------- |
-| Container exits instantly | `start.sh` finished before services started  | Ensure `wait -n` is the last foreground command            |
-| Port already in use       | Host or other process bound to `8000`/`9000` | Change ports in `EXPOSE`, `start.sh`, and job spec         |
-| GPU unavailable           | `"gpu": true` omitted or market mismatch     | Use a GPU market (e.g., `nvidia-3090`) and set `gpu: true` |
-
-## Next Steps
-
-**For Multi-Service Containers**:
-- Swap in your own model weights: change the `vllm serve …` line.
-- Add more services—update `start.sh` and `EXPOSE` as needed.
-
-**For Multi-Operations**:
-- Experiment with different execution groups and dependencies
-- Add health checks to ensure proper startup ordering
-- Use the Node API to monitor and control your operations
 

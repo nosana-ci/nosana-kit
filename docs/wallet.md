@@ -87,7 +87,7 @@ The Kit accepts:
 
 Pass any of these to `createNosanaClient()` and configure the wallet. Use your preferred wallet export format; no conversion is usually necessary.
 
-You can read more on how to use the `@nosana/kit` at the [Wallet Configuration](./guide/wallet.md) page.
+You can read more on how to use the `@nosana/kit` at the [Wallet Configuration](/kit/wallet) page.
 
 ---
 
