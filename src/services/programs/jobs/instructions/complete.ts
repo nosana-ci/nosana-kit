@@ -1,5 +1,5 @@
-import bs58 from 'bs58';
 import type { Address } from '@solana/kit';
+import { ipfsHashToSolBytesArray } from '@nosana/ipfs';
 
 import type { getCompleteInstruction } from '../../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
@@ -28,7 +28,7 @@ export async function complete(
 
   return client.getCompleteInstruction({
     job,
-    ipfsResult: bs58.decode(ipfsResultsHash).subarray(2),
+    ipfsResult: new Uint8Array(ipfsHashToSolBytesArray(ipfsResultsHash)),
     authority: wallet,
   });
 }

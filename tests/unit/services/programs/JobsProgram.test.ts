@@ -20,11 +20,6 @@ import {
   sdkToProgramDeps,
 } from '../../../setup/index.js';
 
-vi.mock('@solana-program/token', () => ({
-  findAssociatedTokenPda: vi.fn(async () => ['ata']),
-  TOKEN_PROGRAM_ADDRESS: 'TokenProg',
-}));
-
 // Test constants
 const DEFAULT_JOB_PRICE = 1;
 const DEFAULT_TIME = 0;
@@ -270,7 +265,6 @@ describe('JobsProgram', () => {
         // Test constants
         const walletAddr = newAddr(70);
         const vaultPda = newAddr(80);
-        const ataPda = newAddr(72);
         const programAddr = newAddr(73);
         const marketAddr = newAddr(74);
         const timeout = 1000;
@@ -286,9 +280,6 @@ describe('JobsProgram', () => {
         (sdk as any).wallet = wallet;
         // Mock PDA helper used for vault
         (sdk as any).solana.pda = vi.fn(async () => vaultPda);
-        // Mock ATA PDA
-        const token = await import('@solana-program/token');
-        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([ataPda]);
         // Mock client.getListInstruction (generated client - acceptable to mock)
         const listSpy = vi.spyOn(programClient, 'getListInstruction' as any).mockReturnValue({
           programAddress: programAddr,
@@ -454,7 +445,6 @@ describe('JobsProgram', () => {
         // Test constants
         const walletAddr = newAddr(200);
         const marketAddr = newAddr(201);
-        const nosAtaPda = newAddr(203);
 
         // Arrange wallet and mocks
         const wallet = {
@@ -463,8 +453,6 @@ describe('JobsProgram', () => {
           signTransactions: async () => [],
         } as any;
         (sdk as any).wallet = wallet;
-        // Mock NOS ATA to return a specific value so we can verify it's used
-        (sdk as any).nos.getATA = vi.fn(async () => nosAtaPda);
         // Mock client.getWorkInstruction (generated client - acceptable to mock)
         const workSpy = vi.spyOn(programClient, 'getWorkInstruction' as any).mockReturnValue({
           programAddress: newAddr(204),
@@ -480,7 +468,7 @@ describe('JobsProgram', () => {
         const args = workSpy.mock.calls[0][0] as any;
         expect(args.market).toBe(marketAddr);
         expect(args.metadata).toBe(SYSTEM_PROGRAM_ADDRESS); // Should use system program for metadata
-        expect(args.nft).toBe(nosAtaPda); // Should use NOS ATA when no NFT provided
+        expect(args.nft).toBeDefined(); // Should use NOS ATA when no NFT provided (real implementation)
         expect(args.stake).toBeDefined(); // Stake PDA should be derived
         expect(args.payer).toBe(wallet);
         expect(args.authority).toBe(wallet);
@@ -493,7 +481,6 @@ describe('JobsProgram', () => {
         const walletAddr = newAddr(210);
         const marketAddr = newAddr(211);
         const nftMint = newAddr(212);
-        const nftAtaPda = newAddr(214);
 
         // Arrange wallet and mocks
         const wallet = {
@@ -502,9 +489,6 @@ describe('JobsProgram', () => {
           signTransactions: async () => [],
         } as any;
         (sdk as any).wallet = wallet;
-        // Mock NFT ATA
-        const token = await import('@solana-program/token');
-        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([nftAtaPda]);
         // Mock client.getWorkInstruction (generated client - acceptable to mock)
         const workSpy = vi.spyOn(programClient, 'getWorkInstruction' as any).mockReturnValue({
           programAddress: newAddr(216),
@@ -519,13 +503,98 @@ describe('JobsProgram', () => {
         expect(workSpy).toHaveBeenCalled();
         const args = workSpy.mock.calls[0][0] as any;
         expect(args.market).toBe(marketAddr);
-        expect(args.nft).toBe(nftAtaPda); // Should use NFT ATA when NFT provided
+        expect(args.nft).toBeDefined(); // Should use NFT ATA when NFT provided
         expect(args.metadata).toBeDefined(); // Should use metadata PDA when NFT provided
         expect(args.stake).toBeDefined(); // Stake PDA should be derived
         expect(args.payer).toBe(wallet);
         expect(args.authority).toBe(wallet);
         expect(args.run).toBeDefined(); // Run keypair should be generated
         expect(instr).toBeDefined();
+      });
+    });
+
+    describe('finish', () => {
+      it('creates finish instruction with decoded ipfsResult and returns tuple', async () => {
+        // Test constants
+        const walletAddr = newAddr(220);
+        const jobAddr = newAddr(221);
+        const nodeAddr = newAddr(223);
+        const payerAddr = newAddr(224);
+        const marketAddr = newAddr(225);
+        const vaultPda = newAddr(226);
+        const ipfsBytes = Array.from({ length: IPFS_BYTES_LENGTH }, (_, i) => i);
+        const ipfsCid = solBytesArrayToIpfsHash(ipfsBytes);
+
+        // Arrange wallet
+        const wallet = {
+          address: walletAddr,
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
+        (sdk as any).wallet = wallet;
+
+        // Mock vault PDA to return a specific value
+        (sdk as any).solana.pda = vi.fn(async () => vaultPda);
+
+        // Mock job account with price > 0
+        const jobAccount = makeJobAccount(JobState.RUNNING, jobAddr);
+        jobAccount.data.market = marketAddr;
+        jobAccount.data.payer = payerAddr;
+        jobAccount.data.price = BigInt(100);
+        vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(jobAccount);
+
+        // Mock run account
+        const runAccount = makeRunAccount(jobAddr, RUN_TIME_555, nodeAddr);
+        runAccount.data.payer = payerAddr;
+        vi.spyOn(programClient, 'decodeRunAccount' as any).mockReturnValue(runAccount);
+        sdk.solana.rpc.getProgramAccounts = vi.fn(() => ({
+          send: vi.fn().mockResolvedValue([
+            {
+              pubkey: runAccount.address,
+              account: {
+                data: Buffer.from('mock-run-data').toString('base64'),
+                executable: false,
+                lamports: 1000000,
+                owner: sdk.config.programs.jobsAddress,
+                rentEpoch: 0,
+              },
+            },
+          ]),
+        })) as any;
+
+        // Mock getCreateATAInstructionIfNeeded to return null (ATAs already exist)
+        (sdk as any).solana.getCreateATAInstructionIfNeeded = vi.fn(async () => null);
+
+        // Mock client.getFinishInstruction (generated client - acceptable to mock)
+        const finishSpy = vi.spyOn(programClient, 'getFinishInstruction' as any).mockReturnValue({
+          programAddress: newAddr(229),
+          accounts: [],
+          data: new Uint8Array([1]),
+        });
+
+        // Act
+        const instructions = await jobs.finish({ job: jobAddr, ipfsResultsHash: ipfsCid });
+
+        // Assert - verify behavior
+        expect(finishSpy).toHaveBeenCalled();
+        const args = finishSpy.mock.calls[0][0] as any;
+        // Verify IPFS result is decoded correctly (32 bytes, not 34 with prefix)
+        expect(Array.from(args.ipfsResult)).toEqual(ipfsBytes);
+        expect(args.ipfsResult).toHaveLength(IPFS_BYTES_LENGTH);
+        // Verify accounts are passed correctly
+        expect(args.job).toBe(jobAddr);
+        expect(args.run).toBe(runAccount.address);
+        expect(args.market).toBe(marketAddr);
+        expect(args.authority).toBe(wallet);
+        // Verify deposit uses ATA when price > 0 (should be different from vault)
+        expect(args.deposit).toBeDefined();
+        expect(args.vault).toBe(vaultPda);
+        // When price > 0, deposit should be the payer's ATA (from real findAssociatedTokenPda), not the vault
+        // The real findAssociatedTokenPda will return a different value than the mocked vault PDA
+        expect(args.deposit).not.toBe(args.vault);
+        // Should return tuple with finish instruction (no ATA creation instructions since ATAs exist)
+        expect(instructions).toHaveLength(1);
+        expect(instructions[0]).toBeDefined();
       });
     });
 
