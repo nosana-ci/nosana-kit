@@ -87,7 +87,8 @@ npm publish prod:
     - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" package.json
     - pnpm install --frozen-lockfile
     - pnpm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
-    - pnpm run publish:public
+    - pnpm run build
+    - pnpm publish --access public --no-git-checks
   when: manual
   rules:
     - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
