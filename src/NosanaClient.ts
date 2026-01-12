@@ -117,15 +117,12 @@ export function createNosanaClient(
     api: NosanaClient['api'];
   } => {
     const authorization = wallet
-      ? createNosanaAuthorization(
-          walletToAuthorizationSigner(wallet),
-          config.authorization?.store
-            ? {
-                identifier: wallet.address.toString(),
-                actions: config.authorization.store,
-              }
-            : undefined
-        )
+      ? config.authorization?.store
+        ? createNosanaAuthorization(walletToAuthorizationSigner(wallet), {
+            identifier: wallet.address.toString(),
+            actions: config.authorization.store,
+          })
+        : createNosanaAuthorization(walletToAuthorizationSigner(wallet))
       : createNosanaAuthorization();
 
     const apiDeps: NosanaApiDeps = { authorization, solana, nos };
