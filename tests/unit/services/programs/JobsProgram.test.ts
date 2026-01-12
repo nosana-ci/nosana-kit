@@ -598,6 +598,52 @@ describe('JobsProgram', () => {
       });
     });
 
+    describe('complete', () => {
+      it('creates complete instruction with decoded ipfsResult and correct accounts', async () => {
+        // Test constants
+        const walletAddr = newAddr(240);
+        const jobAddr = newAddr(241);
+        const ipfsBytes = Array.from({ length: IPFS_BYTES_LENGTH }, (_, i) => i);
+        const ipfsCid = solBytesArrayToIpfsHash(ipfsBytes);
+
+        // Arrange wallet
+        const wallet = {
+          address: walletAddr,
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
+        (sdk as any).wallet = wallet;
+
+        // Mock job account with COMPLETED state and empty ipfsResult (all zeros = empty hash)
+        const jobAccount = makeJobAccount(JobState.COMPLETED, jobAddr);
+        jobAccount.data.ipfsResult = new Uint8Array(IPFS_BYTES_LENGTH).fill(0); // Empty result (will be converted to null)
+        vi.spyOn(programClient, 'fetchJobAccount' as any).mockResolvedValue(jobAccount);
+
+        // Mock client.getCompleteInstruction (generated client - acceptable to mock)
+        const completeSpy = vi
+          .spyOn(programClient, 'getCompleteInstruction' as any)
+          .mockReturnValue({
+            programAddress: newAddr(242),
+            accounts: [],
+            data: new Uint8Array([1]),
+          });
+
+        // Act
+        const instruction = await jobs.complete({ job: jobAddr, ipfsResultsHash: ipfsCid });
+
+        // Assert - verify behavior
+        expect(completeSpy).toHaveBeenCalled();
+        const args = completeSpy.mock.calls[0][0] as any;
+        // Verify IPFS result is decoded correctly (32 bytes, not 34 with prefix)
+        expect(Array.from(args.ipfsResult)).toEqual(ipfsBytes);
+        expect(args.ipfsResult).toHaveLength(IPFS_BYTES_LENGTH);
+        // Verify accounts are passed correctly
+        expect(args.job).toBe(jobAddr);
+        expect(args.authority).toBe(wallet);
+        expect(instruction).toBeDefined();
+      });
+    });
+
     describe('error handling', () => {
       it.each([
         {

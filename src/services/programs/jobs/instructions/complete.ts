@@ -19,12 +19,16 @@ export async function complete(
   { client, get, getRequiredWallet }: InstructionsHelperParams
 ): Promise<CompleteInstruction> {
   const wallet = getRequiredWallet();
-  const { state } = await get(job);
+  const jobAccount = await get(job);
 
-  if (state !== JobState.STOPPED)
+  if (jobAccount.state !== JobState.COMPLETED)
     throw new Error(
-      `Cannot complete a job that has not been stopped. Current state: ${JobState[state]}`
+      `Cannot complete a job that is not in state COMPLETED. Current state: ${JobState[jobAccount.state]}`
     );
+
+  if (jobAccount.ipfsResult !== null) {
+    throw new Error('Job has already been completed.');
+  }
 
   return client.getCompleteInstruction({
     job,
