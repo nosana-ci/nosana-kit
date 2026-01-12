@@ -1,4 +1,5 @@
 export * from './assign.js';
+export * from './complete.js';
 export * from './delist.js';
 export * from './end.js';
 export * from './extend.js';

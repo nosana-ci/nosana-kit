@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { type Address } from '@solana/kit';
+import { SYSTEM_PROGRAM_ADDRESS } from '@solana-program/system';
 import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 
 import {
@@ -444,6 +445,86 @@ describe('JobsProgram', () => {
         const args = assignSpy.mock.calls[0][0] as any;
         expect(Array.from(args.ipfsJob)).toEqual(ipfsBytes);
         expect(args.node).toBe(nodeAddr);
+        expect(instr).toBeDefined();
+      });
+    });
+
+    describe('work', () => {
+      it('creates work instruction without NFT using NOS token ATA', async () => {
+        // Test constants
+        const walletAddr = newAddr(200);
+        const marketAddr = newAddr(201);
+        const nosAtaPda = newAddr(203);
+
+        // Arrange wallet and mocks
+        const wallet = {
+          address: walletAddr,
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
+        (sdk as any).wallet = wallet;
+        // Mock NOS ATA to return a specific value so we can verify it's used
+        (sdk as any).nos.getATA = vi.fn(async () => nosAtaPda);
+        // Mock client.getWorkInstruction (generated client - acceptable to mock)
+        const workSpy = vi.spyOn(programClient, 'getWorkInstruction' as any).mockReturnValue({
+          programAddress: newAddr(204),
+          accounts: [],
+          data: new Uint8Array([1]),
+        });
+
+        // Act
+        const instr = await jobs.work({ market: marketAddr });
+
+        // Assert - verify behavior: instruction is created with correct accounts
+        expect(workSpy).toHaveBeenCalled();
+        const args = workSpy.mock.calls[0][0] as any;
+        expect(args.market).toBe(marketAddr);
+        expect(args.metadata).toBe(SYSTEM_PROGRAM_ADDRESS); // Should use system program for metadata
+        expect(args.nft).toBe(nosAtaPda); // Should use NOS ATA when no NFT provided
+        expect(args.stake).toBeDefined(); // Stake PDA should be derived
+        expect(args.payer).toBe(wallet);
+        expect(args.authority).toBe(wallet);
+        expect(args.run).toBeDefined(); // Run keypair should be generated
+        expect(instr).toBeDefined();
+      });
+
+      it('creates work instruction with NFT using NFT ATA and metadata PDA', async () => {
+        // Test constants
+        const walletAddr = newAddr(210);
+        const marketAddr = newAddr(211);
+        const nftMint = newAddr(212);
+        const nftAtaPda = newAddr(214);
+
+        // Arrange wallet and mocks
+        const wallet = {
+          address: walletAddr,
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
+        (sdk as any).wallet = wallet;
+        // Mock NFT ATA
+        const token = await import('@solana-program/token');
+        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([nftAtaPda]);
+        // Mock client.getWorkInstruction (generated client - acceptable to mock)
+        const workSpy = vi.spyOn(programClient, 'getWorkInstruction' as any).mockReturnValue({
+          programAddress: newAddr(216),
+          accounts: [],
+          data: new Uint8Array([1]),
+        });
+
+        // Act
+        const instr = await jobs.work({ market: marketAddr, nft: nftMint });
+
+        // Assert - verify behavior: instruction is created with correct accounts
+        expect(workSpy).toHaveBeenCalled();
+        const args = workSpy.mock.calls[0][0] as any;
+        expect(args.market).toBe(marketAddr);
+        expect(args.nft).toBe(nftAtaPda); // Should use NFT ATA when NFT provided
+        expect(args.metadata).toBeDefined(); // Should use metadata PDA when NFT provided
+        expect(args.stake).toBeDefined(); // Stake PDA should be derived
+        expect(args.payer).toBe(wallet);
+        expect(args.authority).toBe(wallet);
+        expect(args.run).toBeDefined(); // Run keypair should be generated
         expect(instr).toBeDefined();
       });
     });

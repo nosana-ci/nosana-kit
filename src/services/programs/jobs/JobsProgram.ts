@@ -147,7 +147,6 @@ export interface JobsProgram {
    */
   quit: Instructions.Quit;
 
-
   /**
    * Monitor program account updates using async iterators.
    * Automatically merges run account data into job account updates.
@@ -648,7 +647,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     },
     async work(params) {
       return Instructions.work(params, createInstructionsHelper(this.get, this.runs));
-    }
+    },
     /**
      * Monitor program account updates using async iterators.
      * Automatically merges run account data into job account updates.
