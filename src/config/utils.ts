@@ -28,6 +28,12 @@ const mergeConfigs = (
           ...customConfig.api,
         }
       : defaultConfig.api,
+    authorization: customConfig.authorization
+      ? {
+          ...defaultConfig.authorization,
+          ...customConfig.authorization,
+        }
+      : defaultConfig.authorization,
   };
 };
 

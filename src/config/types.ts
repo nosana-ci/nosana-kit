@@ -46,6 +46,10 @@ export interface APIConfig extends ApiConfig {
   apiKey?: string;
 }
 
+export interface AuthorizationConfig {
+  store?: AuthorizationStore['actions'];
+}
+
 export interface ClientConfig {
   solana: SolanaConfig;
   wallet?: Wallet;
@@ -53,9 +57,7 @@ export interface ClientConfig {
   ipfs: IPFSConfig;
   programs: ProgramConfig;
   api?: APIConfig;
-  authorization?: {
-    store: AuthorizationStore['actions'];
-  };
+  authorization?: AuthorizationConfig;
 }
 
 export interface PartialClientConfig {
@@ -64,4 +66,5 @@ export interface PartialClientConfig {
   ipfs?: Partial<IPFSConfig>;
   logLevel?: LogLevel;
   api?: Partial<APIConfig>;
+  authorization?: Partial<AuthorizationConfig>;
 }
