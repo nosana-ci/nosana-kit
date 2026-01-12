@@ -644,6 +644,120 @@ describe('JobsProgram', () => {
       });
     });
 
+    describe('quit', () => {
+      it('creates quit instruction with correct accounts from run', async () => {
+        // Test constants
+        const walletAddr = newAddr(250);
+        const runAddr = newAddr(251);
+        const jobAddr = newAddr(252);
+        const payerAddr = newAddr(253);
+
+        // Arrange wallet
+        const wallet = {
+          address: walletAddr,
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
+        (sdk as any).wallet = wallet;
+
+        // Mock run account
+        const runAccount = RunAccountFactory.create({
+          address: runAddr,
+          job: jobAddr,
+          payer: payerAddr,
+          time: BigInt(RUN_TIME_555),
+        });
+        vi.spyOn(programClient, 'fetchRunAccount' as any).mockResolvedValue(runAccount);
+
+        // Mock client.getQuitInstruction (generated client - acceptable to mock)
+        const quitSpy = vi.spyOn(programClient, 'getQuitInstruction' as any).mockReturnValue({
+          programAddress: newAddr(254),
+          accounts: [],
+          data: new Uint8Array([1]),
+        });
+
+        // Act
+        const instruction = await jobs.quit({ run: runAddr });
+
+        // Assert - verify behavior
+        expect(quitSpy).toHaveBeenCalled();
+        const args = quitSpy.mock.calls[0][0] as any;
+        // Verify accounts are passed correctly
+        expect(args.job).toBe(jobAddr);
+        expect(args.run).toBe(runAddr);
+        expect(args.payer).toBe(payerAddr);
+        expect(args.authority).toBe(wallet);
+        expect(instruction).toBeDefined();
+      });
+    });
+
+    describe('stop', () => {
+      it('creates stop instruction with market and node (defaults to wallet)', async () => {
+        // Test constants
+        const walletAddr = newAddr(260);
+        const marketAddr = newAddr(261);
+
+        // Arrange wallet
+        const wallet = {
+          address: walletAddr,
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
+        (sdk as any).wallet = wallet;
+
+        // Mock client.getStopInstruction (generated client - acceptable to mock)
+        const stopSpy = vi.spyOn(programClient, 'getStopInstruction' as any).mockReturnValue({
+          programAddress: newAddr(262),
+          accounts: [],
+          data: new Uint8Array([1]),
+        });
+
+        // Act - without node (should default to wallet)
+        const instruction = await jobs.stop({ market: marketAddr });
+
+        // Assert - verify behavior
+        expect(stopSpy).toHaveBeenCalled();
+        const args = stopSpy.mock.calls[0][0] as any;
+        expect(args.market).toBe(marketAddr);
+        expect(args.node).toBe(walletAddr); // Should default to wallet address
+        expect(args.authority).toBe(wallet);
+        expect(instruction).toBeDefined();
+      });
+
+      it('creates stop instruction with market and provided node', async () => {
+        // Test constants
+        const walletAddr = newAddr(270);
+        const marketAddr = newAddr(271);
+        const nodeAddr = newAddr(272);
+
+        // Arrange wallet
+        const wallet = {
+          address: walletAddr,
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
+        (sdk as any).wallet = wallet;
+
+        // Mock client.getStopInstruction (generated client - acceptable to mock)
+        const stopSpy = vi.spyOn(programClient, 'getStopInstruction' as any).mockReturnValue({
+          programAddress: newAddr(273),
+          accounts: [],
+          data: new Uint8Array([1]),
+        });
+
+        // Act - with node provided
+        const instruction = await jobs.stop({ market: marketAddr, node: nodeAddr });
+
+        // Assert - verify behavior
+        expect(stopSpy).toHaveBeenCalled();
+        const args = stopSpy.mock.calls[0][0] as any;
+        expect(args.market).toBe(marketAddr);
+        expect(args.node).toBe(nodeAddr); // Should use provided node
+        expect(args.authority).toBe(wallet);
+        expect(instruction).toBeDefined();
+      });
+    });
+
     describe('error handling', () => {
       it.each([
         {

@@ -146,6 +146,10 @@ export interface JobsProgram {
    * Quit a JobAccount that you have started.
    */
   quit: Instructions.Quit;
+  /**
+   * Exit the node queue
+   */
+  stop: Instructions.Stop;
 
   /**
    * Monitor program account updates using async iterators.
@@ -644,6 +648,9 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     },
     async quit(params) {
       return Instructions.quit(params, createInstructionsHelper(this.get, this.runs));
+    },
+    async stop(params) {
+      return Instructions.stop(params, createInstructionsHelper(this.get, this.runs));
     },
     async work(params) {
       return Instructions.work(params, createInstructionsHelper(this.get, this.runs));
