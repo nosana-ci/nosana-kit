@@ -8,7 +8,7 @@ image: node:22.21.1
 before_script:
   - corepack enable
   - npm install -g corepack@latest
-  - corepack prepare pnpm@9.15.0 --activate
+  - corepack prepare pnpm@10.28.0 --activate
 
 include:
   - project: nosana-ci/tools/cicd/gitlab-ci
