@@ -36,4 +36,4 @@ docs/.vitepress/dist/
 docs/.vitepress/cache/
 
 # Generated API docs
-docs/api/
+docs/kit/reference/

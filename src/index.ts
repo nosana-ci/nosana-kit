@@ -144,6 +144,7 @@ export {
   getNosanaConfig,
   type ClientConfig,
   type PartialClientConfig,
+  type AuthorizationConfig,
   type SolanaConfig,
   type ProgramConfig,
   type APIConfig,

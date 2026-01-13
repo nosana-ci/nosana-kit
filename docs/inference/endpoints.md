@@ -19,7 +19,7 @@ It'll be a good proof of concept to showcase how to use a Nosana endpoint.
 
 #### Step 1: Define the Job Definition
 
-Create a file called `nginx.json` and copy the following [job definition](/jobs/job-definition/intro) into it:
+Create a file called `nginx.json` and copy the following [job definition](/deployments/jobs/job-definition/intro) into it:
 
 ```json
 {
@@ -160,7 +160,7 @@ Now we will delve into how to setup an inference endpoint, where we will run an 
 
 ### Step 1: Define the Job Definition
 
-Create a file named `ollama.json` and paste the following [job definition](/jobs/job-definition/intro) into it:
+Create a file named `ollama.json` and paste the following [job definition](/deployments/jobs/job-definition/intro) into it:
 
 Below we can see an example Nosana Job Definition that is used to post jobs to Nosana.
 

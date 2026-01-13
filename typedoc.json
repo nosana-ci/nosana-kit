@@ -1,7 +1,7 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["src/index.ts"],
-  "out": "docs/api",
+  "out": "docs/kit/reference",
   "tsconfig": "./tsconfig.json",
   "plugin": [
     "typedoc-plugin-mdn-links",

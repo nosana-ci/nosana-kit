@@ -128,4 +128,4 @@ Run the following command to get the result of the job:
 nosana job get FQTP2F5hNP2rNGUtQm4Annrx462PgxPcSA6ND6ToPTxH
 ```
 
-Next, we will learn how to create a Nosana Job Definition to access Nosana's powerful features, such as using GPUs and spinning up an instance to connect to an endpoint. Learn more about the [Job Definition](/jobs/job-definition/intro) structure and capabilities.
+Next, we will learn how to create a Nosana Job Definition to access Nosana's powerful features, such as using GPUs and spinning up an instance to connect to an endpoint. Learn more about the [Job Definition](/deployments/jobs/job-definition/intro) structure and capabilities.
