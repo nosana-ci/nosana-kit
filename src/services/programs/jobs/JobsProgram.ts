@@ -103,8 +103,12 @@ export interface JobsProgram {
   /**
    * Post a new job to the marketplace
    */
-  post: Instructions.Post;
-
+  post(params: Instructions.PostParams): Promise<Instructions.PostInstruction>;
+  post(params: Instructions.AssignParams): Promise<Instructions.AssignInstruction>;
+  /**
+   * Assign a job directly to a host node
+   */
+  assign: Instructions.Assign;
   /**
    *  Extend an existing job's timeout
    */
@@ -580,8 +584,17 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     /**
      * Post a new job to the marketplace
      */
-    async post(params) {
+    // @ts-ignore
+    async post(
+      params: Instructions.PostParams | Instructions.AssignParams
+    ): Promise<Instructions.PostInstruction | Instructions.AssignInstruction> {
+      if ('node' in params) {
+        return Instructions.assign(params, createInstructionsHelper(this.get, this.runs));
+      }
       return Instructions.post(params, createInstructionsHelper(this.get, this.runs));
+    },
+    async assign(params) {
+      return Instructions.assign(params, createInstructionsHelper(this.get, this.runs));
     },
     async extend(params) {
       return Instructions.extend(params, createInstructionsHelper(this.get, this.runs));
