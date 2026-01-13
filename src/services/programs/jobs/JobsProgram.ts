@@ -101,10 +101,15 @@ export interface JobsProgram {
   markets(): Promise<Market[]>;
 
   /**
-   * Post a new job to the marketplace
+   * List a new job to the marketplace
    */
-  post(params: Instructions.PostParams): Promise<Instructions.PostInstruction>;
-  post(params: Instructions.AssignParams): Promise<Instructions.AssignInstruction>;
+  list: Instructions.List;
+  /**
+   * Post a new job to the marketplace (can list or assign based on params)
+   */
+  post(
+    params: Instructions.ListParams | Instructions.AssignParams
+  ): Promise<Instructions.ListInstruction | Instructions.AssignInstruction>;
   /**
    * Assign a job directly to a host node
    */
@@ -582,16 +587,22 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       }
     },
     /**
-     * Post a new job to the marketplace
+     * List a new job to the marketplace
      */
-    // @ts-ignore
-    async post(
-      params: Instructions.PostParams | Instructions.AssignParams
-    ): Promise<Instructions.PostInstruction | Instructions.AssignInstruction> {
+    async list(params) {
+      return Instructions.list(params, createInstructionsHelper(this.get, this.runs));
+    },
+    /**
+     * Post a new job to the marketplace (can list or assign based on params)
+     */
+    async post(params: Instructions.ListParams | Instructions.AssignParams) {
+      const helperParams = createInstructionsHelper(this.get, this.runs);
+      // If node is provided, it's an assign operation
       if ('node' in params) {
-        return Instructions.assign(params, createInstructionsHelper(this.get, this.runs));
+        return Instructions.assign(params, helperParams);
       }
-      return Instructions.post(params, createInstructionsHelper(this.get, this.runs));
+      // Otherwise, it's a list operation
+      return Instructions.list(params, helperParams);
     },
     async assign(params) {
       return Instructions.assign(params, createInstructionsHelper(this.get, this.runs));

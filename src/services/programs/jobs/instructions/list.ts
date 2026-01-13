@@ -1,21 +1,21 @@
-import bs58 from 'bs58';
+import { ipfsHashToSolBytesArray } from '@nosana/ipfs';
 import { type Address, type TransactionSigner, generateKeyPairSigner } from '@solana/kit';
 import type { getListInstruction } from '../../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
-export type PostParams = {
+export type ListParams = {
   market: Address;
   timeout: number | bigint;
   ipfsHash: string;
   payer?: TransactionSigner;
 };
 
-export type PostInstruction = ReturnType<typeof getListInstruction>;
+export type ListInstruction = ReturnType<typeof getListInstruction>;
 
-export type Post = (params: PostParams) => Promise<PostInstruction>;
+export type List = (params: ListParams) => Promise<ListInstruction>;
 
-export async function post(
-  { market, timeout, ipfsHash, payer }: PostParams,
+export async function list(
+  { market, timeout, ipfsHash, payer }: ListParams,
   {
     config,
     deps,
@@ -24,7 +24,7 @@ export async function post(
     getStaticAccounts,
     getNosATA,
   }: InstructionsHelperParams
-): Promise<PostInstruction> {
+): Promise<ListInstruction> {
   try {
     const wallet = getRequiredWallet();
     // Use provided payer or fall back to wallet
@@ -40,13 +40,16 @@ export async function post(
       ]);
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
+    // Convert IPFS hash to Solana bytes array
+    const ipfsJobBytes = ipfsHashToSolBytesArray(ipfsHash);
+
     // Create the list instruction
     return client.getListInstruction(
       {
         job: jobKey,
         run: runKey,
         market,
-        ipfsJob: bs58.decode(ipfsHash).subarray(2),
+        ipfsJob: new Uint8Array(ipfsJobBytes),
         timeout,
         user: associatedTokenAddress,
         vault: vault,
