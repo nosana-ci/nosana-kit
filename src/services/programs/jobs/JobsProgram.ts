@@ -52,6 +52,10 @@ export type Run = ConvertTypesForDb<programClient.RunAccountArgs> & { address: A
 export { MonitorEventType } from './monitor/index.js';
 export type { SimpleMonitorEvent, MonitorEvent } from './monitor/index.js';
 
+// Re-export post types (union of list and assign)
+export type PostParams = Instructions.ListParams | Instructions.AssignParams;
+export type PostInstruction = Instructions.ListInstruction | Instructions.AssignInstruction;
+
 /**
  * Jobs program interface
  * @group @nosana/kit
