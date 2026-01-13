@@ -2,9 +2,9 @@ Welcome to the Nosana Kit SDK Reference! This documentation is automatically gen
 
 ## Need Help?
 
-- Check out our [Getting Started guide](/guide/).
-- Learn about key concepts in our [Core Concept guides](/guide/).
-- Explore [code examples](/examples/).
+- Check out our [Getting Started guide](/kit/).
+- Learn about key concepts in our [Core Concept guides](/kit/architecture).
+- Explore [code examples](/kit/examples/).
 
 ## Overview
 

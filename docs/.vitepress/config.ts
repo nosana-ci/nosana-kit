@@ -8,9 +8,7 @@ import glossary from './glossary.json';
 
 // Generate SDK Reference sidebar - simplified to single link
 function getSdkReferenceSidebar() {
-  return [
-    { text: 'SDK Reference', link: '/kit/reference/' },
-  ];
+  return [{ text: 'SDK Reference', link: '/kit/reference/' }];
 }
 
 export default withMermaid(
@@ -59,18 +57,30 @@ export default withMermaid(
                   { text: 'Intro', link: '/deployments/jobs/job-definition/intro' },
                   { text: 'Schema', link: '/deployments/jobs/job-definition/schema' },
                   { text: 'Health Checks', link: '/deployments/jobs/job-definition/health-checks' },
-                  { text: 'Literals (Pipeline)', link: '/deployments/jobs/job-definition/literals' },
+                  {
+                    text: 'Literals (Pipeline)',
+                    link: '/deployments/jobs/job-definition/literals',
+                  },
                   {
                     text: 'Resources',
                     collapsed: true,
                     items: [
                       { text: 'Overview', link: '/deployments/jobs/job-definition/resources' },
                       { text: 'S3 Resources', link: '/deployments/jobs/job-definition/s3' },
-                      { text: 'HuggingFace Resources', link: '/deployments/jobs/job-definition/huggingface' },
-                      { text: 'Cached Resources', link: '/deployments/jobs/job-definition/cached-resources' },
+                      {
+                        text: 'HuggingFace Resources',
+                        link: '/deployments/jobs/job-definition/huggingface',
+                      },
+                      {
+                        text: 'Cached Resources',
+                        link: '/deployments/jobs/job-definition/cached-resources',
+                      },
                     ],
                   },
-                  { text: 'Confidential Jobs', link: '/deployments/jobs/job-definition/confidential' },
+                  {
+                    text: 'Confidential Jobs',
+                    link: '/deployments/jobs/job-definition/confidential',
+                  },
                   { text: 'Services', link: '/deployments/jobs/job-definition/services' },
                 ],
               },
@@ -80,9 +90,7 @@ export default withMermaid(
         '/api/': [
           {
             text: 'Nosana API',
-            items: [
-              { text: 'Introduction', link: '/api/intro' },
-            ],
+            items: [{ text: 'Introduction', link: '/api/intro' }],
           },
           {
             text: 'Guides',
@@ -245,7 +253,8 @@ export default withMermaid(
       },
 
       footer: {
-        message: '<a href="https://deploy.nosana.com" target="_blank" rel="noopener noreferrer">Deploy</a> · <a href="https://host.nosana.com" target="_blank" rel="noopener noreferrer">Host</a> · <a href="https://stake.nosana.com" target="_blank" rel="noopener noreferrer">Stake</a> · <a href="https://explore.nosana.com" target="_blank" rel="noopener noreferrer">Explore</a>',
+        message:
+          '<a href="https://deploy.nosana.com" target="_blank" rel="noopener noreferrer">Deploy</a> · <a href="https://host.nosana.com" target="_blank" rel="noopener noreferrer">Host</a> · <a href="https://stake.nosana.com" target="_blank" rel="noopener noreferrer">Stake</a> · <a href="https://explore.nosana.com" target="_blank" rel="noopener noreferrer">Explore</a>',
         copyright: '© 2026 <b>Nosana</b>',
       },
     },

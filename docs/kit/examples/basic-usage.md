@@ -33,7 +33,7 @@ const client = createNosanaClient();
 
 ::: info
 
-The `Job` type includes all properties from the on-chain account data. Hover over `job` in your IDE to see the full type definition, or check the [SDK Reference](/api/type-aliases/Job).
+The `Job` type includes all properties from the on-chain account data. Hover over `job` in your IDE to see the full type definition, or check the [SDK Reference](/kit/reference/type-aliases/Job).
 
 :::
 

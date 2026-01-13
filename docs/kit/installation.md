@@ -56,7 +56,7 @@ import { address } from '@nosana/kit';
 
 ::: tip
 
-All exported types are documented in the [SDK Reference](/api/). Hover over types in your IDE or click through to see detailed documentation.
+All exported types are documented in the [SDK Reference](/kit/reference/). Hover over types in your IDE or click through to see detailed documentation.
 
 :::
 

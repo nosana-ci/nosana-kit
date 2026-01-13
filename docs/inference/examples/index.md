@@ -52,7 +52,7 @@ Deploy Open WebUI to interact with language models through a user-friendly web i
 
 If you need help with any of these examples or want to create your own, check out:
 
-- [Job Execution Flow](/jobs/job_execution_flow) - Learn how jobs are executed on the network
-- [Job Definition](/jobs/job-definition/intro) - Understand the job definition structure
+- [Job Execution Flow](/deployments/jobs/job_execution_flow) - Learn how jobs are executed on the network
+- [Job Definition](/deployments/jobs/job-definition/intro) - Understand the job definition structure
 - [Nosana Templates](https://github.com/nosana-ci/pipeline-templates/tree/main/templates) - More examples on GitHub
 

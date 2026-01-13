@@ -151,7 +151,7 @@ curl -s \
 :::
 
 > **Note**: The schedule only applies to deployments using the `SCHEDULED` strategy.  
-> For cron syntax examples, see **[Deployment Strategies](/getting-started/deployments/strategies)**.
+> For cron syntax examples, see **[Deployment Strategies](/deployments/strategies)**.
 
 ## Update Timeout
 

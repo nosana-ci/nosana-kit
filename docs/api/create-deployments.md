@@ -12,7 +12,7 @@ Before creating deployments, ensure you have:
 
 - **API Key**: A valid Nosana API key. See the [API key guide](/api/get-api-key).
 - **Credit Balance**: Sufficient credit balance on your Nosana account to run deployments.
-- **Job Definition**: A valid [job definition](/getting-started/job-definition/intro) describing the container workload.
+- **Job Definition**: A valid [job definition](/deployments/jobs/job-definition/intro) describing the container workload.
 
 ## What you configure
 
@@ -23,7 +23,7 @@ When creating a deployment, you specify:
 - Deployment configuration: **timeout**, **replicas**, **strategy**
 - The **job definition** (container image, commands, operations)
 
-For all available fields, see **[Deployment Options](/getting-started/deployments/options)**. You can find GPU markets **[here](/getting-started/deployments/gpu-markets)**.
+For all available fields, see **[Deployment Options](/deployments/options)**. You can find GPU markets **[here](/deployments/gpu-markets)**.
 
 ## Create a Deployment
 
