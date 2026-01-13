@@ -1,30 +1,24 @@
 import bs58 from 'bs58';
 import { type Address, type TransactionSigner, generateKeyPairSigner } from '@solana/kit';
-import type { getListInstruction } from '../../../../generated_clients/jobs/index.js';
+import type { getAssignInstruction } from '../../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
-export type PostParams = {
+export type AssignParams = {
   market: Address;
   timeout: number | bigint;
   ipfsHash: string;
+  node: Address;
   payer?: TransactionSigner;
 };
 
-export type PostInstruction = ReturnType<typeof getListInstruction>;
+export type AssignInstruction = ReturnType<typeof getAssignInstruction>;
 
-export type Post = (params: PostParams) => Promise<PostInstruction>;
+export type Assign = (params: AssignParams) => Promise<AssignInstruction>;
 
-export async function post(
-  { market, timeout, ipfsHash, payer }: PostParams,
-  {
-    config,
-    deps,
-    client,
-    getRequiredWallet,
-    getStaticAccounts,
-    getNosATA,
-  }: InstructionsHelperParams
-): Promise<PostInstruction> {
+export async function assign(
+  { market, timeout, ipfsHash, node, payer }: AssignParams,
+  { config, deps, client, getRequiredWallet, getStaticAccounts, getNosATA }: InstructionsHelperParams
+): Promise<AssignInstruction> {
   try {
     const wallet = getRequiredWallet();
     // Use provided payer or fall back to wallet
@@ -40,11 +34,11 @@ export async function post(
       ]);
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
-    // Create the list instruction
-    return client.getListInstruction(
+    return client.getAssignInstruction(
       {
         job: jobKey,
         run: runKey,
+        node,
         market,
         ipfsJob: bs58.decode(ipfsHash).subarray(2),
         timeout,
