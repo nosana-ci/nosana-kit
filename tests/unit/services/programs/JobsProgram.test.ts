@@ -104,6 +104,10 @@ describe('JobsProgram', () => {
       jobs = createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
 
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
     describe('get, run, market', () => {
       it('run fetches and transforms single run account', async () => {
         const addr = newAddr(100);
@@ -303,7 +307,6 @@ describe('JobsProgram', () => {
         // Test constants
         const walletAddr = newAddr(75);
         const vaultPda = newAddr(81);
-        const ataPda = newAddr(76);
         const programAddr = newAddr(77);
         const marketAddr = newAddr(78);
         const nodeAddr = newAddr(79);
@@ -320,9 +323,6 @@ describe('JobsProgram', () => {
         (sdk as any).wallet = wallet;
         // Mock PDA helper used for vault
         (sdk as any).solana.pda = vi.fn(async () => vaultPda);
-        // Mock ATA PDA
-        const token = await import('@solana-program/token');
-        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([ataPda]);
         // Mock client.getAssignInstruction (generated client - acceptable to mock)
         const assignSpy = vi.spyOn(programClient, 'getAssignInstruction' as any).mockReturnValue({
           programAddress: programAddr,
@@ -352,7 +352,6 @@ describe('JobsProgram', () => {
         // Test constants
         const walletAddr = newAddr(82);
         const vaultPda = newAddr(83);
-        const ataPda = newAddr(84);
         const programAddr = newAddr(85);
         const marketAddr = newAddr(86);
         const timeout = 3000;
@@ -368,9 +367,6 @@ describe('JobsProgram', () => {
         (sdk as any).wallet = wallet;
         // Mock PDA helper used for vault
         (sdk as any).solana.pda = vi.fn(async () => vaultPda);
-        // Mock ATA PDA
-        const token = await import('@solana-program/token');
-        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([ataPda]);
         // Mock client.getListInstruction (generated client - acceptable to mock)
         const listSpy = vi.spyOn(programClient, 'getListInstruction' as any).mockReturnValue({
           programAddress: programAddr,
@@ -394,7 +390,6 @@ describe('JobsProgram', () => {
         // Test constants
         const walletAddr = newAddr(87);
         const vaultPda = newAddr(88);
-        const ataPda = newAddr(89);
         const programAddr = newAddr(90);
         const marketAddr = newAddr(91);
         const nodeAddr = newAddr(92);
@@ -411,9 +406,6 @@ describe('JobsProgram', () => {
         (sdk as any).wallet = wallet;
         // Mock PDA helper used for vault
         (sdk as any).solana.pda = vi.fn(async () => vaultPda);
-        // Mock ATA PDA
-        const token = await import('@solana-program/token');
-        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([ataPda]);
         // Mock client.getAssignInstruction (generated client - acceptable to mock)
         const assignSpy = vi.spyOn(programClient, 'getAssignInstruction' as any).mockReturnValue({
           programAddress: programAddr,
