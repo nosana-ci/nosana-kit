@@ -52,6 +52,10 @@ export type Run = ConvertTypesForDb<programClient.RunAccountArgs> & { address: A
 export { MonitorEventType } from './monitor/index.js';
 export type { SimpleMonitorEvent, MonitorEvent } from './monitor/index.js';
 
+// Re-export post types (union of list and assign)
+export type PostParams = Instructions.ListParams | Instructions.AssignParams;
+export type PostInstruction = Instructions.ListInstruction | Instructions.AssignInstruction;
+
 /**
  * Jobs program interface
  * @group @nosana/kit
@@ -101,10 +105,19 @@ export interface JobsProgram {
   markets(): Promise<Market[]>;
 
   /**
-   * Post a new job to the marketplace
+   * List a new job to the marketplace
    */
-  post: Instructions.Post;
-
+  list: Instructions.List;
+  /**
+   * Post a new job to the marketplace (can list or assign based on params)
+   */
+  post(
+    params: Instructions.ListParams | Instructions.AssignParams
+  ): Promise<Instructions.ListInstruction | Instructions.AssignInstruction>;
+  /**
+   * Assign a job directly to a host node
+   */
+  assign: Instructions.Assign;
   /**
    *  Extend an existing job's timeout
    */
@@ -578,10 +591,25 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       }
     },
     /**
-     * Post a new job to the marketplace
+     * List a new job to the marketplace
      */
-    async post(params) {
-      return Instructions.post(params, createInstructionsHelper(this.get, this.runs));
+    async list(params) {
+      return Instructions.list(params, createInstructionsHelper(this.get, this.runs));
+    },
+    /**
+     * Post a new job to the marketplace (can list or assign based on params)
+     */
+    async post(params: Instructions.ListParams | Instructions.AssignParams) {
+      const helperParams = createInstructionsHelper(this.get, this.runs);
+      // If node is provided, it's an assign operation
+      if ('node' in params) {
+        return Instructions.assign(params, helperParams);
+      }
+      // Otherwise, it's a list operation
+      return Instructions.list(params, helperParams);
+    },
+    async assign(params) {
+      return Instructions.assign(params, createInstructionsHelper(this.get, this.runs));
     },
     async extend(params) {
       return Instructions.extend(params, createInstructionsHelper(this.get, this.runs));

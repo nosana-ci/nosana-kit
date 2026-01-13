@@ -264,8 +264,8 @@ describe('JobsProgram', () => {
       });
     });
 
-    describe('post', () => {
-      it('creates list instruction with decoded ipfsJob and PDAs', async () => {
+    describe('list', () => {
+      it('creates list instruction with ipfsHashToSolBytesArray and PDAs', async () => {
         // Test constants
         const walletAddr = newAddr(70);
         const vaultPda = newAddr(80);
@@ -296,12 +296,154 @@ describe('JobsProgram', () => {
         });
 
         // Act
-        const instr = await jobs.post({ market: marketAddr, timeout, ipfsHash: ipfsCid });
+        const instr = await jobs.list({ market: marketAddr, timeout, ipfsHash: ipfsCid });
 
-        // Assert - verify behavior: instruction is created with correct IPFS bytes
+        // Assert - verify behavior: instruction is created with correct IPFS bytes using ipfsHashToSolBytesArray
         expect(listSpy).toHaveBeenCalled();
         const args = listSpy.mock.calls[0][0] as any;
         expect(Array.from(args.ipfsJob)).toEqual(ipfsBytes);
+        expect(instr).toBeDefined();
+      });
+    });
+
+    describe('assign', () => {
+      it('creates assign instruction with ipfsHashToSolBytesArray and PDAs', async () => {
+        // Test constants
+        const walletAddr = newAddr(75);
+        const vaultPda = newAddr(81);
+        const ataPda = newAddr(76);
+        const programAddr = newAddr(77);
+        const marketAddr = newAddr(78);
+        const nodeAddr = newAddr(79);
+        const timeout = 2000;
+        const ipfsBytes = Array.from({ length: IPFS_BYTES_LENGTH }, (_, i) => i + 10);
+        const ipfsCid = solBytesArrayToIpfsHash(ipfsBytes);
+
+        // Arrange wallet and mocks
+        const wallet = {
+          address: walletAddr,
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
+        (sdk as any).wallet = wallet;
+        // Mock PDA helper used for vault
+        (sdk as any).solana.pda = vi.fn(async () => vaultPda);
+        // Mock ATA PDA
+        const token = await import('@solana-program/token');
+        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([ataPda]);
+        // Mock client.getAssignInstruction (generated client - acceptable to mock)
+        const assignSpy = vi.spyOn(programClient, 'getAssignInstruction' as any).mockReturnValue({
+          programAddress: programAddr,
+          accounts: [],
+          data: new Uint8Array([2]),
+        });
+
+        // Act
+        const instr = await jobs.assign({
+          market: marketAddr,
+          timeout,
+          ipfsHash: ipfsCid,
+          node: nodeAddr,
+        });
+
+        // Assert - verify behavior: instruction is created with correct IPFS bytes using ipfsHashToSolBytesArray
+        expect(assignSpy).toHaveBeenCalled();
+        const args = assignSpy.mock.calls[0][0] as any;
+        expect(Array.from(args.ipfsJob)).toEqual(ipfsBytes);
+        expect(args.node).toBe(nodeAddr);
+        expect(instr).toBeDefined();
+      });
+    });
+
+    describe('post', () => {
+      it('creates list instruction when node is not provided', async () => {
+        // Test constants
+        const walletAddr = newAddr(82);
+        const vaultPda = newAddr(83);
+        const ataPda = newAddr(84);
+        const programAddr = newAddr(85);
+        const marketAddr = newAddr(86);
+        const timeout = 3000;
+        const ipfsBytes = Array.from({ length: IPFS_BYTES_LENGTH }, (_, i) => i + 20);
+        const ipfsCid = solBytesArrayToIpfsHash(ipfsBytes);
+
+        // Arrange wallet and mocks
+        const wallet = {
+          address: walletAddr,
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
+        (sdk as any).wallet = wallet;
+        // Mock PDA helper used for vault
+        (sdk as any).solana.pda = vi.fn(async () => vaultPda);
+        // Mock ATA PDA
+        const token = await import('@solana-program/token');
+        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([ataPda]);
+        // Mock client.getListInstruction (generated client - acceptable to mock)
+        const listSpy = vi.spyOn(programClient, 'getListInstruction' as any).mockReturnValue({
+          programAddress: programAddr,
+          accounts: [],
+          data: new Uint8Array([1]),
+        });
+        const assignSpy = vi.spyOn(programClient, 'getAssignInstruction' as any);
+
+        // Act
+        const instr = await jobs.post({ market: marketAddr, timeout, ipfsHash: ipfsCid });
+
+        // Assert - verify behavior: post creates list instruction when node is not provided
+        expect(listSpy).toHaveBeenCalled();
+        expect(assignSpy).not.toHaveBeenCalled();
+        const args = listSpy.mock.calls[0][0] as any;
+        expect(Array.from(args.ipfsJob)).toEqual(ipfsBytes);
+        expect(instr).toBeDefined();
+      });
+
+      it('creates assign instruction when node is provided', async () => {
+        // Test constants
+        const walletAddr = newAddr(87);
+        const vaultPda = newAddr(88);
+        const ataPda = newAddr(89);
+        const programAddr = newAddr(90);
+        const marketAddr = newAddr(91);
+        const nodeAddr = newAddr(92);
+        const timeout = 4000;
+        const ipfsBytes = Array.from({ length: IPFS_BYTES_LENGTH }, (_, i) => i + 30);
+        const ipfsCid = solBytesArrayToIpfsHash(ipfsBytes);
+
+        // Arrange wallet and mocks
+        const wallet = {
+          address: walletAddr,
+          signMessages: async () => [],
+          signTransactions: async () => [],
+        } as any;
+        (sdk as any).wallet = wallet;
+        // Mock PDA helper used for vault
+        (sdk as any).solana.pda = vi.fn(async () => vaultPda);
+        // Mock ATA PDA
+        const token = await import('@solana-program/token');
+        vi.spyOn(token, 'findAssociatedTokenPda' as any).mockResolvedValue([ataPda]);
+        // Mock client.getAssignInstruction (generated client - acceptable to mock)
+        const assignSpy = vi.spyOn(programClient, 'getAssignInstruction' as any).mockReturnValue({
+          programAddress: programAddr,
+          accounts: [],
+          data: new Uint8Array([2]),
+        });
+        const listSpy = vi.spyOn(programClient, 'getListInstruction' as any);
+
+        // Act
+        const instr = await jobs.post({
+          market: marketAddr,
+          timeout,
+          ipfsHash: ipfsCid,
+          node: nodeAddr,
+        });
+
+        // Assert - verify behavior: post creates assign instruction when node is provided
+        expect(assignSpy).toHaveBeenCalled();
+        expect(listSpy).not.toHaveBeenCalled();
+        const args = assignSpy.mock.calls[0][0] as any;
+        expect(Array.from(args.ipfsJob)).toEqual(ipfsBytes);
+        expect(args.node).toBe(nodeAddr);
         expect(instr).toBeDefined();
       });
     });

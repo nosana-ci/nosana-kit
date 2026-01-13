@@ -35,10 +35,19 @@ export type { JobsProgram, Job, Market, Run } from './services/programs/jobs/ind
  * @group @nosana/kit
  */
 export type {
-  Post,
-  PostParams,
-  PostInstruction,
-} from './services/programs/jobs/instructions/post.js';
+  List,
+  ListParams,
+  ListInstruction,
+} from './services/programs/jobs/instructions/list.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
+  Assign,
+  AssignParams,
+  AssignInstruction,
+} from './services/programs/jobs/instructions/assign.js';
 
 /**
  * @group @nosana/kit
@@ -57,6 +66,11 @@ export type {
   DelistParams,
   DelistInstruction,
 } from './services/programs/jobs/instructions/delist.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type { PostParams, PostInstruction } from './services/programs/jobs/index.js';
 
 /**
  * @group @nosana/kit
