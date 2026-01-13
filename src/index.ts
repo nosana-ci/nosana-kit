@@ -70,6 +70,52 @@ export type {
 /**
  * @group @nosana/kit
  */
+export type {
+  Work,
+  WorkParams,
+  WorkInstruction,
+} from './services/programs/jobs/instructions/work.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
+  Finish,
+  FinishParams,
+  FinishInstruction,
+  FinishInstructions,
+} from './services/programs/jobs/instructions/finish.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
+  Complete,
+  CompleteParams,
+  CompleteInstruction,
+} from './services/programs/jobs/instructions/complete.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
+  Quit,
+  QuitParams,
+  QuitInstruction,
+} from './services/programs/jobs/instructions/quit.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
+  Stop,
+  StopParams,
+  StopInstruction,
+} from './services/programs/jobs/instructions/stop.js';
+
+/**
+ * @group @nosana/kit
+ */
 export type { PostParams, PostInstruction } from './services/programs/jobs/index.js';
 
 /**
