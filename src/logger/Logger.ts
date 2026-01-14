@@ -1,4 +1,4 @@
-export type LogLevel = 'none' | 'error' | 'warn' | 'info' | 'debug';
+export type LogLevel = 'none' | 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
 
 export interface LoggerOptions {
   level?: LogLevel;
@@ -29,9 +29,8 @@ export class Logger {
 
   private shouldLog(messageLevel: Exclude<LogLevel, 'none'>): boolean {
     if (!this.enabled || this.level === 'none') return false;
-    // Levels ordered from most verbose (debug) to least verbose (error)
-    // If level is 'info', we log 'info', 'warn', 'error' (index >= 2)
-    const levels: Exclude<LogLevel, 'none'>[] = ['debug', 'info', 'warn', 'error'];
+    // Levels ordered from most verbose (trace) to least verbose (fatal)
+    const levels: Exclude<LogLevel, 'none'>[] = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'];
     const currentLevelIndex = levels.indexOf(this.level as Exclude<LogLevel, 'none'>);
     const messageLevelIndex = levels.indexOf(messageLevel);
     return messageLevelIndex >= currentLevelIndex;
@@ -39,6 +38,12 @@ export class Logger {
 
   private formatMessage(level: LogLevel, message: string): string {
     return `${this.prefix} [${level.toUpperCase()}] ${message}`;
+  }
+
+  public trace(message: string): void {
+    if (this.shouldLog('trace')) {
+      console.trace(this.formatMessage('trace', message));
+    }
   }
 
   public debug(message: string): void {
@@ -63,6 +68,31 @@ export class Logger {
     if (this.shouldLog('error')) {
       console.error(this.formatMessage('error', message));
     }
+  }
+
+  public fatal(message: string): void {
+    if (this.shouldLog('fatal')) {
+      console.error(this.formatMessage('fatal', message));
+    }
+  }
+
+  public child(bindings: Record<string, any>): Logger {
+    // Create a new logger instance with modified prefix
+    const childLogger = new Logger({
+      level: this.level,
+      prefix: this.prefix,
+      enabled: this.enabled
+    });
+
+    // Add bindings to the prefix if provided
+    if (Object.keys(bindings).length > 0) {
+      const bindingString = Object.entries(bindings)
+        .map(([key, value]) => `${key}=${value}`)
+        .join(' ');
+      childLogger.prefix = `${this.prefix} [${bindingString}]`;
+    }
+
+    return childLogger;
   }
 
   public setLevel(level: LogLevel): void {
