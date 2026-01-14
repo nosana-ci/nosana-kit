@@ -126,10 +126,7 @@ export { MonitorEventType } from './services/programs/jobs/monitor/types.js';
 /**
  * @group @nosana/kit
  */
-export type {
-  SimpleMonitorEvent,
-  MonitorEvent,
-} from './services/programs/jobs/monitor/types.js';
+export type { SimpleMonitorEvent, MonitorEvent } from './services/programs/jobs/monitor/types.js';
 
 /**
  * @group @nosana/kit
