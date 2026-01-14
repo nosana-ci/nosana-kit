@@ -40,11 +40,10 @@ export const FINISH_INSTRUCTION_ACCOUNTS = {
   vault: 3,
   deposit: 4,
   user: 5,
-  payerJob: 6,
-  payerRun: 7,
-  project: 8,
-  authority: 9,
-  tokenProgram: 10,
+  payerRun: 6,
+  payerJob: 7,
+  authority: 8,
+  tokenProgram: 9,
 } as const;
 
 export type FinishInstructionAccountName = keyof typeof FINISH_INSTRUCTION_ACCOUNTS;
@@ -64,9 +63,8 @@ export type FinishInstruction<
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountDeposit extends string | AccountMeta<string> = string,
   TAccountUser extends string | AccountMeta<string> = string,
-  TAccountPayerJob extends string | AccountMeta<string> = string,
   TAccountPayerRun extends string | AccountMeta<string> = string,
-  TAccountProject extends string | AccountMeta<string> = string,
+  TAccountPayerJob extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
@@ -89,15 +87,12 @@ export type FinishInstruction<
       TAccountUser extends string
         ? WritableAccount<TAccountUser>
         : TAccountUser,
-      TAccountPayerJob extends string
-        ? WritableAccount<TAccountPayerJob>
-        : TAccountPayerJob,
       TAccountPayerRun extends string
         ? WritableAccount<TAccountPayerRun>
         : TAccountPayerRun,
-      TAccountProject extends string
-        ? WritableAccount<TAccountProject>
-        : TAccountProject,
+      TAccountPayerJob extends string
+        ? WritableAccount<TAccountPayerJob>
+        : TAccountPayerJob,
       TAccountAuthority extends string
         ? ReadonlySignerAccount<TAccountAuthority> &
             AccountSignerMeta<TAccountAuthority>
@@ -150,9 +145,8 @@ export type FinishInput<
   TAccountVault extends string = string,
   TAccountDeposit extends string = string,
   TAccountUser extends string = string,
-  TAccountPayerJob extends string = string,
   TAccountPayerRun extends string = string,
-  TAccountProject extends string = string,
+  TAccountPayerJob extends string = string,
   TAccountAuthority extends string = string,
   TAccountTokenProgram extends string = string,
 > = {
@@ -162,9 +156,8 @@ export type FinishInput<
   vault: Address<TAccountVault>;
   deposit: Address<TAccountDeposit>;
   user: Address<TAccountUser>;
-  payerJob: Address<TAccountPayerJob>;
   payerRun: Address<TAccountPayerRun>;
-  project: Address<TAccountProject>;
+  payerJob: Address<TAccountPayerJob>;
   authority: TransactionSigner<TAccountAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
   ipfsResult: FinishInstructionDataArgs["ipfsResult"];
@@ -177,9 +170,8 @@ export function getFinishInstruction<
   TAccountVault extends string,
   TAccountDeposit extends string,
   TAccountUser extends string,
-  TAccountPayerJob extends string,
   TAccountPayerRun extends string,
-  TAccountProject extends string,
+  TAccountPayerJob extends string,
   TAccountAuthority extends string,
   TAccountTokenProgram extends string,
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
@@ -191,9 +183,8 @@ export function getFinishInstruction<
     TAccountVault,
     TAccountDeposit,
     TAccountUser,
-    TAccountPayerJob,
     TAccountPayerRun,
-    TAccountProject,
+    TAccountPayerJob,
     TAccountAuthority,
     TAccountTokenProgram
   >,
@@ -206,9 +197,8 @@ export function getFinishInstruction<
   TAccountVault,
   TAccountDeposit,
   TAccountUser,
-  TAccountPayerJob,
   TAccountPayerRun,
-  TAccountProject,
+  TAccountPayerJob,
   TAccountAuthority,
   TAccountTokenProgram
 > {
@@ -223,9 +213,8 @@ export function getFinishInstruction<
     vault: { value: input.vault ?? null, isWritable: true },
     deposit: { value: input.deposit ?? null, isWritable: true },
     user: { value: input.user ?? null, isWritable: true },
-    payerJob: { value: input.payerJob ?? null, isWritable: true },
     payerRun: { value: input.payerRun ?? null, isWritable: true },
-    project: { value: input.project ?? null, isWritable: true },
+    payerJob: { value: input.payerJob ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
@@ -252,9 +241,8 @@ export function getFinishInstruction<
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.deposit),
       getAccountMeta(accounts.user),
-      getAccountMeta(accounts.payerJob),
       getAccountMeta(accounts.payerRun),
-      getAccountMeta(accounts.project),
+      getAccountMeta(accounts.payerJob),
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.tokenProgram),
     ],
@@ -270,9 +258,8 @@ export function getFinishInstruction<
     TAccountVault,
     TAccountDeposit,
     TAccountUser,
-    TAccountPayerJob,
     TAccountPayerRun,
-    TAccountProject,
+    TAccountPayerJob,
     TAccountAuthority,
     TAccountTokenProgram
   >);
@@ -290,11 +277,10 @@ export type ParsedFinishInstruction<
     vault: TAccountMetas[3];
     deposit: TAccountMetas[4];
     user: TAccountMetas[5];
-    payerJob: TAccountMetas[6];
-    payerRun: TAccountMetas[7];
-    project: TAccountMetas[8];
-    authority: TAccountMetas[9];
-    tokenProgram: TAccountMetas[10];
+    payerRun: TAccountMetas[6];
+    payerJob: TAccountMetas[7];
+    authority: TAccountMetas[8];
+    tokenProgram: TAccountMetas[9];
   };
   data: FinishInstructionData;
 };
@@ -307,7 +293,7 @@ export function parseFinishInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedFinishInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 11) {
+  if (instruction.accounts.length < 10) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -326,9 +312,8 @@ export function parseFinishInstruction<
       vault: getNextAccount(),
       deposit: getNextAccount(),
       user: getNextAccount(),
-      payerJob: getNextAccount(),
       payerRun: getNextAccount(),
-      project: getNextAccount(),
+      payerJob: getNextAccount(),
       authority: getNextAccount(),
       tokenProgram: getNextAccount(),
     },
