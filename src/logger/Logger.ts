@@ -30,7 +30,14 @@ export class Logger {
   private shouldLog(messageLevel: Exclude<LogLevel, 'none'>): boolean {
     if (!this.enabled || this.level === 'none') return false;
     // Levels ordered from most verbose (trace) to least verbose (fatal)
-    const levels: Exclude<LogLevel, 'none'>[] = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'];
+    const levels: Exclude<LogLevel, 'none'>[] = [
+      'trace',
+      'debug',
+      'info',
+      'warn',
+      'error',
+      'fatal',
+    ];
     const currentLevelIndex = levels.indexOf(this.level as Exclude<LogLevel, 'none'>);
     const messageLevelIndex = levels.indexOf(messageLevel);
     return messageLevelIndex >= currentLevelIndex;
@@ -81,7 +88,7 @@ export class Logger {
     const childLogger = new Logger({
       level: this.level,
       prefix: this.prefix,
-      enabled: this.enabled
+      enabled: this.enabled,
     });
 
     // Add bindings to the prefix if provided
