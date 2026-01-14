@@ -121,11 +121,12 @@ export type { PostParams, PostInstruction } from './services/programs/jobs/index
 /**
  * @group @nosana/kit
  */
-export type {
-  SimpleMonitorEvent,
-  MonitorEvent,
-  MonitorEventType,
-} from './services/programs/jobs/monitor/types.js';
+export { MonitorEventType } from './services/programs/jobs/monitor/types.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type { SimpleMonitorEvent, MonitorEvent } from './services/programs/jobs/monitor/types.js';
 
 /**
  * @group @nosana/kit

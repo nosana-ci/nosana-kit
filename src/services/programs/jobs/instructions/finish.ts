@@ -2,7 +2,7 @@ import type { Address } from '@solana/kit';
 import { getCreateAssociatedTokenIdempotentInstructionAsync } from '@solana-program/token';
 import { ipfsHashToSolBytesArray } from '@nosana/ipfs';
 
-import type { getFinishInstruction } from '../../../../generated_clients/jobs/index.js';
+import { type getFinishInstruction } from '../../../../generated_clients/jobs/index.js';
 import type { InstructionsHelperParams } from './types.js';
 
 type CreateATAInstruction = Awaited<
@@ -74,7 +74,6 @@ export async function finish(
         user: nodeATA,
         payerJob: jobAccount.payer,
         payerRun: run.payer,
-        project: jobAccount.project,
         authority: wallet,
         ipfsResult,
         ...staticAccounts,

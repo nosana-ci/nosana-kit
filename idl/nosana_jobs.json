@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "2.2.1",
   "name": "nosana_jobs",
   "metadata": {
     "address": "nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM"
@@ -755,17 +755,12 @@
           "isSigner": false
         },
         {
-          "name": "payerJob",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "payerRun",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "project",
+          "name": "payerJob",
           "isMut": true,
           "isSigner": false
         },
