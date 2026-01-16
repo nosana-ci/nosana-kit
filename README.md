@@ -319,18 +319,380 @@ async post(params: {
 }): Promise<Instruction>
 ```
 
-Create a list instruction for posting a job to a market. Returns an instruction that must be submitted to the network.
+Create a job instruction that can either list a job to a market or assign it directly to a node, depending on whether the `node` parameter is provided. Returns an instruction that must be submitted to the network.
 
 ```typescript
 // Set wallet first
 client.wallet = yourWallet;
 
-// Create job instruction
+// Create job instruction (will list to market if node is not provided)
 const instruction = await client.jobs.post({
-  market: 'market-address',
+  market: address('market-address'),
   timeout: 3600, // Timeout in seconds
   ipfsHash: 'QmXxx...', // IPFS CID of job definition
-  node: 'node-address', // Optional: target specific node
+  node: address('node-address'), // Optional: target specific node (assigns directly if provided)
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+#### List a Job
+
+```typescript
+async list(params: {
+  market: Address,
+  timeout: number | bigint,
+  ipfsHash: string,
+  payer?: TransactionSigner
+}): Promise<Instruction>
+```
+
+List a new job to a market queue. The job will be available for nodes to pick up.
+
+```typescript
+// Set wallet first
+client.wallet = yourWallet;
+
+// List job to market
+const instruction = await client.jobs.list({
+  market: address('market-address'),
+  timeout: 3600, // Timeout in seconds
+  ipfsHash: 'QmXxx...', // IPFS CID of job definition
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+#### Assign a Job
+
+```typescript
+async assign(params: {
+  market: Address,
+  node: Address,
+  timeout: number | bigint,
+  ipfsHash: string,
+  payer?: TransactionSigner
+}): Promise<Instruction>
+```
+
+Assign a job directly to a specific node, bypassing the market queue.
+
+```typescript
+// Set wallet first
+client.wallet = yourWallet;
+
+// Assign job directly to node
+const instruction = await client.jobs.assign({
+  market: address('market-address'),
+  node: address('node-address'),
+  timeout: 3600, // Timeout in seconds
+  ipfsHash: 'QmXxx...', // IPFS CID of job definition
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+### Managing Jobs
+
+#### Extend Job Timeout
+
+```typescript
+async extend(params: {
+  job: Address,
+  timeout: number | bigint,
+  payer?: TransactionSigner
+}): Promise<Instruction>
+```
+
+Extend an existing job's timeout by adding the specified amount to the current timeout.
+
+```typescript
+// Set wallet first
+client.wallet = yourWallet;
+
+// Extend job timeout by 1800 seconds (30 minutes)
+const instruction = await client.jobs.extend({
+  job: address('job-address'),
+  timeout: 1800, // Additional seconds to add
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+#### Delist a Job
+
+```typescript
+async delist(params: {
+  job: Address
+}): Promise<Instruction>
+```
+
+Remove a job from the market queue. The job's deposit will be returned to the payer.
+
+```typescript
+// Set wallet first
+client.wallet = yourWallet;
+
+// Delist job from market
+const instruction = await client.jobs.delist({
+  job: address('job-address'),
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+#### Stop a Running Job
+
+```typescript
+async end(params: {
+  job: Address
+}): Promise<Instruction>
+```
+
+Stop a job that is currently running. The job must have an associated run account.
+
+```typescript
+// Set wallet first
+client.wallet = yourWallet;
+
+// Stop a running job
+const instruction = await client.jobs.end({
+  job: address('job-address'),
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+### Completing Jobs
+
+#### Work (Enter Queue or Create Run)
+
+```typescript
+async work(params: {
+  market: Address,
+  nft?: Address
+}): Promise<Instruction>
+```
+
+Enter a market's node queue or create a run account if a job is available. If an NFT is provided, it will be used for node verification.
+
+```typescript
+// Set wallet first (must be a node wallet)
+client.wallet = nodeWallet;
+
+// Enter market queue or create run
+const instruction = await client.jobs.work({
+  market: address('market-address'),
+  nft: 'nft-address', // Optional: NFT for node verification
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+#### Finish a Stopped Job
+
+```typescript
+async finish(params: {
+  job: Address,
+  ipfsResultsHash: string
+}): Promise<Instruction | Instruction[]>
+```
+
+Finish a job that has been stopped. This posts the result IPFS hash and may return multiple instructions if associated token accounts need to be created.
+
+```typescript
+// Set wallet first
+client.wallet = yourWallet;
+
+// Finish a stopped job with results
+const instructions = await client.jobs.finish({
+  job: address('job-address'),
+  ipfsResultsHash: 'QmYyy...', // IPFS CID of job results
+});
+
+// Submit the instruction(s) - may be array if ATA creation is needed
+await client.solana.buildSignAndSend(instructions);
+```
+
+#### Complete a Job
+
+```typescript
+async complete(params: {
+  job: Address,
+  ipfsResultsHash: string
+}): Promise<Instruction>
+```
+
+Complete a job that is in the COMPLETED state by posting the final result IPFS hash. This finalizes the job and allows payment processing.
+
+```typescript
+// Set wallet first
+client.wallet = yourWallet;
+
+// Complete a job with final results
+const instruction = await client.jobs.complete({
+  job: address('job-address'),
+  ipfsResultsHash: 'QmYyy...', // IPFS CID of final job results
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+#### Quit a Run
+
+```typescript
+async quit(params: {
+  run: Address
+}): Promise<Instruction>
+```
+
+Quit a run account, removing the node from the job execution.
+
+```typescript
+// Set wallet first (must be the node wallet)
+client.wallet = nodeWallet;
+
+// Quit a run
+const instruction = await client.jobs.quit({
+  run: address('run-address'),
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+#### Stop (Exit Node Queue)
+
+```typescript
+async stop(params: {
+  market: Address,
+  node?: Address
+}): Promise<Instruction>
+```
+
+Exit a market's node queue. If no node is specified, uses the wallet's address.
+
+```typescript
+// Set wallet first (must be a node wallet)
+client.wallet = nodeWallet;
+
+// Exit market queue
+const instruction = await client.jobs.stop({
+  market: address('market-address'),
+  node: address('node-address'), // Optional: defaults to wallet address
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+### Market Management
+
+#### Open a Market
+
+```typescript
+async open(params: {
+  nodeAccessKey?: Address,
+  jobExpiration?: number | bigint,
+  jobType?: number,
+  jobPrice?: number | bigint,
+  jobTimeout?: number | bigint,
+  nodeStakeMinimum?: number | bigint,
+  payer?: TransactionSigner
+}): Promise<Instruction>
+```
+
+Create a new market. Returns an instruction that creates a market account. Default values: `jobExpiration` = 86400 (24 hours), `jobTimeout` = 7200 (120 minutes), `nodeStakeMinimum` = 0, `nodeAccessKey` = system program.
+
+```typescript
+// Set wallet first
+client.wallet = yourWallet;
+
+// Create a new market with default values
+const instruction = await client.jobs.open({});
+
+// Or create with custom parameters
+const instruction = await client.jobs.open({
+  jobPrice: 10, // Nos per second in smallest unit
+  jobTimeout: 3600, // 60 minutes
+  jobExpiration: 172800, // 48 hours
+  nodeStakeMinimum: 5000000, // Minimum stake required
+  nodeAccessKey: address('access-key-address'), // Optional: defaults to system program
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+#### Create Market (Synonym)
+
+```typescript
+async createMarket(params: OpenParams): Promise<OpenInstruction>
+```
+
+Synonym for `open()`. Creates a new market with the same parameters.
+
+```typescript
+// Set wallet first
+client.wallet = yourWallet;
+
+// Create market using synonym
+const instruction = await client.jobs.createMarket({
+  jobPrice: 10,
+  jobTimeout: 3600,
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+#### Close a Market
+
+```typescript
+async close(params: {
+  market: Address,
+  payer?: TransactionSigner
+}): Promise<Instruction>
+```
+
+Close an existing market. This will return any remaining funds to the market authority.
+
+```typescript
+// Set wallet first (must be market authority)
+client.wallet = yourWallet;
+
+// Close a market
+const instruction = await client.jobs.close({
+  market: address('market-address'),
+});
+
+// Submit the instruction
+await client.solana.buildSignAndSend(instruction);
+```
+
+#### Close Market (Synonym)
+
+```typescript
+async closeMarket(params: CloseParams): Promise<CloseInstruction>
+```
+
+Synonym for `close()`. Closes a market with the same parameters.
+
+```typescript
+// Set wallet first (must be market authority)
+client.wallet = yourWallet;
+
+// Close market using synonym
+const instruction = await client.jobs.closeMarket({
+  market: address('market-address'),
 });
 
 // Submit the instruction

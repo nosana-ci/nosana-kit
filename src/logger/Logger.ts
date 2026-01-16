@@ -49,6 +49,7 @@ export class Logger {
 
   public trace(message: string): void {
     if (this.shouldLog('trace')) {
+      // eslint-disable-next-line no-console
       console.trace(this.formatMessage('trace', message));
     }
   }
@@ -83,6 +84,7 @@ export class Logger {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public child(bindings: Record<string, any>): Logger {
     // Create a new logger instance with modified prefix
     const childLogger = new Logger({

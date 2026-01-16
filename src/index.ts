@@ -62,10 +62,28 @@ export type {
  * @group @nosana/kit
  */
 export type {
+  Close,
+  CloseParams,
+  CloseInstruction,
+} from './services/programs/jobs/instructions/close.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
   Delist,
   DelistParams,
   DelistInstruction,
 } from './services/programs/jobs/instructions/delist.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
+  Open,
+  OpenParams,
+  OpenInstruction,
+} from './services/programs/jobs/instructions/open.js';
 
 /**
  * @group @nosana/kit
