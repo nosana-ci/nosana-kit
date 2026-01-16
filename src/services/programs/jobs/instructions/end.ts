@@ -52,7 +52,7 @@ export async function end(
         deposit: payerATA, // ATA of the job payer
         user: nodeATA, // ATA of the node (from run account)
         vault: vault,
-        payer: payer, // Use payer from the job account
+        payer: run.payer, // Use payer from the run account
         authority: wallet,
       },
       {
