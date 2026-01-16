@@ -1,4 +1,5 @@
 export * from './assign.js';
+export * from './close.js';
 export * from './complete.js';
 export * from './delist.js';
 export * from './end.js';
@@ -6,6 +7,7 @@ export * from './extend.js';
 export * from './list.js';
 export * from './complete.js';
 export * from './finish.js';
+export * from './open.js';
 export * from './quit.js';
 export * from './work.js';
 export * from './stop.js';
