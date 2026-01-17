@@ -13,7 +13,7 @@
     "@nosana/kit": "workspace:*"
   },
   "devDependencies": {
-    "@braintree/sanitize-url": "^6.0.0",
+    "@braintree/sanitize-url": "^7.0.0",
     "@shikijs/twoslash": "^3.20.0",
     "@shikijs/vitepress-twoslash": "^3.20.0",
     "@vue/repl": "^4.0.0",

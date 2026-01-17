@@ -116,8 +116,8 @@ importers:
         version: link:..
     devDependencies:
       '@braintree/sanitize-url':
-        specifier: ^6.0.0
-        version: 6.0.4
+        specifier: ^7.0.0
+        version: 7.1.1
       '@shikijs/twoslash':
         specifier: ^3.20.0
         version: 3.21.0(typescript@5.9.3)
@@ -4117,7 +4117,8 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@braintree/sanitize-url@6.0.4': {}
+  '@braintree/sanitize-url@6.0.4':
+    optional: true
 
   '@braintree/sanitize-url@7.1.1': {}
 
