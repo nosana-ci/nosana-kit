@@ -3,7 +3,7 @@
 #  | | | | (_) \__ \ (_| | | | | (_| |
 #  |_| |_|\___/|___/\__,_|_| |_|\__,_|
 
-image: node:22.21.1
+image: node:22.22.0
 
 before_script:
   - corepack enable
