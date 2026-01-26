@@ -67,7 +67,12 @@ npm test:localnet:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_VERIFY: "0"
+    DOCKER_CERT_PATH: ""
   script:
+    - export DOCKER_TLS_CERTDIR=
+    - export DOCKER_TLS_VERIFY=
+    - export DOCKER_CERT_PATH=
     - apk add --no-cache nodejs npm
     - npm install -g pnpm@10.28.0
     - pnpm install --frozen-lockfile
