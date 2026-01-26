@@ -60,14 +60,17 @@ npm test:
 
 npm test:localnet:
   stage: test
+  image: docker:24.0.7
   services:
     - name: docker:24.0.7-dind
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   script:
-    - apt-get update
-    - apt-get install -y docker.io docker-compose-plugin
+    - apk add --no-cache nodejs npm
+    - npm install -g corepack@latest
+    - corepack enable
+    - corepack prepare pnpm@10.28.0 --activate
     - pnpm install --frozen-lockfile
     - pnpm test:localnet
   rules:

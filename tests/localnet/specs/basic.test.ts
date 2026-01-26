@@ -33,4 +33,3 @@ describe('localnet basic', () => {
     expect(rewardsInfo.value).not.toBeNull();
   });
 });
-

@@ -52,4 +52,3 @@ describe('localnet jobs/market', () => {
     expect(job.market).toBe(marketAddress);
   });
 });
-

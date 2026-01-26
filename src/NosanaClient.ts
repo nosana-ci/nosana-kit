@@ -4,7 +4,12 @@ import { createIpfsClient } from '@nosana/ipfs';
 import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/authorization';
 
 import { Logger } from './logger/Logger.js';
-import { ClientConfig, getLocalnetConfig, getNosanaConfig, PartialClientConfig } from './config/index.js';
+import {
+  ClientConfig,
+  getLocalnetConfig,
+  getNosanaConfig,
+  PartialClientConfig,
+} from './config/index.js';
 import { createJobsProgram, type JobsProgram } from './services/programs/jobs/index.js';
 import { createStakeProgram, type StakeProgram } from './services/programs/stake/index.js';
 import {
@@ -115,9 +120,9 @@ const createClientFromConfig = (config: ClientConfig, network: NosanaNetwork): N
     const authorization = wallet
       ? config.authorization?.store
         ? createNosanaAuthorization(walletToAuthorizationSigner(wallet), {
-          identifier: wallet.address.toString(),
-          actions: config.authorization.store,
-        })
+            identifier: wallet.address.toString(),
+            actions: config.authorization.store,
+          })
         : createNosanaAuthorization(walletToAuthorizationSigner(wallet))
       : createNosanaAuthorization();
 

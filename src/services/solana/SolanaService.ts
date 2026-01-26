@@ -267,7 +267,10 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
     rpcSubscriptions,
     sendAndConfirmTransaction,
     estimateAndSetComputeUnitLimit,
-    async airdrop(params: { recipient: Address | string; amount: number | bigint }): Promise<Signature> {
+    async airdrop(params: {
+      recipient: Address | string;
+      amount: number | bigint;
+    }): Promise<Signature> {
       try {
         const recipient =
           typeof params.recipient === 'string' ? address(params.recipient) : params.recipient;
@@ -696,8 +699,8 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
         const transactionBlockhash =
           'lifetimeConstraint' in decompiled &&
-            decompiled.lifetimeConstraint &&
-            'blockhash' in decompiled.lifetimeConstraint
+          decompiled.lifetimeConstraint &&
+          'blockhash' in decompiled.lifetimeConstraint
             ? decompiled.lifetimeConstraint.blockhash
             : null;
 

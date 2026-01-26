@@ -32,4 +32,3 @@ export function getLocalnetClient(): Promise<NosanaClient> {
   }
   return globalWithClient.__NOSANA_LOCALNET_CLIENT__;
 }
-

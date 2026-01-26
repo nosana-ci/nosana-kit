@@ -24,21 +24,21 @@ const mergeConfigs = (
     },
     programs: customConfig.programs
       ? {
-        ...defaultConfig.programs,
-        ...customConfig.programs,
-      }
+          ...defaultConfig.programs,
+          ...customConfig.programs,
+        }
       : defaultConfig.programs,
     api: customConfig.api
       ? {
-        ...defaultConfig.api,
-        ...customConfig.api,
-      }
+          ...defaultConfig.api,
+          ...customConfig.api,
+        }
       : defaultConfig.api,
     authorization: customConfig.authorization
       ? {
-        ...defaultConfig.authorization,
-        ...customConfig.authorization,
-      }
+          ...defaultConfig.authorization,
+          ...customConfig.authorization,
+        }
       : defaultConfig.authorization,
   };
 };

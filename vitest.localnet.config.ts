@@ -8,4 +8,3 @@ export default defineConfig({
     setupFiles: ['tests/localnet/helpers/vitest.setup.ts'],
   },
 });
-

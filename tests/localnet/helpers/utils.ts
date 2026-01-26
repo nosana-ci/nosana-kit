@@ -120,7 +120,7 @@ export async function ensureLocalnetMint(client: NosanaClient) {
     if (mintAuthorityOnChain && mintAuthorityOnChain !== mintAuthority.address) {
       throw new Error(
         `Localnet NOS mint already exists with a different mint authority (${mintAuthorityOnChain}). ` +
-        'Reset the validator or provide the matching authority keypair.'
+          'Reset the validator or provide the matching authority keypair.'
       );
     }
   }
@@ -170,4 +170,3 @@ export async function mintNosTo(
   });
   await executeInstructionPlan(client, mintToPlan);
 }
-
