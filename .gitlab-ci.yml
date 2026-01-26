@@ -68,9 +68,7 @@ npm test:localnet:
     DOCKER_TLS_CERTDIR: ""
   script:
     - apk add --no-cache nodejs npm
-    - npm install -g corepack@latest
-    - corepack enable
-    - corepack prepare pnpm@10.28.0 --activate
+    - npm install -g pnpm@10.28.0
     - pnpm install --frozen-lockfile
     - pnpm test:localnet
   rules:
