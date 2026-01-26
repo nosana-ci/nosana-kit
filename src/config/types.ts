@@ -65,6 +65,7 @@ export interface PartialClientConfig {
   wallet?: Wallet;
   ipfs?: Partial<IPFSConfig>;
   logLevel?: LogLevel;
+  programs?: Partial<ProgramConfig>;
   api?: Partial<APIConfig>;
   authorization?: Partial<AuthorizationConfig>;
 }

@@ -129,11 +129,11 @@ export interface JobsProgram {
   /**
    * Create a new market
    */
-  open: Instructions.Open;
+  open(params?: Instructions.OpenParams): Promise<Instructions.OpenInstruction>;
   /**
    * Create a new market (synonym for open)
    */
-  createMarket: Instructions.Open;
+  createMarket(params?: Instructions.OpenParams): Promise<Instructions.OpenInstruction>;
   /**
    * Close a market
    */
@@ -653,10 +653,10 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     async delist(params) {
       return Instructions.delist(params, createInstructionsHelper(this.get, this.runs));
     },
-    async open(params) {
+    async open(params = {}) {
       return Instructions.open(params, createInstructionsHelper(this.get, this.runs));
     },
-    async createMarket(params) {
+    async createMarket(params = {}) {
       return this.open(params);
     },
     async close(params) {

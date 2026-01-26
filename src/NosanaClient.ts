@@ -4,7 +4,7 @@ import { createIpfsClient } from '@nosana/ipfs';
 import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/authorization';
 
 import { Logger } from './logger/Logger.js';
-import { ClientConfig, getNosanaConfig, PartialClientConfig } from './config/index.js';
+import { ClientConfig, getLocalnetConfig, getNosanaConfig, PartialClientConfig } from './config/index.js';
 import { createJobsProgram, type JobsProgram } from './services/programs/jobs/index.js';
 import { createStakeProgram, type StakeProgram } from './services/programs/stake/index.js';
 import {
@@ -64,11 +64,7 @@ export interface NosanaClient {
  * client.wallet = myWallet;
  * ```
  */
-export function createNosanaClient(
-  network: NosanaNetwork = NosanaNetwork.MAINNET,
-  customConfig?: PartialClientConfig
-): NosanaClient {
-  const config = getNosanaConfig(network, customConfig);
+const createClientFromConfig = (config: ClientConfig, network: NosanaNetwork): NosanaClient => {
   const logger = Logger.getInstance({ level: config.logLevel });
 
   // Wallet management
@@ -119,9 +115,9 @@ export function createNosanaClient(
     const authorization = wallet
       ? config.authorization?.store
         ? createNosanaAuthorization(walletToAuthorizationSigner(wallet), {
-            identifier: wallet.address.toString(),
-            actions: config.authorization.store,
-          })
+          identifier: wallet.address.toString(),
+          actions: config.authorization.store,
+        })
         : createNosanaAuthorization(walletToAuthorizationSigner(wallet))
       : createNosanaAuthorization();
 
@@ -163,4 +159,17 @@ export function createNosanaClient(
       reactiveNosanaModules = createReactiveNosanaModules();
     },
   };
+};
+
+export function createNosanaClient(
+  network: NosanaNetwork = NosanaNetwork.MAINNET,
+  customConfig?: PartialClientConfig
+): NosanaClient {
+  const config = getNosanaConfig(network, customConfig);
+  return createClientFromConfig(config, network);
+}
+
+export function createLocalnetClient(customConfig?: PartialClientConfig): NosanaClient {
+  const config = getLocalnetConfig(customConfig);
+  return createClientFromConfig(config, NosanaNetwork.DEVNET);
 }

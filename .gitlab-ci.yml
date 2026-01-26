@@ -58,6 +58,22 @@ npm test:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+npm test:localnet:
+  stage: test
+  services:
+    - name: docker:24.0.7-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - apt-get update
+    - apt-get install -y docker.io docker-compose-plugin
+    - pnpm install --frozen-lockfile
+    - pnpm test:localnet
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 docs build:
   stage: build
   script:

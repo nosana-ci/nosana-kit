@@ -3,6 +3,8 @@ import {
   createSolanaRpcSubscriptions,
   address,
   Address,
+  airdropFactory,
+  lamports,
   getProgramDerivedAddress,
   getAddressEncoder,
   createTransactionMessage,
@@ -90,6 +92,7 @@ export interface SolanaService {
   readonly rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
   readonly sendAndConfirmTransaction: ReturnType<typeof sendAndConfirmTransactionFactory>;
   readonly estimateAndSetComputeUnitLimit: ReturnType<typeof estimateAndSetComputeUnitLimitFactory>;
+  airdrop(params: { recipient: Address | string; amount: number | bigint }): Promise<Signature>;
   /**
    * Optional fee payer for transactions. If set, will be used as fallback when no feePayer is provided in options.
    * Set this property directly to configure the fee payer.
@@ -250,6 +253,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
     rpc,
     rpcSubscriptions,
   });
+  const airdrop = airdropFactory({ rpc, rpcSubscriptions });
 
   // Create a function to estimate and set the compute unit limit
   const estimateAndSetComputeUnitLimit = estimateAndSetComputeUnitLimitFactory({ rpc });
@@ -263,6 +267,21 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
     rpcSubscriptions,
     sendAndConfirmTransaction,
     estimateAndSetComputeUnitLimit,
+    async airdrop(params: { recipient: Address | string; amount: number | bigint }): Promise<Signature> {
+      try {
+        const recipient =
+          typeof params.recipient === 'string' ? address(params.recipient) : params.recipient;
+        const amount = typeof params.amount === 'bigint' ? params.amount : BigInt(params.amount);
+        return await airdrop({
+          recipientAddress: recipient,
+          lamports: lamports(amount),
+          commitment: config.commitment ?? 'confirmed',
+        });
+      } catch (error) {
+        deps.logger.error(`Failed to airdrop SOL: ${error}`);
+        throw new NosanaError('Failed to airdrop SOL', ErrorCodes.RPC_ERROR, error);
+      }
+    },
     get feePayer() {
       return feePayer;
     },
@@ -677,8 +696,8 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
         const transactionBlockhash =
           'lifetimeConstraint' in decompiled &&
-          decompiled.lifetimeConstraint &&
-          'blockhash' in decompiled.lifetimeConstraint
+            decompiled.lifetimeConstraint &&
+            'blockhash' in decompiled.lifetimeConstraint
             ? decompiled.lifetimeConstraint.blockhash
             : null;
 

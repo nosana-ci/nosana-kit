@@ -1,0 +1,22 @@
+services:
+  solana-localnet:
+    image: solanalabs/solana:v1.18.26
+    container_name: nosana-localnet
+    working_dir: /workspace
+    env_file:
+      - ./localnet/localnet.env
+    volumes:
+      - ./localnet:/workspace/localnet
+      - ./localnet/fixtures:/data/fixtures
+      - ./localnet/ledger:/data/ledger
+    ports:
+      - "8899:8899"
+      - "8900:8900"
+      - "8001:8001"
+    entrypoint: ["/bin/bash", "/workspace/localnet/validator-entrypoint.sh"]
+    healthcheck:
+      test: ["CMD", "solana", "cluster-version", "--url", "http://127.0.0.1:8899"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+
