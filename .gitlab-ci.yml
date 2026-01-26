@@ -61,6 +61,7 @@ npm test:
 npm test:localnet:
   stage: test
   image: docker:24.0.7
+  before_script: []
   services:
     - name: docker:24.0.7-dind
   variables:
