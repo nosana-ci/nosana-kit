@@ -10,6 +10,7 @@ import {
   pipe,
   setTransactionMessageFeePayerSigner,
   setTransactionMessageLifetimeUsingBlockhash,
+  unwrapOption,
   type Address,
   type TransactionSigner,
 } from '@solana/kit';
@@ -52,32 +53,6 @@ export async function loadMintAuthoritySigner() {
   return cachedMintAuthority;
 }
 
-function resolveOptionAddress(option: unknown): Address | null {
-  if (typeof option === 'string') {
-    return option as Address;
-  }
-  if (!option || typeof option !== 'object') {
-    return null;
-  }
-  const record = option as Record<string, unknown>;
-  if (typeof record.address === 'string') {
-    return record.address as Address;
-  }
-  if (typeof record.value === 'string') {
-    return record.value as Address;
-  }
-  if (typeof record.some === 'string') {
-    return record.some as Address;
-  }
-  if (typeof record.Some === 'string') {
-    return record.Some as Address;
-  }
-  if (record.__option === 'some' && typeof record.value === 'string') {
-    return record.value as Address;
-  }
-  return null;
-}
-
 export async function ensureLocalnetMint(client: NosanaClient) {
   if (cachedMintAuthority && cachedMintAddress) {
     return { mintAuthority: cachedMintAuthority, mintAddress: cachedMintAddress };
@@ -116,11 +91,11 @@ export async function ensureLocalnetMint(client: NosanaClient) {
       }
     }
   } else {
-    const mintAuthorityOnChain = resolveOptionAddress(existingMint.data.mintAuthority);
+    const mintAuthorityOnChain = unwrapOption(existingMint.data.mintAuthority);
     if (mintAuthorityOnChain && mintAuthorityOnChain !== mintAuthority.address) {
       throw new Error(
         `Localnet NOS mint already exists with a different mint authority (${mintAuthorityOnChain}). ` +
-          'Reset the validator or provide the matching authority keypair.'
+        'Reset the validator or provide the matching authority keypair.'
       );
     }
   }
