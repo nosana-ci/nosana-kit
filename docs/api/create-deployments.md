@@ -34,14 +34,14 @@ For all available fields, see **[Deployment Options](/deployments/options)**. Yo
 ```ts
 import { createNosanaClient } from '@nosana/kit';
 
-const client = createNosanaClient({
+const client = createNosanaClient('mainnet', {
   api: {
-    apiKey: process.env.NOSANA_API_KEY as string,
+    apiKey: process.env.NOSANA_API_KEY,
   },
 });
 
 async function createDeployment() {
-  const deployment = await client.deployments.create({
+  const deployment = await client.api.deployments.create({
     name: 'Hello World',
     market: '7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq',
     timeout: 60, // minutes
@@ -93,7 +93,7 @@ curl -X POST "https://dashboard.k8s.prd.nos.ci/api/deployments/create" \
           "type": "container/run",
           "id": "hello-world",
           "args": {
-            "cmd": ["echo hello world"],
+            "cmd": "for i in `seq 1 30`; do echo $i; sleep 1; done",
             "image": "ubuntu"
           }
         }
