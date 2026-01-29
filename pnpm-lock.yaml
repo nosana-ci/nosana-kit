@@ -21,8 +21,8 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2
       '@nosana/types':
-        specifier: ^0.1.12
-        version: 0.1.12(@types/node@20.19.30)(typescript@5.9.3)
+        specifier: ^0.1.13
+        version: 0.1.13(@types/node@20.19.30)(typescript@5.9.3)
       '@solana-program/compute-budget':
         specifier: 0.12.0
         version: 0.12.0(@solana/kit@5.4.0(typescript@5.9.3))
@@ -672,8 +672,8 @@ packages:
     resolution: {directory: '', type: directory}
     engines: {node: '>=20.18.0'}
 
-  '@nosana/types@0.1.12':
-    resolution: {integrity: sha512-5BlNGtTc4hEHAtBqja6piN2+ke10GwhJ2+fauz7O1X618Bp/tWvmnTCxutIBzU11UFtECkeXSYWsv0tswaBJKg==}
+  '@nosana/types@0.1.13':
+    resolution: {integrity: sha512-Jdd+ItHgmvBf5TIO0Lr3jaAMB7+RZ1DpOhOM5B9LWQD8AYJWPk7WI+JXONghc9ViUL0YpGqyHRIjV8/iR63MRw==}
 
   '@opentelemetry/api@1.9.0':
     resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
@@ -4455,7 +4455,7 @@ snapshots:
 
   '@nosana/api@0.1.7(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
-      '@nosana/types': 0.1.12(@types/node@20.19.30)(typescript@5.9.3)
+      '@nosana/types': 0.1.13(@types/node@20.19.30)(typescript@5.9.3)
       openapi-fetch: 0.14.1
     transitivePeerDependencies:
       - '@types/node'
@@ -4470,7 +4470,7 @@ snapshots:
 
   '@nosana/endpoints@1.0.0(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
-      '@nosana/types': 0.1.12(@types/node@20.19.30)(typescript@5.9.3)
+      '@nosana/types': 0.1.13(@types/node@20.19.30)(typescript@5.9.3)
       bs58: 5.0.0
       tweetnacl: 1.0.3
     transitivePeerDependencies:
@@ -4487,7 +4487,7 @@ snapshots:
       '@nosana/authorization': 0.1.7
       '@nosana/endpoints': 1.0.0(@types/node@20.19.30)(typescript@5.9.3)
       '@nosana/ipfs': 0.1.2
-      '@nosana/types': 0.1.12(@types/node@20.19.30)(typescript@5.9.3)
+      '@nosana/types': 0.1.13(@types/node@20.19.30)(typescript@5.9.3)
       '@solana-program/compute-budget': 0.12.0(@solana/kit@5.4.0(typescript@5.9.3))
       '@solana-program/system': 0.10.0(@solana/kit@5.4.0(typescript@5.9.3))
       '@solana-program/token': 0.9.0(@solana/kit@5.4.0(typescript@5.9.3))
@@ -4500,7 +4500,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@nosana/types@0.1.12(@types/node@20.19.30)(typescript@5.9.3)':
+  '@nosana/types@0.1.13(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
       typia: 10.1.0(@types/node@20.19.30)(typescript@5.9.3)
     transitivePeerDependencies:
