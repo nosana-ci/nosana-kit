@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { type MessageSigner } from '@solana/kit';
 
-import { SignerFactory } from '../../setup/index.js';
+import { SignerFactory } from '../setup/index.js';
 
 import { NosanaError } from '../../../src/errors/NosanaError.js';
 import { walletToAuthorizationSigner } from '../../../src/utils/walletToAuthorizationSigner.js';

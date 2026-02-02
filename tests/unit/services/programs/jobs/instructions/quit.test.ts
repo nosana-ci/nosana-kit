@@ -8,7 +8,7 @@ import {
   MockClientFactory,
   RunAccountFactory,
   sdkToProgramDeps,
-} from '../../../../../setup/index.js';
+} from '../../../../setup/index.js';
 
 const RUN_TIME_555 = 555;
 

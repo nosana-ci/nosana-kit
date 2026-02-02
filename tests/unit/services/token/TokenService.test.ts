@@ -4,7 +4,7 @@ import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
 import { getTransferInstructionDataDecoder } from '@solana-program/token';
 
 import { createNosanaClient, type NosanaClient, TokenService } from '../../../../src/index.js';
-import { SignerFactory, AddressFactory } from '../../../setup/index.js';
+import { SignerFactory, AddressFactory } from '../../setup/index.js';
 
 vi.mock('../../../../src/logger/Logger.js', () => {
   return {

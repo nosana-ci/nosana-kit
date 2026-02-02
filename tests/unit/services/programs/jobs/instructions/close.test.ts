@@ -4,7 +4,7 @@ import { type Address, generateKeyPairSigner } from '@solana/kit';
 import { close } from '../../../../../../src/services/programs/jobs/instructions/close.js';
 import * as programClient from '../../../../../../src/generated_clients/jobs/index.js';
 import { createJobsProgram } from '../../../../../../src/services/programs/jobs/index.js';
-import { AddressFactory, MockClientFactory, sdkToProgramDeps } from '../../../../../setup/index.js';
+import { AddressFactory, MockClientFactory, sdkToProgramDeps } from '../../../../setup/index.js';
 
 describe('close instruction', () => {
   let helperParams: Parameters<typeof close>[1];

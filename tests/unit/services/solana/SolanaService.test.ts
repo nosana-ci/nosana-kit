@@ -4,7 +4,7 @@ import { getTransferSolInstructionDataDecoder } from '@solana-program/system';
 
 import { createSolanaService } from '../../../../src/services/solana/index.js';
 import { PROTOCOL } from '../../../../src/utils/convertHttpToWebSocketUrl.js';
-import { AddressFactory, MockClientFactory, SignerFactory } from '../../../setup/index.js';
+import { AddressFactory, MockClientFactory, SignerFactory } from '../../setup/index.js';
 import type { Wallet } from '../../../../src/types.js';
 
 // Mock @solana/kit module

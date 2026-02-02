@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
-import { ClientFactory } from '../../setup/index.js';
+import { ClientFactory } from '../setup/index.js';
 
 import {
   getStaticAccounts,
