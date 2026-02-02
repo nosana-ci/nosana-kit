@@ -24,9 +24,9 @@ import type { NosanaClient } from '../../../src/index.js';
 
 const NOS_MINT_DECIMALS = 6;
 const DEFAULT_NOS_MINT_KEYPAIR_PATH =
-  'tests/localnet/keys/devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP.json';
+  'tests/scenarios/keys/devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP.json';
 const DEFAULT_NOS_MINT_AUTHORITY_KEYPAIR_PATH =
-  'tests/localnet/keys/dumQVNHZ1KNcLmzjMaDPEA5vFCzwHEEcQmZ8JHmmCNH.json';
+  'tests/scenarios/keys/dumQVNHZ1KNcLmzjMaDPEA5vFCzwHEEcQmZ8JHmmCNH.json';
 let cachedMintAuthority: TransactionSigner | null = null;
 let cachedMintAddress: Address | null = null;
 

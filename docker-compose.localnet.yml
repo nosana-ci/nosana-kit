@@ -7,8 +7,6 @@ services:
       - ./localnet/localnet.env
     volumes:
       - ./localnet:/workspace/localnet
-      - ./localnet/fixtures:/data/fixtures
-      - ./localnet/ledger:/data/ledger
     ports:
       - "8899:8899"
       - "8900:8900"

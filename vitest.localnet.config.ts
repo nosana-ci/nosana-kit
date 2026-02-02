@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    include: ['tests/localnet/specs/**/*.test.ts'],
-    setupFiles: ['tests/localnet/helpers/vitest.setup.ts'],
+    include: ['tests/scenarios/specs/**/*.test.ts'],
+    setupFiles: ['tests/scenarios/helpers/vitest.setup.ts'],
   },
 });

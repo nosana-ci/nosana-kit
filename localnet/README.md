@@ -44,8 +44,8 @@ The test command uses the localnet defaults from the SDK. You can still
 override RPC/WS via environment variables in your own shell if needed.
 
 Localnet test layout:
-- `tests/localnet/specs/` - scenario tests
-- `tests/localnet/helpers/` - shared setup and utilities
+- `tests/scenarios/specs/` - scenario tests
+- `tests/scenarios/helpers/` - shared setup and utilities
 
 ## Option A: Clone from Devnet/Mainnet
 
