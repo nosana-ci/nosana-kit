@@ -8,18 +8,20 @@ self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     // 1) Delete *all* caches (old VuePress/VitePress precache etc.)
     const keys = await caches.keys();
-    await Promise.all(keys.map((k) => caches.delete(k)));
+    await Promise.allSettled(keys.map((k) => caches.delete(k)));
 
     // 2) Unregister this service worker
-    await self.registration.unregister();
+    try {
+      await self.registration.unregister();
+    } catch {
+      // Best-effort; keep going to refresh clients
+    }
 
     // 3) Reload all open tabs so they fetch fresh content normally
     const clients = await self.clients.matchAll({
       type: "window",
       includeUncontrolled: true,
     });
-    for (const client of clients) {
-      client.navigate(client.url);
-    }
+    await Promise.allSettled(clients.map((client) => client.navigate(client.url)));
   })());
 });
