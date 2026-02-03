@@ -33,9 +33,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_STAKING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const STAKE_INSTRUCTION_ACCOUNTS = {
   mint: 0,
@@ -49,7 +49,9 @@ export const STAKE_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type StakeInstructionAccountName = keyof typeof STAKE_INSTRUCTION_ACCOUNTS;
-export const STAKE_DISCRIMINATOR = new Uint8Array([206, 176, 202, 18, 200, 209, 179, 108]);
+export const STAKE_DISCRIMINATOR = new Uint8Array([
+  206, 176, 202, 18, 200, 209, 179, 108,
+]);
 
 export function getStakeDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(STAKE_DISCRIMINATOR);
@@ -62,21 +64,32 @@ export type StakeInstruction<
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountStake extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> = '11111111111111111111111111111111',
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
-  TAccountRent extends string | AccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountRent extends string | AccountMeta<string> =
+    "SysvarRent111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountMint extends string ? ReadonlyAccount<TAccountMint> : TAccountMint,
-      TAccountUser extends string ? WritableAccount<TAccountUser> : TAccountUser,
-      TAccountVault extends string ? WritableAccount<TAccountVault> : TAccountVault,
-      TAccountStake extends string ? WritableAccount<TAccountStake> : TAccountStake,
+      TAccountMint extends string
+        ? ReadonlyAccount<TAccountMint>
+        : TAccountMint,
+      TAccountUser extends string
+        ? WritableAccount<TAccountUser>
+        : TAccountUser,
+      TAccountVault extends string
+        ? WritableAccount<TAccountVault>
+        : TAccountVault,
+      TAccountStake extends string
+        ? WritableAccount<TAccountStake>
+        : TAccountStake,
       TAccountAuthority extends string
-        ? WritableSignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? WritableSignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
@@ -84,7 +97,9 @@ export type StakeInstruction<
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
-      TAccountRent extends string ? ReadonlyAccount<TAccountRent> : TAccountRent,
+      TAccountRent extends string
+        ? ReadonlyAccount<TAccountRent>
+        : TAccountRent,
       ...TRemainingAccounts,
     ]
   >;
@@ -103,19 +118,19 @@ export type StakeInstructionDataArgs = {
 export function getStakeInstructionDataEncoder(): FixedSizeEncoder<StakeInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['amount', getU64Encoder()],
-      ['duration', getU128Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["amount", getU64Encoder()],
+      ["duration", getU128Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: STAKE_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: STAKE_DISCRIMINATOR }),
   );
 }
 
 export function getStakeInstructionDataDecoder(): FixedSizeDecoder<StakeInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['amount', getU64Decoder()],
-    ['duration', getU128Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["amount", getU64Decoder()],
+    ["duration", getU128Decoder()],
   ]);
 }
 
@@ -123,7 +138,10 @@ export function getStakeInstructionDataCodec(): FixedSizeCodec<
   StakeInstructionDataArgs,
   StakeInstructionData
 > {
-  return combineCodec(getStakeInstructionDataEncoder(), getStakeInstructionDataDecoder());
+  return combineCodec(
+    getStakeInstructionDataEncoder(),
+    getStakeInstructionDataDecoder(),
+  );
 }
 
 export type StakeInput<
@@ -144,8 +162,8 @@ export type StakeInput<
   systemProgram?: Address<TAccountSystemProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   rent?: Address<TAccountRent>;
-  amount: StakeInstructionDataArgs['amount'];
-  duration: StakeInstructionDataArgs['duration'];
+  amount: StakeInstructionDataArgs["amount"];
+  duration: StakeInstructionDataArgs["duration"];
 };
 
 export function getStakeInstruction<
@@ -169,7 +187,7 @@ export function getStakeInstruction<
     TAccountTokenProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): StakeInstruction<
   TProgramAddress,
   TAccountMint,
@@ -182,7 +200,8 @@ export function getStakeInstruction<
   TAccountRent
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? NOSANA_STAKING_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? NOSANA_STAKING_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -195,7 +214,10 @@ export function getStakeInstruction<
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
     rent: { value: input.rent ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
@@ -203,18 +225,18 @@ export function getStakeInstruction<
   // Resolve default values.
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
-      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.rent.value) {
     accounts.rent.value =
-      'SysvarRent111111111111111111111111111111111' as Address<'SysvarRent111111111111111111111111111111111'>;
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.mint),
@@ -226,7 +248,9 @@ export function getStakeInstruction<
       getAccountMeta(accounts.tokenProgram),
       getAccountMeta(accounts.rent),
     ],
-    data: getStakeInstructionDataEncoder().encode(args as StakeInstructionDataArgs),
+    data: getStakeInstructionDataEncoder().encode(
+      args as StakeInstructionDataArgs,
+    ),
     programAddress,
   } as StakeInstruction<
     TProgramAddress,
@@ -265,11 +289,11 @@ export function parseStakeInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedStakeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

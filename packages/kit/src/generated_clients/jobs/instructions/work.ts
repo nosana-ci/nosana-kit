@@ -30,9 +30,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const WORK_INSTRUCTION_ACCOUNTS = {
   run: 0,
@@ -46,7 +46,9 @@ export const WORK_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type WorkInstructionAccountName = keyof typeof WORK_INSTRUCTION_ACCOUNTS;
-export const WORK_DISCRIMINATOR = new Uint8Array([15, 67, 45, 195, 215, 137, 229, 47]);
+export const WORK_DISCRIMINATOR = new Uint8Array([
+  15, 67, 45, 195, 215, 137, 229, 47,
+]);
 
 export function getWorkDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(WORK_DISCRIMINATOR);
@@ -61,7 +63,8 @@ export type WorkInstruction<
   TAccountNft extends string | AccountMeta<string> = string,
   TAccountMetadata extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> = '11111111111111111111111111111111',
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -70,15 +73,23 @@ export type WorkInstruction<
       TAccountRun extends string
         ? WritableSignerAccount<TAccountRun> & AccountSignerMeta<TAccountRun>
         : TAccountRun,
-      TAccountMarket extends string ? WritableAccount<TAccountMarket> : TAccountMarket,
+      TAccountMarket extends string
+        ? WritableAccount<TAccountMarket>
+        : TAccountMarket,
       TAccountPayer extends string
-        ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
+        ? WritableSignerAccount<TAccountPayer> &
+            AccountSignerMeta<TAccountPayer>
         : TAccountPayer,
-      TAccountStake extends string ? ReadonlyAccount<TAccountStake> : TAccountStake,
+      TAccountStake extends string
+        ? ReadonlyAccount<TAccountStake>
+        : TAccountStake,
       TAccountNft extends string ? ReadonlyAccount<TAccountNft> : TAccountNft,
-      TAccountMetadata extends string ? ReadonlyAccount<TAccountMetadata> : TAccountMetadata,
+      TAccountMetadata extends string
+        ? ReadonlyAccount<TAccountMetadata>
+        : TAccountMetadata,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
@@ -93,20 +104,25 @@ export type WorkInstructionDataArgs = {};
 
 export function getWorkInstructionDataEncoder(): FixedSizeEncoder<WorkInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: WORK_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: WORK_DISCRIMINATOR }),
   );
 }
 
 export function getWorkInstructionDataDecoder(): FixedSizeDecoder<WorkInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getWorkInstructionDataCodec(): FixedSizeCodec<
   WorkInstructionDataArgs,
   WorkInstructionData
 > {
-  return combineCodec(getWorkInstructionDataEncoder(), getWorkInstructionDataDecoder());
+  return combineCodec(
+    getWorkInstructionDataEncoder(),
+    getWorkInstructionDataDecoder(),
+  );
 }
 
 export type WorkInput<
@@ -150,7 +166,7 @@ export function getWorkInstruction<
     TAccountAuthority,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): WorkInstruction<
   TProgramAddress,
   TAccountRun,
@@ -176,15 +192,18 @@ export function getWorkInstruction<
     authority: { value: input.authority ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
-      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.run),
@@ -235,11 +254,11 @@ export function parseWorkInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedWorkInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

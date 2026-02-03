@@ -29,9 +29,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const CLOSE_CLAIM_STATUS_INSTRUCTION_ACCOUNTS = {
   claimStatus: 0,
@@ -40,14 +40,15 @@ export const CLOSE_CLAIM_STATUS_INSTRUCTION_ACCOUNTS = {
   distributor: 3,
 } as const;
 
-export type CloseClaimStatusInstructionAccountName =
-  keyof typeof CLOSE_CLAIM_STATUS_INSTRUCTION_ACCOUNTS;
+export type CloseClaimStatusInstructionAccountName = keyof typeof CLOSE_CLAIM_STATUS_INSTRUCTION_ACCOUNTS;
 export const CLOSE_CLAIM_STATUS_DISCRIMINATOR = new Uint8Array([
   163, 214, 191, 165, 245, 188, 17, 185,
 ]);
 
 export function getCloseClaimStatusDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(CLOSE_CLAIM_STATUS_DISCRIMINATOR);
+  return fixEncoderSize(getBytesEncoder(), 8).encode(
+    CLOSE_CLAIM_STATUS_DISCRIMINATOR,
+  );
 }
 
 export type CloseClaimStatusInstruction<
@@ -64,9 +65,12 @@ export type CloseClaimStatusInstruction<
       TAccountClaimStatus extends string
         ? WritableAccount<TAccountClaimStatus>
         : TAccountClaimStatus,
-      TAccountClaimant extends string ? WritableAccount<TAccountClaimant> : TAccountClaimant,
+      TAccountClaimant extends string
+        ? WritableAccount<TAccountClaimant>
+        : TAccountClaimant,
       TAccountAdmin extends string
-        ? ReadonlySignerAccount<TAccountAdmin> & AccountSignerMeta<TAccountAdmin>
+        ? ReadonlySignerAccount<TAccountAdmin> &
+            AccountSignerMeta<TAccountAdmin>
         : TAccountAdmin,
       TAccountDistributor extends string
         ? ReadonlyAccount<TAccountDistributor>
@@ -83,13 +87,15 @@ export type CloseClaimStatusInstructionDataArgs = {};
 
 export function getCloseClaimStatusInstructionDataEncoder(): FixedSizeEncoder<CloseClaimStatusInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: CLOSE_CLAIM_STATUS_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: CLOSE_CLAIM_STATUS_DISCRIMINATOR }),
   );
 }
 
 export function getCloseClaimStatusInstructionDataDecoder(): FixedSizeDecoder<CloseClaimStatusInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getCloseClaimStatusInstructionDataCodec(): FixedSizeCodec<
@@ -98,7 +104,7 @@ export function getCloseClaimStatusInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getCloseClaimStatusInstructionDataEncoder(),
-    getCloseClaimStatusInstructionDataDecoder()
+    getCloseClaimStatusInstructionDataDecoder(),
   );
 }
 
@@ -127,7 +133,7 @@ export function getCloseClaimStatusInstruction<
     TAccountAdmin,
     TAccountDistributor
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): CloseClaimStatusInstruction<
   TProgramAddress,
   TAccountClaimStatus,
@@ -136,7 +142,8 @@ export function getCloseClaimStatusInstruction<
   TAccountDistributor
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -145,9 +152,12 @@ export function getCloseClaimStatusInstruction<
     admin: { value: input.admin ?? null, isWritable: false },
     distributor: { value: input.distributor ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.claimStatus),
@@ -186,11 +196,11 @@ export function parseCloseClaimStatusInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCloseClaimStatusInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

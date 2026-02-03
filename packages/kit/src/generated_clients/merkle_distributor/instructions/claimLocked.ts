@@ -29,9 +29,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const CLAIM_LOCKED_INSTRUCTION_ACCOUNTS = {
   distributor: 0,
@@ -43,10 +43,14 @@ export const CLAIM_LOCKED_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type ClaimLockedInstructionAccountName = keyof typeof CLAIM_LOCKED_INSTRUCTION_ACCOUNTS;
-export const CLAIM_LOCKED_DISCRIMINATOR = new Uint8Array([34, 206, 181, 23, 11, 207, 147, 90]);
+export const CLAIM_LOCKED_DISCRIMINATOR = new Uint8Array([
+  34, 206, 181, 23, 11, 207, 147, 90,
+]);
 
 export function getClaimLockedDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(CLAIM_LOCKED_DISCRIMINATOR);
+  return fixEncoderSize(getBytesEncoder(), 8).encode(
+    CLAIM_LOCKED_DISCRIMINATOR,
+  );
 }
 
 export type ClaimLockedInstruction<
@@ -57,7 +61,7 @@ export type ClaimLockedInstruction<
   TAccountTo extends string | AccountMeta<string> = string,
   TAccountClaimant extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -69,10 +73,13 @@ export type ClaimLockedInstruction<
       TAccountClaimStatus extends string
         ? WritableAccount<TAccountClaimStatus>
         : TAccountClaimStatus,
-      TAccountFrom extends string ? WritableAccount<TAccountFrom> : TAccountFrom,
+      TAccountFrom extends string
+        ? WritableAccount<TAccountFrom>
+        : TAccountFrom,
       TAccountTo extends string ? WritableAccount<TAccountTo> : TAccountTo,
       TAccountClaimant extends string
-        ? WritableSignerAccount<TAccountClaimant> & AccountSignerMeta<TAccountClaimant>
+        ? WritableSignerAccount<TAccountClaimant> &
+            AccountSignerMeta<TAccountClaimant>
         : TAccountClaimant,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
@@ -87,13 +94,15 @@ export type ClaimLockedInstructionDataArgs = {};
 
 export function getClaimLockedInstructionDataEncoder(): FixedSizeEncoder<ClaimLockedInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: CLAIM_LOCKED_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: CLAIM_LOCKED_DISCRIMINATOR }),
   );
 }
 
 export function getClaimLockedInstructionDataDecoder(): FixedSizeDecoder<ClaimLockedInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getClaimLockedInstructionDataCodec(): FixedSizeCodec<
@@ -102,7 +111,7 @@ export function getClaimLockedInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getClaimLockedInstructionDataEncoder(),
-    getClaimLockedInstructionDataDecoder()
+    getClaimLockedInstructionDataDecoder(),
   );
 }
 
@@ -148,7 +157,7 @@ export function getClaimLockedInstruction<
     TAccountClaimant,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): ClaimLockedInstruction<
   TProgramAddress,
   TAccountDistributor,
@@ -159,7 +168,8 @@ export function getClaimLockedInstruction<
   TAccountTokenProgram
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -170,15 +180,18 @@ export function getClaimLockedInstruction<
     claimant: { value: input.claimant ?? null, isWritable: true },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.distributor),
@@ -232,11 +245,11 @@ export function parseClaimLockedInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClaimLockedInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

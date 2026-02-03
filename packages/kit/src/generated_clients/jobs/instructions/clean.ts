@@ -26,9 +26,9 @@ import {
   type ReadonlyAccount,
   type ReadonlyUint8Array,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const CLEAN_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -37,7 +37,9 @@ export const CLEAN_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type CleanInstructionAccountName = keyof typeof CLEAN_INSTRUCTION_ACCOUNTS;
-export const CLEAN_DISCRIMINATOR = new Uint8Array([250, 191, 56, 128, 150, 251, 1, 103]);
+export const CLEAN_DISCRIMINATOR = new Uint8Array([
+  250, 191, 56, 128, 150, 251, 1, 103,
+]);
 
 export function getCleanDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(CLEAN_DISCRIMINATOR);
@@ -54,8 +56,12 @@ export type CleanInstruction<
   InstructionWithAccounts<
     [
       TAccountJob extends string ? WritableAccount<TAccountJob> : TAccountJob,
-      TAccountMarket extends string ? ReadonlyAccount<TAccountMarket> : TAccountMarket,
-      TAccountPayer extends string ? WritableAccount<TAccountPayer> : TAccountPayer,
+      TAccountMarket extends string
+        ? ReadonlyAccount<TAccountMarket>
+        : TAccountMarket,
+      TAccountPayer extends string
+        ? WritableAccount<TAccountPayer>
+        : TAccountPayer,
       ...TRemainingAccounts,
     ]
   >;
@@ -66,20 +72,25 @@ export type CleanInstructionDataArgs = {};
 
 export function getCleanInstructionDataEncoder(): FixedSizeEncoder<CleanInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: CLEAN_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: CLEAN_DISCRIMINATOR }),
   );
 }
 
 export function getCleanInstructionDataDecoder(): FixedSizeDecoder<CleanInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getCleanInstructionDataCodec(): FixedSizeCodec<
   CleanInstructionDataArgs,
   CleanInstructionData
 > {
-  return combineCodec(getCleanInstructionDataEncoder(), getCleanInstructionDataDecoder());
+  return combineCodec(
+    getCleanInstructionDataEncoder(),
+    getCleanInstructionDataDecoder(),
+  );
 }
 
 export type CleanInput<
@@ -99,8 +110,13 @@ export function getCleanInstruction<
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
   input: CleanInput<TAccountJob, TAccountMarket, TAccountPayer>,
-  config?: { programAddress?: TProgramAddress }
-): CleanInstruction<TProgramAddress, TAccountJob, TAccountMarket, TAccountPayer> {
+  config?: { programAddress?: TProgramAddress },
+): CleanInstruction<
+  TProgramAddress,
+  TAccountJob,
+  TAccountMarket,
+  TAccountPayer
+> {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
 
@@ -110,9 +126,12 @@ export function getCleanInstruction<
     market: { value: input.market ?? null, isWritable: false },
     payer: { value: input.payer ?? null, isWritable: true },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -121,7 +140,12 @@ export function getCleanInstruction<
     ],
     data: getCleanInstructionDataEncoder().encode({}),
     programAddress,
-  } as CleanInstruction<TProgramAddress, TAccountJob, TAccountMarket, TAccountPayer>);
+  } as CleanInstruction<
+    TProgramAddress,
+    TAccountJob,
+    TAccountMarket,
+    TAccountPayer
+  >);
 }
 
 export type ParsedCleanInstruction<
@@ -143,11 +167,11 @@ export function parseCleanInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCleanInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

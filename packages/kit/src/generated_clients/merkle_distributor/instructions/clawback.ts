@@ -29,9 +29,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const CLAWBACK_INSTRUCTION_ACCOUNTS = {
   distributor: 0,
@@ -43,7 +43,9 @@ export const CLAWBACK_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type ClawbackInstructionAccountName = keyof typeof CLAWBACK_INSTRUCTION_ACCOUNTS;
-export const CLAWBACK_DISCRIMINATOR = new Uint8Array([111, 92, 142, 79, 33, 234, 82, 27]);
+export const CLAWBACK_DISCRIMINATOR = new Uint8Array([
+  111, 92, 142, 79, 33, 234, 82, 27,
+]);
 
 export function getClawbackDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(CLAWBACK_DISCRIMINATOR);
@@ -55,9 +57,10 @@ export type ClawbackInstruction<
   TAccountFrom extends string | AccountMeta<string> = string,
   TAccountTo extends string | AccountMeta<string> = string,
   TAccountClaimant extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> = '11111111111111111111111111111111',
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -66,10 +69,13 @@ export type ClawbackInstruction<
       TAccountDistributor extends string
         ? WritableAccount<TAccountDistributor>
         : TAccountDistributor,
-      TAccountFrom extends string ? WritableAccount<TAccountFrom> : TAccountFrom,
+      TAccountFrom extends string
+        ? WritableAccount<TAccountFrom>
+        : TAccountFrom,
       TAccountTo extends string ? WritableAccount<TAccountTo> : TAccountTo,
       TAccountClaimant extends string
-        ? ReadonlySignerAccount<TAccountClaimant> & AccountSignerMeta<TAccountClaimant>
+        ? ReadonlySignerAccount<TAccountClaimant> &
+            AccountSignerMeta<TAccountClaimant>
         : TAccountClaimant,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
@@ -87,20 +93,25 @@ export type ClawbackInstructionDataArgs = {};
 
 export function getClawbackInstructionDataEncoder(): FixedSizeEncoder<ClawbackInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: CLAWBACK_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: CLAWBACK_DISCRIMINATOR }),
   );
 }
 
 export function getClawbackInstructionDataDecoder(): FixedSizeDecoder<ClawbackInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getClawbackInstructionDataCodec(): FixedSizeCodec<
   ClawbackInstructionDataArgs,
   ClawbackInstructionData
 > {
-  return combineCodec(getClawbackInstructionDataEncoder(), getClawbackInstructionDataDecoder());
+  return combineCodec(
+    getClawbackInstructionDataEncoder(),
+    getClawbackInstructionDataDecoder(),
+  );
 }
 
 export type ClawbackInput<
@@ -145,7 +156,7 @@ export function getClawbackInstruction<
     TAccountSystemProgram,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): ClawbackInstruction<
   TProgramAddress,
   TAccountDistributor,
@@ -156,7 +167,8 @@ export function getClawbackInstruction<
   TAccountTokenProgram
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -167,19 +179,22 @@ export function getClawbackInstruction<
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
-      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.distributor),
@@ -233,11 +248,11 @@ export function parseClawbackInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClawbackInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

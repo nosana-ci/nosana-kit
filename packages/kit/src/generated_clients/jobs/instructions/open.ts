@@ -37,9 +37,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const OPEN_INSTRUCTION_ACCOUNTS = {
   mint: 0,
@@ -53,7 +53,9 @@ export const OPEN_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type OpenInstructionAccountName = keyof typeof OPEN_INSTRUCTION_ACCOUNTS;
-export const OPEN_DISCRIMINATOR = new Uint8Array([228, 220, 155, 71, 199, 189, 60, 45]);
+export const OPEN_DISCRIMINATOR = new Uint8Array([
+  228, 220, 155, 71, 199, 189, 60, 45,
+]);
 
 export function getOpenDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(OPEN_DISCRIMINATOR);
@@ -66,25 +68,37 @@ export type OpenInstruction<
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountAccessKey extends string | AccountMeta<string> = string,
-  TAccountRent extends string | AccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
-  TAccountSystemProgram extends string | AccountMeta<string> = '11111111111111111111111111111111',
+  TAccountRent extends string | AccountMeta<string> =
+    "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountMint extends string ? ReadonlyAccount<TAccountMint> : TAccountMint,
+      TAccountMint extends string
+        ? ReadonlyAccount<TAccountMint>
+        : TAccountMint,
       TAccountMarket extends string
-        ? WritableSignerAccount<TAccountMarket> & AccountSignerMeta<TAccountMarket>
+        ? WritableSignerAccount<TAccountMarket> &
+            AccountSignerMeta<TAccountMarket>
         : TAccountMarket,
-      TAccountVault extends string ? WritableAccount<TAccountVault> : TAccountVault,
+      TAccountVault extends string
+        ? WritableAccount<TAccountVault>
+        : TAccountVault,
       TAccountAuthority extends string
-        ? WritableSignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? WritableSignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
-      TAccountAccessKey extends string ? ReadonlyAccount<TAccountAccessKey> : TAccountAccessKey,
-      TAccountRent extends string ? ReadonlyAccount<TAccountRent> : TAccountRent,
+      TAccountAccessKey extends string
+        ? ReadonlyAccount<TAccountAccessKey>
+        : TAccountAccessKey,
+      TAccountRent extends string
+        ? ReadonlyAccount<TAccountRent>
+        : TAccountRent,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
@@ -115,25 +129,25 @@ export type OpenInstructionDataArgs = {
 export function getOpenInstructionDataEncoder(): FixedSizeEncoder<OpenInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['jobExpiration', getI64Encoder()],
-      ['jobPrice', getU64Encoder()],
-      ['jobTimeout', getI64Encoder()],
-      ['jobType', getU8Encoder()],
-      ['nodeXnosMinimum', getU128Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["jobExpiration", getI64Encoder()],
+      ["jobPrice", getU64Encoder()],
+      ["jobTimeout", getI64Encoder()],
+      ["jobType", getU8Encoder()],
+      ["nodeXnosMinimum", getU128Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: OPEN_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: OPEN_DISCRIMINATOR }),
   );
 }
 
 export function getOpenInstructionDataDecoder(): FixedSizeDecoder<OpenInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['jobExpiration', getI64Decoder()],
-    ['jobPrice', getU64Decoder()],
-    ['jobTimeout', getI64Decoder()],
-    ['jobType', getU8Decoder()],
-    ['nodeXnosMinimum', getU128Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["jobExpiration", getI64Decoder()],
+    ["jobPrice", getU64Decoder()],
+    ["jobTimeout", getI64Decoder()],
+    ["jobType", getU8Decoder()],
+    ["nodeXnosMinimum", getU128Decoder()],
   ]);
 }
 
@@ -141,7 +155,10 @@ export function getOpenInstructionDataCodec(): FixedSizeCodec<
   OpenInstructionDataArgs,
   OpenInstructionData
 > {
-  return combineCodec(getOpenInstructionDataEncoder(), getOpenInstructionDataDecoder());
+  return combineCodec(
+    getOpenInstructionDataEncoder(),
+    getOpenInstructionDataDecoder(),
+  );
 }
 
 export type OpenInput<
@@ -162,11 +179,11 @@ export type OpenInput<
   rent?: Address<TAccountRent>;
   systemProgram?: Address<TAccountSystemProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  jobExpiration: OpenInstructionDataArgs['jobExpiration'];
-  jobPrice: OpenInstructionDataArgs['jobPrice'];
-  jobTimeout: OpenInstructionDataArgs['jobTimeout'];
-  jobType: OpenInstructionDataArgs['jobType'];
-  nodeXnosMinimum: OpenInstructionDataArgs['nodeXnosMinimum'];
+  jobExpiration: OpenInstructionDataArgs["jobExpiration"];
+  jobPrice: OpenInstructionDataArgs["jobPrice"];
+  jobTimeout: OpenInstructionDataArgs["jobTimeout"];
+  jobType: OpenInstructionDataArgs["jobType"];
+  nodeXnosMinimum: OpenInstructionDataArgs["nodeXnosMinimum"];
 };
 
 export function getOpenInstruction<
@@ -190,7 +207,7 @@ export function getOpenInstruction<
     TAccountSystemProgram,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): OpenInstruction<
   TProgramAddress,
   TAccountMint,
@@ -216,7 +233,10 @@ export function getOpenInstruction<
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
@@ -224,18 +244,18 @@ export function getOpenInstruction<
   // Resolve default values.
   if (!accounts.rent.value) {
     accounts.rent.value =
-      'SysvarRent111111111111111111111111111111111' as Address<'SysvarRent111111111111111111111111111111111'>;
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
-      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.mint),
@@ -247,7 +267,9 @@ export function getOpenInstruction<
       getAccountMeta(accounts.systemProgram),
       getAccountMeta(accounts.tokenProgram),
     ],
-    data: getOpenInstructionDataEncoder().encode(args as OpenInstructionDataArgs),
+    data: getOpenInstructionDataEncoder().encode(
+      args as OpenInstructionDataArgs,
+    ),
     programAddress,
   } as OpenInstruction<
     TProgramAddress,
@@ -286,11 +308,11 @@ export function parseOpenInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedOpenInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

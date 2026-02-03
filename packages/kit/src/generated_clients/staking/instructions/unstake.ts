@@ -29,9 +29,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_STAKING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const UNSTAKE_INSTRUCTION_ACCOUNTS = {
   stake: 0,
@@ -40,7 +40,9 @@ export const UNSTAKE_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type UnstakeInstructionAccountName = keyof typeof UNSTAKE_INSTRUCTION_ACCOUNTS;
-export const UNSTAKE_DISCRIMINATOR = new Uint8Array([90, 95, 107, 42, 205, 124, 50, 225]);
+export const UNSTAKE_DISCRIMINATOR = new Uint8Array([
+  90, 95, 107, 42, 205, 124, 50, 225,
+]);
 
 export function getUnstakeDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(UNSTAKE_DISCRIMINATOR);
@@ -56,10 +58,15 @@ export type UnstakeInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountStake extends string ? WritableAccount<TAccountStake> : TAccountStake,
-      TAccountReward extends string ? ReadonlyAccount<TAccountReward> : TAccountReward,
+      TAccountStake extends string
+        ? WritableAccount<TAccountStake>
+        : TAccountStake,
+      TAccountReward extends string
+        ? ReadonlyAccount<TAccountReward>
+        : TAccountReward,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       ...TRemainingAccounts,
     ]
@@ -71,20 +78,25 @@ export type UnstakeInstructionDataArgs = {};
 
 export function getUnstakeInstructionDataEncoder(): FixedSizeEncoder<UnstakeInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: UNSTAKE_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: UNSTAKE_DISCRIMINATOR }),
   );
 }
 
 export function getUnstakeInstructionDataDecoder(): FixedSizeDecoder<UnstakeInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getUnstakeInstructionDataCodec(): FixedSizeCodec<
   UnstakeInstructionDataArgs,
   UnstakeInstructionData
 > {
-  return combineCodec(getUnstakeInstructionDataEncoder(), getUnstakeInstructionDataDecoder());
+  return combineCodec(
+    getUnstakeInstructionDataEncoder(),
+    getUnstakeInstructionDataDecoder(),
+  );
 }
 
 export type UnstakeInput<
@@ -104,10 +116,16 @@ export function getUnstakeInstruction<
   TProgramAddress extends Address = typeof NOSANA_STAKING_PROGRAM_ADDRESS,
 >(
   input: UnstakeInput<TAccountStake, TAccountReward, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress }
-): UnstakeInstruction<TProgramAddress, TAccountStake, TAccountReward, TAccountAuthority> {
+  config?: { programAddress?: TProgramAddress },
+): UnstakeInstruction<
+  TProgramAddress,
+  TAccountStake,
+  TAccountReward,
+  TAccountAuthority
+> {
   // Program address.
-  const programAddress = config?.programAddress ?? NOSANA_STAKING_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? NOSANA_STAKING_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -115,9 +133,12 @@ export function getUnstakeInstruction<
     reward: { value: input.reward ?? null, isWritable: false },
     authority: { value: input.authority ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.stake),
@@ -126,7 +147,12 @@ export function getUnstakeInstruction<
     ],
     data: getUnstakeInstructionDataEncoder().encode({}),
     programAddress,
-  } as UnstakeInstruction<TProgramAddress, TAccountStake, TAccountReward, TAccountAuthority>);
+  } as UnstakeInstruction<
+    TProgramAddress,
+    TAccountStake,
+    TAccountReward,
+    TAccountAuthority
+  >);
 }
 
 export type ParsedUnstakeInstruction<
@@ -148,11 +174,11 @@ export function parseUnstakeInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUnstakeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

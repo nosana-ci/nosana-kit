@@ -29,9 +29,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const END_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -46,7 +46,9 @@ export const END_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type EndInstructionAccountName = keyof typeof END_INSTRUCTION_ACCOUNTS;
-export const END_DISCRIMINATOR = new Uint8Array([180, 160, 249, 217, 194, 121, 70, 16]);
+export const END_DISCRIMINATOR = new Uint8Array([
+  180, 160, 249, 217, 194, 121, 70, 16,
+]);
 
 export function getEndDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(END_DISCRIMINATOR);
@@ -63,21 +65,32 @@ export type EndInstruction<
   TAccountPayer extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
       TAccountJob extends string ? WritableAccount<TAccountJob> : TAccountJob,
-      TAccountMarket extends string ? ReadonlyAccount<TAccountMarket> : TAccountMarket,
+      TAccountMarket extends string
+        ? ReadonlyAccount<TAccountMarket>
+        : TAccountMarket,
       TAccountRun extends string ? WritableAccount<TAccountRun> : TAccountRun,
-      TAccountDeposit extends string ? WritableAccount<TAccountDeposit> : TAccountDeposit,
-      TAccountUser extends string ? WritableAccount<TAccountUser> : TAccountUser,
-      TAccountVault extends string ? WritableAccount<TAccountVault> : TAccountVault,
-      TAccountPayer extends string ? WritableAccount<TAccountPayer> : TAccountPayer,
+      TAccountDeposit extends string
+        ? WritableAccount<TAccountDeposit>
+        : TAccountDeposit,
+      TAccountUser extends string
+        ? WritableAccount<TAccountUser>
+        : TAccountUser,
+      TAccountVault extends string
+        ? WritableAccount<TAccountVault>
+        : TAccountVault,
+      TAccountPayer extends string
+        ? WritableAccount<TAccountPayer>
+        : TAccountPayer,
       TAccountAuthority extends string
-        ? WritableSignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? WritableSignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
@@ -92,20 +105,25 @@ export type EndInstructionDataArgs = {};
 
 export function getEndInstructionDataEncoder(): FixedSizeEncoder<EndInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: END_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: END_DISCRIMINATOR }),
   );
 }
 
 export function getEndInstructionDataDecoder(): FixedSizeDecoder<EndInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getEndInstructionDataCodec(): FixedSizeCodec<
   EndInstructionDataArgs,
   EndInstructionData
 > {
-  return combineCodec(getEndInstructionDataEncoder(), getEndInstructionDataDecoder());
+  return combineCodec(
+    getEndInstructionDataEncoder(),
+    getEndInstructionDataDecoder(),
+  );
 }
 
 export type EndInput<
@@ -153,7 +171,7 @@ export function getEndInstruction<
     TAccountAuthority,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): EndInstruction<
   TProgramAddress,
   TAccountJob,
@@ -181,15 +199,18 @@ export function getEndInstruction<
     authority: { value: input.authority ?? null, isWritable: true },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -243,11 +264,11 @@ export function parseEndInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedEndInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

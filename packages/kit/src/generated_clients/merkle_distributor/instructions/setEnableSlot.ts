@@ -30,9 +30,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const SET_ENABLE_SLOT_INSTRUCTION_ACCOUNTS = {
   distributor: 0,
@@ -40,10 +40,14 @@ export const SET_ENABLE_SLOT_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type SetEnableSlotInstructionAccountName = keyof typeof SET_ENABLE_SLOT_INSTRUCTION_ACCOUNTS;
-export const SET_ENABLE_SLOT_DISCRIMINATOR = new Uint8Array([5, 52, 73, 33, 150, 115, 97, 206]);
+export const SET_ENABLE_SLOT_DISCRIMINATOR = new Uint8Array([
+  5, 52, 73, 33, 150, 115, 97, 206,
+]);
 
 export function getSetEnableSlotDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(SET_ENABLE_SLOT_DISCRIMINATOR);
+  return fixEncoderSize(getBytesEncoder(), 8).encode(
+    SET_ENABLE_SLOT_DISCRIMINATOR,
+  );
 }
 
 export type SetEnableSlotInstruction<
@@ -59,7 +63,8 @@ export type SetEnableSlotInstruction<
         ? WritableAccount<TAccountDistributor>
         : TAccountDistributor,
       TAccountAdmin extends string
-        ? WritableSignerAccount<TAccountAdmin> & AccountSignerMeta<TAccountAdmin>
+        ? WritableSignerAccount<TAccountAdmin> &
+            AccountSignerMeta<TAccountAdmin>
         : TAccountAdmin,
       ...TRemainingAccounts,
     ]
@@ -75,17 +80,17 @@ export type SetEnableSlotInstructionDataArgs = { enableSlot: number | bigint };
 export function getSetEnableSlotInstructionDataEncoder(): FixedSizeEncoder<SetEnableSlotInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['enableSlot', getU64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["enableSlot", getU64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: SET_ENABLE_SLOT_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: SET_ENABLE_SLOT_DISCRIMINATOR }),
   );
 }
 
 export function getSetEnableSlotInstructionDataDecoder(): FixedSizeDecoder<SetEnableSlotInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['enableSlot', getU64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["enableSlot", getU64Decoder()],
   ]);
 }
 
@@ -95,7 +100,7 @@ export function getSetEnableSlotInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getSetEnableSlotInstructionDataEncoder(),
-    getSetEnableSlotInstructionDataDecoder()
+    getSetEnableSlotInstructionDataDecoder(),
   );
 }
 
@@ -107,7 +112,7 @@ export type SetEnableSlotInput<
   distributor: Address<TAccountDistributor>;
   /** Payer to create the distributor. */
   admin: TransactionSigner<TAccountAdmin>;
-  enableSlot: SetEnableSlotInstructionDataArgs['enableSlot'];
+  enableSlot: SetEnableSlotInstructionDataArgs["enableSlot"];
 };
 
 export function getSetEnableSlotInstruction<
@@ -116,27 +121,44 @@ export function getSetEnableSlotInstruction<
   TProgramAddress extends Address = typeof MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS,
 >(
   input: SetEnableSlotInput<TAccountDistributor, TAccountAdmin>,
-  config?: { programAddress?: TProgramAddress }
-): SetEnableSlotInstruction<TProgramAddress, TAccountDistributor, TAccountAdmin> {
+  config?: { programAddress?: TProgramAddress },
+): SetEnableSlotInstruction<
+  TProgramAddress,
+  TAccountDistributor,
+  TAccountAdmin
+> {
   // Program address.
-  const programAddress = config?.programAddress ?? MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
     distributor: { value: input.distributor ?? null, isWritable: true },
     admin: { value: input.admin ?? null, isWritable: true },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
-    accounts: [getAccountMeta(accounts.distributor), getAccountMeta(accounts.admin)],
-    data: getSetEnableSlotInstructionDataEncoder().encode(args as SetEnableSlotInstructionDataArgs),
+    accounts: [
+      getAccountMeta(accounts.distributor),
+      getAccountMeta(accounts.admin),
+    ],
+    data: getSetEnableSlotInstructionDataEncoder().encode(
+      args as SetEnableSlotInstructionDataArgs,
+    ),
     programAddress,
-  } as SetEnableSlotInstruction<TProgramAddress, TAccountDistributor, TAccountAdmin>);
+  } as SetEnableSlotInstruction<
+    TProgramAddress,
+    TAccountDistributor,
+    TAccountAdmin
+  >);
 }
 
 export type ParsedSetEnableSlotInstruction<
@@ -159,11 +181,11 @@ export function parseSetEnableSlotInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetEnableSlotInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

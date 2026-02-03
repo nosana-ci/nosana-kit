@@ -11,8 +11,8 @@ import {
   type Address,
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** InvalidMarketAccount: This market account is not valid. */
 export const NOSANA_JOBS_ERROR__INVALID_MARKET_ACCOUNT = 0x1770; // 6000
@@ -75,7 +75,7 @@ export type NosanaJobsError =
   | typeof NOSANA_JOBS_ERROR__NOT_IN_MARKET_QUEUE;
 
 let nosanaJobsErrorMessages: Record<NosanaJobsError, string> | undefined;
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   nosanaJobsErrorMessages = {
     [NOSANA_JOBS_ERROR__INVALID_JOB_ACCOUNT]: `This job account is not valid.`,
     [NOSANA_JOBS_ERROR__INVALID_MARKET_ACCOUNT]: `This market account is not valid.`,
@@ -100,11 +100,11 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export function getNosanaJobsErrorMessage(code: NosanaJobsError): string {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     return (nosanaJobsErrorMessages as Record<NosanaJobsError, string>)[code];
   }
 
-  return 'Error message not available in production bundles.';
+  return "Error message not available in production bundles.";
 }
 
 export function isNosanaJobsError<TProgramErrorCode extends NosanaJobsError>(
@@ -112,13 +112,13 @@ export function isNosanaJobsError<TProgramErrorCode extends NosanaJobsError>(
   transactionMessage: {
     instructions: Record<number, { programAddress: Address }>;
   },
-  code?: TProgramErrorCode
+  code?: TProgramErrorCode,
 ): error is SolanaError<typeof SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM> &
   Readonly<{ context: Readonly<{ code: TProgramErrorCode }> }> {
   return isProgramError<TProgramErrorCode>(
     error,
     transactionMessage,
     NOSANA_JOBS_PROGRAM_ADDRESS,
-    code
+    code,
   );
 }

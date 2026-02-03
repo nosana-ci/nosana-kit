@@ -6,12 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from './claimLocked.js';
-export * from './clawback.js';
-export * from './closeClaimStatus.js';
-export * from './closeDistributor.js';
-export * from './newClaim.js';
-export * from './newDistributor.js';
-export * from './setAdmin.js';
-export * from './setClawbackReceiver.js';
-export * from './setEnableSlot.js';
+export * from "./claimLocked.js";
+export * from "./clawback.js";
+export * from "./closeClaimStatus.js";
+export * from "./closeDistributor.js";
+export * from "./newClaim.js";
+export * from "./newDistributor.js";
+export * from "./setAdmin.js";
+export * from "./setClawbackReceiver.js";
+export * from "./setEnableSlot.js";

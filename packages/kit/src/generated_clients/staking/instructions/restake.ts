@@ -28,9 +28,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_STAKING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const RESTAKE_INSTRUCTION_ACCOUNTS = {
   vault: 0,
@@ -39,7 +39,9 @@ export const RESTAKE_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type RestakeInstructionAccountName = keyof typeof RESTAKE_INSTRUCTION_ACCOUNTS;
-export const RESTAKE_DISCRIMINATOR = new Uint8Array([97, 161, 241, 167, 6, 32, 213, 53]);
+export const RESTAKE_DISCRIMINATOR = new Uint8Array([
+  97, 161, 241, 167, 6, 32, 213, 53,
+]);
 
 export function getRestakeDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(RESTAKE_DISCRIMINATOR);
@@ -55,10 +57,15 @@ export type RestakeInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountVault extends string ? WritableAccount<TAccountVault> : TAccountVault,
-      TAccountStake extends string ? WritableAccount<TAccountStake> : TAccountStake,
+      TAccountVault extends string
+        ? WritableAccount<TAccountVault>
+        : TAccountVault,
+      TAccountStake extends string
+        ? WritableAccount<TAccountStake>
+        : TAccountStake,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       ...TRemainingAccounts,
     ]
@@ -70,20 +77,25 @@ export type RestakeInstructionDataArgs = {};
 
 export function getRestakeInstructionDataEncoder(): FixedSizeEncoder<RestakeInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: RESTAKE_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: RESTAKE_DISCRIMINATOR }),
   );
 }
 
 export function getRestakeInstructionDataDecoder(): FixedSizeDecoder<RestakeInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getRestakeInstructionDataCodec(): FixedSizeCodec<
   RestakeInstructionDataArgs,
   RestakeInstructionData
 > {
-  return combineCodec(getRestakeInstructionDataEncoder(), getRestakeInstructionDataDecoder());
+  return combineCodec(
+    getRestakeInstructionDataEncoder(),
+    getRestakeInstructionDataDecoder(),
+  );
 }
 
 export type RestakeInput<
@@ -103,10 +115,16 @@ export function getRestakeInstruction<
   TProgramAddress extends Address = typeof NOSANA_STAKING_PROGRAM_ADDRESS,
 >(
   input: RestakeInput<TAccountVault, TAccountStake, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress }
-): RestakeInstruction<TProgramAddress, TAccountVault, TAccountStake, TAccountAuthority> {
+  config?: { programAddress?: TProgramAddress },
+): RestakeInstruction<
+  TProgramAddress,
+  TAccountVault,
+  TAccountStake,
+  TAccountAuthority
+> {
   // Program address.
-  const programAddress = config?.programAddress ?? NOSANA_STAKING_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? NOSANA_STAKING_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -114,9 +132,12 @@ export function getRestakeInstruction<
     stake: { value: input.stake ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.vault),
@@ -125,7 +146,12 @@ export function getRestakeInstruction<
     ],
     data: getRestakeInstructionDataEncoder().encode({}),
     programAddress,
-  } as RestakeInstruction<TProgramAddress, TAccountVault, TAccountStake, TAccountAuthority>);
+  } as RestakeInstruction<
+    TProgramAddress,
+    TAccountVault,
+    TAccountStake,
+    TAccountAuthority
+  >);
 }
 
 export type ParsedRestakeInstruction<
@@ -147,11 +173,11 @@ export function parseRestakeInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRestakeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

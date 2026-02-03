@@ -13,16 +13,16 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
-} from '@solana/kit';
+} from "@solana/kit";
 
 /** The `JobType` describes the type of any job. */
 export const JobType = {
-  Default: 'Default',
-  Small: 'Small',
-  Medium: 'Medium',
-  Large: 'Large',
-  Gpu: 'Gpu',
-  Unknown: 'Unknown',
+  Default: "Default",
+  Small: "Small",
+  Medium: "Medium",
+  Large: "Large",
+  Gpu: "Gpu",
+  Unknown: "Unknown",
 } as const;
 export type JobType = (typeof JobType)[keyof typeof JobType];
 

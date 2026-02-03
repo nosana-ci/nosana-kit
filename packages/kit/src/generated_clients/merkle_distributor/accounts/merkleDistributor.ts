@@ -41,12 +41,16 @@ import {
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
-} from '@solana/kit';
+} from "@solana/kit";
 
-export const MERKLE_DISTRIBUTOR_DISCRIMINATOR = new Uint8Array([77, 119, 139, 70, 84, 247, 12, 26]);
+export const MERKLE_DISTRIBUTOR_DISCRIMINATOR = new Uint8Array([
+  77, 119, 139, 70, 84, 247, 12, 26,
+]);
 
 export function getMerkleDistributorDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(MERKLE_DISTRIBUTOR_DISCRIMINATOR);
+  return fixEncoderSize(getBytesEncoder(), 8).encode(
+    MERKLE_DISTRIBUTOR_DISCRIMINATOR,
+  );
 }
 
 /** State for the account which distributes tokens. */
@@ -145,58 +149,58 @@ export type MerkleDistributorArgs = {
 export function getMerkleDistributorEncoder(): FixedSizeEncoder<MerkleDistributorArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['bump', getU8Encoder()],
-      ['version', getU64Encoder()],
-      ['root', fixEncoderSize(getBytesEncoder(), 32)],
-      ['mint', getAddressEncoder()],
-      ['tokenVault', getAddressEncoder()],
-      ['maxTotalClaim', getU64Encoder()],
-      ['maxNumNodes', getU64Encoder()],
-      ['totalAmountClaimed', getU64Encoder()],
-      ['totalAmountForgone', getU64Encoder()],
-      ['numNodesClaimed', getU64Encoder()],
-      ['startTs', getI64Encoder()],
-      ['endTs', getI64Encoder()],
-      ['clawbackStartTs', getI64Encoder()],
-      ['clawbackReceiver', getAddressEncoder()],
-      ['admin', getAddressEncoder()],
-      ['clawedBack', getBooleanEncoder()],
-      ['enableSlot', getU64Encoder()],
-      ['closable', getBooleanEncoder()],
-      ['buffer0', fixEncoderSize(getBytesEncoder(), 32)],
-      ['buffer1', fixEncoderSize(getBytesEncoder(), 32)],
-      ['buffer2', fixEncoderSize(getBytesEncoder(), 32)],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["bump", getU8Encoder()],
+      ["version", getU64Encoder()],
+      ["root", fixEncoderSize(getBytesEncoder(), 32)],
+      ["mint", getAddressEncoder()],
+      ["tokenVault", getAddressEncoder()],
+      ["maxTotalClaim", getU64Encoder()],
+      ["maxNumNodes", getU64Encoder()],
+      ["totalAmountClaimed", getU64Encoder()],
+      ["totalAmountForgone", getU64Encoder()],
+      ["numNodesClaimed", getU64Encoder()],
+      ["startTs", getI64Encoder()],
+      ["endTs", getI64Encoder()],
+      ["clawbackStartTs", getI64Encoder()],
+      ["clawbackReceiver", getAddressEncoder()],
+      ["admin", getAddressEncoder()],
+      ["clawedBack", getBooleanEncoder()],
+      ["enableSlot", getU64Encoder()],
+      ["closable", getBooleanEncoder()],
+      ["buffer0", fixEncoderSize(getBytesEncoder(), 32)],
+      ["buffer1", fixEncoderSize(getBytesEncoder(), 32)],
+      ["buffer2", fixEncoderSize(getBytesEncoder(), 32)],
     ]),
-    (value) => ({ ...value, discriminator: MERKLE_DISTRIBUTOR_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: MERKLE_DISTRIBUTOR_DISCRIMINATOR }),
   );
 }
 
 /** Gets the decoder for {@link MerkleDistributor} account data. */
 export function getMerkleDistributorDecoder(): FixedSizeDecoder<MerkleDistributor> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['bump', getU8Decoder()],
-    ['version', getU64Decoder()],
-    ['root', fixDecoderSize(getBytesDecoder(), 32)],
-    ['mint', getAddressDecoder()],
-    ['tokenVault', getAddressDecoder()],
-    ['maxTotalClaim', getU64Decoder()],
-    ['maxNumNodes', getU64Decoder()],
-    ['totalAmountClaimed', getU64Decoder()],
-    ['totalAmountForgone', getU64Decoder()],
-    ['numNodesClaimed', getU64Decoder()],
-    ['startTs', getI64Decoder()],
-    ['endTs', getI64Decoder()],
-    ['clawbackStartTs', getI64Decoder()],
-    ['clawbackReceiver', getAddressDecoder()],
-    ['admin', getAddressDecoder()],
-    ['clawedBack', getBooleanDecoder()],
-    ['enableSlot', getU64Decoder()],
-    ['closable', getBooleanDecoder()],
-    ['buffer0', fixDecoderSize(getBytesDecoder(), 32)],
-    ['buffer1', fixDecoderSize(getBytesDecoder(), 32)],
-    ['buffer2', fixDecoderSize(getBytesDecoder(), 32)],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["bump", getU8Decoder()],
+    ["version", getU64Decoder()],
+    ["root", fixDecoderSize(getBytesDecoder(), 32)],
+    ["mint", getAddressDecoder()],
+    ["tokenVault", getAddressDecoder()],
+    ["maxTotalClaim", getU64Decoder()],
+    ["maxNumNodes", getU64Decoder()],
+    ["totalAmountClaimed", getU64Decoder()],
+    ["totalAmountForgone", getU64Decoder()],
+    ["numNodesClaimed", getU64Decoder()],
+    ["startTs", getI64Decoder()],
+    ["endTs", getI64Decoder()],
+    ["clawbackStartTs", getI64Decoder()],
+    ["clawbackReceiver", getAddressDecoder()],
+    ["admin", getAddressDecoder()],
+    ["clawedBack", getBooleanDecoder()],
+    ["enableSlot", getU64Decoder()],
+    ["closable", getBooleanDecoder()],
+    ["buffer0", fixDecoderSize(getBytesDecoder(), 32)],
+    ["buffer1", fixDecoderSize(getBytesDecoder(), 32)],
+    ["buffer2", fixDecoderSize(getBytesDecoder(), 32)],
   ]);
 }
 
@@ -205,38 +209,45 @@ export function getMerkleDistributorCodec(): FixedSizeCodec<
   MerkleDistributorArgs,
   MerkleDistributor
 > {
-  return combineCodec(getMerkleDistributorEncoder(), getMerkleDistributorDecoder());
+  return combineCodec(
+    getMerkleDistributorEncoder(),
+    getMerkleDistributorDecoder(),
+  );
 }
 
 export function decodeMerkleDistributor<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress>,
 ): Account<MerkleDistributor, TAddress>;
 export function decodeMerkleDistributor<TAddress extends string = string>(
-  encodedAccount: MaybeEncodedAccount<TAddress>
+  encodedAccount: MaybeEncodedAccount<TAddress>,
 ): MaybeAccount<MerkleDistributor, TAddress>;
 export function decodeMerkleDistributor<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>
-): Account<MerkleDistributor, TAddress> | MaybeAccount<MerkleDistributor, TAddress> {
+  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>,
+):
+  | Account<MerkleDistributor, TAddress>
+  | MaybeAccount<MerkleDistributor, TAddress> {
   return decodeAccount(
     encodedAccount as MaybeEncodedAccount<TAddress>,
-    getMerkleDistributorDecoder()
+    getMerkleDistributorDecoder(),
   );
 }
 
 export async function fetchMerkleDistributor<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<Account<MerkleDistributor, TAddress>> {
   const maybeAccount = await fetchMaybeMerkleDistributor(rpc, address, config);
   assertAccountExists(maybeAccount);
   return maybeAccount;
 }
 
-export async function fetchMaybeMerkleDistributor<TAddress extends string = string>(
+export async function fetchMaybeMerkleDistributor<
+  TAddress extends string = string,
+>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<MaybeAccount<MerkleDistributor, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
   return decodeMerkleDistributor(maybeAccount);
@@ -245,9 +256,13 @@ export async function fetchMaybeMerkleDistributor<TAddress extends string = stri
 export async function fetchAllMerkleDistributor(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<Account<MerkleDistributor>[]> {
-  const maybeAccounts = await fetchAllMaybeMerkleDistributor(rpc, addresses, config);
+  const maybeAccounts = await fetchAllMaybeMerkleDistributor(
+    rpc,
+    addresses,
+    config,
+  );
   assertAccountsExist(maybeAccounts);
   return maybeAccounts;
 }
@@ -255,10 +270,12 @@ export async function fetchAllMerkleDistributor(
 export async function fetchAllMaybeMerkleDistributor(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<MerkleDistributor>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
-  return maybeAccounts.map((maybeAccount) => decodeMerkleDistributor(maybeAccount));
+  return maybeAccounts.map((maybeAccount) =>
+    decodeMerkleDistributor(maybeAccount),
+  );
 }
 
 export function getMerkleDistributorSize(): number {

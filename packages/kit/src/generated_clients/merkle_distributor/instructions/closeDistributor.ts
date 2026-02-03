@@ -29,9 +29,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const CLOSE_DISTRIBUTOR_INSTRUCTION_ACCOUNTS = {
   distributor: 0,
@@ -41,14 +41,15 @@ export const CLOSE_DISTRIBUTOR_INSTRUCTION_ACCOUNTS = {
   tokenProgram: 4,
 } as const;
 
-export type CloseDistributorInstructionAccountName =
-  keyof typeof CLOSE_DISTRIBUTOR_INSTRUCTION_ACCOUNTS;
+export type CloseDistributorInstructionAccountName = keyof typeof CLOSE_DISTRIBUTOR_INSTRUCTION_ACCOUNTS;
 export const CLOSE_DISTRIBUTOR_DISCRIMINATOR = new Uint8Array([
   202, 56, 180, 143, 46, 104, 106, 112,
 ]);
 
 export function getCloseDistributorDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(CLOSE_DISTRIBUTOR_DISCRIMINATOR);
+  return fixEncoderSize(getBytesEncoder(), 8).encode(
+    CLOSE_DISTRIBUTOR_DISCRIMINATOR,
+  );
 }
 
 export type CloseDistributorInstruction<
@@ -58,7 +59,7 @@ export type CloseDistributorInstruction<
   TAccountAdmin extends string | AccountMeta<string> = string,
   TAccountDestinationTokenAccount extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -67,9 +68,12 @@ export type CloseDistributorInstruction<
       TAccountDistributor extends string
         ? WritableAccount<TAccountDistributor>
         : TAccountDistributor,
-      TAccountTokenVault extends string ? WritableAccount<TAccountTokenVault> : TAccountTokenVault,
+      TAccountTokenVault extends string
+        ? WritableAccount<TAccountTokenVault>
+        : TAccountTokenVault,
       TAccountAdmin extends string
-        ? WritableSignerAccount<TAccountAdmin> & AccountSignerMeta<TAccountAdmin>
+        ? WritableSignerAccount<TAccountAdmin> &
+            AccountSignerMeta<TAccountAdmin>
         : TAccountAdmin,
       TAccountDestinationTokenAccount extends string
         ? WritableAccount<TAccountDestinationTokenAccount>
@@ -89,13 +93,15 @@ export type CloseDistributorInstructionDataArgs = {};
 
 export function getCloseDistributorInstructionDataEncoder(): FixedSizeEncoder<CloseDistributorInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: CLOSE_DISTRIBUTOR_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: CLOSE_DISTRIBUTOR_DISCRIMINATOR }),
   );
 }
 
 export function getCloseDistributorInstructionDataDecoder(): FixedSizeDecoder<CloseDistributorInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getCloseDistributorInstructionDataCodec(): FixedSizeCodec<
@@ -104,7 +110,7 @@ export function getCloseDistributorInstructionDataCodec(): FixedSizeCodec<
 > {
   return combineCodec(
     getCloseDistributorInstructionDataEncoder(),
-    getCloseDistributorInstructionDataDecoder()
+    getCloseDistributorInstructionDataDecoder(),
   );
 }
 
@@ -145,7 +151,7 @@ export function getCloseDistributorInstruction<
     TAccountDestinationTokenAccount,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): CloseDistributorInstruction<
   TProgramAddress,
   TAccountDistributor,
@@ -155,7 +161,8 @@ export function getCloseDistributorInstruction<
   TAccountTokenProgram
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -168,15 +175,18 @@ export function getCloseDistributorInstruction<
     },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.distributor),
@@ -226,11 +236,11 @@ export function parseCloseDistributorInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCloseDistributorInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -31,9 +31,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_STAKING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const SLASH_INSTRUCTION_ACCOUNTS = {
   vault: 0,
@@ -45,7 +45,9 @@ export const SLASH_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type SlashInstructionAccountName = keyof typeof SLASH_INSTRUCTION_ACCOUNTS;
-export const SLASH_DISCRIMINATOR = new Uint8Array([204, 141, 18, 161, 8, 177, 92, 142]);
+export const SLASH_DISCRIMINATOR = new Uint8Array([
+  204, 141, 18, 161, 8, 177, 92, 142,
+]);
 
 export function getSlashDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(SLASH_DISCRIMINATOR);
@@ -59,20 +61,27 @@ export type SlashInstruction<
   TAccountSettings extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountVault extends string ? WritableAccount<TAccountVault> : TAccountVault,
-      TAccountStake extends string ? WritableAccount<TAccountStake> : TAccountStake,
+      TAccountVault extends string
+        ? WritableAccount<TAccountVault>
+        : TAccountVault,
+      TAccountStake extends string
+        ? WritableAccount<TAccountStake>
+        : TAccountStake,
       TAccountTokenAccount extends string
         ? WritableAccount<TAccountTokenAccount>
         : TAccountTokenAccount,
-      TAccountSettings extends string ? ReadonlyAccount<TAccountSettings> : TAccountSettings,
+      TAccountSettings extends string
+        ? ReadonlyAccount<TAccountSettings>
+        : TAccountSettings,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
@@ -91,17 +100,17 @@ export type SlashInstructionDataArgs = { amount: number | bigint };
 export function getSlashInstructionDataEncoder(): FixedSizeEncoder<SlashInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['amount', getU64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["amount", getU64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: SLASH_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: SLASH_DISCRIMINATOR }),
   );
 }
 
 export function getSlashInstructionDataDecoder(): FixedSizeDecoder<SlashInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['amount', getU64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["amount", getU64Decoder()],
   ]);
 }
 
@@ -109,7 +118,10 @@ export function getSlashInstructionDataCodec(): FixedSizeCodec<
   SlashInstructionDataArgs,
   SlashInstructionData
 > {
-  return combineCodec(getSlashInstructionDataEncoder(), getSlashInstructionDataDecoder());
+  return combineCodec(
+    getSlashInstructionDataEncoder(),
+    getSlashInstructionDataDecoder(),
+  );
 }
 
 export type SlashInput<
@@ -126,7 +138,7 @@ export type SlashInput<
   settings: Address<TAccountSettings>;
   authority: TransactionSigner<TAccountAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  amount: SlashInstructionDataArgs['amount'];
+  amount: SlashInstructionDataArgs["amount"];
 };
 
 export function getSlashInstruction<
@@ -146,7 +158,7 @@ export function getSlashInstruction<
     TAccountAuthority,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): SlashInstruction<
   TProgramAddress,
   TAccountVault,
@@ -157,7 +169,8 @@ export function getSlashInstruction<
   TAccountTokenProgram
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? NOSANA_STAKING_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? NOSANA_STAKING_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -168,7 +181,10 @@ export function getSlashInstruction<
     authority: { value: input.authority ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
@@ -176,10 +192,10 @@ export function getSlashInstruction<
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.vault),
@@ -189,7 +205,9 @@ export function getSlashInstruction<
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.tokenProgram),
     ],
-    data: getSlashInstructionDataEncoder().encode(args as SlashInstructionDataArgs),
+    data: getSlashInstructionDataEncoder().encode(
+      args as SlashInstructionDataArgs,
+    ),
     programAddress,
   } as SlashInstruction<
     TProgramAddress,
@@ -224,11 +242,11 @@ export function parseSlashInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSlashInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

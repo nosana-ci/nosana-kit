@@ -28,9 +28,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const CLEAN_ADMIN_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -39,7 +39,9 @@ export const CLEAN_ADMIN_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type CleanAdminInstructionAccountName = keyof typeof CLEAN_ADMIN_INSTRUCTION_ACCOUNTS;
-export const CLEAN_ADMIN_DISCRIMINATOR = new Uint8Array([245, 90, 188, 68, 253, 235, 171, 105]);
+export const CLEAN_ADMIN_DISCRIMINATOR = new Uint8Array([
+  245, 90, 188, 68, 253, 235, 171, 105,
+]);
 
 export function getCleanAdminDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(CLEAN_ADMIN_DISCRIMINATOR);
@@ -56,9 +58,12 @@ export type CleanAdminInstruction<
   InstructionWithAccounts<
     [
       TAccountJob extends string ? WritableAccount<TAccountJob> : TAccountJob,
-      TAccountPayer extends string ? WritableAccount<TAccountPayer> : TAccountPayer,
+      TAccountPayer extends string
+        ? WritableAccount<TAccountPayer>
+        : TAccountPayer,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       ...TRemainingAccounts,
     ]
@@ -70,20 +75,25 @@ export type CleanAdminInstructionDataArgs = {};
 
 export function getCleanAdminInstructionDataEncoder(): FixedSizeEncoder<CleanAdminInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: CLEAN_ADMIN_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: CLEAN_ADMIN_DISCRIMINATOR }),
   );
 }
 
 export function getCleanAdminInstructionDataDecoder(): FixedSizeDecoder<CleanAdminInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getCleanAdminInstructionDataCodec(): FixedSizeCodec<
   CleanAdminInstructionDataArgs,
   CleanAdminInstructionData
 > {
-  return combineCodec(getCleanAdminInstructionDataEncoder(), getCleanAdminInstructionDataDecoder());
+  return combineCodec(
+    getCleanAdminInstructionDataEncoder(),
+    getCleanAdminInstructionDataDecoder(),
+  );
 }
 
 export type CleanAdminInput<
@@ -103,8 +113,13 @@ export function getCleanAdminInstruction<
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
   input: CleanAdminInput<TAccountJob, TAccountPayer, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress }
-): CleanAdminInstruction<TProgramAddress, TAccountJob, TAccountPayer, TAccountAuthority> {
+  config?: { programAddress?: TProgramAddress },
+): CleanAdminInstruction<
+  TProgramAddress,
+  TAccountJob,
+  TAccountPayer,
+  TAccountAuthority
+> {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
 
@@ -114,9 +129,12 @@ export function getCleanAdminInstruction<
     payer: { value: input.payer ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -125,7 +143,12 @@ export function getCleanAdminInstruction<
     ],
     data: getCleanAdminInstructionDataEncoder().encode({}),
     programAddress,
-  } as CleanAdminInstruction<TProgramAddress, TAccountJob, TAccountPayer, TAccountAuthority>);
+  } as CleanAdminInstruction<
+    TProgramAddress,
+    TAccountJob,
+    TAccountPayer,
+    TAccountAuthority
+  >);
 }
 
 export type ParsedCleanAdminInstruction<
@@ -147,11 +170,11 @@ export function parseCleanAdminInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCleanAdminInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

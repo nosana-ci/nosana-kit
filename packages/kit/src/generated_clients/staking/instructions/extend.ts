@@ -30,9 +30,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_STAKING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const EXTEND_INSTRUCTION_ACCOUNTS = {
   stake: 0,
@@ -40,7 +40,9 @@ export const EXTEND_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type ExtendInstructionAccountName = keyof typeof EXTEND_INSTRUCTION_ACCOUNTS;
-export const EXTEND_DISCRIMINATOR = new Uint8Array([228, 127, 0, 1, 227, 154, 54, 168]);
+export const EXTEND_DISCRIMINATOR = new Uint8Array([
+  228, 127, 0, 1, 227, 154, 54, 168,
+]);
 
 export function getExtendDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(EXTEND_DISCRIMINATOR);
@@ -55,9 +57,12 @@ export type ExtendInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountStake extends string ? WritableAccount<TAccountStake> : TAccountStake,
+      TAccountStake extends string
+        ? WritableAccount<TAccountStake>
+        : TAccountStake,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       ...TRemainingAccounts,
     ]
@@ -73,17 +78,17 @@ export type ExtendInstructionDataArgs = { duration: number | bigint };
 export function getExtendInstructionDataEncoder(): FixedSizeEncoder<ExtendInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['duration', getU64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["duration", getU64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: EXTEND_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: EXTEND_DISCRIMINATOR }),
   );
 }
 
 export function getExtendInstructionDataDecoder(): FixedSizeDecoder<ExtendInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['duration', getU64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["duration", getU64Decoder()],
   ]);
 }
 
@@ -91,7 +96,10 @@ export function getExtendInstructionDataCodec(): FixedSizeCodec<
   ExtendInstructionDataArgs,
   ExtendInstructionData
 > {
-  return combineCodec(getExtendInstructionDataEncoder(), getExtendInstructionDataDecoder());
+  return combineCodec(
+    getExtendInstructionDataEncoder(),
+    getExtendInstructionDataDecoder(),
+  );
 }
 
 export type ExtendInput<
@@ -100,7 +108,7 @@ export type ExtendInput<
 > = {
   stake: Address<TAccountStake>;
   authority: TransactionSigner<TAccountAuthority>;
-  duration: ExtendInstructionDataArgs['duration'];
+  duration: ExtendInstructionDataArgs["duration"];
 };
 
 export function getExtendInstruction<
@@ -109,25 +117,34 @@ export function getExtendInstruction<
   TProgramAddress extends Address = typeof NOSANA_STAKING_PROGRAM_ADDRESS,
 >(
   input: ExtendInput<TAccountStake, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): ExtendInstruction<TProgramAddress, TAccountStake, TAccountAuthority> {
   // Program address.
-  const programAddress = config?.programAddress ?? NOSANA_STAKING_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? NOSANA_STAKING_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
     stake: { value: input.stake ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
-    accounts: [getAccountMeta(accounts.stake), getAccountMeta(accounts.authority)],
-    data: getExtendInstructionDataEncoder().encode(args as ExtendInstructionDataArgs),
+    accounts: [
+      getAccountMeta(accounts.stake),
+      getAccountMeta(accounts.authority),
+    ],
+    data: getExtendInstructionDataEncoder().encode(
+      args as ExtendInstructionDataArgs,
+    ),
     programAddress,
   } as ExtendInstruction<TProgramAddress, TAccountStake, TAccountAuthority>);
 }
@@ -150,11 +167,11 @@ export function parseExtendInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedExtendInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

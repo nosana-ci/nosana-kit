@@ -32,9 +32,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const LIST_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -52,7 +52,9 @@ export const LIST_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type ListInstructionAccountName = keyof typeof LIST_INSTRUCTION_ACCOUNTS;
-export const LIST_DISCRIMINATOR = new Uint8Array([54, 174, 193, 67, 17, 41, 132, 38]);
+export const LIST_DISCRIMINATOR = new Uint8Array([
+  54, 174, 193, 67, 17, 41, 132, 38,
+]);
 
 export function getListDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(LIST_DISCRIMINATOR);
@@ -71,8 +73,9 @@ export type ListInstruction<
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountRewardsProgram extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
-  TAccountSystemProgram extends string | AccountMeta<string> = '11111111111111111111111111111111',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -81,14 +84,21 @@ export type ListInstruction<
       TAccountJob extends string
         ? WritableSignerAccount<TAccountJob> & AccountSignerMeta<TAccountJob>
         : TAccountJob,
-      TAccountMarket extends string ? WritableAccount<TAccountMarket> : TAccountMarket,
+      TAccountMarket extends string
+        ? WritableAccount<TAccountMarket>
+        : TAccountMarket,
       TAccountRun extends string
         ? WritableSignerAccount<TAccountRun> & AccountSignerMeta<TAccountRun>
         : TAccountRun,
-      TAccountUser extends string ? WritableAccount<TAccountUser> : TAccountUser,
-      TAccountVault extends string ? WritableAccount<TAccountVault> : TAccountVault,
+      TAccountUser extends string
+        ? WritableAccount<TAccountUser>
+        : TAccountUser,
+      TAccountVault extends string
+        ? WritableAccount<TAccountVault>
+        : TAccountVault,
       TAccountPayer extends string
-        ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
+        ? WritableSignerAccount<TAccountPayer> &
+            AccountSignerMeta<TAccountPayer>
         : TAccountPayer,
       TAccountRewardsReflection extends string
         ? WritableAccount<TAccountRewardsReflection>
@@ -97,7 +107,8 @@ export type ListInstruction<
         ? WritableAccount<TAccountRewardsVault>
         : TAccountRewardsVault,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       TAccountRewardsProgram extends string
         ? ReadonlyAccount<TAccountRewardsProgram>
@@ -126,19 +137,19 @@ export type ListInstructionDataArgs = {
 export function getListInstructionDataEncoder(): FixedSizeEncoder<ListInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['ipfsJob', fixEncoderSize(getBytesEncoder(), 32)],
-      ['timeout', getI64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["ipfsJob", fixEncoderSize(getBytesEncoder(), 32)],
+      ["timeout", getI64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: LIST_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: LIST_DISCRIMINATOR }),
   );
 }
 
 export function getListInstructionDataDecoder(): FixedSizeDecoder<ListInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['ipfsJob', fixDecoderSize(getBytesDecoder(), 32)],
-    ['timeout', getI64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["ipfsJob", fixDecoderSize(getBytesDecoder(), 32)],
+    ["timeout", getI64Decoder()],
   ]);
 }
 
@@ -146,7 +157,10 @@ export function getListInstructionDataCodec(): FixedSizeCodec<
   ListInstructionDataArgs,
   ListInstructionData
 > {
-  return combineCodec(getListInstructionDataEncoder(), getListInstructionDataDecoder());
+  return combineCodec(
+    getListInstructionDataEncoder(),
+    getListInstructionDataDecoder(),
+  );
 }
 
 export type ListInput<
@@ -175,8 +189,8 @@ export type ListInput<
   rewardsProgram: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
-  ipfsJob: ListInstructionDataArgs['ipfsJob'];
-  timeout: ListInstructionDataArgs['timeout'];
+  ipfsJob: ListInstructionDataArgs["ipfsJob"];
+  timeout: ListInstructionDataArgs["timeout"];
 };
 
 export function getListInstruction<
@@ -208,7 +222,7 @@ export function getListInstruction<
     TAccountTokenProgram,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): ListInstruction<
   TProgramAddress,
   TAccountJob,
@@ -245,7 +259,10 @@ export function getListInstruction<
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
@@ -253,14 +270,14 @@ export function getListInstruction<
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
-      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -276,7 +293,9 @@ export function getListInstruction<
       getAccountMeta(accounts.tokenProgram),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getListInstructionDataEncoder().encode(args as ListInstructionDataArgs),
+    data: getListInstructionDataEncoder().encode(
+      args as ListInstructionDataArgs,
+    ),
     programAddress,
   } as ListInstruction<
     TProgramAddress,
@@ -323,11 +342,11 @@ export function parseListInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedListInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 12) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

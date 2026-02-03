@@ -28,9 +28,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const QUIT_ADMIN_INSTRUCTION_ACCOUNTS = {
   run: 0,
@@ -39,7 +39,9 @@ export const QUIT_ADMIN_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type QuitAdminInstructionAccountName = keyof typeof QUIT_ADMIN_INSTRUCTION_ACCOUNTS;
-export const QUIT_ADMIN_DISCRIMINATOR = new Uint8Array([103, 238, 110, 8, 182, 20, 56, 196]);
+export const QUIT_ADMIN_DISCRIMINATOR = new Uint8Array([
+  103, 238, 110, 8, 182, 20, 56, 196,
+]);
 
 export function getQuitAdminDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(QUIT_ADMIN_DISCRIMINATOR);
@@ -56,9 +58,12 @@ export type QuitAdminInstruction<
   InstructionWithAccounts<
     [
       TAccountRun extends string ? WritableAccount<TAccountRun> : TAccountRun,
-      TAccountPayer extends string ? WritableAccount<TAccountPayer> : TAccountPayer,
+      TAccountPayer extends string
+        ? WritableAccount<TAccountPayer>
+        : TAccountPayer,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       ...TRemainingAccounts,
     ]
@@ -70,20 +75,25 @@ export type QuitAdminInstructionDataArgs = {};
 
 export function getQuitAdminInstructionDataEncoder(): FixedSizeEncoder<QuitAdminInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: QUIT_ADMIN_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: QUIT_ADMIN_DISCRIMINATOR }),
   );
 }
 
 export function getQuitAdminInstructionDataDecoder(): FixedSizeDecoder<QuitAdminInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getQuitAdminInstructionDataCodec(): FixedSizeCodec<
   QuitAdminInstructionDataArgs,
   QuitAdminInstructionData
 > {
-  return combineCodec(getQuitAdminInstructionDataEncoder(), getQuitAdminInstructionDataDecoder());
+  return combineCodec(
+    getQuitAdminInstructionDataEncoder(),
+    getQuitAdminInstructionDataDecoder(),
+  );
 }
 
 export type QuitAdminInput<
@@ -103,8 +113,13 @@ export function getQuitAdminInstruction<
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
   input: QuitAdminInput<TAccountRun, TAccountPayer, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress }
-): QuitAdminInstruction<TProgramAddress, TAccountRun, TAccountPayer, TAccountAuthority> {
+  config?: { programAddress?: TProgramAddress },
+): QuitAdminInstruction<
+  TProgramAddress,
+  TAccountRun,
+  TAccountPayer,
+  TAccountAuthority
+> {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
 
@@ -114,9 +129,12 @@ export function getQuitAdminInstruction<
     payer: { value: input.payer ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.run),
@@ -125,7 +143,12 @@ export function getQuitAdminInstruction<
     ],
     data: getQuitAdminInstructionDataEncoder().encode({}),
     programAddress,
-  } as QuitAdminInstruction<TProgramAddress, TAccountRun, TAccountPayer, TAccountAuthority>);
+  } as QuitAdminInstruction<
+    TProgramAddress,
+    TAccountRun,
+    TAccountPayer,
+    TAccountAuthority
+  >);
 }
 
 export type ParsedQuitAdminInstruction<
@@ -147,11 +170,11 @@ export function parseQuitAdminInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedQuitAdminInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

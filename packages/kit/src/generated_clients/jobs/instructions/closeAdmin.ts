@@ -29,9 +29,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const CLOSE_ADMIN_INSTRUCTION_ACCOUNTS = {
   market: 0,
@@ -42,7 +42,9 @@ export const CLOSE_ADMIN_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type CloseAdminInstructionAccountName = keyof typeof CLOSE_ADMIN_INSTRUCTION_ACCOUNTS;
-export const CLOSE_ADMIN_DISCRIMINATOR = new Uint8Array([202, 182, 185, 142, 208, 161, 145, 189]);
+export const CLOSE_ADMIN_DISCRIMINATOR = new Uint8Array([
+  202, 182, 185, 142, 208, 161, 145, 189,
+]);
 
 export function getCloseAdminDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(CLOSE_ADMIN_DISCRIMINATOR);
@@ -55,17 +57,24 @@ export type CloseAdminInstruction<
   TAccountUser extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountMarket extends string ? WritableAccount<TAccountMarket> : TAccountMarket,
-      TAccountVault extends string ? WritableAccount<TAccountVault> : TAccountVault,
-      TAccountUser extends string ? WritableAccount<TAccountUser> : TAccountUser,
+      TAccountMarket extends string
+        ? WritableAccount<TAccountMarket>
+        : TAccountMarket,
+      TAccountVault extends string
+        ? WritableAccount<TAccountVault>
+        : TAccountVault,
+      TAccountUser extends string
+        ? WritableAccount<TAccountUser>
+        : TAccountUser,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
@@ -80,20 +89,25 @@ export type CloseAdminInstructionDataArgs = {};
 
 export function getCloseAdminInstructionDataEncoder(): FixedSizeEncoder<CloseAdminInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: CLOSE_ADMIN_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: CLOSE_ADMIN_DISCRIMINATOR }),
   );
 }
 
 export function getCloseAdminInstructionDataDecoder(): FixedSizeDecoder<CloseAdminInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getCloseAdminInstructionDataCodec(): FixedSizeCodec<
   CloseAdminInstructionDataArgs,
   CloseAdminInstructionData
 > {
-  return combineCodec(getCloseAdminInstructionDataEncoder(), getCloseAdminInstructionDataDecoder());
+  return combineCodec(
+    getCloseAdminInstructionDataEncoder(),
+    getCloseAdminInstructionDataDecoder(),
+  );
 }
 
 export type CloseAdminInput<
@@ -125,7 +139,7 @@ export function getCloseAdminInstruction<
     TAccountAuthority,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): CloseAdminInstruction<
   TProgramAddress,
   TAccountMarket,
@@ -145,15 +159,18 @@ export function getCloseAdminInstruction<
     authority: { value: input.authority ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.market),
@@ -195,11 +212,11 @@ export function parseCloseAdminInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCloseAdminInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

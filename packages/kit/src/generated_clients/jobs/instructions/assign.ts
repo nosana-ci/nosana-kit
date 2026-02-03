@@ -32,9 +32,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const ASSIGN_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -53,7 +53,9 @@ export const ASSIGN_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type AssignInstructionAccountName = keyof typeof ASSIGN_INSTRUCTION_ACCOUNTS;
-export const ASSIGN_DISCRIMINATOR = new Uint8Array([73, 66, 125, 203, 81, 41, 64, 135]);
+export const ASSIGN_DISCRIMINATOR = new Uint8Array([
+  73, 66, 125, 203, 81, 41, 64, 135,
+]);
 
 export function getAssignDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(ASSIGN_DISCRIMINATOR);
@@ -73,8 +75,9 @@ export type AssignInstruction<
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountRewardsProgram extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
-  TAccountSystemProgram extends string | AccountMeta<string> = '11111111111111111111111111111111',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -83,15 +86,24 @@ export type AssignInstruction<
       TAccountJob extends string
         ? WritableSignerAccount<TAccountJob> & AccountSignerMeta<TAccountJob>
         : TAccountJob,
-      TAccountMarket extends string ? WritableAccount<TAccountMarket> : TAccountMarket,
+      TAccountMarket extends string
+        ? WritableAccount<TAccountMarket>
+        : TAccountMarket,
       TAccountRun extends string
         ? WritableSignerAccount<TAccountRun> & AccountSignerMeta<TAccountRun>
         : TAccountRun,
-      TAccountNode extends string ? ReadonlyAccount<TAccountNode> : TAccountNode,
-      TAccountUser extends string ? WritableAccount<TAccountUser> : TAccountUser,
-      TAccountVault extends string ? WritableAccount<TAccountVault> : TAccountVault,
+      TAccountNode extends string
+        ? ReadonlyAccount<TAccountNode>
+        : TAccountNode,
+      TAccountUser extends string
+        ? WritableAccount<TAccountUser>
+        : TAccountUser,
+      TAccountVault extends string
+        ? WritableAccount<TAccountVault>
+        : TAccountVault,
       TAccountPayer extends string
-        ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
+        ? WritableSignerAccount<TAccountPayer> &
+            AccountSignerMeta<TAccountPayer>
         : TAccountPayer,
       TAccountRewardsReflection extends string
         ? WritableAccount<TAccountRewardsReflection>
@@ -100,7 +112,8 @@ export type AssignInstruction<
         ? WritableAccount<TAccountRewardsVault>
         : TAccountRewardsVault,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       TAccountRewardsProgram extends string
         ? ReadonlyAccount<TAccountRewardsProgram>
@@ -129,19 +142,19 @@ export type AssignInstructionDataArgs = {
 export function getAssignInstructionDataEncoder(): FixedSizeEncoder<AssignInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['ipfsJob', fixEncoderSize(getBytesEncoder(), 32)],
-      ['timeout', getI64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["ipfsJob", fixEncoderSize(getBytesEncoder(), 32)],
+      ["timeout", getI64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: ASSIGN_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: ASSIGN_DISCRIMINATOR }),
   );
 }
 
 export function getAssignInstructionDataDecoder(): FixedSizeDecoder<AssignInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['ipfsJob', fixDecoderSize(getBytesDecoder(), 32)],
-    ['timeout', getI64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["ipfsJob", fixDecoderSize(getBytesDecoder(), 32)],
+    ["timeout", getI64Decoder()],
   ]);
 }
 
@@ -149,7 +162,10 @@ export function getAssignInstructionDataCodec(): FixedSizeCodec<
   AssignInstructionDataArgs,
   AssignInstructionData
 > {
-  return combineCodec(getAssignInstructionDataEncoder(), getAssignInstructionDataDecoder());
+  return combineCodec(
+    getAssignInstructionDataEncoder(),
+    getAssignInstructionDataDecoder(),
+  );
 }
 
 export type AssignInput<
@@ -180,8 +196,8 @@ export type AssignInput<
   rewardsProgram: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
-  ipfsJob: AssignInstructionDataArgs['ipfsJob'];
-  timeout: AssignInstructionDataArgs['timeout'];
+  ipfsJob: AssignInstructionDataArgs["ipfsJob"];
+  timeout: AssignInstructionDataArgs["timeout"];
 };
 
 export function getAssignInstruction<
@@ -215,7 +231,7 @@ export function getAssignInstruction<
     TAccountTokenProgram,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): AssignInstruction<
   TProgramAddress,
   TAccountJob,
@@ -254,7 +270,10 @@ export function getAssignInstruction<
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
@@ -262,14 +281,14 @@ export function getAssignInstruction<
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
-      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -286,7 +305,9 @@ export function getAssignInstruction<
       getAccountMeta(accounts.tokenProgram),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getAssignInstructionDataEncoder().encode(args as AssignInstructionDataArgs),
+    data: getAssignInstructionDataEncoder().encode(
+      args as AssignInstructionDataArgs,
+    ),
     programAddress,
   } as AssignInstruction<
     TProgramAddress,
@@ -335,11 +356,11 @@ export function parseAssignInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedAssignInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 13) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

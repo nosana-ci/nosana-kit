@@ -30,9 +30,9 @@ import {
   type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const CLAIM_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -47,7 +47,9 @@ export const CLAIM_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type ClaimInstructionAccountName = keyof typeof CLAIM_INSTRUCTION_ACCOUNTS;
-export const CLAIM_DISCRIMINATOR = new Uint8Array([62, 198, 214, 193, 213, 159, 108, 210]);
+export const CLAIM_DISCRIMINATOR = new Uint8Array([
+  62, 198, 214, 193, 213, 159, 108, 210,
+]);
 
 export function getClaimDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(CLAIM_DISCRIMINATOR);
@@ -63,7 +65,8 @@ export type ClaimInstruction<
   TAccountMetadata extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> = '11111111111111111111111111111111',
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -73,15 +76,23 @@ export type ClaimInstruction<
       TAccountRun extends string
         ? WritableSignerAccount<TAccountRun> & AccountSignerMeta<TAccountRun>
         : TAccountRun,
-      TAccountMarket extends string ? ReadonlyAccount<TAccountMarket> : TAccountMarket,
-      TAccountStake extends string ? ReadonlyAccount<TAccountStake> : TAccountStake,
+      TAccountMarket extends string
+        ? ReadonlyAccount<TAccountMarket>
+        : TAccountMarket,
+      TAccountStake extends string
+        ? ReadonlyAccount<TAccountStake>
+        : TAccountStake,
       TAccountNft extends string ? ReadonlyAccount<TAccountNft> : TAccountNft,
-      TAccountMetadata extends string ? ReadonlyAccount<TAccountMetadata> : TAccountMetadata,
+      TAccountMetadata extends string
+        ? ReadonlyAccount<TAccountMetadata>
+        : TAccountMetadata,
       TAccountPayer extends string
-        ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
+        ? WritableSignerAccount<TAccountPayer> &
+            AccountSignerMeta<TAccountPayer>
         : TAccountPayer,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
@@ -96,20 +107,25 @@ export type ClaimInstructionDataArgs = {};
 
 export function getClaimInstructionDataEncoder(): FixedSizeEncoder<ClaimInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: CLAIM_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: CLAIM_DISCRIMINATOR }),
   );
 }
 
 export function getClaimInstructionDataDecoder(): FixedSizeDecoder<ClaimInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getClaimInstructionDataCodec(): FixedSizeCodec<
   ClaimInstructionDataArgs,
   ClaimInstructionData
 > {
-  return combineCodec(getClaimInstructionDataEncoder(), getClaimInstructionDataDecoder());
+  return combineCodec(
+    getClaimInstructionDataEncoder(),
+    getClaimInstructionDataDecoder(),
+  );
 }
 
 export type ClaimInput<
@@ -157,7 +173,7 @@ export function getClaimInstruction<
     TAccountAuthority,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): ClaimInstruction<
   TProgramAddress,
   TAccountJob,
@@ -185,15 +201,18 @@ export function getClaimInstruction<
     authority: { value: input.authority ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
-      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -247,11 +266,11 @@ export function parseClaimInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClaimInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -37,9 +37,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const UPDATE_INSTRUCTION_ACCOUNTS = {
   market: 0,
@@ -48,7 +48,9 @@ export const UPDATE_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type UpdateInstructionAccountName = keyof typeof UPDATE_INSTRUCTION_ACCOUNTS;
-export const UPDATE_DISCRIMINATOR = new Uint8Array([219, 200, 88, 176, 158, 63, 253, 127]);
+export const UPDATE_DISCRIMINATOR = new Uint8Array([
+  219, 200, 88, 176, 158, 63, 253, 127,
+]);
 
 export function getUpdateDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(UPDATE_DISCRIMINATOR);
@@ -64,10 +66,15 @@ export type UpdateInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountMarket extends string ? WritableAccount<TAccountMarket> : TAccountMarket,
-      TAccountAccessKey extends string ? ReadonlyAccount<TAccountAccessKey> : TAccountAccessKey,
+      TAccountMarket extends string
+        ? WritableAccount<TAccountMarket>
+        : TAccountMarket,
+      TAccountAccessKey extends string
+        ? ReadonlyAccount<TAccountAccessKey>
+        : TAccountAccessKey,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       ...TRemainingAccounts,
     ]
@@ -93,25 +100,25 @@ export type UpdateInstructionDataArgs = {
 export function getUpdateInstructionDataEncoder(): FixedSizeEncoder<UpdateInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['jobExpiration', getI64Encoder()],
-      ['jobPrice', getU64Encoder()],
-      ['jobType', getU8Encoder()],
-      ['nodeStakeMinimum', getU128Encoder()],
-      ['jobTimeout', getI64Encoder()],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["jobExpiration", getI64Encoder()],
+      ["jobPrice", getU64Encoder()],
+      ["jobType", getU8Encoder()],
+      ["nodeStakeMinimum", getU128Encoder()],
+      ["jobTimeout", getI64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: UPDATE_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: UPDATE_DISCRIMINATOR }),
   );
 }
 
 export function getUpdateInstructionDataDecoder(): FixedSizeDecoder<UpdateInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['jobExpiration', getI64Decoder()],
-    ['jobPrice', getU64Decoder()],
-    ['jobType', getU8Decoder()],
-    ['nodeStakeMinimum', getU128Decoder()],
-    ['jobTimeout', getI64Decoder()],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["jobExpiration", getI64Decoder()],
+    ["jobPrice", getU64Decoder()],
+    ["jobType", getU8Decoder()],
+    ["nodeStakeMinimum", getU128Decoder()],
+    ["jobTimeout", getI64Decoder()],
   ]);
 }
 
@@ -119,7 +126,10 @@ export function getUpdateInstructionDataCodec(): FixedSizeCodec<
   UpdateInstructionDataArgs,
   UpdateInstructionData
 > {
-  return combineCodec(getUpdateInstructionDataEncoder(), getUpdateInstructionDataDecoder());
+  return combineCodec(
+    getUpdateInstructionDataEncoder(),
+    getUpdateInstructionDataDecoder(),
+  );
 }
 
 export type UpdateInput<
@@ -130,11 +140,11 @@ export type UpdateInput<
   market: Address<TAccountMarket>;
   accessKey: Address<TAccountAccessKey>;
   authority: TransactionSigner<TAccountAuthority>;
-  jobExpiration: UpdateInstructionDataArgs['jobExpiration'];
-  jobPrice: UpdateInstructionDataArgs['jobPrice'];
-  jobType: UpdateInstructionDataArgs['jobType'];
-  nodeStakeMinimum: UpdateInstructionDataArgs['nodeStakeMinimum'];
-  jobTimeout: UpdateInstructionDataArgs['jobTimeout'];
+  jobExpiration: UpdateInstructionDataArgs["jobExpiration"];
+  jobPrice: UpdateInstructionDataArgs["jobPrice"];
+  jobType: UpdateInstructionDataArgs["jobType"];
+  nodeStakeMinimum: UpdateInstructionDataArgs["nodeStakeMinimum"];
+  jobTimeout: UpdateInstructionDataArgs["jobTimeout"];
 };
 
 export function getUpdateInstruction<
@@ -144,8 +154,13 @@ export function getUpdateInstruction<
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
   input: UpdateInput<TAccountMarket, TAccountAccessKey, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress }
-): UpdateInstruction<TProgramAddress, TAccountMarket, TAccountAccessKey, TAccountAuthority> {
+  config?: { programAddress?: TProgramAddress },
+): UpdateInstruction<
+  TProgramAddress,
+  TAccountMarket,
+  TAccountAccessKey,
+  TAccountAuthority
+> {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
 
@@ -155,21 +170,31 @@ export function getUpdateInstruction<
     accessKey: { value: input.accessKey ?? null, isWritable: false },
     authority: { value: input.authority ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.market),
       getAccountMeta(accounts.accessKey),
       getAccountMeta(accounts.authority),
     ],
-    data: getUpdateInstructionDataEncoder().encode(args as UpdateInstructionDataArgs),
+    data: getUpdateInstructionDataEncoder().encode(
+      args as UpdateInstructionDataArgs,
+    ),
     programAddress,
-  } as UpdateInstruction<TProgramAddress, TAccountMarket, TAccountAccessKey, TAccountAuthority>);
+  } as UpdateInstruction<
+    TProgramAddress,
+    TAccountMarket,
+    TAccountAccessKey,
+    TAccountAuthority
+  >);
 }
 
 export type ParsedUpdateInstruction<
@@ -191,11 +216,11 @@ export function parseUpdateInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

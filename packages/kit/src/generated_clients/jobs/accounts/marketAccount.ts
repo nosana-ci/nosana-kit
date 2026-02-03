@@ -43,12 +43,16 @@ import {
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
-} from '@solana/kit';
+} from "@solana/kit";
 
-export const MARKET_ACCOUNT_DISCRIMINATOR = new Uint8Array([201, 78, 187, 225, 240, 198, 201, 251]);
+export const MARKET_ACCOUNT_DISCRIMINATOR = new Uint8Array([
+  201, 78, 187, 225, 240, 198, 201, 251,
+]);
 
 export function getMarketAccountDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(MARKET_ACCOUNT_DISCRIMINATOR);
+  return fixEncoderSize(getBytesEncoder(), 8).encode(
+    MARKET_ACCOUNT_DISCRIMINATOR,
+  );
 }
 
 /** The `MarketAccount` struct holds all the information about jobs and the nodes queue. */
@@ -85,62 +89,68 @@ export type MarketAccountArgs = {
 export function getMarketAccountEncoder(): Encoder<MarketAccountArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['authority', getAddressEncoder()],
-      ['jobExpiration', getI64Encoder()],
-      ['jobPrice', getU64Encoder()],
-      ['jobTimeout', getI64Encoder()],
-      ['jobType', getU8Encoder()],
-      ['vault', getAddressEncoder()],
-      ['vaultBump', getU8Encoder()],
-      ['nodeAccessKey', getAddressEncoder()],
-      ['nodeXnosMinimum', getU128Encoder()],
-      ['queueType', getU8Encoder()],
-      ['queue', getArrayEncoder(getAddressEncoder())],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["authority", getAddressEncoder()],
+      ["jobExpiration", getI64Encoder()],
+      ["jobPrice", getU64Encoder()],
+      ["jobTimeout", getI64Encoder()],
+      ["jobType", getU8Encoder()],
+      ["vault", getAddressEncoder()],
+      ["vaultBump", getU8Encoder()],
+      ["nodeAccessKey", getAddressEncoder()],
+      ["nodeXnosMinimum", getU128Encoder()],
+      ["queueType", getU8Encoder()],
+      ["queue", getArrayEncoder(getAddressEncoder())],
     ]),
-    (value) => ({ ...value, discriminator: MARKET_ACCOUNT_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: MARKET_ACCOUNT_DISCRIMINATOR }),
   );
 }
 
 /** Gets the decoder for {@link MarketAccount} account data. */
 export function getMarketAccountDecoder(): Decoder<MarketAccount> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['authority', getAddressDecoder()],
-    ['jobExpiration', getI64Decoder()],
-    ['jobPrice', getU64Decoder()],
-    ['jobTimeout', getI64Decoder()],
-    ['jobType', getU8Decoder()],
-    ['vault', getAddressDecoder()],
-    ['vaultBump', getU8Decoder()],
-    ['nodeAccessKey', getAddressDecoder()],
-    ['nodeXnosMinimum', getU128Decoder()],
-    ['queueType', getU8Decoder()],
-    ['queue', getArrayDecoder(getAddressDecoder())],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["authority", getAddressDecoder()],
+    ["jobExpiration", getI64Decoder()],
+    ["jobPrice", getU64Decoder()],
+    ["jobTimeout", getI64Decoder()],
+    ["jobType", getU8Decoder()],
+    ["vault", getAddressDecoder()],
+    ["vaultBump", getU8Decoder()],
+    ["nodeAccessKey", getAddressDecoder()],
+    ["nodeXnosMinimum", getU128Decoder()],
+    ["queueType", getU8Decoder()],
+    ["queue", getArrayDecoder(getAddressDecoder())],
   ]);
 }
 
 /** Gets the codec for {@link MarketAccount} account data. */
-export function getMarketAccountCodec(): Codec<MarketAccountArgs, MarketAccount> {
+export function getMarketAccountCodec(): Codec<
+  MarketAccountArgs,
+  MarketAccount
+> {
   return combineCodec(getMarketAccountEncoder(), getMarketAccountDecoder());
 }
 
 export function decodeMarketAccount<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress>,
 ): Account<MarketAccount, TAddress>;
 export function decodeMarketAccount<TAddress extends string = string>(
-  encodedAccount: MaybeEncodedAccount<TAddress>
+  encodedAccount: MaybeEncodedAccount<TAddress>,
 ): MaybeAccount<MarketAccount, TAddress>;
 export function decodeMarketAccount<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>
+  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>,
 ): Account<MarketAccount, TAddress> | MaybeAccount<MarketAccount, TAddress> {
-  return decodeAccount(encodedAccount as MaybeEncodedAccount<TAddress>, getMarketAccountDecoder());
+  return decodeAccount(
+    encodedAccount as MaybeEncodedAccount<TAddress>,
+    getMarketAccountDecoder(),
+  );
 }
 
 export async function fetchMarketAccount<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<Account<MarketAccount, TAddress>> {
   const maybeAccount = await fetchMaybeMarketAccount(rpc, address, config);
   assertAccountExists(maybeAccount);
@@ -150,7 +160,7 @@ export async function fetchMarketAccount<TAddress extends string = string>(
 export async function fetchMaybeMarketAccount<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
-  config?: FetchAccountConfig
+  config?: FetchAccountConfig,
 ): Promise<MaybeAccount<MarketAccount, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
   return decodeMarketAccount(maybeAccount);
@@ -159,9 +169,13 @@ export async function fetchMaybeMarketAccount<TAddress extends string = string>(
 export async function fetchAllMarketAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<Account<MarketAccount>[]> {
-  const maybeAccounts = await fetchAllMaybeMarketAccount(rpc, addresses, config);
+  const maybeAccounts = await fetchAllMaybeMarketAccount(
+    rpc,
+    addresses,
+    config,
+  );
   assertAccountsExist(maybeAccounts);
   return maybeAccounts;
 }
@@ -169,7 +183,7 @@ export async function fetchAllMarketAccount(
 export async function fetchAllMaybeMarketAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
-  config?: FetchAccountsConfig
+  config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<MarketAccount>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeMarketAccount(maybeAccount));

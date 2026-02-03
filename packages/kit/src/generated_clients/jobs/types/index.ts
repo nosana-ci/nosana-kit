@@ -6,6 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from './jobState.js';
-export * from './jobType.js';
-export * from './queueType.js';
+export * from "./jobState.js";
+export * from "./jobType.js";
+export * from "./queueType.js";

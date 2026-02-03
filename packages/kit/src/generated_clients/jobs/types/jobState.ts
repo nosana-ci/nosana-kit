@@ -13,13 +13,13 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
-} from '@solana/kit';
+} from "@solana/kit";
 
 /** The `JobState` describes the status of a job. */
 export const JobState = {
-  Queued: 'Queued',
-  Done: 'Done',
-  Stopped: 'Stopped',
+  Queued: "Queued",
+  Done: "Done",
+  Stopped: "Stopped",
 } as const;
 export type JobState = (typeof JobState)[keyof typeof JobState];
 

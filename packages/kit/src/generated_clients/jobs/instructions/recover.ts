@@ -29,9 +29,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const RECOVER_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -44,7 +44,9 @@ export const RECOVER_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type RecoverInstructionAccountName = keyof typeof RECOVER_INSTRUCTION_ACCOUNTS;
-export const RECOVER_DISCRIMINATOR = new Uint8Array([108, 216, 38, 58, 109, 146, 116, 17]);
+export const RECOVER_DISCRIMINATOR = new Uint8Array([
+  108, 216, 38, 58, 109, 146, 116, 17,
+]);
 
 export function getRecoverDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(RECOVER_DISCRIMINATOR);
@@ -59,19 +61,28 @@ export type RecoverInstruction<
   TAccountPayer extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
       TAccountJob extends string ? WritableAccount<TAccountJob> : TAccountJob,
-      TAccountMarket extends string ? ReadonlyAccount<TAccountMarket> : TAccountMarket,
-      TAccountVault extends string ? WritableAccount<TAccountVault> : TAccountVault,
-      TAccountUser extends string ? WritableAccount<TAccountUser> : TAccountUser,
-      TAccountPayer extends string ? WritableAccount<TAccountPayer> : TAccountPayer,
+      TAccountMarket extends string
+        ? ReadonlyAccount<TAccountMarket>
+        : TAccountMarket,
+      TAccountVault extends string
+        ? WritableAccount<TAccountVault>
+        : TAccountVault,
+      TAccountUser extends string
+        ? WritableAccount<TAccountUser>
+        : TAccountUser,
+      TAccountPayer extends string
+        ? WritableAccount<TAccountPayer>
+        : TAccountPayer,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
@@ -86,20 +97,25 @@ export type RecoverInstructionDataArgs = {};
 
 export function getRecoverInstructionDataEncoder(): FixedSizeEncoder<RecoverInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: RECOVER_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: RECOVER_DISCRIMINATOR }),
   );
 }
 
 export function getRecoverInstructionDataDecoder(): FixedSizeDecoder<RecoverInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getRecoverInstructionDataCodec(): FixedSizeCodec<
   RecoverInstructionDataArgs,
   RecoverInstructionData
 > {
-  return combineCodec(getRecoverInstructionDataEncoder(), getRecoverInstructionDataDecoder());
+  return combineCodec(
+    getRecoverInstructionDataEncoder(),
+    getRecoverInstructionDataDecoder(),
+  );
 }
 
 export type RecoverInput<
@@ -139,7 +155,7 @@ export function getRecoverInstruction<
     TAccountAuthority,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): RecoverInstruction<
   TProgramAddress,
   TAccountJob,
@@ -163,15 +179,18 @@ export function getRecoverInstruction<
     authority: { value: input.authority ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -219,11 +238,11 @@ export function parseRecoverInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRecoverInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

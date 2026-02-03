@@ -29,9 +29,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const FINISH_INSTRUCTION_ACCOUNTS = {
   job: 0,
@@ -47,7 +47,9 @@ export const FINISH_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type FinishInstructionAccountName = keyof typeof FINISH_INSTRUCTION_ACCOUNTS;
-export const FINISH_DISCRIMINATOR = new Uint8Array([67, 74, 170, 132, 125, 233, 182, 37]);
+export const FINISH_DISCRIMINATOR = new Uint8Array([
+  67, 74, 170, 132, 125, 233, 182, 37,
+]);
 
 export function getFinishDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(FINISH_DISCRIMINATOR);
@@ -65,7 +67,7 @@ export type FinishInstruction<
   TAccountPayerJob extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -73,14 +75,27 @@ export type FinishInstruction<
     [
       TAccountJob extends string ? WritableAccount<TAccountJob> : TAccountJob,
       TAccountRun extends string ? WritableAccount<TAccountRun> : TAccountRun,
-      TAccountMarket extends string ? ReadonlyAccount<TAccountMarket> : TAccountMarket,
-      TAccountVault extends string ? WritableAccount<TAccountVault> : TAccountVault,
-      TAccountDeposit extends string ? WritableAccount<TAccountDeposit> : TAccountDeposit,
-      TAccountUser extends string ? WritableAccount<TAccountUser> : TAccountUser,
-      TAccountPayerRun extends string ? WritableAccount<TAccountPayerRun> : TAccountPayerRun,
-      TAccountPayerJob extends string ? WritableAccount<TAccountPayerJob> : TAccountPayerJob,
+      TAccountMarket extends string
+        ? ReadonlyAccount<TAccountMarket>
+        : TAccountMarket,
+      TAccountVault extends string
+        ? WritableAccount<TAccountVault>
+        : TAccountVault,
+      TAccountDeposit extends string
+        ? WritableAccount<TAccountDeposit>
+        : TAccountDeposit,
+      TAccountUser extends string
+        ? WritableAccount<TAccountUser>
+        : TAccountUser,
+      TAccountPayerRun extends string
+        ? WritableAccount<TAccountPayerRun>
+        : TAccountPayerRun,
+      TAccountPayerJob extends string
+        ? WritableAccount<TAccountPayerJob>
+        : TAccountPayerJob,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
@@ -99,17 +114,17 @@ export type FinishInstructionDataArgs = { ipfsResult: ReadonlyUint8Array };
 export function getFinishInstructionDataEncoder(): FixedSizeEncoder<FinishInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
-      ['ipfsResult', fixEncoderSize(getBytesEncoder(), 32)],
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["ipfsResult", fixEncoderSize(getBytesEncoder(), 32)],
     ]),
-    (value) => ({ ...value, discriminator: FINISH_DISCRIMINATOR })
+    (value) => ({ ...value, discriminator: FINISH_DISCRIMINATOR }),
   );
 }
 
 export function getFinishInstructionDataDecoder(): FixedSizeDecoder<FinishInstructionData> {
   return getStructDecoder([
-    ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
-    ['ipfsResult', fixDecoderSize(getBytesDecoder(), 32)],
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["ipfsResult", fixDecoderSize(getBytesDecoder(), 32)],
   ]);
 }
 
@@ -117,7 +132,10 @@ export function getFinishInstructionDataCodec(): FixedSizeCodec<
   FinishInstructionDataArgs,
   FinishInstructionData
 > {
-  return combineCodec(getFinishInstructionDataEncoder(), getFinishInstructionDataDecoder());
+  return combineCodec(
+    getFinishInstructionDataEncoder(),
+    getFinishInstructionDataDecoder(),
+  );
 }
 
 export type FinishInput<
@@ -142,7 +160,7 @@ export type FinishInput<
   payerJob: Address<TAccountPayerJob>;
   authority: TransactionSigner<TAccountAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  ipfsResult: FinishInstructionDataArgs['ipfsResult'];
+  ipfsResult: FinishInstructionDataArgs["ipfsResult"];
 };
 
 export function getFinishInstruction<
@@ -170,7 +188,7 @@ export function getFinishInstruction<
     TAccountAuthority,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress }
+  config?: { programAddress?: TProgramAddress },
 ): FinishInstruction<
   TProgramAddress,
   TAccountJob,
@@ -200,7 +218,10 @@ export function getFinishInstruction<
     authority: { value: input.authority ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
@@ -208,10 +229,10 @@ export function getFinishInstruction<
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
-      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' as Address<'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'>;
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.job),
@@ -225,7 +246,9 @@ export function getFinishInstruction<
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.tokenProgram),
     ],
-    data: getFinishInstructionDataEncoder().encode(args as FinishInstructionDataArgs),
+    data: getFinishInstructionDataEncoder().encode(
+      args as FinishInstructionDataArgs,
+    ),
     programAddress,
   } as FinishInstruction<
     TProgramAddress,
@@ -268,11 +291,11 @@ export function parseFinishInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedFinishInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 10) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {

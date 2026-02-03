@@ -29,9 +29,9 @@ import {
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-} from '@solana/kit';
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../programs/index.js';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared/index.js';
+} from "@solana/kit";
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
 
 export const STOP_INSTRUCTION_ACCOUNTS = {
   market: 0,
@@ -40,7 +40,9 @@ export const STOP_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type StopInstructionAccountName = keyof typeof STOP_INSTRUCTION_ACCOUNTS;
-export const STOP_DISCRIMINATOR = new Uint8Array([42, 133, 32, 60, 171, 253, 184, 155]);
+export const STOP_DISCRIMINATOR = new Uint8Array([
+  42, 133, 32, 60, 171, 253, 184, 155,
+]);
 
 export function getStopDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(STOP_DISCRIMINATOR);
@@ -56,10 +58,15 @@ export type StopInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountMarket extends string ? WritableAccount<TAccountMarket> : TAccountMarket,
-      TAccountNode extends string ? ReadonlyAccount<TAccountNode> : TAccountNode,
+      TAccountMarket extends string
+        ? WritableAccount<TAccountMarket>
+        : TAccountMarket,
+      TAccountNode extends string
+        ? ReadonlyAccount<TAccountNode>
+        : TAccountNode,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> & AccountSignerMeta<TAccountAuthority>
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
       ...TRemainingAccounts,
     ]
@@ -71,20 +78,25 @@ export type StopInstructionDataArgs = {};
 
 export function getStopInstructionDataEncoder(): FixedSizeEncoder<StopInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([['discriminator', fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: STOP_DISCRIMINATOR })
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: STOP_DISCRIMINATOR }),
   );
 }
 
 export function getStopInstructionDataDecoder(): FixedSizeDecoder<StopInstructionData> {
-  return getStructDecoder([['discriminator', fixDecoderSize(getBytesDecoder(), 8)]]);
+  return getStructDecoder([
+    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+  ]);
 }
 
 export function getStopInstructionDataCodec(): FixedSizeCodec<
   StopInstructionDataArgs,
   StopInstructionData
 > {
-  return combineCodec(getStopInstructionDataEncoder(), getStopInstructionDataDecoder());
+  return combineCodec(
+    getStopInstructionDataEncoder(),
+    getStopInstructionDataDecoder(),
+  );
 }
 
 export type StopInput<
@@ -104,8 +116,13 @@ export function getStopInstruction<
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
   input: StopInput<TAccountMarket, TAccountNode, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress }
-): StopInstruction<TProgramAddress, TAccountMarket, TAccountNode, TAccountAuthority> {
+  config?: { programAddress?: TProgramAddress },
+): StopInstruction<
+  TProgramAddress,
+  TAccountMarket,
+  TAccountNode,
+  TAccountAuthority
+> {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
 
@@ -115,9 +132,12 @@ export function getStopInstruction<
     node: { value: input.node ?? null, isWritable: false },
     authority: { value: input.authority ?? null, isWritable: false },
   };
-  const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.market),
@@ -126,7 +146,12 @@ export function getStopInstruction<
     ],
     data: getStopInstructionDataEncoder().encode({}),
     programAddress,
-  } as StopInstruction<TProgramAddress, TAccountMarket, TAccountNode, TAccountAuthority>);
+  } as StopInstruction<
+    TProgramAddress,
+    TAccountMarket,
+    TAccountNode,
+    TAccountAuthority
+  >);
 }
 
 export type ParsedStopInstruction<
@@ -148,11 +173,11 @@ export function parseStopInstruction<
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    InstructionWithData<ReadonlyUint8Array>,
 ): ParsedStopInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
     // TODO: Coded error.
-    throw new Error('Not enough accounts');
+    throw new Error("Not enough accounts");
   }
   let accountIndex = 0;
   const getNextAccount = () => {
