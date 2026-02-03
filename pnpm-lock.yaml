@@ -6,7 +6,23 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      '@eslint/js':
+        specifier: ^9.39.2
+        version: 9.39.2
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.50.0
+        version: 8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.50.0
+        version: 8.53.1(eslint@9.39.2)(typescript@5.9.3)
+      eslint:
+        specifier: ^9.39.2
+        version: 9.39.2
+      eslint-plugin-import:
+        specifier: ^2.32.0
+        version: 2.32.0(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)
 
   docs:
     dependencies:
@@ -111,9 +127,6 @@ importers:
       '@codama/visitors-core':
         specifier: ^1.5.0
         version: 1.5.0
-      '@eslint/js':
-        specifier: ^9.39.2
-        version: 9.39.2
       '@nosana/kit':
         specifier: file:.
         version: 'link:'
@@ -123,24 +136,12 @@ importers:
       '@types/node':
         specifier: ^20.19.27
         version: 20.19.30
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^8.50.0
-        version: 8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: ^8.50.0
-        version: 8.53.1(eslint@9.39.2)(typescript@5.9.3)
       '@vitest/coverage-v8':
         specifier: ^4.0.16
         version: 4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@20.19.30)(sass-embedded@1.97.3)(sass@1.97.3)(yaml@2.8.2))
       codama:
         specifier: ^1.5.0
         version: 1.5.0
-      eslint:
-        specifier: ^9.39.2
-        version: 9.39.2
-      eslint-plugin-import:
-        specifier: ^2.32.0
-        version: 2.32.0(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)
       prettier:
         specifier: ^3.7.4
         version: 3.8.1

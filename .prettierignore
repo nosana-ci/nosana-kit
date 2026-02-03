@@ -1,12 +1,12 @@
 # Generated code
-src/generated_clients/
+packages/kit/src/generated_clients/
 
 # Examples
-examples/
+packages/kit/examples/
 
 # Build output
-dist/
-build/
+packages/kit/dist/
+packages/kit/build/
 
 # Dependencies
 node_modules/
