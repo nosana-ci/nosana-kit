@@ -6,114 +6,13 @@ settings:
 
 importers:
 
-  .:
-    dependencies:
-      '@nosana/api':
-        specifier: ^0.1.7
-        version: 0.1.7(@types/node@20.19.30)(typescript@5.9.3)
-      '@nosana/authorization':
-        specifier: ^0.1.7
-        version: 0.1.7
-      '@nosana/endpoints':
-        specifier: ^1.0.0
-        version: 1.0.0(@types/node@20.19.30)(typescript@5.9.3)
-      '@nosana/ipfs':
-        specifier: ^0.1.2
-        version: 0.1.2
-      '@nosana/types':
-        specifier: ^0.1.18
-        version: 0.1.18(@types/node@20.19.30)(typescript@5.9.3)
-      '@solana-program/compute-budget':
-        specifier: 0.12.0
-        version: 0.12.0(@solana/kit@5.4.0(typescript@5.9.3))
-      '@solana-program/system':
-        specifier: 0.10.0
-        version: 0.10.0(@solana/kit@5.4.0(typescript@5.9.3))
-      '@solana-program/token':
-        specifier: 0.9.0
-        version: 0.9.0(@solana/kit@5.4.0(typescript@5.9.3))
-      '@solana/kit':
-        specifier: 5.4.0
-        version: 5.4.0(typescript@5.9.3)
-      bs58:
-        specifier: 6.0.0
-        version: 6.0.0
-    devDependencies:
-      '@codama/nodes-from-anchor':
-        specifier: ^1.3.8
-        version: 1.3.8(typescript@5.9.3)
-      '@codama/renderers-js':
-        specifier: ^1.5.5
-        version: 1.5.5(typescript@5.9.3)
-      '@codama/visitors-core':
-        specifier: ^1.5.0
-        version: 1.5.0
-      '@eslint/js':
-        specifier: ^9.39.2
-        version: 9.39.2
-      '@nosana/kit':
-        specifier: file:.
-        version: file:(@types/node@20.19.30)(typescript@5.9.3)
-      '@prettier/sync':
-        specifier: ^0.6.1
-        version: 0.6.1(prettier@3.8.1)
-      '@types/node':
-        specifier: ^20.19.27
-        version: 20.19.30
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^8.50.0
-        version: 8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: ^8.50.0
-        version: 8.53.1(eslint@9.39.2)(typescript@5.9.3)
-      '@vitest/coverage-v8':
-        specifier: ^4.0.16
-        version: 4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@20.19.30)(sass-embedded@1.97.3)(sass@1.97.3)(yaml@2.8.2))
-      codama:
-        specifier: ^1.5.0
-        version: 1.5.0
-      eslint:
-        specifier: ^9.39.2
-        version: 9.39.2
-      eslint-plugin-import:
-        specifier: ^2.32.0
-        version: 2.32.0(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)
-      prettier:
-        specifier: ^3.7.4
-        version: 3.8.1
-      sass-embedded:
-        specifier: ^1.97.2
-        version: 1.97.3
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.30)(typescript@5.9.3)
-      typedoc:
-        specifier: 0.28.16
-        version: 0.28.16(typescript@5.9.3)
-      typedoc-plugin-frontmatter:
-        specifier: ^1.3.1
-        version: 1.3.1(typedoc-plugin-markdown@4.9.0(typedoc@0.28.16(typescript@5.9.3)))
-      typedoc-plugin-markdown:
-        specifier: ^4.9.0
-        version: 4.9.0(typedoc@0.28.16(typescript@5.9.3))
-      typedoc-plugin-mdn-links:
-        specifier: ^5.0.10
-        version: 5.1.1(typedoc@0.28.16(typescript@5.9.3))
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      vitest:
-        specifier: ^4.0.16
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@20.19.30)(sass-embedded@1.97.3)(sass@1.97.3)(yaml@2.8.2)
-      ws:
-        specifier: ^8.18.0
-        version: 8.19.0
+  .: {}
 
   docs:
     dependencies:
       '@nosana/kit':
         specifier: workspace:*
-        version: link:..
+        version: link:../packages/kit
     devDependencies:
       '@braintree/sanitize-url':
         specifier: ^7.0.0
@@ -169,6 +68,109 @@ importers:
       vitepress-plugin-tabs:
         specifier: ^0.7.3
         version: 0.7.3(vitepress@2.0.0-alpha.15(@algolia/client-search@5.46.2)(@types/node@20.19.30)(markdown-it-mathjax3@5.2.0)(postcss@8.5.6)(react@19.2.3)(sass-embedded@1.97.3)(sass@1.97.3)(search-insights@2.17.3)(typescript@5.9.3)(yaml@2.8.2))(vue@3.5.26(typescript@5.9.3))
+
+  packages/kit:
+    dependencies:
+      '@nosana/api':
+        specifier: ^0.1.7
+        version: 0.1.7(@types/node@20.19.30)(typescript@5.9.3)
+      '@nosana/authorization':
+        specifier: ^0.1.7
+        version: 0.1.7
+      '@nosana/endpoints':
+        specifier: ^1.0.0
+        version: 1.0.0(@types/node@20.19.30)(typescript@5.9.3)
+      '@nosana/ipfs':
+        specifier: ^0.1.2
+        version: 0.1.2
+      '@nosana/types':
+        specifier: ^0.1.18
+        version: 0.1.18(@types/node@20.19.30)(typescript@5.9.3)
+      '@solana-program/compute-budget':
+        specifier: 0.12.0
+        version: 0.12.0(@solana/kit@5.4.0(typescript@5.9.3))
+      '@solana-program/system':
+        specifier: 0.10.0
+        version: 0.10.0(@solana/kit@5.4.0(typescript@5.9.3))
+      '@solana-program/token':
+        specifier: 0.9.0
+        version: 0.9.0(@solana/kit@5.4.0(typescript@5.9.3))
+      '@solana/kit':
+        specifier: 5.4.0
+        version: 5.4.0(typescript@5.9.3)
+      bs58:
+        specifier: 6.0.0
+        version: 6.0.0
+    devDependencies:
+      '@codama/nodes-from-anchor':
+        specifier: ^1.3.8
+        version: 1.3.8(typescript@5.9.3)
+      '@codama/renderers-js':
+        specifier: ^1.5.5
+        version: 1.5.5(typescript@5.9.3)
+      '@codama/visitors-core':
+        specifier: ^1.5.0
+        version: 1.5.0
+      '@eslint/js':
+        specifier: ^9.39.2
+        version: 9.39.2
+      '@nosana/kit':
+        specifier: file:.
+        version: 'link:'
+      '@prettier/sync':
+        specifier: ^0.6.1
+        version: 0.6.1(prettier@3.8.1)
+      '@types/node':
+        specifier: ^20.19.27
+        version: 20.19.30
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.50.0
+        version: 8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.50.0
+        version: 8.53.1(eslint@9.39.2)(typescript@5.9.3)
+      '@vitest/coverage-v8':
+        specifier: ^4.0.16
+        version: 4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@20.19.30)(sass-embedded@1.97.3)(sass@1.97.3)(yaml@2.8.2))
+      codama:
+        specifier: ^1.5.0
+        version: 1.5.0
+      eslint:
+        specifier: ^9.39.2
+        version: 9.39.2
+      eslint-plugin-import:
+        specifier: ^2.32.0
+        version: 2.32.0(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)
+      prettier:
+        specifier: ^3.7.4
+        version: 3.8.1
+      sass-embedded:
+        specifier: ^1.97.2
+        version: 1.97.3
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@20.19.30)(typescript@5.9.3)
+      typedoc:
+        specifier: 0.28.16
+        version: 0.28.16(typescript@5.9.3)
+      typedoc-plugin-frontmatter:
+        specifier: ^1.3.1
+        version: 1.3.1(typedoc-plugin-markdown@4.9.0(typedoc@0.28.16(typescript@5.9.3)))
+      typedoc-plugin-markdown:
+        specifier: ^4.9.0
+        version: 4.9.0(typedoc@0.28.16(typescript@5.9.3))
+      typedoc-plugin-mdn-links:
+        specifier: ^5.0.10
+        version: 5.1.1(typedoc@0.28.16(typescript@5.9.3))
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.16
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@20.19.30)(sass-embedded@1.97.3)(sass@1.97.3)(yaml@2.8.2)
+      ws:
+        specifier: ^8.18.0
+        version: 8.19.0
 
 packages:
 
@@ -668,10 +670,6 @@ packages:
   '@nosana/ipfs@0.1.2':
     resolution: {integrity: sha512-CEq0sL0nbJeBzay8QD5gRdDM8im2KHz4v5t0xUq8ykC355KKuW06af7U+u3rPaAkE573HJ1mFhhOKpeujhjlwQ==}
 
-  '@nosana/kit@file:':
-    resolution: {directory: '', type: directory}
-    engines: {node: '>=20.18.0'}
-
   '@nosana/types@0.1.18':
     resolution: {integrity: sha512-RU0KxoiLbrEeNXv01+Q4yJZPAumrtZ54F//7YH8lgCCtQ5vCulfFHpbE5vzztnirh7r0OQl1nTONsoUcYohXaQ==}
 
@@ -1026,12 +1024,6 @@ packages:
       typescript:
         optional: true
 
-  '@solana/codecs-core@5.1.0':
-    resolution: {integrity: sha512-vDwi03mxWeWCS5Il6BCdNdifYdOoHVz97YOmbWGIt45b77Ivu5NUYeSD2+ccl6fSw8eYQ6QaqqKXMjbSfsXv4g==}
-    engines: {node: '>=20.18.0'}
-    peerDependencies:
-      typescript: '>=5.3.3'
-
   '@solana/codecs-core@5.4.0':
     resolution: {integrity: sha512-rQ5jXgiDe2vIU+mYCHDjgwMd9WdzZfh4sc5H6JgYleAUjeTUX6mx8hTV2+pcXvvn27LPrgrt9jfxswbDb8O8ww==}
     engines: {node: '>=20.18.0'}
@@ -1040,12 +1032,6 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
-
-  '@solana/codecs-data-structures@5.1.0':
-    resolution: {integrity: sha512-ftAwL/jsurFrk9kFVhkTLdQ8fGZ8I0PcbVH+V1a0dIP2aKDofGePvK0XbwZE/ohizC9gEIZxyBX5IgRKk5PXyg==}
-    engines: {node: '>=20.18.0'}
-    peerDependencies:
-      typescript: '>=5.3.3'
 
   '@solana/codecs-data-structures@5.4.0':
     resolution: {integrity: sha512-LVssbdQ1GfY6upnxW3mufYsNfvTWKnHNk5Hx2gHuOYJhm3HZlp+Y8zvuoY65G1d1xAXkPz5YVGxaSeVIRWLGWg==}
@@ -1056,12 +1042,6 @@ packages:
       typescript:
         optional: true
 
-  '@solana/codecs-numbers@5.1.0':
-    resolution: {integrity: sha512-Ea5/9yjDNOrDZcI40UGzzi6Aq1JNsmzM4m5pOk6Xb3JRZ0YdKOv/MwuCqb6jRgzZ7SQjHhkfGL43kHLJA++bOw==}
-    engines: {node: '>=20.18.0'}
-    peerDependencies:
-      typescript: '>=5.3.3'
-
   '@solana/codecs-numbers@5.4.0':
     resolution: {integrity: sha512-z6LMkY+kXWx1alrvIDSAxexY5QLhsso638CjM7XI1u6dB7drTLWKhifyjnm1vOQc1VPVFmbYxTgKKpds8TY8tg==}
     engines: {node: '>=20.18.0'}
@@ -1069,16 +1049,6 @@ packages:
       typescript: ^5.0.0
     peerDependenciesMeta:
       typescript:
-        optional: true
-
-  '@solana/codecs-strings@5.1.0':
-    resolution: {integrity: sha512-014xwl5T/3VnGW0gceizF47DUs5EURRtgGmbWIR5+Z32yxgQ6hT9Zl0atZbL268RHbUQ03/J8Ush1StQgy7sfQ==}
-    engines: {node: '>=20.18.0'}
-    peerDependencies:
-      fastestsmallesttextencoderdecoder: ^1.0.22
-      typescript: '>=5.3.3'
-    peerDependenciesMeta:
-      fastestsmallesttextencoderdecoder:
         optional: true
 
   '@solana/codecs-strings@5.4.0':
@@ -1093,12 +1063,6 @@ packages:
       typescript:
         optional: true
 
-  '@solana/codecs@5.1.0':
-    resolution: {integrity: sha512-krSuf/E2Sa/4oASZ/jb/5KGUG58m1/bQdLrKvBnoAFhYj7zZf+8V4UqHGTV5n2NCQfmMyORsg9n2saKjkUzo8w==}
-    engines: {node: '>=20.18.0'}
-    peerDependencies:
-      typescript: '>=5.3.3'
-
   '@solana/codecs@5.4.0':
     resolution: {integrity: sha512-IbDCUvNX0MrkQahxiXj9rHzkd/fYfp1F2nTJkHGH8v+vPfD+YPjl007ZBM38EnCeXj/Xn+hxqBBivPvIHP29dA==}
     engines: {node: '>=20.18.0'}
@@ -1107,13 +1071,6 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
-
-  '@solana/errors@5.1.0':
-    resolution: {integrity: sha512-JlTyekErWa6Fdcwu1Hrh+jZxjM4YxyorGCFDRVZlmHZFkp5N00DWKcYnSGZrTF8E6ZZEP9pfS2XwM8y7p7HPww==}
-    engines: {node: '>=20.18.0'}
-    hasBin: true
-    peerDependencies:
-      typescript: '>=5.3.3'
 
   '@solana/errors@5.4.0':
     resolution: {integrity: sha512-hNoAOmlZAszaVBrAy1Jf7amHJ8wnUnTU0BqhNQXknbSvirvsYr81yEud2iq18YiCqhyJ9SuQ5kWrSAT0x7S0oA==}
@@ -1196,12 +1153,6 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
-
-  '@solana/options@5.1.0':
-    resolution: {integrity: sha512-PqgfALd0yhK+QFaYIbRFTV6hBpiy5xwdu07zSw1RLoNvt1sg+MRsRFDk9R8ZdEdiM69PY/cKiClVSjpNzLLcJg==}
-    engines: {node: '>=20.18.0'}
-    peerDependencies:
-      typescript: '>=5.3.3'
 
   '@solana/options@5.4.0':
     resolution: {integrity: sha512-h4vTWRChEXPhaHo9i1pCyQBWWs+NqYPQRXSAApqpUYvHb9Kct/C6KbHjfyaRMyqNQnDHLcJCX7oW9tk0iRDzIg==}
@@ -4164,7 +4115,7 @@ snapshots:
       '@codama/nodes': 1.5.0
       '@codama/visitors': 1.5.0
       '@noble/hashes': 2.0.1
-      '@solana/codecs': 5.1.0(typescript@5.9.3)
+      '@solana/codecs': 5.4.0(typescript@5.9.3)
     transitivePeerDependencies:
       - fastestsmallesttextencoderdecoder
       - typescript
@@ -4186,7 +4137,7 @@ snapshots:
       '@codama/nodes': 1.5.0
       '@codama/renderers-core': 1.3.5
       '@codama/visitors-core': 1.5.0
-      '@solana/codecs-strings': 5.1.0(typescript@5.9.3)
+      '@solana/codecs-strings': 5.4.0(typescript@5.9.3)
       prettier: 3.8.1
       semver: 7.7.3
     transitivePeerDependencies:
@@ -4480,25 +4431,6 @@ snapshots:
   '@nosana/ipfs@0.1.2':
     dependencies:
       bs58: 5.0.0
-
-  '@nosana/kit@file:(@types/node@20.19.30)(typescript@5.9.3)':
-    dependencies:
-      '@nosana/api': 0.1.7(@types/node@20.19.30)(typescript@5.9.3)
-      '@nosana/authorization': 0.1.7
-      '@nosana/endpoints': 1.0.0(@types/node@20.19.30)(typescript@5.9.3)
-      '@nosana/ipfs': 0.1.2
-      '@nosana/types': 0.1.18(@types/node@20.19.30)(typescript@5.9.3)
-      '@solana-program/compute-budget': 0.12.0(@solana/kit@5.4.0(typescript@5.9.3))
-      '@solana-program/system': 0.10.0(@solana/kit@5.4.0(typescript@5.9.3))
-      '@solana-program/token': 0.9.0(@solana/kit@5.4.0(typescript@5.9.3))
-      '@solana/kit': 5.4.0(typescript@5.9.3)
-      bs58: 6.0.0
-    transitivePeerDependencies:
-      - '@types/node'
-      - bufferutil
-      - fastestsmallesttextencoderdecoder
-      - typescript
-      - utf-8-validate
 
   '@nosana/types@0.1.18(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
@@ -4803,22 +4735,10 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  '@solana/codecs-core@5.1.0(typescript@5.9.3)':
-    dependencies:
-      '@solana/errors': 5.1.0(typescript@5.9.3)
-      typescript: 5.9.3
-
   '@solana/codecs-core@5.4.0(typescript@5.9.3)':
     dependencies:
       '@solana/errors': 5.4.0(typescript@5.9.3)
     optionalDependencies:
-      typescript: 5.9.3
-
-  '@solana/codecs-data-structures@5.1.0(typescript@5.9.3)':
-    dependencies:
-      '@solana/codecs-core': 5.1.0(typescript@5.9.3)
-      '@solana/codecs-numbers': 5.1.0(typescript@5.9.3)
-      '@solana/errors': 5.1.0(typescript@5.9.3)
       typescript: 5.9.3
 
   '@solana/codecs-data-structures@5.4.0(typescript@5.9.3)':
@@ -4829,24 +4749,11 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  '@solana/codecs-numbers@5.1.0(typescript@5.9.3)':
-    dependencies:
-      '@solana/codecs-core': 5.1.0(typescript@5.9.3)
-      '@solana/errors': 5.1.0(typescript@5.9.3)
-      typescript: 5.9.3
-
   '@solana/codecs-numbers@5.4.0(typescript@5.9.3)':
     dependencies:
       '@solana/codecs-core': 5.4.0(typescript@5.9.3)
       '@solana/errors': 5.4.0(typescript@5.9.3)
     optionalDependencies:
-      typescript: 5.9.3
-
-  '@solana/codecs-strings@5.1.0(typescript@5.9.3)':
-    dependencies:
-      '@solana/codecs-core': 5.1.0(typescript@5.9.3)
-      '@solana/codecs-numbers': 5.1.0(typescript@5.9.3)
-      '@solana/errors': 5.1.0(typescript@5.9.3)
       typescript: 5.9.3
 
   '@solana/codecs-strings@5.4.0(typescript@5.9.3)':
@@ -4856,17 +4763,6 @@ snapshots:
       '@solana/errors': 5.4.0(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
-
-  '@solana/codecs@5.1.0(typescript@5.9.3)':
-    dependencies:
-      '@solana/codecs-core': 5.1.0(typescript@5.9.3)
-      '@solana/codecs-data-structures': 5.1.0(typescript@5.9.3)
-      '@solana/codecs-numbers': 5.1.0(typescript@5.9.3)
-      '@solana/codecs-strings': 5.1.0(typescript@5.9.3)
-      '@solana/options': 5.1.0(typescript@5.9.3)
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - fastestsmallesttextencoderdecoder
 
   '@solana/codecs@5.4.0(typescript@5.9.3)':
     dependencies:
@@ -4879,12 +4775,6 @@ snapshots:
       typescript: 5.9.3
     transitivePeerDependencies:
       - fastestsmallesttextencoderdecoder
-
-  '@solana/errors@5.1.0(typescript@5.9.3)':
-    dependencies:
-      chalk: 5.6.2
-      commander: 14.0.2
-      typescript: 5.9.3
 
   '@solana/errors@5.4.0(typescript@5.9.3)':
     dependencies:
@@ -4979,17 +4869,6 @@ snapshots:
       '@solana/keys': 5.4.0(typescript@5.9.3)
       '@solana/nominal-types': 5.4.0(typescript@5.9.3)
     optionalDependencies:
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - fastestsmallesttextencoderdecoder
-
-  '@solana/options@5.1.0(typescript@5.9.3)':
-    dependencies:
-      '@solana/codecs-core': 5.1.0(typescript@5.9.3)
-      '@solana/codecs-data-structures': 5.1.0(typescript@5.9.3)
-      '@solana/codecs-numbers': 5.1.0(typescript@5.9.3)
-      '@solana/codecs-strings': 5.1.0(typescript@5.9.3)
-      '@solana/errors': 5.1.0(typescript@5.9.3)
       typescript: 5.9.3
     transitivePeerDependencies:
       - fastestsmallesttextencoderdecoder
