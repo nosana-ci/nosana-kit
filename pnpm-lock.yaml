@@ -39,6 +39,12 @@ importers:
       '@shikijs/vitepress-twoslash':
         specifier: ^3.20.0
         version: 3.21.0(typescript@5.9.3)
+      '@solana-program/system':
+        specifier: 0.10.0
+        version: 0.10.0(@solana/kit@5.4.0(typescript@5.9.3))
+      '@solana/kit':
+        specifier: 5.4.0
+        version: 5.4.0(typescript@5.9.3)
       '@vue/repl':
         specifier: ^4.0.0
         version: 4.7.1

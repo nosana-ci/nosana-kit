@@ -3,7 +3,7 @@
     "target": "ES2020",
     "module": "ESNext",
     "lib": ["ES2020", "DOM"],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -15,7 +15,7 @@
     "typeRoots": ["../../node_modules/@types", "../../node_modules", "../node_modules/@types", "../node_modules"]
   },
   "include": [
-    "../../dist/**/*.d.ts",
+    "../../packages/kit/dist/**/*.d.ts",
     "**/*.ts",
     "**/*.vue"
   ],

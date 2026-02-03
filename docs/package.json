@@ -16,6 +16,8 @@
     "@braintree/sanitize-url": "^7.0.0",
     "@shikijs/twoslash": "^3.20.0",
     "@shikijs/vitepress-twoslash": "^3.20.0",
+    "@solana-program/system": "0.10.0",
+    "@solana/kit": "5.4.0",
     "@vue/repl": "^4.0.0",
     "chart.js": "^4.5.1",
     "cytoscape": "^3.32.0",
