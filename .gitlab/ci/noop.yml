@@ -1,0 +1,7 @@
+noop:
+  stage: prepare
+  script:
+    - echo "No kit/docs changes; skipping child pipeline."
+  rules:
+    - if: $ANY_CHANGED == "0"
+    - when: never

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vitepress dev .",
     "build": "pnpm run api && NODE_OPTIONS='--max-old-space-size=4096' vitepress build .",
-    "api": "cd .. && typedoc",
+    "api": "cd .. && pnpm --filter @nosana/kit exec typedoc",
     "preview": "vitepress preview ."
   },
   "dependencies": {
