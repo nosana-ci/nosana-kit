@@ -10,7 +10,7 @@ trap cleanup EXIT
 workspace_json="$tmp_dir/workspace.json"
 changed_json="$tmp_dir/changed.json"
 
-pnpm -m ls --json --depth=-1 > "$workspace_json"
+pnpm -r ls --json --depth=-1 > "$workspace_json"
 
 if [ "${CI_COMMIT_BRANCH:-}" = "${CI_DEFAULT_BRANCH:-}" ] && [ -n "${CI_COMMIT_BEFORE_SHA:-}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
   compare_ref="${CI_COMMIT_BEFORE_SHA}"
