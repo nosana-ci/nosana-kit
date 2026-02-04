@@ -40,7 +40,6 @@ detect-changes:
     - bash .gitlab/ci/detect-changes.sh
   artifacts:
     paths:
-      - child-*.yml
       - orchestrator.yml
     expire_in: 1 hour
     reports:
@@ -48,9 +47,7 @@ detect-changes:
       dotenv: changes.env
   rules: *pipeline_rules
 
-# Single trigger: run orchestrator child. Its config is generated with KIT_CHANGED etc.
-# baked in, so its trigger jobs are created correctly (rules run at pipeline creation).
-# PARENT_PIPELINE_ID lets the orchestrator pull our detect-changes artifacts via needs:pipeline:job.
+# Single trigger: orchestrator child uses local: path to each package's .gitlab-ci.yml.
 run-child-pipelines:
   stage: trigger
   needs:
@@ -61,6 +58,4 @@ run-child-pipelines:
       - artifact: orchestrator.yml
         job: detect-changes
     strategy: depend
-  variables:
-    PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   rules: *pipeline_rules

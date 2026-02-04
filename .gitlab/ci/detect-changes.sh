@@ -44,8 +44,6 @@ const toKey = pkgPath => {
 
 const toSafeName = rel => rel.replace(/\//g, '-');
 
-let template = fs.readFileSync('.gitlab/ci/child-template.yml', 'utf8');
-
 for (const pkg of workspace) {
   const pkgPath = pkg.path || pkg.dir || pkg.location || pkg.directory;
   const name = pkg.name;
@@ -63,29 +61,11 @@ for (const pkg of workspace) {
 variablesLines.push(`  ANY_CHANGED: "${anyChanged}"`);
 changesEnvLines.push(`ANY_CHANGED=${anyChanged}`);
 
-const variablesBlock = variablesLines.join('\n');
-
-for (const pkg of workspace) {
-  const pkgPath = pkg.path || pkg.dir || pkg.location || pkg.directory;
-  const name = pkg.name;
-  if (!pkgPath || !name || !changed.has(name)) continue;
-
-  const rel = path.relative(process.cwd(), pkgPath).replace(/\\/g, '/');
-  const ciPath = `${rel}/.gitlab-ci.yml`;
-  if (!fs.existsSync(ciPath)) continue;
-
-  const pkgTemplate = template
-    .replace('__VARIABLES_BLOCK__', variablesBlock)
-    .replace('__INCLUDE_BLOCK__', `  - local: ${ciPath}`);
-  const safeName = toSafeName(rel);
-  fs.writeFileSync(`child-${safeName}.yml`, pkgTemplate);
-}
-
 fs.writeFileSync('changes.env', changesEnvLines.join('\n') + '\n');
 
-// Orchestrator child pipeline: variables baked in so rules see them at creation time.
-// forward-artifacts pulls parent's detect-changes artifacts via needs:pipeline:job (child can't
-// reference parent job in trigger: directly). Trigger jobs then use artifact from forward-artifacts.
+const variablesBlock = variablesLines.join('\n');
+
+// Orchestrator: trigger jobs use local: path to each package's .gitlab-ci.yml (no artifacts).
 const triggerJobs = [];
 for (const pkg of workspace) {
   const pkgPath = pkg.path || pkg.dir || pkg.location || pkg.directory;
@@ -101,13 +81,9 @@ for (const pkg of workspace) {
   triggerJobs.push(`
 trigger:${safeName}:
   stage: trigger
-  needs:
-    - job: forward-artifacts
-      artifacts: true
   trigger:
     include:
-      - artifact: child-${safeName}.yml
-        job: forward-artifacts
+      - local: ${ciPath}
     strategy: depend
   rules:
     - if: $${key}_CHANGED == "1"
@@ -115,22 +91,18 @@ trigger:${safeName}:
 }
 
 const orchestratorYaml = `stages:
-  - prepare
   - trigger
 
 variables:
 ${variablesBlock}
 
-forward-artifacts:
-  stage: prepare
-  needs:
-    - pipeline: \$PARENT_PIPELINE_ID
-      job: detect-changes
-  script:
-    - "true"
-  artifacts:
-    paths:
-      - child-*.yml
+trigger:test-include:
+  stage: trigger
+  trigger:
+    include:
+      - local: .gitlab/ci/test-trigger.yml
+    strategy: depend
+
 ${triggerJobs.join('')}
 `;
 fs.writeFileSync('orchestrator.yml', orchestratorYaml.trimStart());
