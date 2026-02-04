@@ -78,9 +78,9 @@ for (const pkg of workspace) {
 
   const key = toKey(rel);
   const safeName = toSafeName(rel);
-  const jobName = `trigger:${safeName}`;
+  const jobName = `trigger_${safeName}`;
   triggerJobs.push(`
-"${jobName}":
+${jobName}:
   stage: trigger
   trigger:
     include:
@@ -99,12 +99,12 @@ variables:
 ${variablesBlock}
 
 # At least one real job so GitLab does not treat the pipeline as empty (trigger-only pipelines fail).
-"orchestrator:ready":
+orchestrator_ready:
   stage: prepare
   script:
     - "echo Orchestrator pipeline started"
 
-"trigger:test-include":
+trigger_test_include:
   stage: trigger
   trigger:
     include:
