@@ -6,7 +6,7 @@ stages:
 include:
   - local: .gitlab/ci/common.yml
 
-docs build:
+docs:build:
   stage: build
   script:
     - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" packages/kit/package.json
@@ -22,10 +22,10 @@ docs build:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
 
-pages:
+docs:pages:
   stage: deploy
   needs:
-    - job: docs build
+    - job: docs:build
       artifacts: true
   script:
     - mv docs/.vitepress/dist public

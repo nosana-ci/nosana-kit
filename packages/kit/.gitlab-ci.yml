@@ -6,7 +6,7 @@ stages:
 include:
   - local: .gitlab/ci/common.yml
 
-npm format:
+kit:npm format:
   stage: test
   script:
     - pnpm install --frozen-lockfile
@@ -15,7 +15,7 @@ npm format:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-npm lint:
+kit:npm lint:
   stage: test
   script:
     - pnpm install --frozen-lockfile
@@ -24,7 +24,7 @@ npm lint:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-npm test:
+kit:npm test:
   stage: test
   script:
     - pnpm install --frozen-lockfile
@@ -34,7 +34,7 @@ npm test:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-npm publish prod:
+kit:npm publish prod:
   stage: deploy
   script:
     - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" packages/kit/package.json
