@@ -1,0 +1,17 @@
+# Runs whenever any workspace package changed. Catches outdated generated clients
+# (e.g. after idl/ or root codama deps change without running generate-clients).
+check-generated-clients:
+  stage: test
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm run generate-clients
+    - |
+      if [ -n "$(git status --porcelain)" ]; then
+        echo "❌ Generated clients are out of date. Run 'pnpm run generate-clients' at repo root and commit the changes."
+        git status
+        git diff
+        exit 1
+      fi
+      echo "✅ Generated clients are up to date."
+  rules:
+    - if: $ANY_CHANGED == "1"

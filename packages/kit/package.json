@@ -7,7 +7,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
     "dev": "tsc --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
     "test": "NODE_NO_WARNINGS=1 vitest run",
     "test:coverage": "NODE_NO_WARNINGS=1 vitest run --coverage",
     "test:watch": "NODE_NO_WARNINGS=1 vitest",

@@ -1613,6 +1613,26 @@ pnpm build
 pnpm test
 ```
 
+### Building only what you need
+
+If you're only working on one package, you can build that package and its workspace dependencies instead of the whole repo:
+
+```bash
+# From root: build kit and its deps (generated clients), skip docs
+pnpm --filter @nosana/kit run build:with-deps
+
+# Or from the package directory
+cd packages/kit && pnpm run build:with-deps
+```
+
+Same for docs (builds kit first, then docs):
+
+```bash
+pnpm --filter @nosana/docs run build:with-deps
+```
+
+Use `pnpm build` when you want everything built (e.g. before opening a PR or publishing).
+
 ### Regenerating program clients
 
 After changing IDLs in `/idl`, regenerate the client packages:
@@ -1633,6 +1653,19 @@ pnpm dev
 ```
 
 This runs `tsc --watch` for the generated client packages and kit, and starts the VitePress dev server for docs.
+
+To work only on kit (no docs server), run watch for kit and its workspace deps:
+
+```bash
+pnpm --filter @nosana/kit run dev:with-deps
+# or from package dir: cd packages/kit && pnpm run dev:with-deps
+```
+
+To work on docs (kit + docs dev server):
+
+```bash
+pnpm --filter @nosana/docs run dev:with-deps
+```
 
 ### Lint and format
 
