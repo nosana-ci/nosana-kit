@@ -104,6 +104,7 @@ ${variablesBlock}
 
 orchestrator_ready:
   stage: prepare
+  image: alpine:3
   script:
     - "echo Orchestrator pipeline started"
 
