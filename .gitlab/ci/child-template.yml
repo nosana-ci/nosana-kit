@@ -10,7 +10,5 @@ __VARIABLES_BLOCK__
 include:
   - local: .gitlab/ci/common.yml
   - local: .gitlab/ci/noop.yml
-  - local: .gitlab/ci/generated-clients.yml
-  - local: .gitlab/ci/release.yml
 __INCLUDE_BLOCK__
 

@@ -14,4 +14,5 @@ check-generated-clients:
       fi
       echo "✅ Generated clients are up to date."
   rules:
-    - if: $ANY_CHANGED == "1"
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
