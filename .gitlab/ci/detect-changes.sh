@@ -99,7 +99,7 @@ variables:
 ${variablesBlock}
 
 # At least one real job so GitLab does not treat the pipeline as empty (trigger-only pipelines fail).
-orchestrator:ready:
+"orchestrator:ready":
   stage: prepare
   script:
     - "echo Orchestrator pipeline started"
