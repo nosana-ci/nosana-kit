@@ -78,7 +78,7 @@ for (const pkg of workspace) {
 
   const key = toKey(rel);
   const safeName = toSafeName(rel);
-  const jobName = `trigger_${safeName}`;
+  const jobName = `trigger_${safeName.replace(/-/g, '_')}`;
   triggerJobs.push(`
 ${jobName}:
   stage: trigger
@@ -91,14 +91,17 @@ ${jobName}:
 `);
 }
 
-const orchestratorYaml = `stages:
+const orchestratorYaml = `workflow:
+  rules:
+    - when: always
+
+stages:
   - prepare
   - trigger
 
 variables:
 ${variablesBlock}
 
-# At least one real job so GitLab does not treat the pipeline as empty (trigger-only pipelines fail).
 orchestrator_ready:
   stage: prepare
   script:

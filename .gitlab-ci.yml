@@ -48,6 +48,7 @@ detect-changes:
   rules: *pipeline_rules
 
 # Single trigger: orchestrator child uses local: path to each package's .gitlab-ci.yml.
+# Forward dotenv variables (KIT_CHANGED, DOCS_CHANGED, etc.) so orchestrator rules see them.
 run-child-pipelines:
   stage: trigger
   needs:
@@ -58,4 +59,6 @@ run-child-pipelines:
       - artifact: orchestrator.yml
         job: detect-changes
     strategy: depend
+    forward:
+      pipeline_variables: true
   rules: *pipeline_rules
