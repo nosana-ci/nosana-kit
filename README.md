@@ -1641,7 +1641,7 @@ After changing IDLs in `/idl`, regenerate the client packages:
 pnpm run generate-clients
 ```
 
-Then run `pnpm build` so the rest of the workspace picks up the changes.
+Generated code is written into each package’s **`src/`** directory so `package.json` and `tsconfig.json` at the package root are never overwritten. Then run `pnpm build` so the rest of the workspace picks up the changes.
 
 ### Development mode
 
