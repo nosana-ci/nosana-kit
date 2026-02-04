@@ -1,0 +1,19 @@
+workflow:
+  rules:
+    - when: always
+
+stages:
+  - prepare
+  - trigger
+
+variables:
+__VARIABLES_BLOCK__
+
+# One real job so the pipeline is not considered empty when all trigger rules skip.
+orchestrator_ready:
+  stage: prepare
+  image: alpine:3
+  script:
+    - "echo Orchestrator pipeline started"
+
+__TRIGGER_JOBS_BLOCK__

@@ -91,32 +91,10 @@ ${jobName}:
 `);
 }
 
-const orchestratorYaml = `workflow:
-  rules:
-    - when: always
-
-stages:
-  - prepare
-  - trigger
-
-variables:
-${variablesBlock}
-
-orchestrator_ready:
-  stage: prepare
-  image: alpine:3
-  script:
-    - "echo Orchestrator pipeline started"
-
-trigger_test_include:
-  stage: trigger
-  trigger:
-    include:
-      - local: .gitlab/ci/test-trigger.yml
-    strategy: depend
-
-${triggerJobs.join('')}
-`;
-fs.writeFileSync('orchestrator.yml', orchestratorYaml.trimStart());
+let orchestratorTemplate = fs.readFileSync('.gitlab/ci/orchestrator-template.yml', 'utf8');
+orchestratorTemplate = orchestratorTemplate
+  .replace('__VARIABLES_BLOCK__', variablesBlock)
+  .replace('__TRIGGER_JOBS_BLOCK__', triggerJobs.join('').trimStart());
+fs.writeFileSync('orchestrator.yml', orchestratorTemplate);
 NODE
 
