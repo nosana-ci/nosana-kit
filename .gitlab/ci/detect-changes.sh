@@ -127,7 +127,7 @@ forward-artifacts:
     - pipeline: \$PARENT_PIPELINE_ID
       job: detect-changes
   script:
-    - true
+    - "true"
   artifacts:
     paths:
       - child-*.yml
