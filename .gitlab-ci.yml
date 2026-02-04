@@ -40,20 +40,38 @@ detect-changes:
     - bash .gitlab/ci/detect-changes.sh
   artifacts:
     paths:
-      - child.yml
+      - child-*.yml
     expire_in: 1 hour
     reports:
       dotenv: changes.env
   rules: *pipeline_rules
 
-run-child-pipeline:
+trigger:packages-kit:
   stage: trigger
   needs:
     - job: detect-changes
       artifacts: true
   trigger:
     include:
-      - artifact: child.yml
+      - artifact: child-packages-kit.yml
         job: detect-changes
     strategy: depend
-  rules: *pipeline_rules
+  rules:
+    - if: $CI_MERGE_REQUEST_ID && $KIT_CHANGED == "1"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $KIT_CHANGED == "1"
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest" && $KIT_CHANGED == "1"
+
+trigger:docs:
+  stage: trigger
+  needs:
+    - job: detect-changes
+      artifacts: true
+  trigger:
+    include:
+      - artifact: child-docs.yml
+        job: detect-changes
+    strategy: depend
+  rules:
+    - if: $CI_MERGE_REQUEST_ID && $DOCS_CHANGED == "1"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $DOCS_CHANGED == "1"
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest" && $DOCS_CHANGED == "1"
