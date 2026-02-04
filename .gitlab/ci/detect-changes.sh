@@ -84,7 +84,8 @@ for (const pkg of workspace) {
 fs.writeFileSync('changes.env', changesEnvLines.join('\n') + '\n');
 
 // Orchestrator child pipeline: variables baked in so rules see them at creation time.
-// One trigger job per package with CI; only changed packages' jobs run (rules use baked-in vars).
+// forward-artifacts pulls parent's detect-changes artifacts via needs:pipeline:job (child can't
+// reference parent job in trigger: directly). Trigger jobs then use artifact from forward-artifacts.
 const triggerJobs = [];
 for (const pkg of workspace) {
   const pkgPath = pkg.path || pkg.dir || pkg.location || pkg.directory;
@@ -100,10 +101,13 @@ for (const pkg of workspace) {
   triggerJobs.push(`
 trigger:${safeName}:
   stage: trigger
+  needs:
+    - job: forward-artifacts
+      artifacts: true
   trigger:
     include:
       - artifact: child-${safeName}.yml
-        job: detect-changes
+        job: forward-artifacts
     strategy: depend
   rules:
     - if: $${key}_CHANGED == "1"
@@ -111,11 +115,22 @@ trigger:${safeName}:
 }
 
 const orchestratorYaml = `stages:
+  - prepare
   - trigger
 
 variables:
 ${variablesBlock}
 
+forward-artifacts:
+  stage: prepare
+  needs:
+    - pipeline: \$PARENT_PIPELINE_ID
+      job: detect-changes
+  script:
+    - true
+  artifacts:
+    paths:
+      - child-*.yml
 ${triggerJobs.join('')}
 `;
 fs.writeFileSync('orchestrator.yml', orchestratorYaml.trimStart());
