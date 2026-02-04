@@ -7,7 +7,7 @@ import {
   ALLOWED_RECEIVE_ADDRESSES,
   ClaimTarget,
 } from '../../../../src/services/programs/merkleDistributor/index.js';
-import * as merkleDistributorClient from '../../../../src/generated_clients/merkle_distributor/index.js';
+import * as merkleDistributorClient from '@nosana/merkle-distributor-program';
 import { type Address, generateKeyPairSigner } from '@solana/kit';
 import {
   AddressFactory,

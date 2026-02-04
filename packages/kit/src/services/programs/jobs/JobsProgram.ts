@@ -20,7 +20,7 @@ import type { ProgramConfig } from '../../../config/types.js';
 import type { InstructionsHelperParams } from './instructions/types.js';
 
 import * as Instructions from './instructions/index.js';
-import * as programClient from '../../../generated_clients/jobs/index.js';
+import * as programClient from '@nosana/jobs-program';
 import { createMonitorFunctions } from './monitor/index.js';
 import type { SimpleMonitorEvent, MonitorEvent } from './monitor/index.js';
 

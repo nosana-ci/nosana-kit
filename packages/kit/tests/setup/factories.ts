@@ -23,9 +23,9 @@ import {
   type PartialClientConfig,
   type Wallet,
 } from '../../src/index.js';
-import * as programClient from '../../src/generated_clients/jobs/index.js';
-import * as stakingClient from '../../src/generated_clients/staking/index.js';
-import * as merkleDistributorClient from '../../src/generated_clients/merkle_distributor/index.js';
+import * as programClient from '@nosana/jobs-program';
+import * as stakingClient from '@nosana/stake-program';
+import * as merkleDistributorClient from '@nosana/merkle-distributor-program';
 import { JobState, MarketQueueType } from '../../src/services/programs/jobs/index.js';
 import { NosanaNetwork } from '@nosana/types';
 

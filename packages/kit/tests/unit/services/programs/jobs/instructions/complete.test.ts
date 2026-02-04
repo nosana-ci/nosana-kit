@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 
 import { complete } from '../../../../../../src/services/programs/jobs/instructions/complete.js';
-import * as programClient from '../../../../../../src/generated_clients/jobs/index.js';
+import * as programClient from '@nosana/jobs-program';
 import { createJobsProgram, JobState } from '../../../../../../src/services/programs/jobs/index.js';
 import {
   AddressFactory,

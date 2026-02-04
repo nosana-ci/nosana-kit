@@ -2,7 +2,7 @@ import { type Address, generateKeyPairSigner } from '@solana/kit';
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import { SYSTEM_PROGRAM_ADDRESS } from '@solana-program/system';
 
-import { getWorkInstruction } from '../../../../generated_clients/jobs/index.js';
+import { getWorkInstruction } from '@nosana/jobs-program';
 import { InstructionsHelperParams } from './types.js';
 
 // Metaplex Token Metadata Program ID

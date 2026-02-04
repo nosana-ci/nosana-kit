@@ -10,7 +10,7 @@ export default [
       'dist/',
       'node_modules/',
       'coverage/',
-      'src/generated_clients/',
+      'packages/generated_clients/',
       'examples/',
       'docs/',
       '**/*.config.js',

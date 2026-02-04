@@ -42,7 +42,7 @@ async function main() {
   // Generate clients
   const codamaJobs = createFromRoot(rootNodeFromAnchor(anchorJobsIdl as AnchorIdl));
 
-  const jobsPath = path.join(__dirname, '..', 'src', 'generated_clients', 'jobs');
+  const jobsPath = path.join(__dirname, '..', 'packages', 'generated_clients', 'jobs');
   ensureDir(jobsPath);
   codamaJobs.accept(renderJavaScriptVisitor(jobsPath));
   console.log('Processing enums in jobs...');
@@ -55,7 +55,7 @@ async function main() {
 
   const codamaStaking = createFromRoot(rootNodeFromAnchor(anchorStakingIdl as AnchorIdl));
 
-  const stakingPath = path.join(__dirname, '..', 'src', 'generated_clients', 'staking');
+  const stakingPath = path.join(__dirname, '..', 'packages', 'generated_clients', 'stake');
   ensureDir(stakingPath);
   codamaStaking.accept(renderJavaScriptVisitor(stakingPath));
   console.log('Processing enums in staking...');
@@ -72,7 +72,7 @@ async function main() {
   const merkleDistributorPath = path.join(
     __dirname,
     '..',
-    'src',
+    'packages',
     'generated_clients',
     'merkle_distributor'
   );

@@ -2,7 +2,7 @@ import type { Address } from '@solana/kit';
 import { getCreateAssociatedTokenIdempotentInstructionAsync } from '@solana-program/token';
 import { ipfsHashToSolBytesArray } from '@nosana/ipfs';
 
-import { type getFinishInstruction } from '../../../../generated_clients/jobs/index.js';
+import { type getFinishInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
 
 type CreateATAInstruction = Awaited<

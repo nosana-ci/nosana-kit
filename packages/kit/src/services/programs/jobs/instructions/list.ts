@@ -1,7 +1,7 @@
 import { ipfsHashToSolBytesArray } from '@nosana/ipfs';
 import { type Address, type TransactionSigner, generateKeyPairSigner } from '@solana/kit';
 
-import type { getListInstruction } from '../../../../generated_clients/jobs/index.js';
+import type { getListInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
 
 export type ListParams = {

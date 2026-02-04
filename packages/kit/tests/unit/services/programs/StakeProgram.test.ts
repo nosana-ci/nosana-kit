@@ -3,7 +3,7 @@ import {
   createStakeProgram,
   type StakeProgram,
 } from '../../../../src/services/programs/stake/index.js';
-import * as stakingClient from '../../../../src/generated_clients/staking/index.js';
+import * as stakingClient from '@nosana/stake-program';
 import { type Address } from '@solana/kit';
 import {
   AddressFactory,

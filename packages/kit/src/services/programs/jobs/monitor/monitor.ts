@@ -12,7 +12,7 @@ import type { ProgramDeps } from '../../../../types.js';
 import type { ProgramConfig } from '../../../../config/types.js';
 import type { JobsProgram, Job, Market, Run } from '../JobsProgram.js';
 import { JobState } from '../JobsProgram.js';
-import * as programClient from '../../../../generated_clients/jobs/index.js';
+import * as programClient from '@nosana/jobs-program';
 import { MonitorEventType, type MonitorEvent, type SimpleMonitorEvent } from './types.js';
 
 export interface MonitorDeps {

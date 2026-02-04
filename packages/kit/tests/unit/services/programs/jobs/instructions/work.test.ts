@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { SYSTEM_PROGRAM_ADDRESS } from '@solana-program/system';
 
 import { work } from '../../../../../../src/services/programs/jobs/instructions/work.js';
-import * as programClient from '../../../../../../src/generated_clients/jobs/index.js';
+import * as programClient from '@nosana/jobs-program';
 import { createJobsProgram } from '../../../../../../src/services/programs/jobs/index.js';
 import { AddressFactory, MockClientFactory, sdkToProgramDeps } from '../../../../../setup/index.js';
 

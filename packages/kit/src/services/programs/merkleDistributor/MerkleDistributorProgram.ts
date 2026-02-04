@@ -9,7 +9,7 @@ import {
 } from '@solana/kit';
 import { NosanaError, ErrorCodes } from '../../../errors/NosanaError.js';
 import type { ProgramDeps } from '../../../types.js';
-import * as programClient from '../../../generated_clients/merkle_distributor/index.js';
+import * as programClient from '@nosana/merkle-distributor-program';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../../../utils/index.js';
 import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import { SYSTEM_PROGRAM_ADDRESS } from '@solana-program/system';

@@ -3,7 +3,7 @@ import os from 'os';
 import { createKeyPairSignerFromPrivateKeyBytes, address } from '@solana/kit';
 import { createNosanaClient, NosanaNetwork } from '../../../src/index.js';
 import { MonitorEventType } from '../../../src/services/programs/jobs/index.js';
-import { LIST_INSTRUCTION_ACCOUNTS } from '../../../src/generated_clients/jobs/index.js';
+import { LIST_INSTRUCTION_ACCOUNTS } from '@nosana/jobs-program';
 
 const keyData = JSON.parse(
   fs.readFileSync(os.homedir() + '/.nosana/nosana_key.json', 'utf8')

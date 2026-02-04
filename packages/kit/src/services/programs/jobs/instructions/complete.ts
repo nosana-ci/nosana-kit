@@ -1,7 +1,7 @@
 import type { Address } from '@solana/kit';
 import { ipfsHashToSolBytesArray } from '@nosana/ipfs';
 
-import type { getCompleteInstruction } from '../../../../generated_clients/jobs/index.js';
+import type { getCompleteInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
 import { JobState } from '../JobsProgram.js';
 

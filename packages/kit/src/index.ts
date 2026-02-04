@@ -266,17 +266,17 @@ export { walletToAuthorizationSigner } from './utils/walletToAuthorizationSigner
 /**
  * @group @nosana/kit
  */
-export * as JobsClient from './generated_clients/jobs/index.js';
+export * as JobsClient from '@nosana/jobs-program';
 
 /**
  * @group @nosana/kit
  */
-export * as StakingClient from './generated_clients/staking/index.js';
+export * as StakingClient from '@nosana/stake-program';
 
 /**
  * @group @nosana/kit
  */
-export * as MerkleDistributorClient from './generated_clients/merkle_distributor/index.js';
+export * as MerkleDistributorClient from '@nosana/merkle-distributor-program';
 
 // ============================================================================
 // @nosana/authorization - Authentication & Authorization

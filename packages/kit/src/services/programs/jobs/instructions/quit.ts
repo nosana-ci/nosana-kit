@@ -1,6 +1,6 @@
 import type { Address } from '@solana/kit';
 
-import type { getQuitInstruction } from '../../../../generated_clients/jobs/index.js';
+import type { getQuitInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
 
 export type QuitParams = {

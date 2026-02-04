@@ -1,5 +1,5 @@
 import type { Address, TransactionSigner } from '@solana/kit';
-import type { getCloseInstruction } from '../../../../generated_clients/jobs/index.js';
+import type { getCloseInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
 
 export type CloseParams = {

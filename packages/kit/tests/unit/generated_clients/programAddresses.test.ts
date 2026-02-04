@@ -3,12 +3,12 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'url';
 import path from 'node:path';
 
-import { NOSANA_JOBS_PROGRAM_ADDRESS } from '../../../src/generated_clients/jobs/programs/index.js';
-import { NOSANA_STAKING_PROGRAM_ADDRESS } from '../../../src/generated_clients/staking/programs/index.js';
-import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '../../../src/generated_clients/merkle_distributor/programs/index.js';
+import { NOSANA_JOBS_PROGRAM_ADDRESS } from '@nosana/jobs-program';
+import { NOSANA_STAKING_PROGRAM_ADDRESS } from '@nosana/stake-program';
+import { MERKLE_DISTRIBUTOR_PROGRAM_ADDRESS } from '@nosana/merkle-distributor-program';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const idlDir = path.resolve(__dirname, '../../../idl');
+const idlDir = path.resolve(__dirname, '../../../../../idl');
 
 function getProgramAddressFromIdl(idlFileName: string): string {
   const idlPath = path.join(idlDir, idlFileName);

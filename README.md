@@ -57,7 +57,7 @@ The SDK uses a functional architecture with factory functions for improved modul
 - **`ipfs/`** - IPFS integration for pinning and retrieving data
 - **`config/`** - Network configurations and defaults
 - **`utils/`** - Helper utilities and type conversions
-- **`generated_clients/`** - Auto-generated Solana program clients (exported as namespaces)
+- **`packages/generated_clients/`** - Auto-generated Solana program clients (exported as namespaces)
 
 All components use factory functions with explicit dependency injection, making the codebase modular, testable, and maintainable.
 
@@ -1581,21 +1581,24 @@ client.logger.debug('Debug details');
 The SDK includes comprehensive test coverage.
 
 ```bash
-# Run tests
+# Run tests (all workspace packages; only @nosana/kit has tests for now)
 pnpm test
 
-# Run tests in watch mode
-pnpm run test:watch
-
-# Generate coverage report
-pnpm run test:coverage
+# Kit-only: watch mode or coverage
+pnpm --filter @nosana/kit run test:watch
+pnpm --filter @nosana/kit run test:coverage
 ```
 
 ## Development
 
 This project uses **pnpm workspaces** with a monorepo structure:
-- **Root package** (`@nosana/kit`) - The main SDK
-- **Docs package** (`@nosana/docs`) - Documentation site (VitePress)
+
+- **Root** – Workspace orchestration (build, dev, test, generate-clients)
+- **`packages/kit`** (`@nosana/kit`) – Main SDK
+- **`packages/generated_clients/*`** – Generated Solana program clients (jobs, stake, merkle_distributor)
+- **`docs`** (`@nosana/docs`) – Documentation site (VitePress)
+
+All commands below are run from the **repository root** unless stated otherwise.
 
 ### Setup
 
@@ -1603,22 +1606,49 @@ This project uses **pnpm workspaces** with a monorepo structure:
 # Install dependencies for all workspace packages
 pnpm install
 
-# Build the SDK
-pnpm run build
+# Build all packages (generated clients first, then kit, then docs)
+pnpm build
 
-# Lint code
-pnpm run lint
+# Run tests
+pnpm test
+```
 
-# Format code
-pnpm run format:fix
+### Regenerating program clients
 
-# Generate Solana program clients
+After changing IDLs in `/idl`, regenerate the client packages:
+
+```bash
 pnpm run generate-clients
 ```
 
-### Documentation Development
+Then run `pnpm build` so the rest of the workspace picks up the changes.
 
-The documentation is in a separate workspace package:
+### Development mode
+
+Start all watch processes and the docs dev server in parallel:
+
+```bash
+# From root (run `pnpm build` once first so dist/ exist)
+pnpm dev
+```
+
+This runs `tsc --watch` for the generated client packages and kit, and starts the VitePress dev server for docs.
+
+### Lint and format
+
+From root, lint and format run in all workspace packages (only `@nosana/kit` has real lint/format for now):
+
+```bash
+pnpm lint
+pnpm format
+pnpm format:fix
+```
+
+For a single package: `pnpm --filter @nosana/kit run lint` (or `format` / `format:fix`).
+
+### Documentation
+
+Run docs scripts via the filter (no root shorthand; use the same pattern for any package-specific script):
 
 ```bash
 # Start docs dev server
@@ -1629,19 +1659,6 @@ pnpm --filter @nosana/docs build
 
 # Preview built docs
 pnpm --filter @nosana/docs preview
-```
-
-Or work directly in the docs package:
-
-```bash
-# Navigate to docs
-cd docs
-
-# Start dev server
-pnpm dev
-
-# Build docs
-pnpm build
 ```
 
 ## TypeScript Support

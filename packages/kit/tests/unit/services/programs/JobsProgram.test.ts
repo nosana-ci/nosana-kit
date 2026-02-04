@@ -9,7 +9,7 @@ import {
   MarketQueueType,
   MonitorEventType,
 } from '../../../../src/services/programs/jobs/index.js';
-import * as programClient from '../../../../src/generated_clients/jobs/index.js';
+import * as programClient from '@nosana/jobs-program';
 import {
   AddressFactory,
   MockClientFactory,

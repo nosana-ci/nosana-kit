@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import { createKeyPairSignerFromPrivateKeyBytes } from '@solana/kit';
 import { createNosanaClient, NosanaNetwork } from '../../../src/index.js';
-import { OPEN_INSTRUCTION_ACCOUNTS } from '../../../src/generated_clients/jobs/index.js';
+import { OPEN_INSTRUCTION_ACCOUNTS } from '@nosana/jobs-program';
 
 // Load wallet from key file
 const keyData = JSON.parse(

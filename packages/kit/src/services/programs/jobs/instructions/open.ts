@@ -1,6 +1,6 @@
 import { type Address, type TransactionSigner, generateKeyPairSigner } from '@solana/kit';
 import { SYSTEM_PROGRAM_ADDRESS } from '@solana-program/system';
-import type { getOpenInstruction } from '../../../../generated_clients/jobs/index.js';
+import type { getOpenInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
 
 export type OpenParams = {

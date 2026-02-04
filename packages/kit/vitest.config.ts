@@ -19,6 +19,7 @@ export default defineConfig({
         '**/*.d.ts',
         '**/*.config.*',
         '**/generated_clients/**',
+        '**/kit-*-client/**',
         '**/.nuxt/**',
       ],
       thresholds: {

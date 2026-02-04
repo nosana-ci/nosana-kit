@@ -7,7 +7,11 @@
     "dev": "vitepress dev .",
     "build": "pnpm run api && NODE_OPTIONS='--max-old-space-size=4096' vitepress build .",
     "api": "cd .. && pnpm --filter @nosana/kit exec typedoc",
-    "preview": "vitepress preview ."
+    "preview": "vitepress preview .",
+    "test": "echo 'No tests' && exit 0",
+    "lint": "echo 'No lint' && exit 0",
+    "format": "echo 'No format' && exit 0",
+    "format:fix": "echo 'No format:fix' && exit 0"
   },
   "dependencies": {
     "@nosana/kit": "workspace:*"
