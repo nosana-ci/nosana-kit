@@ -82,5 +82,42 @@ for (const pkg of workspace) {
 }
 
 fs.writeFileSync('changes.env', changesEnvLines.join('\n') + '\n');
+
+// Orchestrator child pipeline: variables baked in so rules see them at creation time.
+// One trigger job per package with CI; only changed packages' jobs run (rules use baked-in vars).
+const triggerJobs = [];
+for (const pkg of workspace) {
+  const pkgPath = pkg.path || pkg.dir || pkg.location || pkg.directory;
+  const name = pkg.name;
+  if (!pkgPath || !name) continue;
+
+  const rel = path.relative(process.cwd(), pkgPath).replace(/\\/g, '/');
+  const ciPath = `${rel}/.gitlab-ci.yml`;
+  if (!fs.existsSync(ciPath)) continue;
+
+  const key = toKey(rel);
+  const safeName = toSafeName(rel);
+  triggerJobs.push(`
+trigger:${safeName}:
+  stage: trigger
+  trigger:
+    include:
+      - artifact: child-${safeName}.yml
+        job: detect-changes
+    strategy: depend
+  rules:
+    - if: $${key}_CHANGED == "1"
+`);
+}
+
+const orchestratorYaml = `stages:
+  - trigger
+
+variables:
+${variablesBlock}
+
+${triggerJobs.join('')}
+`;
+fs.writeFileSync('orchestrator.yml', orchestratorYaml.trimStart());
 NODE
 

@@ -41,37 +41,23 @@ detect-changes:
   artifacts:
     paths:
       - child-*.yml
+      - orchestrator.yml
     expire_in: 1 hour
     reports:
+      # Injects KIT_CHANGED, DOCS_CHANGED, etc. into jobs that need this job
       dotenv: changes.env
   rules: *pipeline_rules
 
-trigger:packages-kit:
+# Single trigger: run orchestrator child. Its config is generated with KIT_CHANGED etc.
+# baked in, so its trigger jobs are created correctly (rules run at pipeline creation).
+run-child-pipelines:
   stage: trigger
   needs:
     - job: detect-changes
       artifacts: true
   trigger:
     include:
-      - artifact: child-packages-kit.yml
+      - artifact: orchestrator.yml
         job: detect-changes
     strategy: depend
-  rules:
-    - if: $CI_MERGE_REQUEST_ID && $KIT_CHANGED == "1"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $KIT_CHANGED == "1"
-    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest" && $KIT_CHANGED == "1"
-
-trigger:docs:
-  stage: trigger
-  needs:
-    - job: detect-changes
-      artifacts: true
-  trigger:
-    include:
-      - artifact: child-docs.yml
-        job: detect-changes
-    strategy: depend
-  rules:
-    - if: $CI_MERGE_REQUEST_ID && $DOCS_CHANGED == "1"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $DOCS_CHANGED == "1"
-    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest" && $DOCS_CHANGED == "1"
+  rules: *pipeline_rules
