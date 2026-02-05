@@ -13,8 +13,6 @@ stages:
 variables:
   GIT_STRATEGY: fetch
   GIT_DEPTH: "0"
-  KIT_CHANGED: "0"
-  DOCS_CHANGED: "0"
 
 .pnpm_setup: &pnpm_setup
   - corepack enable
@@ -32,32 +30,29 @@ include:
   - local: .gitlab/ci/release.yml
   - local: .gitlab/ci/generated-clients.yml
 
-detect-changes:
+detect-packages-changes:
   stage: trigger
   needs:
     - job: check-generated-clients
   script:
-    - bash .gitlab/ci/detect-changes.sh
+    - bash .gitlab/ci/detect-packages-changes.sh
   artifacts:
     paths:
       - orchestrator.yml
     expire_in: 1 hour
     reports:
-      # Injects KIT_CHANGED, DOCS_CHANGED, etc. into jobs that need this job
       dotenv: changes.env
   rules: *pipeline_rules
 
-# Single trigger: orchestrator child uses local: path to each package's .gitlab-ci.yml.
-# Forward dotenv variables (KIT_CHANGED, DOCS_CHANGED, etc.) so orchestrator rules see them.
-run-child-pipelines:
+run-packages-pipelines:
   stage: trigger
   needs:
-    - job: detect-changes
+    - job: detect-packages-changes
       artifacts: true
   trigger:
     include:
       - artifact: orchestrator.yml
-        job: detect-changes
+        job: detect-packages-changes
     strategy: depend
     forward:
       pipeline_variables: true
