@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@nosana/api':
-        specifier: ^0.1.7
-        version: 0.1.7(@types/node@20.19.30)(typescript@5.9.3)
+        specifier: ^0.1.9
+        version: 0.1.9(@types/node@20.19.30)(typescript@5.9.3)
       '@nosana/authorization':
         specifier: ^0.1.7
         version: 0.1.7
@@ -21,8 +21,8 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2
       '@nosana/types':
-        specifier: ^0.1.18
-        version: 0.1.18(@types/node@20.19.30)(typescript@5.9.3)
+        specifier: ^0.1.22
+        version: 0.1.22(@types/node@20.19.30)(typescript@5.9.3)
       '@solana-program/compute-budget':
         specifier: 0.12.0
         version: 0.12.0(@solana/kit@5.4.0(typescript@5.9.3))
@@ -656,8 +656,8 @@ packages:
     resolution: {integrity: sha512-XlOlEbQcE9fmuXxrVTXCTlG2nlRXa9Rj3rr5Ue/+tX+nmkgbX720YHh0VR3hBF9xDvwnb8D2shVGOwNx+ulArw==}
     engines: {node: '>= 20.19.0'}
 
-  '@nosana/api@0.1.7':
-    resolution: {integrity: sha512-u2ZlDKC8hyg+5R1hhXP/ZXYOSO1r2HFD5xR/zklBJrIwjidZU9M7FsLSvn0HWTKxfeTVWTGhQ8VU7KsQwgeIJg==}
+  '@nosana/api@0.1.9':
+    resolution: {integrity: sha512-jPp0PnZE+fAVR+laNRt+LWW3LdqWQJqbK0hWiZG25hXT5vP+nWm5SVvnq4Euzc8e3K1aL1o56Mkd1byMdy4Cmg==}
 
   '@nosana/authorization@0.1.7':
     resolution: {integrity: sha512-xQRp8uRiCrui/ApvdkLpjjz80zUS48BGF/pMFR8Jt7BzXhYK3Jikwll2CVy6agSvjmf16bMbJg8uhjPunY4XRg==}
@@ -672,8 +672,8 @@ packages:
     resolution: {directory: '', type: directory}
     engines: {node: '>=20.18.0'}
 
-  '@nosana/types@0.1.18':
-    resolution: {integrity: sha512-RU0KxoiLbrEeNXv01+Q4yJZPAumrtZ54F//7YH8lgCCtQ5vCulfFHpbE5vzztnirh7r0OQl1nTONsoUcYohXaQ==}
+  '@nosana/types@0.1.22':
+    resolution: {integrity: sha512-NaxN1OS7U+FYdefsH6iFPnfBhvIl/ZOuY8nkxcIcMdKA43tV3RtpnZMdthYty+BIkQ68wNV7KH89AWYxvdjCOw==}
 
   '@opentelemetry/api@1.9.0':
     resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
@@ -4453,9 +4453,9 @@ snapshots:
 
   '@noble/hashes@2.0.1': {}
 
-  '@nosana/api@0.1.7(@types/node@20.19.30)(typescript@5.9.3)':
+  '@nosana/api@0.1.9(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
-      '@nosana/types': 0.1.18(@types/node@20.19.30)(typescript@5.9.3)
+      '@nosana/types': 0.1.22(@types/node@20.19.30)(typescript@5.9.3)
       openapi-fetch: 0.14.1
     transitivePeerDependencies:
       - '@types/node'
@@ -4470,7 +4470,7 @@ snapshots:
 
   '@nosana/endpoints@1.0.0(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
-      '@nosana/types': 0.1.18(@types/node@20.19.30)(typescript@5.9.3)
+      '@nosana/types': 0.1.22(@types/node@20.19.30)(typescript@5.9.3)
       bs58: 5.0.0
       tweetnacl: 1.0.3
     transitivePeerDependencies:
@@ -4483,11 +4483,11 @@ snapshots:
 
   '@nosana/kit@file:(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
-      '@nosana/api': 0.1.7(@types/node@20.19.30)(typescript@5.9.3)
+      '@nosana/api': 0.1.9(@types/node@20.19.30)(typescript@5.9.3)
       '@nosana/authorization': 0.1.7
       '@nosana/endpoints': 1.0.0(@types/node@20.19.30)(typescript@5.9.3)
       '@nosana/ipfs': 0.1.2
-      '@nosana/types': 0.1.18(@types/node@20.19.30)(typescript@5.9.3)
+      '@nosana/types': 0.1.22(@types/node@20.19.30)(typescript@5.9.3)
       '@solana-program/compute-budget': 0.12.0(@solana/kit@5.4.0(typescript@5.9.3))
       '@solana-program/system': 0.10.0(@solana/kit@5.4.0(typescript@5.9.3))
       '@solana-program/token': 0.9.0(@solana/kit@5.4.0(typescript@5.9.3))
@@ -4500,7 +4500,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@nosana/types@0.1.18(@types/node@20.19.30)(typescript@5.9.3)':
+  '@nosana/types@0.1.22(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
       typia: 10.1.0(@types/node@20.19.30)(typescript@5.9.3)
     transitivePeerDependencies:
