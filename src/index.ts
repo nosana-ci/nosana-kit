@@ -419,7 +419,7 @@ export type {
   FlowState,
   FlowSecrets,
   JobExposeSecrets,
-  Events,
+  Event,
   StdOption,
   Revision,
   SpreadMarker,
