@@ -6,3 +6,10 @@ image: node:22.22.0
   - corepack prepare pnpm@10.28.0 --activate
 
 before_script: *pnpm_setup
+
+# Tag pipelines: publishing is done from root (lerna-publish). This job keeps the child pipeline valid.
+noop-tag:
+  stage: test
+  script: echo "Tag pipeline; npm publishing is done from root (lerna)."
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"

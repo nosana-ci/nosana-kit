@@ -67,10 +67,13 @@ run-packages-pipelines:
       pipeline_variables: true
   rules: *pipeline_rules
 
-# On main: bump versions, Lerna commits, tags, and pushes. Pick deploy (changed packages) or deploy-force (all).
-deploy:
+# On main: bump versions (patch/minor/major), Lerna commits, tags, and pushes. One base job, variables avoid repetition.
+.deploy:
   stage: deploy
   when: manual
+  variables:
+    LERNA_BUMP: patch
+    LERNA_FORCE: ""
   script:
     - git checkout -B $CI_COMMIT_BRANCH origin/$CI_COMMIT_BRANCH
     - pnpm install --frozen-lockfile
@@ -78,23 +81,27 @@ deploy:
     - git config user.name "CI"
     - git remote set-url origin "https://bot:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
     - rm -f orchestrator.yml changes.env
-    - pnpm run version:patch
+    - pnpm exec lerna version $LERNA_BUMP --yes $LERNA_FORCE
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+deploy-patch:
+  extends: .deploy
+
+deploy-minor:
+  extends: .deploy
+  variables:
+    LERNA_BUMP: minor
+
+deploy-major:
+  extends: .deploy
+  variables:
+    LERNA_BUMP: major
+
 deploy-force:
-  stage: deploy
-  when: manual
-  script:
-    - git checkout -B $CI_COMMIT_BRANCH origin/$CI_COMMIT_BRANCH
-    - pnpm install --frozen-lockfile
-    - git config user.email "ci@nosana.com"
-    - git config user.name "CI"
-    - git remote set-url origin "https://bot:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
-    - rm -f orchestrator.yml changes.env
-    - pnpm run version:force
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  extends: .deploy
+  variables:
+    LERNA_FORCE: "--force-publish"
 
 # When a tag is pushed (by deploy): publish those packages to npm (prepack builds each package).
 lerna-publish:
