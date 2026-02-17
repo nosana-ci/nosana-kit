@@ -1,6 +1,6 @@
 {
   "name": "@nosana/kit",
-  "version": "0.0.0",
+  "version": "2.0.62",
   "description": "Nosana KIT",
   "type": "module",
   "main": "dist/index.js",
@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "prepack": "pnpm run build:with-deps",
     "dev": "tsc --watch",
     "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
     "test": "NODE_NO_WARNINGS=1 vitest run",
@@ -29,13 +30,13 @@
   "author": "Nosana",
   "license": "MIT",
   "dependencies": {
-    "@nosana/jobs-program": "workspace:*",
-    "@nosana/merkle-distributor-program": "workspace:*",
-    "@nosana/stake-program": "workspace:*",
     "@nosana/api": "^0.1.9",
     "@nosana/authorization": "^0.1.7",
     "@nosana/endpoints": "^1.0.0",
     "@nosana/ipfs": "^0.1.2",
+    "@nosana/jobs-program": "workspace:*",
+    "@nosana/merkle-distributor-program": "workspace:*",
+    "@nosana/stake-program": "workspace:*",
     "@nosana/types": "^0.1.24",
     "@solana-program/compute-budget": "0.12.0",
     "@solana-program/system": "0.10.0",

@@ -13,7 +13,10 @@
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format",
     "format:fix": "pnpm -r run format:fix",
-    "generate-clients": "pnpm exec tsx scripts/generate-clients.ts"
+    "generate-clients": "pnpm exec tsx scripts/generate-clients.ts",
+    "version": "lerna version patch --yes",
+    "version:force": "lerna version patch --yes --force-publish",
+    "publish": "lerna publish from-git --yes"
   },
   "devDependencies": {
     "@codama/node-types": "^1.5.0",
@@ -26,6 +29,7 @@
     "codama": "^1.5.0",
     "eslint": "^9.39.2",
     "eslint-plugin-import": "^2.32.0",
+    "lerna": "^9.0.4",
     "tsx": "^4.19.0",
     "typescript": "^5.9.3"
   }

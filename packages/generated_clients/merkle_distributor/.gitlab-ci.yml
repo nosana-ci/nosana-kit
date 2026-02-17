@@ -1,7 +1,6 @@
 stages:
   - test
   - build
-  - deploy
 
 include:
   - local: .gitlab/ci/common.yml
@@ -33,15 +32,3 @@ merkle-distributor-program:npm test:
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
-merkle-distributor-program:npm publish prod:
-  stage: deploy
-  script:
-    - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" packages/generated_clients/merkle_distributor/package.json
-    - pnpm install --frozen-lockfile
-    - pnpm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
-    - pnpm --filter @nosana/merkle-distributor-program run build:with-deps
-    - pnpm --filter @nosana/merkle-distributor-program publish --access public --no-git-checks
-  when: manual
-  rules:
-    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"

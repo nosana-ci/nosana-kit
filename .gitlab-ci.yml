@@ -27,13 +27,13 @@ before_script: *pnpm_setup
   - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
 
 include:
-  - local: .gitlab/ci/release.yml
   - local: .gitlab/ci/generated-clients.yml
 
 detect-packages-changes:
   stage: trigger
   needs:
     - job: check-generated-clients
+      optional: true
   script:
     - bash .gitlab/ci/detect-packages-changes.sh
   artifacts:
@@ -57,3 +57,25 @@ run-packages-pipelines:
     forward:
       pipeline_variables: true
   rules: *pipeline_rules
+
+# On main: bump versions, Lerna commits, tags, and pushes (requires GIT_PUSH_TOKEN for Lerna's push).
+lerna-version:
+  stage: deploy
+  script:
+    - pnpm install --frozen-lockfile
+    - git config user.email "ci@nosana.com"
+    - git config user.name "CI"
+    - git remote set-url origin "https://oauth2:${GIT_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    - pnpm run version:force
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# When a tag is pushed (by lerna-version): publish those packages to npm (prepack builds each package).
+lerna-publish:
+  stage: deploy
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
+    - pnpm run publish
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
