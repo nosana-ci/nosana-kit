@@ -17,7 +17,7 @@
     "version": "true",
     "version:patch": "lerna version patch --yes",
     "version:force": "lerna version patch --yes --force-publish",
-    "publish": "lerna publish from-git --yes --access public"
+    "publish": "lerna publish from-git --yes"
   },
   "devDependencies": {
     "@codama/node-types": "^1.5.0",
