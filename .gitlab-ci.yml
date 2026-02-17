@@ -67,9 +67,22 @@ run-packages-pipelines:
       pipeline_variables: true
   rules: *pipeline_rules
 
-# On main: bump versions, Lerna commits, tags, and pushes (requires GIT_PUSH_TOKEN for Lerna's push).
-# Manual so we don't deploy on every commit to main.
+# On main: bump versions, Lerna commits, tags, and pushes. Pick deploy (changed packages) or deploy-force (all).
 deploy:
+  stage: deploy
+  when: manual
+  script:
+    - git checkout -B $CI_COMMIT_BRANCH origin/$CI_COMMIT_BRANCH
+    - pnpm install --frozen-lockfile
+    - git config user.email "ci@nosana.com"
+    - git config user.name "CI"
+    - git remote set-url origin "https://bot:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    - rm -f orchestrator.yml changes.env
+    - pnpm run version:patch
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+deploy-force:
   stage: deploy
   when: manual
   script:
