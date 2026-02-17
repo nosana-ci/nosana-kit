@@ -34,6 +34,7 @@ detect-packages-changes:
   stage: trigger
   needs:
     - job: check-generated-clients
+      optional: true
   script:
     - bash .gitlab/ci/detect-packages-changes.sh
   artifacts:
