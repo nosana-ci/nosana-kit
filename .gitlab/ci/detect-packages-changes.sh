@@ -35,7 +35,6 @@ const changed = new Set(
 
 const variablesLines = [];
 const changesEnvLines = [];
-let anyChanged = 0;
 
 const toKey = pkgPath => {
   const base = path.basename(pkgPath);
@@ -55,18 +54,14 @@ for (const pkg of workspace) {
 
   variablesLines.push(`  ${key}_CHANGED: "${isChanged}"`);
   changesEnvLines.push(`${key}_CHANGED=${isChanged}`);
-  if (isChanged) anyChanged = 1;
 }
 
-variablesLines.push(`  ANY_CHANGED: "${anyChanged}"`);
-changesEnvLines.push(`ANY_CHANGED=${anyChanged}`);
-
-fs.writeFileSync('changes.env', changesEnvLines.join('\n') + '\n');
-
-const variablesBlock = variablesLines.join('\n');
+// ANY_CHANGED only when at least one changed package has a child pipeline (.gitlab-ci.yml) to trigger
+// (computed in the trigger-jobs loop below)
 
 // Orchestrator: trigger jobs use local: path to each package's .gitlab-ci.yml (no artifacts).
 const triggerJobs = [];
+let anyChanged = 0;
 for (const pkg of workspace) {
   const pkgPath = pkg.path || pkg.dir || pkg.location || pkg.directory;
   const name = pkg.name;
@@ -75,6 +70,9 @@ for (const pkg of workspace) {
   const rel = path.relative(process.cwd(), pkgPath).replace(/\\/g, '/');
   const ciPath = `${rel}/.gitlab-ci.yml`;
   if (!fs.existsSync(ciPath)) continue;
+
+  const isChanged = changed.has(name);
+  if (isChanged) anyChanged = 1;
 
   const key = toKey(rel);
   const safeName = toSafeName(rel);
@@ -90,6 +88,12 @@ ${jobName}:
     - if: $${key}_CHANGED == "1"
 `);
 }
+variablesLines.push(`  ANY_CHANGED: "${anyChanged}"`);
+changesEnvLines.push(`ANY_CHANGED=${anyChanged}`);
+
+fs.writeFileSync('changes.env', changesEnvLines.join('\n') + '\n');
+
+const variablesBlock = variablesLines.join('\n');
 
 let orchestratorTemplate = fs.readFileSync('.gitlab/ci/orchestrator-template.yml', 'utf8');
 orchestratorTemplate = orchestratorTemplate
