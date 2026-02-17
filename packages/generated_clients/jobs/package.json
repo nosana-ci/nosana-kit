@@ -1,6 +1,6 @@
 {
   "name": "@nosana/jobs-program",
-  "version": "2.0.64",
+  "version": "2.0.65",
   "description": "Nosana Jobs program generated client",
   "type": "module",
   "main": "dist/index.js",
