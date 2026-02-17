@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "npmClient": "pnpm",
+  "version": "2.0.62",
+  "command": {
+    "version": {
+      "allowBranch": "main",
+      "conventionalCommits": false,
+      "message": "chore(release): publish %s [skip ci]",
+      "tagVersionPrefix": "v"
+    },
+    "publish": {
+      "registry": "https://registry.npmjs.org/"
+    }
+  }
+}

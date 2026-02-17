@@ -1,0 +1,39 @@
+{
+  "name": "@nosana/jobs-program",
+  "version": "1.0.0",
+  "description": "Nosana Jobs program generated client",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "prepack": "pnpm run build:with-deps",
+    "build": "tsc",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "tsc --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "test": "echo 'No tests' && exit 0",
+    "lint": "echo 'No lint' && exit 0",
+    "format": "echo 'No format' && exit 0",
+    "format:fix": "echo 'No format:fix' && exit 0"
+  },
+  "dependencies": {
+    "@solana/kit": "5.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  },
+  "files": [
+    "dist",
+    "package.json"
+  ]
+}

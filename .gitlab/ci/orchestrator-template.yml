@@ -1,0 +1,15 @@
+workflow:
+  rules:
+    - when: always
+
+stages:
+  - prepare
+  - trigger
+
+variables:
+__VARIABLES_BLOCK__
+
+include:
+  - local: .gitlab/ci/noop.yml
+
+__TRIGGER_JOBS_BLOCK__
