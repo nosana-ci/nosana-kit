@@ -59,8 +59,10 @@ run-packages-pipelines:
   rules: *pipeline_rules
 
 # On main: bump versions, Lerna commits, tags, and pushes (requires GIT_PUSH_TOKEN for Lerna's push).
-lerna-version:
+# Manual so we don't deploy on every commit to main.
+deploy:
   stage: deploy
+  when: manual
   script:
     - pnpm install --frozen-lockfile
     - git config user.email "ci@nosana.com"
@@ -70,7 +72,7 @@ lerna-version:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-# When a tag is pushed (by lerna-version): publish those packages to npm (prepack builds each package).
+# When a tag is pushed (by deploy): publish those packages to npm (prepack builds each package).
 lerna-publish:
   stage: deploy
   script:
