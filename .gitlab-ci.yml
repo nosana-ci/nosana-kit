@@ -5,6 +5,15 @@
 
 image: node:22.22.0
 
+# Skip branch pipeline for Lerna release commits (tag pipeline still runs for publish).
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_MESSAGE =~ /^chore\(release\): publish /
+      when: never
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
+
 stages:
   - test
   - trigger
