@@ -1,0 +1,10 @@
+include:
+  - project: nosana-ci/tools/cicd/gitlab-ci
+    file: templates/semver.yml
+
+release:
+  stage: deploy
+  extends: .release
+  before_script: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

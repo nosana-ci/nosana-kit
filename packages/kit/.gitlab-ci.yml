@@ -1,0 +1,47 @@
+stages:
+  - test
+  - build
+  - deploy
+
+include:
+  - local: .gitlab/ci/common.yml
+
+kit:npm format:
+  stage: test
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm --filter @nosana/kit run format
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+kit:npm lint:
+  stage: test
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm --filter @nosana/kit run lint
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+kit:npm test:
+  stage: test
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm --filter @nosana/kit run build:with-deps
+    - pnpm --filter @nosana/kit run test
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+kit:npm publish prod:
+  stage: deploy
+  script:
+    - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" packages/kit/package.json
+    - pnpm install --frozen-lockfile
+    - pnpm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
+    - pnpm --filter @nosana/kit run build:with-deps
+    - pnpm --filter @nosana/kit publish --access public --no-git-checks
+  when: manual
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
