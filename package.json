@@ -14,7 +14,8 @@
     "format": "pnpm -r run format",
     "format:fix": "pnpm -r run format:fix",
     "generate-clients": "pnpm exec tsx scripts/generate-clients.ts",
-    "version": "lerna version patch --yes",
+    "version": "true",
+    "version:patch": "lerna version patch --yes",
     "version:force": "lerna version patch --yes --force-publish",
     "publish": "lerna publish from-git --yes"
   },
