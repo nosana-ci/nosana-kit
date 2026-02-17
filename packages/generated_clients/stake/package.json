@@ -1,8 +1,7 @@
 {
   "name": "@nosana/stake-program",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Nosana Stake program generated client",
-  "private": true,
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,6 +12,7 @@
     }
   },
   "scripts": {
+    "prepack": "pnpm run build:with-deps",
     "build": "tsc",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
     "dev": "tsc --watch",
