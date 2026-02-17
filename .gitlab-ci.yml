@@ -64,6 +64,7 @@ deploy:
   stage: deploy
   when: manual
   script:
+    - git checkout -B $CI_COMMIT_BRANCH origin/$CI_COMMIT_BRANCH
     - pnpm install --frozen-lockfile
     - git config user.email "ci@nosana.com"
     - git config user.name "CI"
