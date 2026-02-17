@@ -68,7 +68,7 @@ deploy:
     - pnpm install --frozen-lockfile
     - git config user.email "ci@nosana.com"
     - git config user.name "CI"
-    - git remote set-url origin "https://oauth2:${GIT_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    - git remote set-url origin "https://bot:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
     - pnpm run version:force
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

@@ -88,7 +88,6 @@ ${jobName}:
     strategy: depend
   rules:
     - if: $${key}_CHANGED == "1"
-    - when: manual
 `);
 }
 
