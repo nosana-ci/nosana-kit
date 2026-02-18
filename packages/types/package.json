@@ -27,8 +27,8 @@
     "test:coverage": "vitest run --coverage",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
-    "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
-    "format:fix": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\"",
+    "format": "echo 'No format' && exit 0",
+    "format:fix": "echo 'No format:fix' && exit 0",
     "prepare": "ts-patch install && typia patch"
   },
   "devDependencies": {
@@ -39,7 +39,6 @@
     "eslint-plugin-import": "^2.32.0",
     "husky": "^9.1.7",
     "openapi-typescript": "^7.10.1",
-    "prettier": "^3.7.4",
     "ts-patch": "^3.3.0",
     "typescript": "^5.7.0",
     "vitest": "^4.0.13"

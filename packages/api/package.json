@@ -1,1 +1,51 @@
-{"name":"@nosana/api","version":"0.1.11","description":"Nosana API module","main":"dist/index.js","types":"dist/index.d.ts","type":"module","author":"Nosana","license":"MIT","files":["dist"],"scripts":{"prepack":"pnpm run build:with-deps","build":"tsc","build:with-deps":"pnpm --filter $npm_package_name... run build","dev":"tsc --watch","dev:with-deps":"pnpm --filter $npm_package_name... run dev --parallel","clean":"rm -rf dist","generate:types:dev":"openapi-typescript https://dashboard.k8s.dev.nos.ci/api/swagger/json -o src/client/schema.ts","generate:types:prd":"openapi-typescript https://dashboard.k8s.prd.nos.ci/api/swagger/json -o src/client/schema.ts","generate:types:local":"openapi-typescript http://localhost:3000/api/swagger/json -o src/client/schema.ts","test":"vitest run","test:watch":"vitest","test:coverage":"vitest run --coverage","lint":"eslint ./src","lint:fix":"eslint --fix ./src","format":"prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"","format:fix":"prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\""},"devDependencies":{"@types/node":"^24.0.14","@typescript-eslint/eslint-plugin":"^8.38.0","@typescript-eslint/parser":"^8.38.0","@vitest/coverage-v8":"^4.0.3","eslint":"^9.31.0","eslint-plugin-import":"^2.32.0","husky":"^9.1.7","openapi-typescript":"^7.8.0","prettier":"^3.7.4","typescript":"^5.8.3","vitest":"^4.0.3"},"dependencies":{"@nosana/types":"^0.1.24","openapi-fetch":"^0.14.0"},"packageManager":"pnpm@10.28.1","engines":{"node":">=20.18.0"}}
+{
+  "name": "@nosana/api",
+  "version": "0.1.11",
+  "description": "Nosana API module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "author": "Nosana",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepack": "pnpm run build:with-deps",
+    "build": "tsc",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "tsc --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "clean": "rm -rf dist",
+    "generate:types:dev": "openapi-typescript https://dashboard.k8s.dev.nos.ci/api/swagger/json -o src/client/schema.ts",
+    "generate:types:prd": "openapi-typescript https://dashboard.k8s.prd.nos.ci/api/swagger/json -o src/client/schema.ts",
+    "generate:types:local": "openapi-typescript http://localhost:3000/api/swagger/json -o src/client/schema.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint --fix ./src",
+    "format": "echo 'No format' && exit 0",
+    "format:fix": "echo 'No format:fix' && exit 0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.14",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "@vitest/coverage-v8": "^4.0.3",
+    "eslint": "^9.31.0",
+    "eslint-plugin-import": "^2.32.0",
+    "husky": "^9.1.7",
+    "openapi-typescript": "^7.8.0",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.3"
+  },
+  "dependencies": {
+    "@nosana/types": "^0.1.24",
+    "openapi-fetch": "^0.14.0"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  }
+}

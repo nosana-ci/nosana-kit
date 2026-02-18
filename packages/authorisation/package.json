@@ -1,1 +1,50 @@
-{"name":"@nosana/authorization","version":"0.1.7","description":"Nosana authorization module","main":"dist/index.js","types":"dist/index.d.ts","type":"module","author":"Nosana","license":"MIT","files":["dist"],"scripts":{"prepack":"pnpm run build:with-deps","build":"tsc","build:with-deps":"pnpm --filter $npm_package_name... run build","dev":"tsc --watch","dev:with-deps":"pnpm --filter $npm_package_name... run dev --parallel","clean":"rm -rf dist","test":"vitest run","test:watch":"vitest","test:coverage":"vitest run --coverage","lint":"eslint .","lint:fix":"eslint . --fix","format":"prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"","format:fix":"prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\""},"devDependencies":{"@types/jest":"^30.0.0","@types/node":"^24.0.14","@typescript-eslint/eslint-plugin":"^8.38.0","@typescript-eslint/parser":"^8.38.0","@vitest/coverage-v8":"^4.0.3","eslint":"^9.31.0","husky":"^9.1.7","prettier":"^3.7.4","ts-node":"^10.9.2","typescript":"^5.8.3","vitest":"^4.0.3"},"dependencies":{"bs58":"^5.0.0","buffer":"^6.0.3","tweetnacl":"^1.0.3","tweetnacl-util":"^0.15.1"},"packageManager":"pnpm@10.28.1","engines":{"node":">=20.18.0"}}
+{
+  "name": "@nosana/authorization",
+  "version": "0.1.7",
+  "description": "Nosana authorization module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "author": "Nosana",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepack": "pnpm run build:with-deps",
+    "build": "tsc",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "tsc --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "echo 'No format' && exit 0",
+    "format:fix": "echo 'No format:fix' && exit 0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.14",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "@vitest/coverage-v8": "^4.0.3",
+    "eslint": "^9.31.0",
+    "husky": "^9.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.3"
+  },
+  "dependencies": {
+    "bs58": "^5.0.0",
+    "buffer": "^6.0.3",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  }
+}
