@@ -118,8 +118,8 @@ importers:
   packages/api:
     dependencies:
       '@nosana/types':
-        specifier: ^0.1.24
-        version: 0.1.24(@types/node@24.10.13)(typescript@5.9.3)
+        specifier: workspace:*
+        version: link:../types
       openapi-fetch:
         specifier: ^0.14.0
         version: 0.14.1
@@ -6937,13 +6937,6 @@ snapshots:
   '@nosana/types@0.1.24(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
       typia: 10.1.0(@types/node@20.19.30)(typescript@5.9.3)
-    transitivePeerDependencies:
-      - '@types/node'
-      - typescript
-
-  '@nosana/types@0.1.24(@types/node@24.10.13)(typescript@5.9.3)':
-    dependencies:
-      typia: 10.1.0(@types/node@24.10.13)(typescript@5.9.3)
     transitivePeerDependencies:
       - '@types/node'
       - typescript
