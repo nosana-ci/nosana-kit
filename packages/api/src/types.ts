@@ -11,7 +11,7 @@ export interface SolanaConfig {
 
 export type ApiKeyAuth = string
 
-export type IncludeCookiesAuth = 'include'
+export type IncludeCookiesAuth = 'include';
 
 /**
  * SignerAuth provides identifier and generate function for API authentication.

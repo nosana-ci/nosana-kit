@@ -39,7 +39,6 @@ export function createNosanaClient(
     baseUrl: backend_url,
     ...(authParams === 'include' ? { credentials: 'include' } : {}),
   });
-  client.use(authMiddleware);
 
   if (authParams !== 'include') {
     client.use(authMiddleware);
