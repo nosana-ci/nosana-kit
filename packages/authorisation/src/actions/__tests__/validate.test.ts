@@ -25,7 +25,7 @@ describe('validate', () => {
   });
 
   it('should validate with expiry', () => {
-    vi.setSystemTime(new Date('2024-12-16:00:05:00'));
+    vi.setSystemTime(new Date('2024-12-16T00:05:00.000Z'));
 
     let msg: string = '';
 

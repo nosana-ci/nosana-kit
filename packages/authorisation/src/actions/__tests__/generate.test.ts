@@ -24,20 +24,25 @@ describe("generate", () => {
     test('and does not contain a stored signature, should store and return a new signature', async () => {
       const mockStore: AuthorizationStore = {
         identifier: 'test-identifier',
-        get: vi.fn().mockResolvedValue(undefined),
-        set: vi.fn().mockResolvedValue(undefined),
+        actions: {
+          get: vi.fn().mockResolvedValue(undefined),
+          set: vi.fn().mockResolvedValue(undefined),
+        },
       };
 
-      const signature = await generate('messageToStore', {
-        store: mockStore,
-      }, global.TEST_WALLET);
+      const signature = await generate(
+        'messageToStore',
+        undefined,
+        global.TEST_WALLET,
+        mockStore,
+      );
 
-      expect(mockStore.get).toHaveBeenCalledWith(mockStore.identifier, {
+      expect(mockStore.actions.get).toHaveBeenCalledWith(mockStore.identifier, {
         includeTime: false,
         separator: ':',
       });
 
-      expect(mockStore.set).toHaveBeenCalledWith(
+      expect(mockStore.actions.set).toHaveBeenCalledWith(
         mockStore.identifier,
         {
           includeTime: false,
@@ -50,20 +55,25 @@ describe("generate", () => {
     test('and contains a stored signature, should return the stored signature', async () => {
       const mockStore: AuthorizationStore = {
         identifier: 'test-identifier',
-        get: vi.fn().mockResolvedValue('storedSignature'),
-        set: vi.fn().mockResolvedValue(undefined),
+        actions: {
+          get: vi.fn().mockResolvedValue('storedSignature'),
+          set: vi.fn().mockResolvedValue(undefined),
+        },
       };
 
-      const signature = await generate('messageToStore', {
-        store: mockStore,
-      }, global.TEST_WALLET);
+      const signature = await generate(
+        'messageToStore',
+        undefined,
+        global.TEST_WALLET,
+        mockStore,
+      );
 
-      expect(mockStore.get).toHaveBeenCalledWith(mockStore.identifier, {
+      expect(mockStore.actions.get).toHaveBeenCalledWith(mockStore.identifier, {
         includeTime: false,
         separator: ':',
       });
       expect(signature).toBe('storedSignature');
-      expect(mockStore.set).not.toHaveBeenCalled();
+      expect(mockStore.actions.set).not.toHaveBeenCalled();
     });
   });
 });

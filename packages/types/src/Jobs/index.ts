@@ -1,4 +1,4 @@
-import typia, { tags } from "typia";
+import typia, { type IValidation, tags } from "typia";
 import { JobDefinition } from "./JobDefinition/index.js";
 
 export * from "./Diagnostics/index.js"
@@ -28,4 +28,7 @@ type JobDefinitionWithRule = Omit<JobDefinition, 'ops'> & {
   ops: JobDefinition['ops'] & UniqueById;
 };
 
-export const validateJobDefinition = typia.createValidateEquals<JobDefinitionWithRule>();
+export const validateJobDefinition: (
+  input: unknown,
+) => IValidation<JobDefinitionWithRule> =
+  typia.createValidateEquals<JobDefinitionWithRule>();
