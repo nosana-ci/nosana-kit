@@ -1,11 +1,10 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
 import type { QueryClient } from '../../../../client/index.js';
-import type { Task } from '@nosana/types';
-import type { DeploymentState } from '../../types.js';
+import type { DeploymentState, PaginationParams, TaskListResult } from '../../types.js';
 
 /**
- * @returns Promise<Task[]>
+ * @returns Promise<TaskListResult>
  * @throws Error if there is an error fetching the tasks
  * @throws Error if the deployment is not found
  * @description Fetches the tasks for the deployment.
@@ -15,11 +14,19 @@ import type { DeploymentState } from '../../types.js';
 export async function deploymentGetTasks(
   client: QueryClient,
   state: DeploymentState,
-): Promise<Task[]> {
+  params?: PaginationParams,
+): Promise<TaskListResult> {
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/tasks',
     {
-      params: { path: { deployment: state.id } },
+      params: { 
+        path: { deployment: state.id },
+        query: {
+          cursor: params?.cursor,
+          limit: params?.limit,
+          sort_order: params?.sort_order,
+        },
+      },
     },
   );
 
@@ -27,5 +34,18 @@ export async function deploymentGetTasks(
     throw errorFormatter('Error getting deployment tasks', error);
   }
 
-  return data;
+  const nextPage = data.pagination.cursor_next
+    ? async () => deploymentGetTasks(client, state, { ...params, cursor: data.pagination.cursor_next! })
+    : null;
+
+  const previousPage = data.pagination.cursor_prev
+    ? async () => deploymentGetTasks(client, state, { ...params, cursor: data.pagination.cursor_prev! })
+    : null;
+
+  return {
+    items: data.tasks,
+    total_items: data.pagination.total_items,
+    nextPage,
+    previousPage,
+  };
 }

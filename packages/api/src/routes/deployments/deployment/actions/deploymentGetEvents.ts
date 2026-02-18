@@ -1,13 +1,10 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
 import type { QueryClient } from '../../../../client/index.js';
-import type { paths } from '@nosana/types';
-import type { DeploymentState } from '../../types.js';
-
-export type DeploymentEvents = paths['/api/deployments/{deployment}/events']['get']['responses']['200']['content']['application/json'];
+import type { DeploymentState, PaginationParams, EventListResult } from '../../types.js';
 
 /**
- * @returns Promise<DeploymentEvents>
+ * @returns Promise<EventListResult>
  * @throws Error if there is an error fetching the events
  * @throws Error if the deployment is not found
  * @description Fetches the events for the deployment.
@@ -17,11 +14,19 @@ export type DeploymentEvents = paths['/api/deployments/{deployment}/events']['ge
 export async function deploymentGetEvents(
   client: QueryClient,
   state: DeploymentState,
-): Promise<DeploymentEvents> {
+  params?: PaginationParams,
+): Promise<EventListResult> {
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/events',
     {
-      params: { path: { deployment: state.id } },
+      params: { 
+        path: { deployment: state.id },
+        query: {
+          cursor: params?.cursor,
+          limit: params?.limit,
+          sort_order: params?.sort_order,
+        },
+      },
     },
   );
 
@@ -29,5 +34,18 @@ export async function deploymentGetEvents(
     throw errorFormatter('Error getting deployment events', error);
   }
 
-  return data;
+  const nextPage = data.pagination.cursor_next
+    ? async () => deploymentGetEvents(client, state, { ...params, cursor: data.pagination.cursor_next! })
+    : null;
+
+  const previousPage = data.pagination.cursor_prev
+    ? async () => deploymentGetEvents(client, state, { ...params, cursor: data.pagination.cursor_prev! })
+    : null;
+
+  return {
+    items: data.events,
+    total_items: data.pagination.total_items,
+    nextPage,
+    previousPage,
+  };
 }

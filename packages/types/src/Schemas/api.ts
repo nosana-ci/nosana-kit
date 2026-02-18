@@ -128,26 +128,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/sign-message/external": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Get the signed message for external service authentication
-         * @description Authentication required via Authorization header. Supports either JWT (Bearer <jwt>) or API key (Bearer <key>).
-         */
-        post: operations["postApiAuthSign-messageExternal"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/credits/balance": {
         parameters: {
             query?: never;
@@ -178,7 +158,26 @@ export interface paths {
         /** @description List all user deployments. */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Base64-encoded cursor for keyset pagination */
+                    cursor?: string;
+                    /** @description Number of items per page (10, 20, 50, or 100) */
+                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                    sort_order?: "asc" | "desc";
+                    /** @description Filter by deployment status. Can be single value or comma-separated list */
+                    status?: ("DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED") | string;
+                    /** @description Filter by deployment strategy. Can be single value or comma-separated list */
+                    strategy?: ("SIMPLE" | "SIMPLE-EXTEND" | "SCHEDULED" | "INFINITE") | string;
+                    /** @description Filter by exact deployment ID */
+                    id?: string;
+                    /** @description Filter by vault public key */
+                    vault?: string;
+                    /** @description Filter deployments created after this date (ISO 8601 format) */
+                    created_after?: string;
+                    /** @description Filter deployments created before this date (ISO 8601 format) */
+                    created_before?: string;
+                };
                 header: {
                     /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
                     "x-user-id"?: string;
@@ -193,13 +192,23 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of deployments. */
+                /** @description List of deployments with pagination. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Deployments"];
+                        "application/json": {
+                            deployments: components["schemas"]["Deployment"][];
+                            pagination: {
+                                /** @description Cursor for next page, null if no more pages */
+                                cursor_next: string | null;
+                                /** @description Cursor for previous page, null if on first page */
+                                cursor_prev: string | null;
+                                /** @description Total number of items in collection */
+                                total_items: number;
+                            };
+                        };
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -370,7 +379,20 @@ export interface paths {
         /** @description Get scheduled tasks for a specific deployment. */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Base64-encoded cursor for keyset pagination */
+                    cursor?: string;
+                    /** @description Number of items per page (10, 20, 50, or 100) */
+                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                    sort_order?: "asc" | "desc";
+                    /** @description Filter by task type. Can be single value or comma-separated list */
+                    task?: ("LIST" | "EXTEND" | "STOP") | string;
+                    /** @description Filter tasks due after this date (ISO 8601 format) */
+                    due_after?: string;
+                    /** @description Filter tasks due before this date (ISO 8601 format) */
+                    due_before?: string;
+                };
                 header: {
                     /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
                     "x-user-id"?: string;
@@ -387,13 +409,23 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of scheduled tasks for the deployment. */
+                /** @description List of scheduled tasks for the deployment with pagination. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Task"][];
+                        "application/json": {
+                            tasks: components["schemas"]["Task"][];
+                            pagination: {
+                                /** @description Cursor for next page, null if no more pages */
+                                cursor_next: string | null;
+                                /** @description Cursor for previous page, null if on first page */
+                                cursor_prev: string | null;
+                                /** @description Total number of items in collection */
+                                total_items: number;
+                            };
+                        };
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -604,7 +636,24 @@ export interface paths {
         /** @description Get jobs for a specific deployment. */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Base64-encoded cursor for keyset pagination */
+                    cursor?: string;
+                    /** @description Number of items per page (10, 20, 50, or 100) */
+                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                    sort_order?: "asc" | "desc";
+                    /** @description Filter by job state. Can be single value or comma-separated list (e.g., 'RUNNING,COMPLETED') */
+                    state?: ("QUEUED" | "RUNNING" | "COMPLETED" | "STOPPED") | string;
+                    /** @description Filter by exact job ID */
+                    job?: string;
+                    /** @description Filter by deployment revision number */
+                    revision?: number;
+                    /** @description Filter jobs created after this date (ISO 8601 format) */
+                    created_after?: string;
+                    /** @description Filter jobs created before this date (ISO 8601 format) */
+                    created_before?: string;
+                };
                 header: {
                     /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
                     "x-user-id"?: string;
@@ -621,13 +670,23 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of jobs for the deployment. */
+                /** @description List of jobs for the deployment with pagination. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Job"][];
+                        "application/json": {
+                            jobs: components["schemas"]["Job"][];
+                            pagination: {
+                                /** @description Cursor for next page, null if no more pages */
+                                cursor_next: string | null;
+                                /** @description Cursor for previous page, null if on first page */
+                                cursor_prev: string | null;
+                                /** @description Total number of items in collection */
+                                total_items: number;
+                            };
+                        };
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -677,7 +736,20 @@ export interface paths {
         /** @description Get revisions for a specific deployment. */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Base64-encoded cursor for keyset pagination */
+                    cursor?: string;
+                    /** @description Number of items per page (10, 20, 50, or 100) */
+                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                    sort_order?: "asc" | "desc";
+                    /** @description Filter by exact revision number */
+                    revision?: number;
+                    /** @description Filter revisions created after this date (ISO 8601 format) */
+                    created_after?: string;
+                    /** @description Filter revisions created before this date (ISO 8601 format) */
+                    created_before?: string;
+                };
                 header: {
                     /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
                     "x-user-id"?: string;
@@ -694,13 +766,23 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of revisions for the deployment. */
+                /** @description List of revisions for the deployment with pagination. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Revision"][];
+                        "application/json": {
+                            revisions: components["schemas"]["Revision"][];
+                            pagination: {
+                                /** @description Cursor for next page, null if no more pages */
+                                cursor_next: string | null;
+                                /** @description Cursor for previous page, null if on first page */
+                                cursor_prev: string | null;
+                                /** @description Total number of items in collection */
+                                total_items: number;
+                            };
+                        };
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -750,7 +832,22 @@ export interface paths {
         /** @description Get events for a specific deployment. */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Base64-encoded cursor for keyset pagination */
+                    cursor?: string;
+                    /** @description Number of items per page (10, 20, 50, or 100) */
+                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                    sort_order?: "asc" | "desc";
+                    /** @description Filter by event category: 'Deployment' or 'Event'. Can be comma-separated list */
+                    category?: ("Deployment" | "Event") | string;
+                    /** @description Filter by event type. Can be single value or comma-separated list */
+                    type?: string;
+                    /** @description Filter events created after this date (ISO 8601 format) */
+                    created_after?: string;
+                    /** @description Filter events created before this date (ISO 8601 format) */
+                    created_before?: string;
+                };
                 header: {
                     /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
                     "x-user-id"?: string;
@@ -767,13 +864,23 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of events for the deployment. */
+                /** @description List of events for the deployment with pagination. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Event"][];
+                        "application/json": {
+                            events: components["schemas"]["Event"][];
+                            pagination: {
+                                /** @description Cursor for next page, null if no more pages */
+                                cursor_next: string | null;
+                                /** @description Cursor for previous page, null if on first page */
+                                cursor_prev: string | null;
+                                /** @description Total number of items in collection */
+                                total_items: number;
+                            };
+                        };
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -2354,9 +2461,9 @@ export interface operations {
     postApiJobsList: {
         parameters: {
             query?: never;
-            header: {
+            header?: {
                 /** @description Authorization header: Bearer <jwt> or Bearer <key> */
-                authorization: string;
+                authorization?: string;
             };
             path?: never;
             cookie?: never;
@@ -2429,9 +2536,9 @@ export interface operations {
     postApiJobsByAddressExtend: {
         parameters: {
             query?: never;
-            header: {
+            header?: {
                 /** @description Authorization header: Bearer <jwt> or Bearer <key> */
-                authorization: string;
+                authorization?: string;
             };
             path: {
                 address: string;
@@ -2491,9 +2598,9 @@ export interface operations {
     postApiJobsByAddressStop: {
         parameters: {
             query?: never;
-            header: {
+            header?: {
                 /** @description Authorization header: Bearer <jwt> or Bearer <key> */
-                authorization: string;
+                authorization?: string;
             };
             path: {
                 address: string;
@@ -3008,110 +3115,12 @@ export interface operations {
             };
         };
     };
-    "postApiAuthSign-messageExternal": {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description JWT token (with or without Bearer prefix) */
-                authorization: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @description The message to be signed with the user's private key */
-                    message: string;
-                };
-                "multipart/form-data": {
-                    /** @description The message to be signed with the user's private key */
-                    message: string;
-                };
-                "text/plain": {
-                    /** @description The message to be signed with the user's private key */
-                    message: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @description The signed message in base58 format */
-                        signature: string;
-                        /** @description The original message that was signed */
-                        message: string;
-                        /** @description The address of the user whose private key should be used for signing */
-                        userAddress: string;
-                    };
-                    "multipart/form-data": {
-                        /** @description The signed message in base58 format */
-                        signature: string;
-                        /** @description The original message that was signed */
-                        message: string;
-                        /** @description The address of the user whose private key should be used for signing */
-                        userAddress: string;
-                    };
-                    "text/plain": {
-                        /** @description The signed message in base58 format */
-                        signature: string;
-                        /** @description The original message that was signed */
-                        message: string;
-                        /** @description The address of the user whose private key should be used for signing */
-                        userAddress: string;
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        name: string;
-                        message: string;
-                    };
-                    "multipart/form-data": {
-                        name: string;
-                        message: string;
-                    };
-                    "text/plain": {
-                        name: string;
-                        message: string;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        name: string;
-                        message: string;
-                    };
-                    "multipart/form-data": {
-                        name: string;
-                        message: string;
-                    };
-                    "text/plain": {
-                        name: string;
-                        message: string;
-                    };
-                };
-            };
-        };
-    };
     getApiCreditsBalance: {
         parameters: {
             query?: never;
-            header: {
+            header?: {
                 /** @description Authorization header: Bearer <jwt> or Bearer <key> */
-                authorization: string;
+                authorization?: string;
             };
             path?: never;
             cookie?: never;

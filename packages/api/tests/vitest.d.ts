@@ -37,6 +37,7 @@ declare global {
   var TEST_CREATE_DEPLOYMENT_REQUEST: CreateDeployment;
   var TEST_MOCK_TASK: Task;
   var TEST_MOCK_TASKS_LIST: Task[];
+  var TEST_MOCK_TASKS_RESPONSE: { tasks: Task[]; pagination: { cursor_next: string | null; cursor_prev: string | null; total_items: number } };
 
   // Vault fixtures
   var TEST_MOCK_VAULT: { vault: string; owner: string; created_at: string };

@@ -1,12 +1,11 @@
 import type {
   JobDefinition,
-  Task,
   components,
   paths,
 } from '@nosana/types';
 
 // Re-export types from @nosana/types for reuse
-export type { JobDefinition, Task } from '@nosana/types';
+export type { JobDefinition } from '@nosana/types';
 
 // Deployment state with Date objects instead of strings
 export type DeploymentState = Omit<components['schemas']['Deployment'], "updated_at" | "created_at"> & {
@@ -21,10 +20,41 @@ export type CreateDeployment = Omit<DeploymentCreateBody, 'job_definition'> & {
   job_definition: JobDefinition;
 };
 
+// Pagination type from API (internal use)
+export type PaginationMeta = {
+  cursor_next: string | null;
+  cursor_prev: string | null;
+  total_items: number;
+};
+
+// Generic paginated result with navigation methods
+export interface PaginatedResult<T> {
+  items: T[];
+  total_items: number;
+  nextPage: (() => Promise<PaginatedResult<T>>) | null;
+  previousPage: (() => Promise<PaginatedResult<T>>) | null;
+}
+
+// Specific paginated result types
+export type DeploymentListResult = PaginatedResult<Deployment>;
+export type ApiDeploymentListResult = PaginatedResult<ApiDeployment>;
+export type JobListResult = PaginatedResult<DeploymentJobItem>;
+export type EventListResult = PaginatedResult<DeploymentEventItem>;
+export type RevisionListResult = PaginatedResult<DeploymentRevisionItem>;
+export type TaskListResult = PaginatedResult<DeploymentTaskItem>;
+
+// Pagination query parameters
+export type PaginationParams = {
+  cursor?: string;
+  limit?: 10 | 20 | 50 | 100;
+  sort_order?: 'asc' | 'desc';
+};
+
 // Response types for the new endpoints
 export type DeploymentJobs = paths['/api/deployments/{deployment}/jobs']['get']['responses']['200']['content']['application/json'];
 export type DeploymentRevisions = paths['/api/deployments/{deployment}/revisions']['get']['responses']['200']['content']['application/json'];
 export type DeploymentEvents = paths['/api/deployments/{deployment}/events']['get']['responses']['200']['content']['application/json'];
+export type DeploymentTasks = paths['/api/deployments/{deployment}/tasks']['get']['responses']['200']['content']['application/json'];
 
 export interface TopupVaultOptions {
   SOL?: number;
@@ -47,17 +77,23 @@ export interface Vault {
 // Type for deployment job response
 export type DeploymentJob = paths['/api/deployments/{deployment}/jobs/{job}']['get']['responses']['200']['content']['application/json'];
 
+// Item types extracted from paginated responses
+export type DeploymentJobItem = DeploymentJobs['jobs'][number];
+export type DeploymentRevisionItem = DeploymentRevisions['revisions'][number];
+export type DeploymentEventItem = DeploymentEvents['events'][number];
+export type DeploymentTaskItem = DeploymentTasks['tasks'][number];
+
 // API deployment (with API key auth) - no vault
 export type ApiDeployment = DeploymentState & {
   start: () => Promise<void>;
   stop: () => Promise<void>;
   archive: () => Promise<void>;
   delete: () => Promise<void>;
-  getTasks: () => Promise<Task[]>;
+  getTasks: (params?: PaginationParams) => Promise<TaskListResult>;
   getJob: (job: string) => Promise<DeploymentJob>;
-  getJobs: () => Promise<DeploymentJobs>;
-  getRevisions: () => Promise<DeploymentRevisions>;
-  getEvents: () => Promise<DeploymentEvents>;
+  getJobs: (params?: PaginationParams) => Promise<JobListResult>;
+  getRevisions: (params?: PaginationParams) => Promise<RevisionListResult>;
+  getEvents: (params?: PaginationParams) => Promise<EventListResult>;
   generateAuthHeader: () => Promise<string>;
   createRevision: (jobDefinition: JobDefinition) => Promise<void>;
   updateActiveRevision: (revision: number) => Promise<void>;
@@ -75,7 +111,7 @@ export type Deployment = ApiDeployment & {
 export interface DeploymentsApi {
   create: (deploymentBody: CreateDeployment) => Promise<Deployment>;
   get: (deployment: string) => Promise<Deployment>;
-  list: () => Promise<Deployment[]>;
+  list: (params?: PaginationParams) => Promise<DeploymentListResult>;
   pipe: (
     deploymentIDorCreateObject: string | CreateDeployment,
     ...actions: Array<(deployment: Deployment) => Promise<void> | void>
@@ -90,7 +126,7 @@ export interface DeploymentsApi {
 export interface ApiDeploymentsApi {
   create: (deploymentBody: CreateDeployment) => Promise<ApiDeployment>;
   get: (deployment: string) => Promise<ApiDeployment>;
-  list: () => Promise<ApiDeployment[]>;
+  list: (params?: PaginationParams) => Promise<ApiDeploymentListResult>;
   pipe: (
     deploymentIDorCreateObject: string | CreateDeployment,
     ...actions: Array<(deployment: ApiDeployment) => Promise<void> | void>

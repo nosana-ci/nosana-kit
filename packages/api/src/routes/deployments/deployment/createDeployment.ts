@@ -19,13 +19,14 @@ import { createVault } from './createVault.js';
 
 import type {
   JobDefinition,
-  Task,
   Deployment,
   DeploymentState,
   ApiDeployment,
-  DeploymentJobs,
-  DeploymentRevisions,
-  DeploymentEvents,
+  PaginationParams,
+  JobListResult,
+  RevisionListResult,
+  EventListResult,
+  TaskListResult
 } from '../types.js';
 import type { RouteOptions, RouteOptionsWithSigner } from '../../../types.js';
 import type { components } from '@nosana/types';
@@ -81,15 +82,16 @@ export function createDeployment(
   };
 
   /**
-   * @returns Promise<Task[]>
+   * @param params Pagination parameters (optional: cursor, limit, sort_order)
+   * @returns Promise<TaskListResult>
    * @throws Error if there is an error fetching the tasks
    * @throws Error if the deployment is not found
    * @description Fetches the tasks for the deployment.
    * This will return the current tasks associated with the deployment.
    * It is useful for monitoring the deployment's progress and status.
    */
-  const getTasks = async (): Promise<Task[]> => {
-    return await deploymentGetTasks(options.client, state);
+  const getTasks = async (params?: PaginationParams): Promise<TaskListResult> => {
+    return await deploymentGetTasks(options.client, state, params);
   };
 
   /**
@@ -165,39 +167,42 @@ export function createDeployment(
   };
 
   /**
-   * @returns Promise<DeploymentJobs>
+   * @param params Pagination parameters (optional: cursor, limit, sort_order)
+   * @returns Promise<JobListResult>
    * @throws Error if there is an error fetching the jobs
    * @throws Error if the deployment is not found
    * @description Fetches all jobs for the deployment.
    * This will return the current jobs associated with the deployment.
    * It is useful for monitoring the deployment's job status.
    */
-  const getJobs = async (): Promise<DeploymentJobs> => {
-    return await deploymentGetJobs(options.client, state);
+  const getJobs = async (params?: PaginationParams): Promise<JobListResult> => {
+    return await deploymentGetJobs(options.client, state, params);
   };
 
   /**
-   * @returns Promise<DeploymentRevisions>
+   * @param params Pagination parameters (optional: cursor, limit, sort_order)
+   * @returns Promise<RevisionListResult>
    * @throws Error if there is an error fetching the revisions
    * @throws Error if the deployment is not found
    * @description Fetches all revisions for the deployment.
    * This will return all revisions associated with the deployment.
    * It is useful for viewing the deployment history.
    */
-  const getRevisions = async (): Promise<DeploymentRevisions> => {
-    return await deploymentGetRevisions(options.client, state);
+  const getRevisions = async (params?: PaginationParams): Promise<RevisionListResult> => {
+    return await deploymentGetRevisions(options.client, state, params);
   };
 
   /**
-   * @returns Promise<DeploymentEvents>
+   * @param params Pagination parameters (optional: cursor, limit, sort_order)
+   * @returns Promise<EventListResult>
    * @throws Error if there is an error fetching the events
    * @throws Error if the deployment is not found
    * @description Fetches all events for the deployment.
    * This will return all events associated with the deployment.
    * It is useful for monitoring deployment activity and debugging.
    */
-  const getEvents = async (): Promise<DeploymentEvents> => {
-    return await deploymentGetEvents(options.client, state);
+  const getEvents = async (params?: PaginationParams): Promise<EventListResult> => {
+    return await deploymentGetEvents(options.client, state, params);
   };
 
   /**

@@ -3,7 +3,7 @@ import { createVault as createVaultFn } from './deployment/createVault.js';
 import { createDeployment as createDeploymentFn } from './deployment/createDeployment.js';
 
 import type { RouteOptions, RouteOptionsWithSigner } from '../../types.js';
-import type { CreateDeployment, DeploymentCreateBody, Deployment, DeploymentsApi, ApiDeploymentsApi, ApiDeployment, } from './types.js';
+import type { CreateDeployment, DeploymentCreateBody, Deployment, DeploymentsApi, ApiDeploymentsApi, ApiDeployment, PaginationParams, DeploymentListResult, ApiDeploymentListResult } from './types.js';
 import type { components } from '@nosana/types';
 
 type DeploymentSchema = components['schemas']['Deployment'];
@@ -46,16 +46,35 @@ export function createDeploymentsApi(options: RouteOptions | RouteOptionsWithSig
     return createDeployment(data);
   };
 
-  const list = async () => {
-    const { data, error } = await options.client.GET('/api/deployments', {});
+  const list = async (params?: PaginationParams): Promise<DeploymentListResult | ApiDeploymentListResult> => {
+    const { data, error } = await options.client.GET('/api/deployments', {
+      params: {
+        query: {
+          cursor: params?.cursor,
+          limit: params?.limit,
+          sort_order: params?.sort_order,
+        },
+      },
+    });
 
     if (error || !data) {
       throw errorFormatter('Error listing deployments', error);
     }
 
-    return data.map((deployment) =>
-      createDeployment(deployment)
-    );
+    const nextPage = data.pagination.cursor_next
+      ? async () => list({ ...params, cursor: data.pagination.cursor_next! })
+      : null;
+
+    const previousPage = data.pagination.cursor_prev
+      ? async () => list({ ...params, cursor: data.pagination.cursor_prev! })
+      : null;
+
+    return {
+      items: data.deployments.map((deployment) => createDeployment(deployment)),
+      total_items: data.pagination.total_items,
+      nextPage,
+      previousPage,
+    };
   };
 
   const pipe = async (

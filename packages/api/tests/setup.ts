@@ -208,7 +208,18 @@ global.TEST_MOCK_DEPLOYMENT = {
   strategy: 'SIMPLE',
 };
 
-global.TEST_MOCK_DEPLOYMENTS_LIST = [global.TEST_MOCK_DEPLOYMENT];
+global.TEST_MOCK_DEPLOYMENTS_LIST = {
+  deployments: [global.TEST_MOCK_DEPLOYMENT],
+  pagination: {
+    cursor_next: null,
+    cursor_prev: null,
+    has_next_page: false,
+    has_previous_page: false,
+    page_size: 10,
+    current_page: 1,
+    total_items: 1
+  }
+};
 
 global.TEST_CREATE_DEPLOYMENT_REQUEST = {
   name: 'Pytorch Jupyter Notebook',
@@ -246,6 +257,15 @@ global.TEST_MOCK_TASK = {
 };
 
 global.TEST_MOCK_TASKS_LIST = [global.TEST_MOCK_TASK];
+
+global.TEST_MOCK_TASKS_RESPONSE = {
+  tasks: global.TEST_MOCK_TASKS_LIST,
+  pagination: {
+    cursor_next: null,
+    cursor_prev: null,
+    total_items: global.TEST_MOCK_TASKS_LIST.length,
+  },
+};
 
 // Vault fixtures
 global.TEST_MOCK_VAULT = {
