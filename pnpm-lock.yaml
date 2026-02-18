@@ -148,8 +148,8 @@ importers:
   packages/kit:
     dependencies:
       '@nosana/api':
-        specifier: ^0.1.9
-        version: 0.1.9(@types/node@20.19.30)(typescript@5.9.3)
+        specifier: ^0.1.11
+        version: 0.1.11(@types/node@20.19.30)(typescript@5.9.3)
       '@nosana/authorization':
         specifier: ^0.1.7
         version: 0.1.7
@@ -896,8 +896,8 @@ packages:
     resolution: {integrity: sha512-XlOlEbQcE9fmuXxrVTXCTlG2nlRXa9Rj3rr5Ue/+tX+nmkgbX720YHh0VR3hBF9xDvwnb8D2shVGOwNx+ulArw==}
     engines: {node: '>= 20.19.0'}
 
-  '@nosana/api@0.1.9':
-    resolution: {integrity: sha512-jPp0PnZE+fAVR+laNRt+LWW3LdqWQJqbK0hWiZG25hXT5vP+nWm5SVvnq4Euzc8e3K1aL1o56Mkd1byMdy4Cmg==}
+  '@nosana/api@0.1.11':
+    resolution: {integrity: sha512-n9zW/n3q08u8Rfyxfxhi2VrXvHtPbpk2Ixy76jVIeMhP/iI0sUawHIVf5inqxNUec7PBXbpm1wLJCkGk63HBeQ==}
 
   '@nosana/authorization@0.1.7':
     resolution: {integrity: sha512-xQRp8uRiCrui/ApvdkLpjjz80zUS48BGF/pMFR8Jt7BzXhYK3Jikwll2CVy6agSvjmf16bMbJg8uhjPunY4XRg==}
@@ -6526,7 +6526,7 @@ snapshots:
 
   '@noble/hashes@2.0.1': {}
 
-  '@nosana/api@0.1.9(@types/node@20.19.30)(typescript@5.9.3)':
+  '@nosana/api@0.1.11(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
       '@nosana/types': 0.1.24(@types/node@20.19.30)(typescript@5.9.3)
       openapi-fetch: 0.14.1
@@ -6556,7 +6556,7 @@ snapshots:
 
   '@nosana/kit@file:packages/kit(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
-      '@nosana/api': 0.1.9(@types/node@20.19.30)(typescript@5.9.3)
+      '@nosana/api': 0.1.11(@types/node@20.19.30)(typescript@5.9.3)
       '@nosana/authorization': 0.1.7
       '@nosana/endpoints': 1.0.0(@types/node@20.19.30)(typescript@5.9.3)
       '@nosana/ipfs': 0.1.2
