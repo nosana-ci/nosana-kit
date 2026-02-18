@@ -48,7 +48,7 @@ detect-packages-changes:
   artifacts:
     paths:
       - orchestrator.yml
-    expire_in: 1 hour
+    expire_in: 2 hours
     reports:
       dotenv: changes.env
   rules: *pipeline_rules
@@ -71,6 +71,7 @@ run-packages-pipelines:
 .deploy:
   stage: deploy
   when: manual
+  dependencies: []  # do not pull trigger-stage artifacts (we rm them anyway)
   variables:
     LERNA_BUMP: patch
     LERNA_FORCE: ""
@@ -106,6 +107,7 @@ deploy-force:
 # When a tag is pushed (by deploy): publish those packages to npm (prepack builds each package).
 lerna-publish:
   stage: deploy
+  dependencies: []  # do not pull artifacts from trigger stage (we don't need them)
   script:
     - pnpm install --frozen-lockfile
     - pnpm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
