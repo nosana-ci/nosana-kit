@@ -11,6 +11,8 @@ export interface SolanaConfig {
 
 export type ApiKeyAuth = string
 
+export type IncludeCookiesAuth = 'include'
+
 /**
  * SignerAuth provides identifier and generate function for API authentication.
  * Used by nosana-kit which converts Wallet → SignerAuth via @nosana/authorization.

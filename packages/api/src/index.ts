@@ -7,7 +7,7 @@ import {
 } from './routes/index.js';
 
 import { NosanaNetwork } from './types.js';
-import type { ApiKeyAuth, CreateNosanaApiOptions, SignerAuth, NosanaNetwork as NosanaNetworkType } from './types.js';
+import type { ApiKeyAuth, CreateNosanaApiOptions, SignerAuth, NosanaNetwork as NosanaNetworkType, IncludeCookiesAuth } from './types.js';
 
 export interface NosanaApi {
   jobs: NosanaJobsApi;
@@ -27,21 +27,22 @@ export interface NosanaApiWithApiKey {
 export function createNosanaApi(environment: NosanaNetworkType, noAuth: undefined, options?: CreateNosanaApiOptions): NosanaApi;
 export function createNosanaApi(environment: NosanaNetworkType, signerAuth: SignerAuth, options?: CreateNosanaApiOptions): NosanaApi;
 export function createNosanaApi(environment: NosanaNetworkType, apiKeyAuth: ApiKeyAuth, options?: CreateNosanaApiOptions): NosanaApiWithApiKey;
+export function createNosanaApi(environment: NosanaNetworkType, includeCookies: IncludeCookiesAuth, options?: CreateNosanaApiOptions): NosanaApi;
 
 export function createNosanaApi(
   environment: NosanaNetworkType = NosanaNetwork.MAINNET,
-  signerOrApiKey: SignerAuth | ApiKeyAuth | undefined,
+  signerApiKeyOrIncludeCookies: SignerAuth | ApiKeyAuth | IncludeCookiesAuth | undefined,
   options?: CreateNosanaApiOptions,
 ): NosanaApi | NosanaApiWithApiKey {
-  const client = createNosanaClient(environment, signerOrApiKey, options);
-  const hasApiKey = typeof signerOrApiKey === 'string';
+  const client = createNosanaClient(environment, signerApiKeyOrIncludeCookies, options);
+  const hasApiKey = typeof signerApiKeyOrIncludeCookies === 'string';
 
   return {
     jobs: createNosanaJobsApi(client),
     credits: createNosanaCreditsApi(client),
     markets: createNosanaMarketsApi(client),
-    deployments: !hasApiKey && signerOrApiKey
-      ? createDeploymentsApi({ client, solana: signerOrApiKey.solana }, false)
+    deployments: !hasApiKey && signerApiKeyOrIncludeCookies
+      ? createDeploymentsApi({ client, solana: signerApiKeyOrIncludeCookies.solana }, false)
       : createDeploymentsApi({ client }, true)
   };
 }

@@ -16,8 +16,20 @@ describe('createNosanaClient', () => {
 
     expect(createClient).toHaveBeenCalledWith({
       baseUrl: 'https://custom.api.com',
-      credentials: 'include',
     });
+  });
+
+  test('when called with "include" credentials option, it should pass it to the client and auth middleware to be skipped', () => {
+    createNosanaClient(NosanaNetwork.MAINNET, 'include', undefined);
+
+    expect(createClient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        baseUrl: defaultConfig[NosanaNetwork.MAINNET].backend_url,
+        credentials: 'include',
+      })
+    );
+
+    expect(global.TEST_MOCK_CLIENT.use).not.toHaveBeenCalled();
   });
 
   test('when called without options, it should use the default mainnet URL', () => {
@@ -25,7 +37,6 @@ describe('createNosanaClient', () => {
 
     expect(createClient).toHaveBeenCalledWith({
       baseUrl: defaultConfig[NosanaNetwork.MAINNET].backend_url,
-      credentials: 'include',
     });
   });
 
@@ -34,7 +45,6 @@ describe('createNosanaClient', () => {
 
     expect(createClient).toHaveBeenCalledWith({
       baseUrl: defaultConfig[NosanaNetwork.DEVNET].backend_url,
-      credentials: 'include',
     });
   });
 
