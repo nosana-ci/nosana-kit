@@ -311,17 +311,17 @@ importers:
   packages/kit:
     dependencies:
       '@nosana/api':
-        specifier: ^0.1.11
-        version: 0.1.11(@types/node@20.19.30)(typescript@5.9.3)
+        specifier: workspace:*
+        version: link:../api
       '@nosana/authorization':
-        specifier: ^0.1.7
-        version: 0.1.7
+        specifier: workspace:*
+        version: link:../authorisation
       '@nosana/endpoints':
-        specifier: ^1.0.0
-        version: 1.0.0(@types/node@20.19.30)(typescript@5.9.3)
+        specifier: workspace:*
+        version: link:../endpoints
       '@nosana/ipfs':
-        specifier: ^0.1.2
-        version: 0.1.2
+        specifier: workspace:*
+        version: link:../ipfs
       '@nosana/jobs-program':
         specifier: workspace:*
         version: link:../generated_clients/jobs
@@ -332,8 +332,8 @@ importers:
         specifier: workspace:*
         version: link:../generated_clients/stake
       '@nosana/types':
-        specifier: ^0.1.24
-        version: 0.1.24(@types/node@20.19.30)(typescript@5.9.3)
+        specifier: workspace:*
+        version: link:../types
       '@solana-program/compute-budget':
         specifier: 0.12.0
         version: 0.12.0(@solana/kit@5.4.0(typescript@5.9.3))
@@ -1107,18 +1107,6 @@ packages:
   '@noble/hashes@2.0.1':
     resolution: {integrity: sha512-XlOlEbQcE9fmuXxrVTXCTlG2nlRXa9Rj3rr5Ue/+tX+nmkgbX720YHh0VR3hBF9xDvwnb8D2shVGOwNx+ulArw==}
     engines: {node: '>= 20.19.0'}
-
-  '@nosana/api@0.1.11':
-    resolution: {integrity: sha512-n9zW/n3q08u8Rfyxfxhi2VrXvHtPbpk2Ixy76jVIeMhP/iI0sUawHIVf5inqxNUec7PBXbpm1wLJCkGk63HBeQ==}
-
-  '@nosana/authorization@0.1.7':
-    resolution: {integrity: sha512-xQRp8uRiCrui/ApvdkLpjjz80zUS48BGF/pMFR8Jt7BzXhYK3Jikwll2CVy6agSvjmf16bMbJg8uhjPunY4XRg==}
-
-  '@nosana/endpoints@1.0.0':
-    resolution: {integrity: sha512-mO/Xxlc8yVpG3h5yR+u9FKgFUPMkkghfoC/OKmCd5iisMGu0G0RpbkOvd+bQAp/Xj4BFp+uaZerU5ryCiSzg3w==}
-
-  '@nosana/ipfs@0.1.2':
-    resolution: {integrity: sha512-CEq0sL0nbJeBzay8QD5gRdDM8im2KHz4v5t0xUq8ykC355KKuW06af7U+u3rPaAkE573HJ1mFhhOKpeujhjlwQ==}
 
   '@nosana/kit@file:packages/kit':
     resolution: {directory: packages/kit, type: directory}
@@ -6924,40 +6912,12 @@ snapshots:
 
   '@noble/hashes@2.0.1': {}
 
-  '@nosana/api@0.1.11(@types/node@20.19.30)(typescript@5.9.3)':
-    dependencies:
-      '@nosana/types': 0.1.24(@types/node@20.19.30)(typescript@5.9.3)
-      openapi-fetch: 0.14.1
-    transitivePeerDependencies:
-      - '@types/node'
-      - typescript
-
-  '@nosana/authorization@0.1.7':
-    dependencies:
-      bs58: 5.0.0
-      buffer: 6.0.3
-      tweetnacl: 1.0.3
-      tweetnacl-util: 0.15.1
-
-  '@nosana/endpoints@1.0.0(@types/node@20.19.30)(typescript@5.9.3)':
-    dependencies:
-      '@nosana/types': 0.1.24(@types/node@20.19.30)(typescript@5.9.3)
-      bs58: 5.0.0
-      tweetnacl: 1.0.3
-    transitivePeerDependencies:
-      - '@types/node'
-      - typescript
-
-  '@nosana/ipfs@0.1.2':
-    dependencies:
-      bs58: 5.0.0
-
   '@nosana/kit@file:packages/kit(@types/node@20.19.30)(typescript@5.9.3)':
     dependencies:
-      '@nosana/api': 0.1.11(@types/node@20.19.30)(typescript@5.9.3)
-      '@nosana/authorization': 0.1.7
-      '@nosana/endpoints': 1.0.0(@types/node@20.19.30)(typescript@5.9.3)
-      '@nosana/ipfs': 0.1.2
+      '@nosana/api': link:packages/api
+      '@nosana/authorization': link:packages/authorisation
+      '@nosana/endpoints': link:packages/endpoints
+      '@nosana/ipfs': link:packages/ipfs
       '@nosana/jobs-program': link:packages/generated_clients/jobs
       '@nosana/merkle-distributor-program': link:packages/generated_clients/merkle_distributor
       '@nosana/stake-program': link:packages/generated_clients/stake
