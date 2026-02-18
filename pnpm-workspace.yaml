@@ -1,5 +1,10 @@
 packages:
   - 'packages/kit'
+  - 'packages/api'
+  - 'packages/authorisation'
+  - 'packages/endpoints'
+  - 'packages/ipfs'
+  - 'packages/types'
   - 'docs'
   - 'packages/generated_clients/jobs'
   - 'packages/generated_clients/stake'

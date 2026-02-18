@@ -1,0 +1,54 @@
+{
+  "name": "@nosana/types",
+  "version": "0.1.24",
+  "author": "Nosana",
+  "description": "Nosana Types Module",
+  "type": "module",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepack": "pnpm run build:with-deps",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run prepare && tsc --build",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "npm run prepare && tsc --build --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build",
+    "generate": "openapi-typescript https://dashboard.k8s.prd.nos.ci/api/swagger/json -o ./src/Schemas/api.ts",
+    "generate:dev": "openapi-typescript https://dashboard.k8s.dev.nos.ci/api/swagger/json -o ./src/Schemas/api.ts",
+    "generate:local": "openapi-typescript http://localhost:3000/api/swagger/json -o ./src/Schemas/api.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint --fix ./src",
+    "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
+    "format:fix": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\"",
+    "prepare": "ts-patch install && typia patch"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
+    "@typescript-eslint/parser": "^8.47.0",
+    "@vitest/coverage-v8": "^4.0.13",
+    "eslint": "^9.39.1",
+    "eslint-plugin-import": "^2.32.0",
+    "husky": "^9.1.7",
+    "openapi-typescript": "^7.10.1",
+    "prettier": "^3.7.4",
+    "ts-patch": "^3.3.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.13"
+  },
+  "dependencies": {
+    "typia": "^10.0.2"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  }
+}

@@ -1,0 +1,21 @@
+#   _ __   ___  ___  __ _ _ __   __ _
+#  | '_ \ / _ \/ __|/ _` | '_ \ / _` |
+#  | | | | (_) \__ \ (_| | | | | (_| |
+#  |_| |_|\___/|___/\__,_|_| |_|\__,_|
+
+include:
+  - local: .gitlab/ci/common.yml
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm --filter @nosana/authorization run format
+    - pnpm --filter @nosana/authorization run build:with-deps
+    - pnpm --filter @nosana/authorization run test
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
