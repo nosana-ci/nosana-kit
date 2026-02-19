@@ -10,8 +10,7 @@ export type * from './schema.js';
 
 export type QueryClient = AuthenticatedClient<paths>;
 
-
-export function createNosanaClient(
+export function createNosanaApiClient(
   environment: NosanaNetwork,
   authParams: ApiKeyAuth | SignerAuth | undefined,
   options: CreateNosanaApiOptions | undefined

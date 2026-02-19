@@ -93,10 +93,10 @@ export function createApiInstance(
   wallet: Wallet | undefined,
   deps: { authorization: NosanaAuthorization; solana: SolanaService; nos: TokenService }
 ): NosanaApi | NosanaApiWithApiKey {
-  const apiOptions = config?.backend_url ? { backend_url: config.backend_url } : undefined;
+  const { apiKey, ...apiConfig } = config || {};
 
-  if (config?.apiKey) {
-    return createNosanaApi(network, config.apiKey, apiOptions);
+  if (apiKey) {
+    return createNosanaApi(network, apiKey, apiConfig);
   }
 
   if (wallet) {
@@ -107,9 +107,9 @@ export function createApiInstance(
         generate: deps.authorization.generate,
         solana: createApiSolanaIntegration(wallet, deps),
       },
-      apiOptions
+      apiConfig
     );
   }
 
-  return createNosanaApi(network, undefined, apiOptions);
+  return createNosanaApi(network, undefined, apiConfig);
 }
