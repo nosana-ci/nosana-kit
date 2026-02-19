@@ -22,9 +22,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
-  "references": [
-    { "path": "../types" }
-  ],
+  "references": [{ "path": "../types" }],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "tests", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
