@@ -1,0 +1,13 @@
+The Distributed Dream
+
+In 2047, Maya ran her climate simulation not on a single supercomputer, but across ten thousand idle devices worldwide. A gaming PC in Tokyo processed ocean currents during its owner's sleep. A retired server in Iceland crunched atmospheric data between northern lights tours. A phone in Buenos Aires calculated wind patterns while charging overnight.
+
+The computation cost her pennies. No tech giant owned the network. No data center consumed a river's worth of water. The algorithm split her work into fragments, encrypted each piece, and scattered them like digital dandelion seeds across the mesh.
+
+When results returned three hours later, Maya couldn't tell which node in São Paulo or Stockholm or Seoul had computed what. She only knew her model was complete, assembled from a thousand anonymous contributions.
+
+Her colleague asked, "Aren't you worried about trust?"
+
+Maya smiled. "The math verifies itself. I don't need to trust them. I just need to trust the protocol."
+
+Outside, the old data center on the hill sat dark and empty, a monument to the centralized past.

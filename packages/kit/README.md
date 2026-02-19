@@ -1578,121 +1578,20 @@ client.logger.debug('Debug details');
 
 ## Testing
 
-The SDK includes comprehensive test coverage.
+The SDK includes comprehensive test coverage. From the **repository root**:
 
 ```bash
-# Run tests (all workspace packages; only @nosana/kit has tests for now)
 pnpm test
+```
 
-# Kit-only: watch mode or coverage
+Kit-only (watch or coverage):
+
+```bash
 pnpm --filter @nosana/kit run test:watch
 pnpm --filter @nosana/kit run test:coverage
 ```
 
-## Development
-
-This project uses **pnpm workspaces** with a monorepo structure:
-
-- **Root** – Workspace orchestration (build, dev, test, generate-clients)
-- **`packages/kit`** (`@nosana/kit`) – Main SDK
-- **`packages/generated_clients/*`** – Generated Solana program clients (jobs, stake, merkle_distributor)
-- **`docs`** (`@nosana/docs`) – Documentation site (VitePress)
-
-All commands below are run from the **repository root** unless stated otherwise.
-
-### Setup
-
-```bash
-# Install dependencies for all workspace packages
-pnpm install
-
-# Build all packages (generated clients first, then kit, then docs)
-pnpm build
-
-# Run tests
-pnpm test
-```
-
-### Building only what you need
-
-If you're only working on one package, you can build that package and its workspace dependencies instead of the whole repo:
-
-```bash
-# From root: build kit and its deps (generated clients), skip docs
-pnpm --filter @nosana/kit run build:with-deps
-
-# Or from the package directory
-cd packages/kit && pnpm run build:with-deps
-```
-
-Same for docs (builds kit first, then docs):
-
-```bash
-pnpm --filter @nosana/docs run build:with-deps
-```
-
-Use `pnpm build` when you want everything built (e.g. before opening a PR or publishing).
-
-### Regenerating program clients
-
-After changing IDLs in `/idl`, regenerate the client packages:
-
-```bash
-pnpm run generate-clients
-```
-
-Generated code is written into each package’s **`src/`** directory so `package.json` and `tsconfig.json` at the package root are never overwritten. Then run `pnpm build` so the rest of the workspace picks up the changes.
-
-### Development mode
-
-Start all watch processes and the docs dev server in parallel:
-
-```bash
-# From root (run `pnpm build` once first so dist/ exist)
-pnpm dev
-```
-
-This runs `tsc --watch` for the generated client packages and kit, and starts the VitePress dev server for docs.
-
-To work only on kit (no docs server), run watch for kit and its workspace deps:
-
-```bash
-pnpm --filter @nosana/kit run dev:with-deps
-# or from package dir: cd packages/kit && pnpm run dev:with-deps
-```
-
-To work on docs (kit + docs dev server):
-
-```bash
-pnpm --filter @nosana/docs run dev:with-deps
-```
-
-### Lint and format
-
-From root, lint and format run in all workspace packages (only `@nosana/kit` has real lint/format for now):
-
-```bash
-pnpm lint
-pnpm format
-pnpm format:fix
-```
-
-For a single package: `pnpm --filter @nosana/kit run lint` (or `format` / `format:fix`).
-
-### Documentation
-
-Run docs scripts via the filter (no root shorthand; use the same pattern for any package-specific script):
-
-```bash
-# Start docs dev server
-pnpm --filter @nosana/docs dev
-
-# Build docs
-pnpm --filter @nosana/docs build
-
-# Preview built docs
-pnpm --filter @nosana/docs preview
-```
+For monorepo setup, build, and development, see the [root README](../../README.md).
 
 ## TypeScript Support
 

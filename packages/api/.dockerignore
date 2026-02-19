@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.gitignore
+README.md
+.eslintcache
+.nyc_output
+coverage
+.coverage
+*.log
+.DS_Store
+.vscode
+.idea

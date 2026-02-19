@@ -1,0 +1,11 @@
+.idea
+.vscode
+.DS_Store
+
+node_modules
+
+yarn-error.log
+dist
+
+# TODO: Uncomment when ready with correct path
+# src/client/schema.d.ts
