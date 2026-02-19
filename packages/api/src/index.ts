@@ -1,4 +1,4 @@
-import { createNosanaClient } from './client/index.js';
+import { createNosanaApiClient } from './client/index.js';
 import {
   createNosanaJobsApi, type NosanaJobsApi,
   createNosanaCreditsApi, type NosanaCreditsApi,
@@ -35,7 +35,7 @@ export function createNosanaApi(
   signerOrApiKey: SignerAuth | ApiKeyAuth | undefined,
   options?: CreateNosanaApiOptions,
 ): NosanaApiClient {
-  const client = createNosanaClient(environment, signerOrApiKey, options);
+  const client = createNosanaApiClient(environment, signerOrApiKey, options);
   const hasApiKey = typeof signerOrApiKey === 'string';
 
   return {

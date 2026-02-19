@@ -237,7 +237,7 @@ describe('NosanaClient', () => {
 
       // Verify createNosanaApi was called with API key
       expect(mockCreateNosanaApi).toHaveBeenCalledTimes(1);
-      expect(mockCreateNosanaApi).toHaveBeenCalledWith(NosanaNetwork.MAINNET, apiKey, undefined);
+      expect(mockCreateNosanaApi).toHaveBeenCalledWith(NosanaNetwork.MAINNET, apiKey, {});
 
       // API should be created and accessible
       expect(client.api).toBeDefined();
@@ -262,7 +262,7 @@ describe('NosanaClient', () => {
             deserializeSignSendAndConfirmTransaction: expect.any(Function),
           },
         }),
-        undefined
+        {}
       );
 
       // API should be created and accessible
@@ -280,7 +280,7 @@ describe('NosanaClient', () => {
 
       // Verify createNosanaApi was called with API key, not wallet
       expect(mockCreateNosanaApi).toHaveBeenCalledTimes(1);
-      expect(mockCreateNosanaApi).toHaveBeenCalledWith(NosanaNetwork.MAINNET, apiKey, undefined);
+      expect(mockCreateNosanaApi).toHaveBeenCalledWith(NosanaNetwork.MAINNET, apiKey, {});
 
       // API should be created (using API key, not wallet)
       expect(client.api).toBeDefined();

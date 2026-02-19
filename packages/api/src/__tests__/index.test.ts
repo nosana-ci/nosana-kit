@@ -1,11 +1,11 @@
 import { vi } from 'vitest';
 
 import { createNosanaApi, NosanaNetwork } from '../index.js';
-import { createNosanaClient } from '../client/index.js';
+import { createNosanaApiClient } from '../client/index.js';
 import { createDeploymentsApi } from '../routes/deployments/index.js';
 
 vi.mock('../client/index.js', () => ({
-  createNosanaClient: vi.fn(() => global.TEST_MOCK_CLIENT),
+  createNosanaApiClient: vi.fn(() => global.TEST_MOCK_CLIENT),
 }));
 
 vi.mock('../routes/deployments/index.js', () => ({
@@ -27,7 +27,7 @@ describe('createNosanaApi', () => {
   test('when called with SignerAuth, it should pass it to the client', () => {
     createNosanaApi(NosanaNetwork.MAINNET, testSignerAuth, undefined);
 
-    expect(createNosanaClient).toHaveBeenCalledWith(
+    expect(createNosanaApiClient).toHaveBeenCalledWith(
       NosanaNetwork.MAINNET,
       testSignerAuth,
       undefined
@@ -37,7 +37,7 @@ describe('createNosanaApi', () => {
   test('when called with ApiKey, it should pass it to the client', () => {
     createNosanaApi(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
 
-    expect(createNosanaClient).toHaveBeenCalledWith(
+    expect(createNosanaApiClient).toHaveBeenCalledWith(
       NosanaNetwork.MAINNET,
       global.TEST_API_KEY,
       undefined
@@ -47,7 +47,7 @@ describe('createNosanaApi', () => {
   test('when called without auth, it should pass undefined to the client', () => {
     createNosanaApi(NosanaNetwork.MAINNET, undefined, undefined);
 
-    expect(createNosanaClient).toHaveBeenCalledWith(
+    expect(createNosanaApiClient).toHaveBeenCalledWith(
       NosanaNetwork.MAINNET,
       undefined,
       undefined
@@ -57,7 +57,7 @@ describe('createNosanaApi', () => {
   test('when called with options, it should pass them to the client', () => {
     createNosanaApi(NosanaNetwork.MAINNET, testSignerAuth, global.TEST_NOSANA_API_OPTIONS);
 
-    expect(createNosanaClient).toHaveBeenCalledWith(
+    expect(createNosanaApiClient).toHaveBeenCalledWith(
       NosanaNetwork.MAINNET,
       testSignerAuth,
       global.TEST_NOSANA_API_OPTIONS
