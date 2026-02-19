@@ -4,19 +4,16 @@ import { defaultConfig } from '../defaults/index.js';
 
 import type { paths } from './schema.js';
 import type { AuthenticatedClient, AuthenticatedPaths } from './type.utils.js';
-import type { NosanaNetwork, ApiKeyAuth, SignerAuth, CreateNosanaApiOptions, IncludeCookiesAuth } from '../types.js';
+import type { NosanaNetwork, ApiKeyAuth, SignerAuth, CreateNosanaApiOptions } from '../types.js';
 
 export type * from './schema.js';
 
 export type QueryClient = AuthenticatedClient<paths>;
 
-export interface ApiConfig {
-  backend_url?: string;
-}
 
 export function createNosanaClient(
   environment: NosanaNetwork,
-  authParams: ApiKeyAuth | SignerAuth | IncludeCookiesAuth | undefined,
+  authParams: ApiKeyAuth | SignerAuth | undefined,
   options: CreateNosanaApiOptions | undefined
 ): QueryClient {
   const backend_url = options?.backend_url || defaultConfig[environment].backend_url;
@@ -37,10 +34,10 @@ export function createNosanaClient(
 
   const client = createClient<AuthenticatedPaths<paths>>({
     baseUrl: backend_url,
-    ...(authParams === 'include' ? { credentials: 'include' } : {}),
+    ...(options?.include_credentials ? { credentials: 'include' } : {}),
   });
 
-  if (authParams !== 'include') {
+  if (!options?.include_credentials) {
     client.use(authMiddleware);
   }
 

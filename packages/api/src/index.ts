@@ -7,7 +7,7 @@ import {
 } from './routes/index.js';
 
 import { NosanaNetwork } from './types.js';
-import type { ApiKeyAuth, CreateNosanaApiOptions, SignerAuth, NosanaNetwork as NosanaNetworkType, IncludeCookiesAuth } from './types.js';
+import type { ApiKeyAuth, CreateNosanaApiOptions, SignerAuth, NosanaNetwork as NosanaNetworkType } from './types.js';
 
 export interface NosanaApi {
   jobs: NosanaJobsApi;
@@ -29,29 +29,28 @@ export type NosanaApiClient = NosanaApi | NosanaApiWithApiKey;
 export function createNosanaApi(environment: NosanaNetworkType, noAuth: undefined, options?: CreateNosanaApiOptions): NosanaApi;
 export function createNosanaApi(environment: NosanaNetworkType, signerAuth: SignerAuth, options?: CreateNosanaApiOptions): NosanaApi;
 export function createNosanaApi(environment: NosanaNetworkType, apiKeyAuth: ApiKeyAuth, options?: CreateNosanaApiOptions): NosanaApiWithApiKey;
-export function createNosanaApi(environment: NosanaNetworkType, includeCookies: IncludeCookiesAuth, options?: CreateNosanaApiOptions): NosanaApi;
 
 export function createNosanaApi(
   environment: NosanaNetworkType = NosanaNetwork.MAINNET,
-  signerApiKeyOrIncludeCookies: SignerAuth | ApiKeyAuth | IncludeCookiesAuth | undefined,
+  signerOrApiKey: SignerAuth | ApiKeyAuth | undefined,
   options?: CreateNosanaApiOptions,
 ): NosanaApiClient {
-  const client = createNosanaClient(environment, signerApiKeyOrIncludeCookies, options);
-  const hasApiKey = typeof signerApiKeyOrIncludeCookies === 'string';
+  const client = createNosanaClient(environment, signerOrApiKey, options);
+  const hasApiKey = typeof signerOrApiKey === 'string';
 
   return {
     jobs: createNosanaJobsApi(client),
     credits: createNosanaCreditsApi(client),
     markets: createNosanaMarketsApi(client),
-    deployments: !hasApiKey && signerApiKeyOrIncludeCookies
-      ? createDeploymentsApi({ client, solana: signerApiKeyOrIncludeCookies.solana }, false)
+    deployments: !hasApiKey && signerOrApiKey
+      ? createDeploymentsApi({ client, solana: signerOrApiKey.solana }, false)
       : createDeploymentsApi({ client }, true)
   };
 }
 
 // Export types
 export * from './types.js';
-export type { ApiConfig } from './client/index.js';
+export type { CreateNosanaApiOptions as ApiConfig, CreateNosanaApiOptions } from './types.js';
 
 // Export request/response types
 export type * from './routes/jobs/types.js';
