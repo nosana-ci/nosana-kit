@@ -20,7 +20,7 @@ describe('createNosanaClient', () => {
   });
 
   test('when called with "include" credentials option, it should pass it to the client and auth middleware to be skipped', () => {
-    createNosanaClient(NosanaNetwork.MAINNET, 'include', undefined);
+    createNosanaClient(NosanaNetwork.MAINNET, undefined, { include_credentials: true });
 
     expect(createClient).toHaveBeenCalledWith(
       expect.objectContaining({
