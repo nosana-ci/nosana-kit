@@ -50,8 +50,8 @@ describe('createDeploymentsApi', () => {
       const api = createDeploymentsApi({ client: global.TEST_MOCK_CLIENT }, true);
       const result = await api.list();
 
-      expect(result.items).toHaveLength(1);
-      expect(result.items[0].id).toBe('8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH');
+      expect(result.deployments).toHaveLength(1);
+      expect(result.deployments[0].id).toBe('8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH');
       expect(result.total_items).toBeDefined();
     });
 

@@ -1,4 +1,5 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
+import { withPagination } from '../../../../utils/withPagination.js';
 
 import type { QueryClient } from '../../../../client/index.js';
 import type { DeploymentState, PaginationParams, EventListResult } from '../../types.js';
@@ -19,7 +20,7 @@ export async function deploymentGetEvents(
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/events',
     {
-      params: { 
+      params: {
         path: { deployment: state.id },
         query: {
           cursor: params?.cursor,
@@ -34,18 +35,8 @@ export async function deploymentGetEvents(
     throw errorFormatter('Error getting deployment events', error);
   }
 
-  const nextPage = data.pagination.cursor_next
-    ? async () => deploymentGetEvents(client, state, { ...params, cursor: data.pagination.cursor_next! })
-    : null;
-
-  const previousPage = data.pagination.cursor_prev
-    ? async () => deploymentGetEvents(client, state, { ...params, cursor: data.pagination.cursor_prev! })
-    : null;
-
-  return {
-    items: data.events,
-    total_items: data.pagination.total_items,
-    nextPage,
-    previousPage,
-  };
+  return withPagination(
+    data,
+    (cursor) => deploymentGetEvents(client, state, { ...params, cursor })
+  );
 }

@@ -1,4 +1,5 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
+import { withPagination } from '../../../../utils/withPagination.js';
 
 import type { QueryClient } from '../../../../client/index.js';
 import type { DeploymentState, PaginationParams, JobListResult } from '../../types.js';
@@ -19,7 +20,7 @@ export async function deploymentGetJobs(
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/jobs',
     {
-      params: { 
+      params: {
         path: { deployment: state.id },
         query: {
           cursor: params?.cursor,
@@ -34,18 +35,8 @@ export async function deploymentGetJobs(
     throw errorFormatter('Error getting deployment jobs', error);
   }
 
-  const nextPage = data.pagination.cursor_next
-    ? async () => deploymentGetJobs(client, state, { ...params, cursor: data.pagination.cursor_next! })
-    : null;
-
-  const previousPage = data.pagination.cursor_prev
-    ? async () => deploymentGetJobs(client, state, { ...params, cursor: data.pagination.cursor_prev! })
-    : null;
-
-  return {
-    items: data.jobs,
-    total_items: data.pagination.total_items,
-    nextPage,
-    previousPage,
-  };
+  return withPagination(
+    data,
+    (cursor) => deploymentGetJobs(client, state, { ...params, cursor })
+  );
 }

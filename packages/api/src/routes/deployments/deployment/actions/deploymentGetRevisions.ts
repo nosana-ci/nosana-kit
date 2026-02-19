@@ -1,4 +1,5 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
+import { withPagination } from '../../../../utils/withPagination.js';
 
 import type { QueryClient } from '../../../../client/index.js';
 import type { DeploymentState, PaginationParams, RevisionListResult } from '../../types.js';
@@ -16,10 +17,10 @@ export async function deploymentGetRevisions(
   state: DeploymentState,
   params?: PaginationParams,
 ): Promise<RevisionListResult> {
-  const { data, error} = await client.GET(
+  const { data, error } = await client.GET(
     '/api/deployments/{deployment}/revisions',
     {
-      params: { 
+      params: {
         path: { deployment: state.id },
         query: {
           cursor: params?.cursor,
@@ -34,18 +35,8 @@ export async function deploymentGetRevisions(
     throw errorFormatter('Error getting deployment revisions', error);
   }
 
-  const nextPage = data.pagination.cursor_next
-    ? async () => deploymentGetRevisions(client, state, { ...params, cursor: data.pagination.cursor_next! })
-    : null;
-
-  const previousPage = data.pagination.cursor_prev
-    ? async () => deploymentGetRevisions(client, state, { ...params, cursor: data.pagination.cursor_prev! })
-    : null;
-
-  return {
-    items: data.revisions,
-    total_items: data.pagination.total_items,
-    nextPage,
-    previousPage,
-  };
+  return withPagination(
+    data,
+    (cursor) => deploymentGetRevisions(client, state, { ...params, cursor })
+  );
 }

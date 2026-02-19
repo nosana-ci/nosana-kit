@@ -1,4 +1,5 @@
 import { errorFormatter } from '../../utils/errorFormatter.js';
+import { withPagination } from '../../utils/withPagination.js';
 import { createVault as createVaultFn } from './deployment/createVault.js';
 import { createDeployment as createDeploymentFn } from './deployment/createDeployment.js';
 
@@ -61,20 +62,13 @@ export function createDeploymentsApi(options: RouteOptions | RouteOptionsWithSig
       throw errorFormatter('Error listing deployments', error);
     }
 
-    const nextPage = data.pagination.cursor_next
-      ? async () => list({ ...params, cursor: data.pagination.cursor_next! })
-      : null;
-
-    const previousPage = data.pagination.cursor_prev
-      ? async () => list({ ...params, cursor: data.pagination.cursor_prev! })
-      : null;
-
-    return {
-      items: data.deployments.map((deployment) => createDeployment(deployment)),
-      total_items: data.pagination.total_items,
-      nextPage,
-      previousPage,
-    };
+    return withPagination(
+      {
+        ...data,
+        deployments: data.deployments.map((deployment) => createDeployment(deployment)),
+      },
+      (cursor) => list({ ...params, cursor })
+    );
   };
 
   const pipe = async (

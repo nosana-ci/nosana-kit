@@ -1,4 +1,5 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
+import { withPagination } from '../../../../utils/withPagination.js';
 
 import type { QueryClient } from '../../../../client/index.js';
 import type { DeploymentState, PaginationParams, TaskListResult } from '../../types.js';
@@ -19,7 +20,7 @@ export async function deploymentGetTasks(
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/tasks',
     {
-      params: { 
+      params: {
         path: { deployment: state.id },
         query: {
           cursor: params?.cursor,
@@ -34,18 +35,8 @@ export async function deploymentGetTasks(
     throw errorFormatter('Error getting deployment tasks', error);
   }
 
-  const nextPage = data.pagination.cursor_next
-    ? async () => deploymentGetTasks(client, state, { ...params, cursor: data.pagination.cursor_next! })
-    : null;
-
-  const previousPage = data.pagination.cursor_prev
-    ? async () => deploymentGetTasks(client, state, { ...params, cursor: data.pagination.cursor_prev! })
-    : null;
-
-  return {
-    items: data.tasks,
-    total_items: data.pagination.total_items,
-    nextPage,
-    previousPage,
-  };
+  return withPagination(
+    data,
+    (cursor) => deploymentGetTasks(client, state, { ...params, cursor })
+  );
 }

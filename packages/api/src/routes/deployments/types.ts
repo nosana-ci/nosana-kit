@@ -28,20 +28,19 @@ export type PaginationMeta = {
 };
 
 // Generic paginated result with navigation methods
-export interface PaginatedResult<T> {
-  items: T[];
+export type PaginatedResult<T> = T & {
   total_items: number;
   nextPage: (() => Promise<PaginatedResult<T>>) | null;
   previousPage: (() => Promise<PaginatedResult<T>>) | null;
 }
 
 // Specific paginated result types
-export type DeploymentListResult = PaginatedResult<Deployment>;
-export type ApiDeploymentListResult = PaginatedResult<ApiDeployment>;
-export type JobListResult = PaginatedResult<DeploymentJobItem>;
-export type EventListResult = PaginatedResult<DeploymentEventItem>;
-export type RevisionListResult = PaginatedResult<DeploymentRevisionItem>;
-export type TaskListResult = PaginatedResult<DeploymentTaskItem>;
+export type DeploymentListResult = PaginatedResult<{ deployments: Deployment[] }>;
+export type ApiDeploymentListResult = PaginatedResult<{ deployments: ApiDeployment[] }>;
+export type JobListResult = PaginatedResult<{ jobs: DeploymentJobItem[] }>;
+export type EventListResult = PaginatedResult<{ events: DeploymentEventItem[] }>;
+export type RevisionListResult = PaginatedResult<{ revisions: DeploymentRevisionItem[] }>;
+export type TaskListResult = PaginatedResult<{ tasks: DeploymentTaskItem[] }>;
 
 // Pagination query parameters
 export type PaginationParams = {
