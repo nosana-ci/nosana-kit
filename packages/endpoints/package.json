@@ -1,6 +1,6 @@
 {
   "name": "@nosana/endpoints",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "description": "Nosana endpoints module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

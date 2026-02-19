@@ -1,6 +1,6 @@
 {
   "name": "@nosana/api",
-  "version": "0.1.13",
+  "version": "2.1.0",
   "description": "Nosana API module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
