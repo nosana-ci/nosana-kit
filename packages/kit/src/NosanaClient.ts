@@ -119,9 +119,9 @@ export function createNosanaClient(
     const authorization = wallet
       ? config.authorization?.store
         ? createNosanaAuthorization(walletToAuthorizationSigner(wallet), {
-          identifier: wallet.address.toString(),
-          actions: config.authorization.store,
-        })
+            identifier: wallet.address.toString(),
+            actions: config.authorization.store,
+          })
         : createNosanaAuthorization(walletToAuthorizationSigner(wallet))
       : createNosanaAuthorization();
 
