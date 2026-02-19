@@ -1,6 +1,6 @@
 import { NosanaNetwork } from '@nosana/types';
-import { createNosanaApi } from '@nosana/api';
-import { createIpfsClient } from '@nosana/ipfs';
+import { NosanaApiClient } from '@nosana/api';
+import { createIpfsClient, NosanaIpfsClient } from '@nosana/ipfs';
 import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/authorization';
 
 import { Logger } from './logger/Logger.js';
@@ -30,8 +30,8 @@ export interface NosanaClient {
   readonly merkleDistributor: MerkleDistributorProgram;
   readonly solana: SolanaService;
   readonly nos: TokenService;
-  readonly api: ReturnType<typeof createNosanaApi>;
-  readonly ipfs: ReturnType<typeof createIpfsClient>;
+  readonly api: NosanaApiClient;
+  readonly ipfs: NosanaIpfsClient;
   readonly authorization: NosanaAuthorization;
   readonly logger: Logger;
   /**
@@ -119,9 +119,9 @@ export function createNosanaClient(
     const authorization = wallet
       ? config.authorization?.store
         ? createNosanaAuthorization(walletToAuthorizationSigner(wallet), {
-            identifier: wallet.address.toString(),
-            actions: config.authorization.store,
-          })
+          identifier: wallet.address.toString(),
+          actions: config.authorization.store,
+        })
         : createNosanaAuthorization(walletToAuthorizationSigner(wallet))
       : createNosanaAuthorization();
 

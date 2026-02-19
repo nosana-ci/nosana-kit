@@ -9,7 +9,13 @@ import { defaultIPFSConfig } from "./defaults/index.js";
 // Types
 import type { IPFSConfig } from "./types.js";
 
-export function createIpfsClient(config?: Partial<IPFSConfig>) {
+export type NosanaIpfsClient = {
+  pin: (data: object) => Promise<string>;
+  pinFile: (path: string) => Promise<string>;
+  retrieve: <T>(hash: string | Array<number>) => Promise<T>;
+};
+
+export function createIpfsClient(config?: Partial<IPFSConfig>): NosanaIpfsClient {
   const fetchClient = createIPFSFetchClient(Object.assign(defaultIPFSConfig, config));
 
   return {

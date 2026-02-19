@@ -23,6 +23,8 @@ export interface NosanaApiWithApiKey {
   deployments: ApiDeploymentsApi;
 }
 
+export type NosanaApiClient = NosanaApi | NosanaApiWithApiKey;
+
 // Overloads for different auth modes
 export function createNosanaApi(environment: NosanaNetworkType, noAuth: undefined, options?: CreateNosanaApiOptions): NosanaApi;
 export function createNosanaApi(environment: NosanaNetworkType, signerAuth: SignerAuth, options?: CreateNosanaApiOptions): NosanaApi;
@@ -33,7 +35,7 @@ export function createNosanaApi(
   environment: NosanaNetworkType = NosanaNetwork.MAINNET,
   signerApiKeyOrIncludeCookies: SignerAuth | ApiKeyAuth | IncludeCookiesAuth | undefined,
   options?: CreateNosanaApiOptions,
-): NosanaApi | NosanaApiWithApiKey {
+): NosanaApiClient {
   const client = createNosanaClient(environment, signerApiKeyOrIncludeCookies, options);
   const hasApiKey = typeof signerApiKeyOrIncludeCookies === 'string';
 
