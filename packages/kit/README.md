@@ -80,6 +80,9 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
     cluster: 'mainnet-beta',
     rpcEndpoint: 'https://api.mainnet-beta.solana.com',
     commitment: 'confirmed',
+    // Optional: priority fees (fixed or dynamic). Default configs use dynamic with strategy 'medium'.
+    // priorityFees: { type: 'fixed', microLamports: 10_000 },
+    // priorityFees: { type: 'dynamic', strategy: 'medium', min: 10_000, max: 15_000_000 },
   },
   ipfs: {
     api: 'https://api.pinata.cloud',
@@ -93,6 +96,13 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
   wallet: myWallet, // Optional: Set wallet during initialization (must be a Wallet type)
 });
 ```
+
+### Priority fees
+
+Transactions built via `solana.buildTransaction` or `solana.buildSignAndSend` can include a priority fee (compute unit price) when `solana.priorityFees` is set:
+
+- **Fixed** – `{ type: 'fixed', microLamports: number }` uses the same microLamports per compute unit every time.
+- **Dynamic** – `{ type: 'dynamic', strategy?: 'low'|'medium'|'high', percentile?: number, min?: number, max?: number, accountAddresses?: Address[] }` fetches recent fees from the RPC (`getRecentPrioritizationFees`), takes a percentile (or strategy preset), and clamps to min/max. On empty or error it falls back to `min`. Default configs use dynamic with strategy `medium`, min 10k, max 15M, and SOL + USDC mints for fee estimation.
 
 ## Core Components
 
