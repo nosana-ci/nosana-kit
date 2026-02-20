@@ -111,7 +111,7 @@ lerna-publish:
   dependencies: []  # do not pull artifacts from trigger stage (we don't need them)
   script:
     - pnpm install --frozen-lockfile
-    - pnpm run build
+    - pnpm run build:packages
     - pnpm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
     - pnpm run publish
   rules:
