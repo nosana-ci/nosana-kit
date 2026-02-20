@@ -7,9 +7,7 @@ import type { LogLevel } from '../logger/Logger.js';
 // Priority fee defaults (matches legacy SDK); used only in DEFAULT_CONFIGS below
 const SOL_MINT_ADDRESS: Address = address('So11111111111111111111111111111111111111112');
 const USDC_MINT_ADDRESS: Address = address('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
-const USDC_DEVNET_MINT_ADDRESS: Address = address(
-  '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
-);
+const USDC_DEVNET_MINT_ADDRESS: Address = address('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');
 
 export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
   mainnet: {

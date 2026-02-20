@@ -57,10 +57,7 @@ export async function resolvePriorityFeeMicroLamports(
           ? STRATEGY_PERCENTILE[dynamic.strategy]
           : DEFAULT_DYNAMIC_PERCENTILE;
 
-    const index = Math.min(
-      fees.length - 1,
-      Math.floor((percentile / 100) * (fees.length - 0.01))
-    );
+    const index = Math.min(fees.length - 1, Math.floor((percentile / 100) * (fees.length - 0.01)));
     let microLamports = fees[index] ?? 0n;
     if (dynamic.min !== undefined && microLamports < BigInt(dynamic.min)) {
       microLamports = BigInt(dynamic.min);
