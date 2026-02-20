@@ -40,6 +40,7 @@ import {
 import {
   estimateComputeUnitLimitFactory,
   getSetComputeUnitLimitInstruction,
+  getSetComputeUnitPriceInstruction,
 } from '@solana-program/compute-budget';
 import {
   getCreateAssociatedTokenIdempotentInstructionAsync,
@@ -51,6 +52,7 @@ import { Logger } from '../../logger/Logger.js';
 import { Wallet } from '../../types.js';
 import { SolanaConfig } from '../../config/types.js';
 import { convertHttpToWebSocketUrl } from '../../utils/convertHttpToWebSocketUrl.js';
+import { resolvePriorityFeeMicroLamports } from './priorityFees.js';
 
 /**
  * Factory function to create an estimateAndSetComputeUnitLimit function
@@ -359,7 +361,20 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
         const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
 
         // Normalize instructions to array
-        const instructionsArray = Array.isArray(instructions) ? instructions : [instructions];
+        let instructionsArray = Array.isArray(instructions) ? instructions : [instructions];
+
+        // Prepend priority fee instruction when config.priorityFees is set
+        if (config.priorityFees) {
+          const microLamports = await resolvePriorityFeeMicroLamports(
+            config.priorityFees,
+            rpc,
+            deps.logger
+          );
+          instructionsArray = [
+            getSetComputeUnitPriceInstruction({ microLamports }),
+            ...instructionsArray,
+          ];
+        }
 
         // Helper to check if the feePayer is a TransactionSigner
         const isSigner = (
@@ -677,8 +692,8 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
         const transactionBlockhash =
           'lifetimeConstraint' in decompiled &&
-          decompiled.lifetimeConstraint &&
-          'blockhash' in decompiled.lifetimeConstraint
+            decompiled.lifetimeConstraint &&
+            'blockhash' in decompiled.lifetimeConstraint
             ? decompiled.lifetimeConstraint.blockhash
             : null;
 
