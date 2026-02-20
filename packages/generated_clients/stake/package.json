@@ -12,7 +12,6 @@
     }
   },
   "scripts": {
-    "prepack": "pnpm run build:with-deps",
     "build": "tsc",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
     "dev": "tsc --watch",

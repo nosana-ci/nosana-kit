@@ -104,12 +104,14 @@ deploy-force:
   variables:
     LERNA_FORCE: "--force-publish"
 
-# When a tag is pushed (by deploy): publish those packages to npm (prepack builds each package).
+# When a tag is pushed (by deploy): publish those packages to npm.
+# Build all packages from root first so dist/ exists before Lerna packs.
 lerna-publish:
   stage: deploy
   dependencies: []  # do not pull artifacts from trigger stage (we don't need them)
   script:
     - pnpm install --frozen-lockfile
+    - pnpm run build
     - pnpm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
     - pnpm run publish
   rules:
