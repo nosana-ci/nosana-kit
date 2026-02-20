@@ -1,11 +1,12 @@
+import type { components } from '@nosana/types';
+
 import { errorFormatter } from '../../utils/errorFormatter.js';
 import { withPagination } from '../../utils/withPagination.js';
 import { createVault as createVaultFn } from './deployment/createVault.js';
 import { createDeployment as createDeploymentFn } from './deployment/createDeployment.js';
 
 import type { RouteOptions, RouteOptionsWithSigner } from '../../types.js';
-import type { CreateDeployment, DeploymentCreateBody, Deployment, DeploymentsApi, ApiDeploymentsApi, ApiDeployment, PaginationParams, DeploymentListResult, ApiDeploymentListResult } from './types.js';
-import type { components } from '@nosana/types';
+import type { CreateDeployment, DeploymentCreateBody, Deployment, DeploymentsApi, ApiDeploymentsApi, ApiDeployment, DeploymentListResult, ApiDeploymentListResult, DeploymentsSearchParams } from './types.js';
 
 type DeploymentSchema = components['schemas']['Deployment'];
 
@@ -47,13 +48,11 @@ export function createDeploymentsApi(options: RouteOptions | RouteOptionsWithSig
     return createDeployment(data);
   };
 
-  const list = async (params?: PaginationParams): Promise<DeploymentListResult | ApiDeploymentListResult> => {
+  const list = async (searchParams?: DeploymentsSearchParams): Promise<DeploymentListResult | ApiDeploymentListResult> => {
     const { data, error } = await options.client.GET('/api/deployments', {
       params: {
         query: {
-          cursor: params?.cursor,
-          limit: params?.limit,
-          sort_order: params?.sort_order,
+          ...searchParams,
         },
       },
     });
@@ -67,7 +66,7 @@ export function createDeploymentsApi(options: RouteOptions | RouteOptionsWithSig
         ...data,
         deployments: data.deployments.map((deployment) => createDeployment(deployment)),
       },
-      (cursor) => list({ ...params, cursor })
+      (cursor) => list({ ...searchParams, cursor })
     );
   };
 

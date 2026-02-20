@@ -26,7 +26,10 @@ import type {
   JobListResult,
   RevisionListResult,
   EventListResult,
-  TaskListResult
+  TaskListResult,
+  DeploymentJobsSearchParams,
+  DeploymentRevisionsSearchParams,
+  DeploymentEventsSearchParams
 } from '../types.js';
 import type { RouteOptions, RouteOptionsWithSigner } from '../../../types.js';
 import type { components } from '@nosana/types';
@@ -175,8 +178,8 @@ export function createDeployment(
    * This will return the current jobs associated with the deployment.
    * It is useful for monitoring the deployment's job status.
    */
-  const getJobs = async (params?: PaginationParams): Promise<JobListResult> => {
-    return await deploymentGetJobs(options.client, state, params);
+  const getJobs = async (searchParams?: DeploymentJobsSearchParams): Promise<JobListResult> => {
+    return await deploymentGetJobs(options.client, state, searchParams);
   };
 
   /**
@@ -188,8 +191,8 @@ export function createDeployment(
    * This will return all revisions associated with the deployment.
    * It is useful for viewing the deployment history.
    */
-  const getRevisions = async (params?: PaginationParams): Promise<RevisionListResult> => {
-    return await deploymentGetRevisions(options.client, state, params);
+  const getRevisions = async (searchParams?: DeploymentRevisionsSearchParams): Promise<RevisionListResult> => {
+    return await deploymentGetRevisions(options.client, state, searchParams);
   };
 
   /**
@@ -201,8 +204,8 @@ export function createDeployment(
    * This will return all events associated with the deployment.
    * It is useful for monitoring deployment activity and debugging.
    */
-  const getEvents = async (params?: PaginationParams): Promise<EventListResult> => {
-    return await deploymentGetEvents(options.client, state, params);
+  const getEvents = async (searchParams?: DeploymentEventsSearchParams): Promise<EventListResult> => {
+    return await deploymentGetEvents(options.client, state, searchParams);
   };
 
   /**

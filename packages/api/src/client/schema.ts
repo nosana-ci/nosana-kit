@@ -165,12 +165,16 @@ export interface paths {
                     limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
                     /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
                     sort_order?: "asc" | "desc";
+                    /** @description Search for partial matches in deployment ID or name (case-insensitive) */
+                    search?: string;
+                    /** @description Filter by exact deployment ID */
+                    id?: string;
+                    /** @description Filter by exact deployment name */
+                    name?: string;
                     /** @description Filter by deployment status. Can be single value or comma-separated list */
                     status?: ("DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED") | string;
                     /** @description Filter by deployment strategy. Can be single value or comma-separated list */
                     strategy?: ("SIMPLE" | "SIMPLE-EXTEND" | "SCHEDULED" | "INFINITE") | string;
-                    /** @description Filter by exact deployment ID */
-                    id?: string;
                     /** @description Filter by vault public key */
                     vault?: string;
                     /** @description Filter deployments created after this date (ISO 8601 format) */

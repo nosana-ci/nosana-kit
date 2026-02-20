@@ -2,7 +2,7 @@ import { errorFormatter } from '../../../../utils/errorFormatter.js';
 import { withPagination } from '../../../../utils/withPagination.js';
 
 import type { QueryClient } from '../../../../client/index.js';
-import type { DeploymentState, PaginationParams, EventListResult } from '../../types.js';
+import type { DeploymentState, DeploymentEventsSearchParams, EventListResult } from '../../types.js';
 
 /**
  * @returns Promise<EventListResult>
@@ -15,7 +15,7 @@ import type { DeploymentState, PaginationParams, EventListResult } from '../../t
 export async function deploymentGetEvents(
   client: QueryClient,
   state: DeploymentState,
-  params?: PaginationParams,
+  searchParams?: DeploymentEventsSearchParams,
 ): Promise<EventListResult> {
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/events',
@@ -23,9 +23,7 @@ export async function deploymentGetEvents(
       params: {
         path: { deployment: state.id },
         query: {
-          cursor: params?.cursor,
-          limit: params?.limit,
-          sort_order: params?.sort_order,
+          ...searchParams,
         },
       },
     },
@@ -37,6 +35,6 @@ export async function deploymentGetEvents(
 
   return withPagination(
     data,
-    (cursor) => deploymentGetEvents(client, state, { ...params, cursor })
+    (cursor) => deploymentGetEvents(client, state, { ...searchParams, cursor })
   );
 }

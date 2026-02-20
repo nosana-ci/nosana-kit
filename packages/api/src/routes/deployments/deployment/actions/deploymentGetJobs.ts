@@ -2,7 +2,7 @@ import { errorFormatter } from '../../../../utils/errorFormatter.js';
 import { withPagination } from '../../../../utils/withPagination.js';
 
 import type { QueryClient } from '../../../../client/index.js';
-import type { DeploymentState, PaginationParams, JobListResult } from '../../types.js';
+import type { DeploymentState, JobListResult, DeploymentJobsSearchParams } from '../../types.js';
 
 /**
  * @returns Promise<JobListResult>
@@ -15,7 +15,7 @@ import type { DeploymentState, PaginationParams, JobListResult } from '../../typ
 export async function deploymentGetJobs(
   client: QueryClient,
   state: DeploymentState,
-  params?: PaginationParams,
+  searchParams?: DeploymentJobsSearchParams,
 ): Promise<JobListResult> {
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/jobs',
@@ -23,9 +23,7 @@ export async function deploymentGetJobs(
       params: {
         path: { deployment: state.id },
         query: {
-          cursor: params?.cursor,
-          limit: params?.limit,
-          sort_order: params?.sort_order,
+          ...searchParams,
         },
       },
     },
@@ -37,6 +35,6 @@ export async function deploymentGetJobs(
 
   return withPagination(
     data,
-    (cursor) => deploymentGetJobs(client, state, { ...params, cursor })
+    (cursor) => deploymentGetJobs(client, state, { ...searchParams, cursor })
   );
 }

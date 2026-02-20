@@ -2,7 +2,7 @@ import { errorFormatter } from '../../../../utils/errorFormatter.js';
 import { withPagination } from '../../../../utils/withPagination.js';
 
 import type { QueryClient } from '../../../../client/index.js';
-import type { DeploymentState, PaginationParams, RevisionListResult } from '../../types.js';
+import type { DeploymentRevisionsSearchParams, DeploymentState, RevisionListResult } from '../../types.js';
 
 /**
  * @returns Promise<RevisionListResult>
@@ -15,7 +15,7 @@ import type { DeploymentState, PaginationParams, RevisionListResult } from '../.
 export async function deploymentGetRevisions(
   client: QueryClient,
   state: DeploymentState,
-  params?: PaginationParams,
+  searchParams?: DeploymentRevisionsSearchParams,
 ): Promise<RevisionListResult> {
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/revisions',
@@ -23,9 +23,7 @@ export async function deploymentGetRevisions(
       params: {
         path: { deployment: state.id },
         query: {
-          cursor: params?.cursor,
-          limit: params?.limit,
-          sort_order: params?.sort_order,
+          ...searchParams,
         },
       },
     },
@@ -37,6 +35,6 @@ export async function deploymentGetRevisions(
 
   return withPagination(
     data,
-    (cursor) => deploymentGetRevisions(client, state, { ...params, cursor })
+    (cursor) => deploymentGetRevisions(client, state, { ...searchParams, cursor })
   );
 }
