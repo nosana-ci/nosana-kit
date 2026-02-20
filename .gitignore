@@ -5,6 +5,7 @@ package-lock.json
 # Build output
 dist/
 build/
+*.tsbuildinfo
 
 # Test coverage
 coverage/
