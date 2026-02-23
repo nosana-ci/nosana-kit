@@ -1,15 +1,18 @@
-import { createNosanaApiClient } from './client/index.js';
+import { createNosanaClientManagerApiClient, createNosanaDashboardApiClient } from './client/index.js';
+import { NosanaAuthApi } from './routes/auth/types.js';
 import {
   createNosanaJobsApi, type NosanaJobsApi,
   createNosanaCreditsApi, type NosanaCreditsApi,
   createNosanaMarketsApi, type NosanaMarketsApi,
-  createDeploymentsApi, type DeploymentsApi, type ApiDeploymentsApi
+  createDeploymentsApi, type DeploymentsApi, type ApiDeploymentsApi,
+  createNosanaAuthApi
 } from './routes/index.js';
 
 import { NosanaNetwork } from './types.js';
 import type { ApiKeyAuth, CreateNosanaApiOptions, SignerAuth, NosanaNetwork as NosanaNetworkType } from './types.js';
 
 export interface NosanaApi {
+  auth: NosanaAuthApi;
   jobs: NosanaJobsApi;
   credits: NosanaCreditsApi;
   markets: NosanaMarketsApi;
@@ -17,6 +20,7 @@ export interface NosanaApi {
 }
 
 export interface NosanaApiWithApiKey {
+  auth: NosanaAuthApi;
   jobs: NosanaJobsApi;
   credits: NosanaCreditsApi;
   markets: NosanaMarketsApi;
@@ -35,16 +39,19 @@ export function createNosanaApi(
   signerOrApiKey: SignerAuth | ApiKeyAuth | undefined,
   options?: CreateNosanaApiOptions,
 ): NosanaApiClient {
-  const client = createNosanaApiClient(environment, signerOrApiKey, options);
   const hasApiKey = typeof signerOrApiKey === 'string';
 
+  const clientManagerClient = createNosanaClientManagerApiClient(environment, signerOrApiKey, options);
+  const dashboardClient = createNosanaDashboardApiClient(environment, signerOrApiKey, options);
+
   return {
-    jobs: createNosanaJobsApi(client),
-    credits: createNosanaCreditsApi(client),
-    markets: createNosanaMarketsApi(client),
+    auth: createNosanaAuthApi(clientManagerClient),
+    jobs: createNosanaJobsApi(dashboardClient),
+    credits: createNosanaCreditsApi(dashboardClient),
+    markets: createNosanaMarketsApi(dashboardClient),
     deployments: !hasApiKey && signerOrApiKey
-      ? createDeploymentsApi({ client, solana: signerOrApiKey.solana }, false)
-      : createDeploymentsApi({ client }, true)
+      ? createDeploymentsApi({ client: dashboardClient, solana: signerOrApiKey.solana }, false)
+      : createDeploymentsApi({ client: dashboardClient }, true)
   };
 }
 
