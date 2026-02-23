@@ -34,11 +34,13 @@ export type SignerAuth = {
 
 export type CreateNosanaApiOptions = Partial<{
   backend_url: string;
+  client_manager_url: string;
   include_credentials: boolean;
 }>
 
 export interface Config {
   backend_url: string;
+  client_manager_url: string;
   nos_address: string;
 }
 
