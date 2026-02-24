@@ -1,8 +1,13 @@
-import { address } from '@solana/kit';
+import { address, type Address } from '@solana/kit';
 import type { NosanaNetwork } from '@nosana/types';
 
 import type { ClientConfig } from './types.js';
 import type { LogLevel } from '../logger/Logger.js';
+
+// Priority fee defaults (matches legacy SDK); used only in DEFAULT_CONFIGS below
+const SOL_MINT_ADDRESS: Address = address('So11111111111111111111111111111111111111112');
+const USDC_MINT_ADDRESS: Address = address('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
+const USDC_DEVNET_MINT_ADDRESS: Address = address('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');
 
 export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
   mainnet: {
@@ -10,6 +15,13 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
       cluster: 'mainnet-beta',
       rpcEndpoint: 'https://rpc.ironforge.network/mainnet?apiKey=01J4RYMAWZC65B6CND9DTZZ5BK',
       commitment: 'confirmed',
+      priorityFees: {
+        type: 'dynamic',
+        strategy: 'medium',
+        min: 10_000,
+        max: 15_000_000,
+        accountAddresses: [SOL_MINT_ADDRESS, USDC_MINT_ADDRESS],
+      },
     },
     ipfs: {
       api: 'https://api.pinata.cloud',
@@ -31,6 +43,13 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
       cluster: 'devnet',
       rpcEndpoint: 'https://api.devnet.solana.com',
       commitment: 'confirmed',
+      priorityFees: {
+        type: 'dynamic',
+        strategy: 'medium',
+        min: 10_000,
+        max: 15_000_000,
+        accountAddresses: [SOL_MINT_ADDRESS, USDC_DEVNET_MINT_ADDRESS],
+      },
     },
     ipfs: {
       api: 'https://api.pinata.cloud',
