@@ -357,9 +357,6 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       }
 
       try {
-        // Get latest blockhash
-        const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
-
         // Normalize instructions to array
         let instructionsArray = Array.isArray(instructions) ? instructions : [instructions];
 
@@ -380,6 +377,9 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
         const isSigner = (
           value: TransactionSigner | Address | string
         ): value is TransactionSigner => typeof value === 'object' && isTransactionSigner(value);
+
+        // Get latest blockhash as late as possible to minimize staleness
+        const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
 
         // Build transaction message using pipe
         // Use setTransactionMessageFeePayerSigner for TransactionSigner, setTransactionMessageFeePayer for Address
