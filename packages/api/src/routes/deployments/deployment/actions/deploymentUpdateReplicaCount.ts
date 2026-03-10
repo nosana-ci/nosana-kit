@@ -1,6 +1,6 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
-import type { QueryClient } from '../../../../client/index.js';
+import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import { type DeploymentState } from '../../types.js';
 
 /**
@@ -13,7 +13,7 @@ import { type DeploymentState } from '../../types.js';
  */
 export async function deploymentUpdateReplicaCount(
   replicas: number,
-  client: QueryClient,
+  client: DeploymentManagerClient,
   state: DeploymentState,
 ): Promise<void> {
   if (replicas < 1) {

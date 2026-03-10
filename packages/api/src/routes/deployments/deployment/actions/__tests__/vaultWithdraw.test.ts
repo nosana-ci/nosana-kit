@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 import { vaultWithdraw } from '../vaultWithdraw.js';
 
 describe('vaultWithdraw', () => {
-  const mockOptions = global.TEST_ROUTE_OPTIONS_WITH_SIGNER;
+  const mockOptions = global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER;
   const vaultAddress = global.TEST_MOCK_DEPLOYMENT.vault;
 
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('vaultWithdraw', () => {
 
   describe("when data is returned", () => {
     beforeEach(() => {
-      (mockOptions.client.POST as Mock).mockResolvedValue({
+      (mockOptions.deploymentManager.POST as Mock).mockResolvedValue({
         data: { transaction: global.TEST_MOCK_TRANSACTION_SIGNATURE },
         error: null,
       });
@@ -21,7 +21,7 @@ describe('vaultWithdraw', () => {
     it('should successfully withdraw from vault', async () => {
       await vaultWithdraw(vaultAddress, mockOptions);
 
-      expect(mockOptions.client.POST).toHaveBeenCalledWith(
+      expect(mockOptions.deploymentManager.POST).toHaveBeenCalledWith(
         '/api/deployments/vaults/{vault}/withdraw',
         {
           params: {
@@ -47,7 +47,7 @@ describe('vaultWithdraw', () => {
   })
 
   test('when api returns error, it should throw formatted error', async () => {
-    (mockOptions.client.POST as Mock).mockResolvedValue({
+    (mockOptions.deploymentManager.POST as Mock).mockResolvedValue({
       data: null,
       error: { message: 'Server error' },
     });
@@ -58,7 +58,7 @@ describe('vaultWithdraw', () => {
   });
 
   test('when api returns no data, it should throw formatted error', async () => {
-    (mockOptions.client.POST as Mock).mockResolvedValue({
+    (mockOptions.deploymentManager.POST as Mock).mockResolvedValue({
       data: null,
       error: null,
     });

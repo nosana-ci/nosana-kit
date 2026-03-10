@@ -4,7 +4,7 @@
  */
 
 import { vi, beforeEach, afterEach } from 'vitest';
-import { createMockQueryClient, createMockSolanaFunctions } from './mockFactory.js';
+import { createMockClient, createMockSolanaFunctions } from './mockFactory.js';
 
 // Mock openapi-fetch globally
 vi.mock('openapi-fetch', () => ({
@@ -21,18 +21,16 @@ afterEach(() => {
 });
 
 // Global mock client for API tests
-global.TEST_MOCK_CLIENT = createMockQueryClient();
+global.TEST_MOCK_CLIENT = createMockClient();
 
-global.TEST_ROUTE_OPTIONS_WITH_SIGNER = {
-  client: createMockQueryClient(),
+global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER = {
+  deploymentManager: createMockClient(),
   solana: createMockSolanaFunctions(),
 }
 
 // Auth fixtures
 global.TEST_API_KEY = 'test-api-key';
-global.TEST_NOSANA_API_OPTIONS = {
-  backend_url: 'https://api.test.com',
-};
+global.TEST_NOSANA_API_OPTIONS = {};
 
 // Request fixtures
 global.TEST_CREATE_JOB_REQUEST = {

@@ -28,7 +28,7 @@ vi.mock('../createVault.js', () => ({
 
 describe('createDeployment', () => {
   it('should create a deployment with all methods', () => {
-    const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+    const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
     expect(deployment.id).toBe('8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH');
     expect(deployment.start).toBeTypeOf('function');
@@ -45,21 +45,21 @@ describe('createDeployment', () => {
   });
 
   it('should convert date strings to Date objects', () => {
-    const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+    const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
     expect(deployment.created_at).toBeInstanceOf(Date);
     expect(deployment.updated_at).toBeInstanceOf(Date);
   });
 
   test('when hasApiKey is false, it should include vault', () => {
-    const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, false);
+    const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, false);
 
     expect(deployment.vault).toBeDefined();
     expect(deployment.vault.address).toBe('vault-address');
   });
 
   test('when hasApiKey is true, vault should not be a Vault object with methods', () => {
-    const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+    const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
     // vault is preserved from input as string, not converted to Vault object
     expect(typeof (deployment).vault).toBe('string');
@@ -67,24 +67,24 @@ describe('createDeployment', () => {
 
   describe('method execution', () => {
     test('when generateAuthHeader method is invoked, it should call generateAuthHeader action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
       const result = await deployment.generateAuthHeader();
 
       expect(actions.deploymentGenerateAuthHeader).toHaveBeenCalledWith(
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
       expect(result).toBe('auth-header');
     });
 
     test('when getJob method is invoked, it should call getJob action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
       const result = await deployment.getJob('job-123');
 
       expect(actions.deploymentGetJob).toHaveBeenCalledWith(
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         global.TEST_MOCK_DEPLOYMENT.id,
         'job-123',
       );
@@ -92,57 +92,57 @@ describe('createDeployment', () => {
     });
 
     test('when updateSchedule method is invoked, it should call updateSchedule action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
       await deployment.updateSchedule('0 0 * * *');
 
       expect(actions.deploymentUpdateSchedule).toHaveBeenCalledWith(
         '0 0 * * *',
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
     });
 
     test('when start method is invoked, it should call start action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
       await deployment.start();
 
       expect(actions.deploymentStart).toHaveBeenCalledWith(
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
     });
 
     test('when stop method is invoked, it should call stop action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
       await deployment.stop();
 
       expect(actions.deploymentStop).toHaveBeenCalledWith(
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
     });
 
     test('when archive method is invoked, it should call archive action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
       await deployment.archive();
 
       expect(actions.deploymentArchive).toHaveBeenCalledWith(
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
     });
 
     test('when getTasks method is invoked, it should call getTasks action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
       const result = await deployment.getTasks();
 
       expect(actions.deploymentGetTasks).toHaveBeenCalledWith(
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
         undefined,
       );
@@ -150,7 +150,7 @@ describe('createDeployment', () => {
     });
 
     test('when createRevision method is invoked, it should call createRevision action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
       const jobDefinition = {
         version: '0.1',
         type: 'container',
@@ -162,43 +162,43 @@ describe('createDeployment', () => {
 
       expect(actions.deploymentCreateNewRevision).toHaveBeenCalledWith(
         jobDefinition,
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
     });
 
     test('when updateReplicaCount method is invoked, it should call updateReplicaCount action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
       await deployment.updateReplicaCount(3);
 
       expect(actions.deploymentUpdateReplicaCount).toHaveBeenCalledWith(
         3,
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
     });
 
     test('when updateActiveRevision method is invoked, it should call updateActiveRevision action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
       await deployment.updateActiveRevision(2);
 
       expect(actions.deploymentUpdateActiveRevision).toHaveBeenCalledWith(
         2,
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
     });
 
     test('when updateTimeout method is invoked, it should call updateTimeout action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_ROUTE_OPTIONS_WITH_SIGNER, true);
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
       await deployment.updateTimeout(120);
 
       expect(actions.deploymentUpdateTimeout).toHaveBeenCalledWith(
         120,
-        global.TEST_ROUTE_OPTIONS_WITH_SIGNER.client,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
     });

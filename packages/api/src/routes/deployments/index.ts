@@ -5,23 +5,25 @@ import { withPagination } from '../../utils/withPagination.js';
 import { createVault as createVaultFn } from './deployment/createVault.js';
 import { createDeployment as createDeploymentFn } from './deployment/createDeployment.js';
 
-import type { RouteOptions, RouteOptionsWithSigner } from '../../types.js';
+import type { DeploymentRouteClients, DeploymentRouteClientsWithSigner } from '../../types.js';
 import type { CreateDeployment, DeploymentCreateBody, Deployment, DeploymentsApi, ApiDeploymentsApi, ApiDeployment, DeploymentListResult, ApiDeploymentListResult, DeploymentsSearchParams } from './types.js';
 
 type DeploymentSchema = components['schemas']['Deployment'];
 
 export type { DeploymentsApi, ApiDeploymentsApi } from './types.js';
 
-export function createDeploymentsApi(options: RouteOptions, hasApiKey: true): ApiDeploymentsApi;
-export function createDeploymentsApi(options: RouteOptionsWithSigner, hasApiKey: false): DeploymentsApi;
+export function createDeploymentsApi(clients: DeploymentRouteClients, hasApiKey: true): ApiDeploymentsApi;
+export function createDeploymentsApi(clients: DeploymentRouteClientsWithSigner, hasApiKey: false): DeploymentsApi;
 
-export function createDeploymentsApi(options: RouteOptions | RouteOptionsWithSigner, hasApiKey: true | false): DeploymentsApi | ApiDeploymentsApi {
-  const createDeployment = (data: DeploymentSchema) => !hasApiKey && "solana" in options
-    ? createDeploymentFn(data, options, false)
-    : createDeploymentFn(data, options, true);
+export function createDeploymentsApi(clients: DeploymentRouteClients | DeploymentRouteClientsWithSigner, hasApiKey: true | false): DeploymentsApi | ApiDeploymentsApi {
+  const client = clients.deploymentManager;
+
+  const createDeployment = (data: DeploymentSchema) => !hasApiKey && "solana" in clients
+    ? createDeploymentFn(data, clients, false)
+    : createDeploymentFn(data, clients, true);
 
   const create = async (deploymentBody: CreateDeployment) => {
-    const { data, error } = await options.client.POST('/api/deployments/create', {
+    const { data, error } = await client.POST('/api/deployments/create', {
       body: deploymentBody as DeploymentCreateBody,
     });
 
@@ -33,7 +35,7 @@ export function createDeploymentsApi(options: RouteOptions | RouteOptionsWithSig
   };
 
   const get = async (deployment: string) => {
-    const { data, error } = await options.client.GET('/api/deployments/{deployment}', {
+    const { data, error } = await client.GET('/api/deployments/{deployment}', {
       params: {
         path: {
           deployment,
@@ -49,7 +51,7 @@ export function createDeploymentsApi(options: RouteOptions | RouteOptionsWithSig
   };
 
   const list = async (searchParams?: DeploymentsSearchParams): Promise<DeploymentListResult | ApiDeploymentListResult> => {
-    const { data, error } = await options.client.GET('/api/deployments', {
+    const { data, error } = await client.GET('/api/deployments', {
       params: {
         query: {
           ...searchParams,
@@ -90,11 +92,11 @@ export function createDeploymentsApi(options: RouteOptions | RouteOptionsWithSig
   };
 
   const createVault = async () => {
-    if (hasApiKey || !('solana' in options)) {
+    if (hasApiKey || !('solana' in clients)) {
       throw errorFormatter('Creating a vault requires signer authentication');
     }
 
-    const { data, error } = await options.client.POST('/api/deployments/vaults/create', {});
+    const { data, error } = await client.POST('/api/deployments/vaults/create', {});
 
     if (error || !data) {
       throw errorFormatter('Error creating vault', error);
@@ -102,17 +104,17 @@ export function createDeploymentsApi(options: RouteOptions | RouteOptionsWithSig
 
     return createVaultFn(
       data.vault,
-      options,
+      clients,
       new Date(data.created_at)
     );
   };
 
   const listVaults = async () => {
-    if (hasApiKey || !('solana' in options)) {
+    if (hasApiKey || !('solana' in clients)) {
       throw errorFormatter('Creating a vault requires signer authentication');
     }
 
-    const { data, error } = await options.client.GET('/api/deployments/vaults', {});
+    const { data, error } = await client.GET('/api/deployments/vaults', {});
 
     if (error || !data) {
       throw errorFormatter('Error listing vaults', error);
@@ -120,7 +122,7 @@ export function createDeploymentsApi(options: RouteOptions | RouteOptionsWithSig
 
     return data.map(({ vault, created_at }) => createVaultFn(
       vault,
-      options,
+      clients,
       new Date(created_at),
     ));
   };

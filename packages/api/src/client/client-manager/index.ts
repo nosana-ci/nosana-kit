@@ -1,13 +1,13 @@
 import createClient, { Client, type Middleware } from 'openapi-fetch';
 
-import { defaultConfig } from '../defaults/index.js';
+import { defaultConfig } from '../../defaults/index.js';
 
 import type {
   NosanaNetwork,
   ApiKeyAuth,
   SignerAuth,
   CreateNosanaApiOptions,
-} from '../types.js';
+} from '../../types.js';
 
 // Types for /auth/sign-message/external endpoint
 export interface SignMessageExternalRequest {

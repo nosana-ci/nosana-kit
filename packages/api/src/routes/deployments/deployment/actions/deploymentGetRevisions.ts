@@ -1,7 +1,7 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 import { withPagination } from '../../../../utils/withPagination.js';
 
-import type { QueryClient } from '../../../../client/index.js';
+import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type { DeploymentRevisionsSearchParams, DeploymentState, RevisionListResult } from '../../types.js';
 
 /**
@@ -13,7 +13,7 @@ import type { DeploymentRevisionsSearchParams, DeploymentState, RevisionListResu
  * It is useful for viewing the deployment history.
  */
 export async function deploymentGetRevisions(
-  client: QueryClient,
+  client: DeploymentManagerClient,
   state: DeploymentState,
   searchParams?: DeploymentRevisionsSearchParams,
 ): Promise<RevisionListResult> {

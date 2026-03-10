@@ -1,13 +1,12 @@
 import { vi } from 'vitest';
-import type { QueryClient } from '../src/client';
+import type { DeploymentManagerClient } from '../src/client';
 import type { ExternalSolanaFunctions } from '../src/types';
 
 /**
- * Creates a mock QueryClient for testing
- * Returns an object with vi.fn() mocks that can be used with .mockResolvedValue() etc
- * Typed as QueryClient for compatibility with code that expects a real client
+ * Creates a mock API client for testing.
+ * Works for any openapi-fetch based client (QueryClient, BlockchainIndexerClient, DeploymentManagerClient, etc.)
  */
-export function createMockQueryClient(): QueryClient {
+export function createMockClient() {
   return {
     GET: vi.fn(),
     POST: vi.fn(),
@@ -20,7 +19,14 @@ export function createMockQueryClient(): QueryClient {
     request: vi.fn(),
     use: vi.fn(),
     eject: vi.fn(),
-  } as QueryClient;
+  };
+}
+
+/**
+ * Creates a mock DeploymentManagerClient for testing
+ */
+export function createMockDeploymentManagerClient(): DeploymentManagerClient {
+  return createMockClient() as DeploymentManagerClient;
 }
 
 /**

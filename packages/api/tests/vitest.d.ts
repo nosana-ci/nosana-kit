@@ -1,19 +1,19 @@
 /// <reference types="vitest/globals" />
 
 import 'vitest';
-import type { ApiKeyAuth, Balance, CreateDeployment, CreateNosanaApiOptions, Market, MarketRequiredResources, NosanaApiExtendJobRequest, NosanaApiExtendJobResponse, NosanaApiGetJobByAddressResponse, NosanaApiListJobRequest, NosanaApiListJobResponse, NosanaApiStopJobResponse, RouteOptions, RouteOptionsWithSigner, Task } from '../src';
+import type { ApiKeyAuth, Balance, CreateDeployment, CreateNosanaApiOptions, Market, MarketRequiredResources, NosanaApiExtendJobRequest, NosanaApiExtendJobResponse, NosanaApiGetJobByAddressResponse, NosanaApiListJobRequest, NosanaApiListJobResponse, NosanaApiStopJobResponse, DeploymentRouteClientsWithSigner, Task } from '../src';
 import type { Mock } from 'vitest';
 import { Deployment } from '@nosana/types';
-import { QueryClient } from '../src/client';
 
 declare global {
   // Auth fixtures
   var TEST_API_KEY: ApiKeyAuth;
   var TEST_NOSANA_API_OPTIONS: CreateNosanaApiOptions;
 
-  // Mock client (used across all API tests) - typed as QueryClient but runtime is mocked
-  var TEST_MOCK_CLIENT: QueryClient;
-  var TEST_ROUTE_OPTIONS_WITH_SIGNER: RouteOptionsWithSigner;
+  // Mock client (used across all API tests) - runtime is mocked via openapi-fetch mock
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  var TEST_MOCK_CLIENT: any;
+  var TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER: DeploymentRouteClientsWithSigner;
 
   // Job fixtures
   var TEST_CREATE_JOB_REQUEST: NosanaApiListJobRequest;

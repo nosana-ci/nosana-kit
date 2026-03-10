@@ -1,4 +1,4 @@
-import { ClientManagerClient } from '../../client/clientManagerClient.js';
+import { ClientManagerClient } from '../../client/client-manager/index.js';
 import { errorFormatter } from '../../utils/errorFormatter.js';
 
 import type { NosanaAuthApi } from './types.js';

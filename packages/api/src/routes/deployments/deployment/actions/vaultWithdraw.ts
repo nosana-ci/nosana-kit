@@ -1,6 +1,6 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
-import type { RouteOptionsWithSigner } from '../../../../types.js';
+import type { DeploymentRouteClientsWithSigner } from '../../../../types.js';
 
 /**
  * Withdraws all tokens from a vault.
@@ -11,12 +11,12 @@ import type { RouteOptionsWithSigner } from '../../../../types.js';
  * 2. Sign and send the transaction using wallet from @nosana/kit
  *
  * @param vaultAddress - The vault's Solana address
- * @param options - Options including QueryClient for API calls
+ * @param clients - Clients including DeploymentManagerClient and Solana functions
  * @returns Promise that resolves when withdrawal is complete
  */
 export async function vaultWithdraw(
   vaultAddress: string,
-  { client, solana: { deserializeSignSendAndConfirmTransaction } }: RouteOptionsWithSigner
+  { deploymentManager: client, solana: { deserializeSignSendAndConfirmTransaction } }: DeploymentRouteClientsWithSigner
 ): Promise<void> {
   const { data, error } = await client.POST('/api/deployments/vaults/{vault}/withdraw', {
     params: {

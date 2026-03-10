@@ -1,6 +1,6 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
-import type { QueryClient } from '../../../../client/index.js';
+import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type { DeploymentState } from '../../types.js';
 import { DeploymentStatus } from '@nosana/types';
 
@@ -11,7 +11,7 @@ import { DeploymentStatus } from '@nosana/types';
  * @description Starts the deployment.
  */
 export async function deploymentStart(
-  client: QueryClient,
+  client: DeploymentManagerClient,
   state: DeploymentState,
 ): Promise<void> {
   if ([DeploymentStatus.STARTING, DeploymentStatus.RUNNING].includes(state.status)) {

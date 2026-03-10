@@ -1,6 +1,6 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
-import type { QueryClient } from '../../../../client/index.js';
+import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type { DeploymentState } from '../../types.js';
 import { DeploymentStatus } from '@nosana/types';
 
@@ -13,7 +13,7 @@ import { DeploymentStatus } from '@nosana/types';
  * It is useful for cleaning up deployments that are no longer needed.
  */
 export async function deploymentArchive(
-  client: QueryClient,
+  client: DeploymentManagerClient,
   state: DeploymentState,
 ): Promise<void> {
   if (state.status !== DeploymentStatus.STOPPED) {

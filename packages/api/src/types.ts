@@ -1,4 +1,7 @@
-import { QueryClient } from './client/index.js';
+import type { ClientManagerClient } from './client/client-manager/index.js';
+import type { BlockchainIndexerClient } from './client/blockchain-indexer/index.js';
+import type { HostManagerClient } from './client/host-manager/index.js';
+import type { DeploymentManagerClient } from './client/deployment-manager/index.js';
 import { TopupVaultOptions } from './routes/deployments/types.js';
 
 // Re-export shared types from @nosana/types
@@ -33,21 +36,35 @@ export type SignerAuth = {
 }
 
 export type CreateNosanaApiOptions = Partial<{
-  backend_url: string;
   client_manager_url: string;
+  host_manager_url: string;
+  blockchain_indexer_url: string;
+  deployment_manager_url: string;
   include_credentials: boolean;
 }>
 
 export interface Config {
-  backend_url: string;
   client_manager_url: string;
+  host_manager_url: string;
+  blockchain_indexer_url: string;
+  deployment_manager_url: string;
   nos_address: string;
 }
 
-export interface RouteOptions {
-  client: QueryClient
+/**
+ * All available API clients, organized by service.
+ */
+export interface NosanaClients {
+  clientManager: ClientManagerClient;
+  hostManager: HostManagerClient;
+  blockchainIndexer: BlockchainIndexerClient;
+  deploymentManager: DeploymentManagerClient;
 }
 
-export type RouteOptionsWithSigner = RouteOptions & {
-  solana: ExternalSolanaFunctions
+export interface DeploymentRouteClients {
+  deploymentManager: DeploymentManagerClient;
+}
+
+export type DeploymentRouteClientsWithSigner = DeploymentRouteClients & {
+  solana: ExternalSolanaFunctions;
 }

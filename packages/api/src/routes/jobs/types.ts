@@ -1,4 +1,4 @@
-import { operations } from "../../client/schema.js";
+import { operations } from "../../client/blockchain-indexer/schema.js";
 
 // Request types from OpenAPI
 export type NosanaApiGetJobByAddressRequest = operations['getApiJobsByAddress']['parameters']['path']['address'];

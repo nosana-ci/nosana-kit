@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 import { vaultTopup } from '../vaultTopup.js';
 
 describe('vaultTopup', () => {
-  const mockOptions = global.TEST_ROUTE_OPTIONS_WITH_SIGNER;
+  const mockOptions = global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER;
   const vaultAddress = global.TEST_MOCK_DEPLOYMENT.vault;
   const topupOptions = { SOL: 0.5, NOS: 10 };
 

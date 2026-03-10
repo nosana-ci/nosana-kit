@@ -1,6 +1,6 @@
 import { errorFormatter } from '../../utils/errorFormatter.js';
 
-import type { QueryClient } from '../../client/index.js';
+import type { BlockchainIndexerClient } from '../../client/blockchain-indexer/index.js';
 import type {
   NosanaJobsApi,
   NosanaApiExtendJobRequest,
@@ -15,7 +15,8 @@ import type {
 
 export * from './types.js';
 
-export function createNosanaJobsApi(client: QueryClient): NosanaJobsApi {
+export function createNosanaJobsApi(clients: { blockchainIndexer: BlockchainIndexerClient }): NosanaJobsApi {
+  const { blockchainIndexer: client } = clients;
   return {
     async get(address: NosanaApiGetJobByAddressRequest): Promise<NosanaApiGetJobByAddressResponse> {
       const { data, error } = await client.GET('/api/jobs/{address}', {

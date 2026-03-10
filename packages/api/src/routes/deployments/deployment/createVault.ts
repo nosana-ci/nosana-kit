@@ -1,7 +1,7 @@
 import { vaultGetBalance, vaultTopup, vaultWithdraw } from './actions/index.js';
 
 import type { TopupVaultOptions, Vault } from '../types.js';
-import type { RouteOptionsWithSigner } from '../../../types.js';
+import type { DeploymentRouteClientsWithSigner } from '../../../types.js';
 
 /**
  * Creates a Vault object with methods for managing vault operations.
@@ -10,13 +10,13 @@ import type { RouteOptionsWithSigner } from '../../../types.js';
  * implementations to use them instead of throwing errors.
  *
  * @param vaultAddress - The vault's Solana address
- * @param options - Options including QueryClient for API calls
+ * @param clients - Clients including DeploymentManagerClient and Solana functions
  * @param created_at - Optional creation timestamp
  * @returns A Vault object with methods
  */
 export function createVault(
   vaultAddress: string,
-  options: RouteOptionsWithSigner,
+  clients: DeploymentRouteClientsWithSigner,
   created_at?: Date,
 ): Vault {
   return {
@@ -28,7 +28,7 @@ export function createVault(
      * TODO: Implementation in actions/vaultGetBalance.ts
      */
     getBalance: async () => {
-      return await vaultGetBalance(vaultAddress, options);
+      return await vaultGetBalance(vaultAddress, clients);
     },
 
     /**
@@ -36,7 +36,7 @@ export function createVault(
      * TODO: Implementation in actions/vaultTopup.ts
      */
     topup: async (topupOptions: TopupVaultOptions) => {
-      return await vaultTopup(vaultAddress, topupOptions, options);
+      return await vaultTopup(vaultAddress, topupOptions, clients);
     },
 
     /**
@@ -44,7 +44,7 @@ export function createVault(
      * TODO: Implementation in actions/vaultWithdraw.ts
      */
     withdraw: async () => {
-      await vaultWithdraw(vaultAddress, options);
+      await vaultWithdraw(vaultAddress, clients);
     },
   };
 }
