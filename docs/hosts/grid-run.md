@@ -28,6 +28,16 @@ These guides are instructing you on how to establish your GPU Host and partake i
 
 [Ubuntu](/hosts/grid-ubuntu): If you're running Ubuntu, a popular distribution of Linux, you should follow this guide.
 
+## Next Steps: Check Your Host's Status
+
+After you have registered and your GPU Host is running:
+
+1. Open [host.nosana.com](https://host.nosana.com) and connect your wallet to:
+   - See its statistics and $NOS earnings
+2. Visit [explore.nosana.com](https://explore.nosana.com/markets) to:
+   - Check the current market queue and activity
+
+
 ## Advanced (optional)
 ### Launching the GPU Host with Custom Parameters
 
@@ -61,8 +71,12 @@ docker logs -f nosana-node
 ```
 :::
 
+::: details Where can I view my host's statistics?
+To view detailed statistics for your host, visit [Nosana Host](https://host.nosana.com/) and connect your wallet.
+:::
+
 ::: details Where can I see how much $NOS I’ve earned so far?
-You can see how much you've earned by checking your $NOS balance. If you imported your private key in a wallet you can see the $NOS balance in the wallet. Else go to a [Solscan](https://solscan.io/) or [Solana Explorer](https://explorer.solana.com/) and fill in your hosts' address to see your token balances.
+You can see how much you've earned by checking your $NOS balance. If you imported your private key in a wallet you can see the $NOS balance in the wallet. Or go to [Nosana Host](https://host.nosana.com/) and connect your wallet.
 :::
 
 ::: details Why is my host queued?
@@ -70,5 +84,5 @@ Not at all times will there be enough jobs for all the hosts in a market. In tha
 :::
 
 ::: details Which position in the queue is my host?
-To see the market queue, go to the markets page on the [Nosana Dashboard](https://dashboard.nosana.com/markets). Choose the market you are assigned to, on the market page it'll show you the queue.
+To see the market queue, go to the markets page on [Nosana Explore](https://explore.nosana.com/markets). Choose the market you are assigned to, on the market page it'll show you the queue.
 :::
