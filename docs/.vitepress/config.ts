@@ -254,7 +254,7 @@ export default withMermaid(
 
       footer: {
         message:
-          '<a href="https://deploy.nosana.com" target="_blank" rel="noopener noreferrer">Deploy</a> · <a href="https://host.nosana.com" target="_blank" rel="noopener noreferrer">Host</a> · <a href="https://stake.nosana.com" target="_blank" rel="noopener noreferrer">Stake</a> · <a href="https://explore.nosana.com" target="_blank" rel="noopener noreferrer">Explore</a>',
+          '<a href="https://deploy.nosana.com" target="_blank" rel="noopener noreferrer">Deploy</a> · <a href="https://explore.nosana.com" target="_blank" rel="noopener noreferrer">Explore</a> · <a href="https://host.nosana.com" target="_blank" rel="noopener noreferrer">Host</a> · <a href="https://stake.nosana.com" target="_blank" rel="noopener noreferrer">Stake</a>',
         copyright: '© 2026 <b>Nosana</b>',
       },
     },

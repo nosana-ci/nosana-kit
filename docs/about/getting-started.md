@@ -133,7 +133,8 @@ If you want to earn $NOS by providing GPU resources to the network:
   - 12GB+ RAM
   - 256GB+ NVMe SSD
   - Ubuntu 20.04+ (Linux recommended)
-- **Earnings**: Earn $NOS tokens for running jobs on your hardware
+- **Monitor your host & earnings**: Once your host is running, go to [host.nosana.com](https://host.nosana.com) to see its status, statistics, and $NOS earnings.
+- **View markets & queues**: Use [explore.nosana.com](https://explore.nosana.com) to inspect GPU markets, queues, and host positions.
 
 ## Understanding the Basics
 
