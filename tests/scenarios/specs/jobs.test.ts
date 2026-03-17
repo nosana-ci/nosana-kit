@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { getScenarioClient, type Address } from '@nosana/scenario';
-import { JobsClient, JobState } from '../../../src/index.js';
+import { JobsClient, JobState } from '@nosana/kit';
 
 describe('scenario: jobs/market', () => {
   let marketAddress: Address;

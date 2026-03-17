@@ -7,9 +7,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "build:with-deps": "pnpm run build",
     "dev": "tsc --watch",
-    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "dev:with-deps": "pnpm run dev",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
@@ -24,12 +24,10 @@
   ],
   "author": "Nosana",
   "license": "MIT",
-  "dependencies": {
-    "@nosana/kit": "workspace:*",
-    "@solana-program/token": "0.9.0",
-    "@solana/kit": "5.4.0"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@types/node": "^20.19.27",
+    "prettier": "^3.7.4",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {

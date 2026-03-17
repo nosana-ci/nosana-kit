@@ -1,16 +1,25 @@
-export { getScenarioClient, type ScenarioClientOptions } from './setup.js';
+export {
+  getScenarioClient,
+  getLocalnetClient,
+  type ScenarioClientOptions,
+  type LocalnetClientOptions,
+} from './setup.js';
+export {
+  mintNosTo,
+  ensureLocalnetMint,
+  executeInstructionPlan,
+  loadMintKeypairSigner,
+  loadMintAuthoritySigner,
+} from './utils.js';
 export { scenarioVitestSetup } from './vitest-setup-fn.js';
 export { defineScenarioVitestConfig } from './vitest-config.js';
 
 // Re-export localnet helpers for convenience
 export {
-  getLocalnetClient,
   startLocalnet,
   stopLocalnet,
-  mintNosTo,
-  ensureLocalnetMint,
-  executeInstructionPlan,
-  type LocalnetClientOptions,
+  LOCALNET_RPC_ENDPOINT,
+  LOCALNET_WS_ENDPOINT,
   type LocalnetOptions,
 } from '@nosana/localnet';
 

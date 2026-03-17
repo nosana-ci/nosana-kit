@@ -2,6 +2,8 @@
 
 Network-aware scenario test helpers for Nosana. Run the same tests against localnet, devnet, or mainnet — controlled entirely via environment variables.
 
+Uses [`@nosana/localnet`](../localnet) for Docker infrastructure and [`@nosana/kit`](../kit) for the Nosana SDK.
+
 ## Quick Start
 
 ```bash
@@ -95,14 +97,35 @@ The wallet is determined by (in order of precedence):
 | `mintAmount` | `bigint` | `1_000_000_000n` | NOS mint amount (localnet only) |
 | `config` | `Partial<NosanaClientConfig>` | — | Override client config |
 
-**Localnet** (default): delegates to `getLocalnetClient()` from `@nosana/localnet` — generates a random keypair, airdrops SOL, and mints NOS tokens.
+**Localnet** (default): generates a random keypair, airdrops SOL, and mints NOS tokens.
 
 **Devnet / Mainnet**: connects with the provided wallet (via option or `NOSANA_WALLET` env var). No airdrop or minting is performed.
 
-### Re-exports
+### `getLocalnetClient(options?): Promise<NosanaClient>`
 
-For convenience, `@nosana/scenario` re-exports everything from `@nosana/localnet`:
+Returns a cached `NosanaClient` connected to localnet. Equivalent to `getScenarioClient({ network: 'localnet' })`.
 
-- `getLocalnetClient`, `startLocalnet`, `stopLocalnet`
-- `mintNosTo`, `ensureLocalnetMint`, `executeInstructionPlan`
+### `mintNosTo(client, recipient, amount): Promise<void>`
+
+Mint NOS tokens to any address on the localnet.
+
+### `ensureLocalnetMint(client): Promise<{ mintAuthority, mintAddress }>`
+
+Ensures the NOS mint exists on localnet. Creates it if it doesn't exist.
+
+### `executeInstructionPlan(client, plan): Promise<void>`
+
+Execute a Solana instruction plan using the client's wallet as fee payer.
+
+### `defineScenarioVitestConfig(overrides?): object`
+
+Returns a Vitest config object with the scenario setup file pre-configured.
+
+### Re-exports from `@nosana/localnet`
+
+- `startLocalnet`, `stopLocalnet`
+- `LOCALNET_RPC_ENDPOINT`, `LOCALNET_WS_ENDPOINT`
+
+### Re-exports from `@nosana/kit`
+
 - `NosanaNetwork`, `type NosanaClient`, `type Wallet`, `type Address`

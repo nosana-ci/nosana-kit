@@ -39,7 +39,7 @@ localnet:npm build:
   stage: lint
   script:
     - pnpm install --frozen-lockfile
-    - pnpm --filter @nosana/localnet... run build
+    - pnpm --filter @nosana/localnet run build
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

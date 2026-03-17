@@ -1,7 +1,36 @@
 import fs from 'fs';
-import { createKeyPairSignerFromBytes } from '@solana/kit';
-import { createNosanaClient, NosanaNetwork, type NosanaClient } from '@nosana/kit';
-import { getLocalnetClient, type LocalnetClientOptions } from '@nosana/localnet';
+import { createKeyPairSignerFromBytes, generateKeyPairSigner } from '@solana/kit';
+import {
+  createLocalnetClient,
+  createNosanaClient,
+  NosanaNetwork,
+  type NosanaClient,
+  type PartialClientConfig,
+  type Wallet,
+} from '@nosana/kit';
+import { mintNosTo } from './utils.js';
+
+export interface LocalnetClientOptions {
+  /**
+   * Wallet to use. If not provided, a random keypair is generated and funded.
+   */
+  wallet?: Wallet;
+
+  /**
+   * Amount of SOL (in lamports) to airdrop. Default: 2 SOL.
+   */
+  airdropAmount?: bigint;
+
+  /**
+   * Amount of NOS (in raw token units) to mint. Default: 1 000 000 000.
+   */
+  mintAmount?: bigint;
+
+  /**
+   * Additional Nosana client config overrides.
+   */
+  config?: PartialClientConfig;
+}
 
 export interface ScenarioClientOptions extends LocalnetClientOptions {
   /**
@@ -17,11 +46,54 @@ export interface ScenarioClientOptions extends LocalnetClientOptions {
   network?: 'localnet' | 'devnet' | 'mainnet';
 }
 
-type GlobalWithClient = typeof globalThis & {
+type GlobalWithLocalnetClient = typeof globalThis & {
+  __NOSANA_LOCALNET_CLIENT__?: Promise<NosanaClient>;
+};
+
+type GlobalWithScenarioClient = typeof globalThis & {
   __NOSANA_SCENARIO_CLIENT__?: Promise<NosanaClient>;
 };
 
-const globalWithClient = globalThis as GlobalWithClient;
+const globalWithLocalnet = globalThis as GlobalWithLocalnetClient;
+const globalWithScenario = globalThis as GlobalWithScenarioClient;
+
+// ---------------------------------------------------------------------------
+// Localnet client
+// ---------------------------------------------------------------------------
+
+async function createLocalnetClientInstance(
+  options: LocalnetClientOptions = {},
+): Promise<NosanaClient> {
+  const wallet = options.wallet ?? (await generateKeyPairSigner());
+  const client = createLocalnetClient({ ...options.config, wallet });
+
+  const balance = await client.solana.getBalance(wallet.address);
+  if (balance === 0) {
+    await client.solana.airdrop({
+      recipient: wallet.address,
+      amount: options.airdropAmount ?? 2_000_000_000n,
+    });
+  }
+
+  await mintNosTo(client, wallet.address, options.mintAmount ?? 1_000_000_000n);
+  return client;
+}
+
+/**
+ * Returns a cached Nosana client connected to localnet.
+ *
+ * Generates a random keypair, airdrops SOL, and mints NOS tokens automatically.
+ */
+export function getLocalnetClient(options?: LocalnetClientOptions): Promise<NosanaClient> {
+  if (!globalWithLocalnet.__NOSANA_LOCALNET_CLIENT__) {
+    globalWithLocalnet.__NOSANA_LOCALNET_CLIENT__ = createLocalnetClientInstance(options);
+  }
+  return globalWithLocalnet.__NOSANA_LOCALNET_CLIENT__;
+}
+
+// ---------------------------------------------------------------------------
+// Scenario client (network-aware)
+// ---------------------------------------------------------------------------
 
 /**
  * Load a wallet from a Solana keypair JSON file.
@@ -64,10 +136,10 @@ async function loadWalletFromFile(filePath: string) {
  * ```
  */
 export function getScenarioClient(options?: ScenarioClientOptions): Promise<NosanaClient> {
-  if (!globalWithClient.__NOSANA_SCENARIO_CLIENT__) {
-    globalWithClient.__NOSANA_SCENARIO_CLIENT__ = createScenarioClientInstance(options);
+  if (!globalWithScenario.__NOSANA_SCENARIO_CLIENT__) {
+    globalWithScenario.__NOSANA_SCENARIO_CLIENT__ = createScenarioClientInstance(options);
   }
-  return globalWithClient.__NOSANA_SCENARIO_CLIENT__;
+  return globalWithScenario.__NOSANA_SCENARIO_CLIENT__;
 }
 
 async function createScenarioClientInstance(

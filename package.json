@@ -11,6 +11,11 @@
     "build:packages": "pnpm --filter \"./packages/**\" run build",
     "dev": "pnpm -r run dev --parallel",
     "test": "pnpm -r run test",
+    "test:scenario": "NODE_NO_WARNINGS=1 vitest run --config vitest.scenario.config.ts",
+    "test:scenario:localnet": "pnpm run localnet:up && pnpm run test:scenario",
+    "localnet:up": "docker compose -f packages/localnet/docker/docker-compose.yml up -d --wait --force-recreate",
+    "localnet:down": "docker compose -f packages/localnet/docker/docker-compose.yml down -v",
+    "localnet:logs": "docker compose -f packages/localnet/docker/docker-compose.yml logs -f",
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format",
     "format:fix": "pnpm -r run format:fix",
@@ -26,6 +31,8 @@
     "@codama/renderers-js": "^1.5.5",
     "@codama/visitors-core": "^1.5.0",
     "@eslint/js": "^9.39.2",
+    "@nosana/kit": "workspace:*",
+    "@nosana/scenario": "workspace:*",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
     "codama": "^1.5.0",
@@ -33,6 +40,7 @@
     "eslint-plugin-import": "^2.32.0",
     "lerna": "^9.0.4",
     "tsx": "^4.19.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
   }
 }

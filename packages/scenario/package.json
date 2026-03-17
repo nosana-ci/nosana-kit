@@ -26,9 +26,11 @@
   "dependencies": {
     "@nosana/kit": "workspace:*",
     "@nosana/localnet": "workspace:*",
+    "@solana-program/token": "0.9.0",
     "@solana/kit": "5.4.0"
   },
   "devDependencies": {
+    "prettier": "^3.7.4",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
