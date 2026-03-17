@@ -15,6 +15,7 @@ variables:
   REG_REPOSITORY: nosana/localnet
 
 localnet:npm format:
+  image: node:22.22.0
   stage: lint
   script:
     - pnpm install --frozen-lockfile
@@ -24,6 +25,7 @@ localnet:npm format:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 localnet:npm lint:
+  image: node:22.22.0
   stage: lint
   script:
     - pnpm install --frozen-lockfile
@@ -33,6 +35,7 @@ localnet:npm lint:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 localnet:npm build:
+  image: node:22.22.0
   stage: lint
   script:
     - pnpm install --frozen-lockfile

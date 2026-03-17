@@ -51,7 +51,7 @@ kit:npm test:scenario:
     - apk add --no-cache nodejs npm
     - npm install -g pnpm@10.28.0
     - pnpm install --frozen-lockfile
-    - pnpm --filter @nosana/kit run build:with-deps
+    - pnpm --filter @nosana/scenario... run build
     - pnpm --filter @nosana/kit run test:scenario:localnet
   rules:
     - if: $CI_MERGE_REQUEST_ID

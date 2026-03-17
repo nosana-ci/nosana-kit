@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "build:with-deps": "pnpm --filter $npm_package_name... --filter !@nosana/localnet --filter !@nosana/scenario run build",
     "dev": "tsc --watch",
     "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
     "test": "NODE_NO_WARNINGS=1 vitest run",
