@@ -1601,6 +1601,49 @@ pnpm --filter @nosana/kit run test:watch
 pnpm --filter @nosana/kit run test:coverage
 ```
 
+### Scenario Tests
+
+Scenario tests exercise SDK functionality against a real Solana validator. They can run against localnet, devnet, or mainnet — controlled entirely via environment variables (no code changes needed).
+
+#### Localnet (default)
+
+Starts a Docker-based Solana validator with Nosana programs pre-baked, runs the tests, then you can stop it:
+
+```bash
+# Start localnet + run tests
+pnpm --filter @nosana/kit run test:scenario:localnet
+
+# Or step by step
+pnpm --filter @nosana/kit run localnet:up
+pnpm --filter @nosana/kit run test:scenario
+pnpm --filter @nosana/kit run localnet:down
+```
+
+#### Devnet
+
+Requires a funded wallet (with SOL and NOS tokens on devnet):
+
+```bash
+NOSANA_NETWORK=devnet \
+NOSANA_WALLET=~/.config/solana/id.json \
+pnpm --filter @nosana/kit run test:scenario
+```
+
+#### Mainnet
+
+```bash
+NOSANA_NETWORK=mainnet \
+NOSANA_WALLET=/path/to/mainnet-keypair.json \
+pnpm --filter @nosana/kit run test:scenario
+```
+
+#### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NOSANA_NETWORK` | `localnet` | Target network: `localnet`, `devnet`, or `mainnet` |
+| `NOSANA_WALLET` | — | Path to a Solana keypair JSON file (required for devnet/mainnet) |
+
 For monorepo setup, build, and development, see the [root README](../../README.md).
 
 ## TypeScript Support

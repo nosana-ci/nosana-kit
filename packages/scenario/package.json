@@ -1,0 +1,51 @@
+{
+  "name": "@nosana/scenario",
+  "version": "2.1.8",
+  "description": "Nosana scenario test helpers: network-aware client setup for localnet, devnet, and mainnet",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "tsc --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
+    "format:fix": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\""
+  },
+  "keywords": [
+    "nosana",
+    "solana",
+    "scenario",
+    "testing"
+  ],
+  "author": "Nosana",
+  "license": "MIT",
+  "dependencies": {
+    "@nosana/kit": "workspace:*",
+    "@nosana/localnet": "workspace:*",
+    "@solana/kit": "5.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "vitest": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ]
+}

@@ -1,5 +1,7 @@
 packages:
   - 'packages/kit'
+  - 'packages/localnet'
+  - 'packages/scenario'
   - 'packages/api'
   - 'packages/authorisation'
   - 'packages/endpoints'

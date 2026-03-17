@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { getLocalnetClient } from '../helpers/setup.js';
-import { Address, JobsClient, JobState } from '../../../src/index.js';
+import { getScenarioClient, type Address } from '@nosana/scenario';
+import { JobsClient, JobState } from '../../../src/index.js';
 
-describe('localnet jobs/market', () => {
+describe('scenario: jobs/market', () => {
   let marketAddress: Address;
 
   beforeEach(async () => {
-    const client = await getLocalnetClient();
+    const client = await getScenarioClient();
     const openIx = await client.jobs.createMarket();
     await client.solana.buildSignAndSend(openIx);
 
@@ -18,19 +18,19 @@ describe('localnet jobs/market', () => {
   });
 
   afterEach(async () => {
-    const client = await getLocalnetClient();
+    const client = await getScenarioClient();
     const closeIx = await client.jobs.closeMarket({ market: marketAddress });
     await client.solana.buildSignAndSend(closeIx);
   });
 
   it('creates a market', async () => {
-    const client = await getLocalnetClient();
+    const client = await getScenarioClient();
     const market = await client.jobs.market(marketAddress);
     expect(market.address).toBe(marketAddress);
   });
 
   it('lists a job in a market', async () => {
-    const client = await getLocalnetClient();
+    const client = await getScenarioClient();
     const listIx = await client.jobs.list({
       market: marketAddress,
       timeout: 3600,

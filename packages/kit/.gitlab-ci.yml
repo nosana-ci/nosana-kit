@@ -33,7 +33,7 @@ kit:npm test:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-kit:npm test:localnet:
+kit:npm test:scenario:
   stage: test
   image: docker:24.0.7
   before_script: []
@@ -52,7 +52,7 @@ kit:npm test:localnet:
     - npm install -g pnpm@10.28.0
     - pnpm install --frozen-lockfile
     - pnpm --filter @nosana/kit run build:with-deps
-    - pnpm --filter @nosana/kit run test:localnet
+    - pnpm --filter @nosana/kit run test:scenario:localnet
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

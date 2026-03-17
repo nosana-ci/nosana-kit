@@ -1,0 +1,42 @@
+include:
+  - local: .gitlab/ci/common.yml
+  - project: nosana-ci/tools/cicd/gitlab-ci
+    file: docker-container.yml
+
+stages:
+  - lint
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKERFILE_DIR: ./packages/localnet/
+  CONTAINER_PLATFORMS: linux/amd64
+  REG_REPOSITORY: nosana/localnet
+
+localnet:npm format:
+  stage: lint
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm --filter @nosana/localnet run format
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+localnet:npm lint:
+  stage: lint
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm --filter @nosana/localnet run lint
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+localnet:npm build:
+  stage: lint
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm --filter @nosana/localnet... run build
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

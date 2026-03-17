@@ -1,12 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import {
   address,
   createKeyPairSignerFromBytes,
   createTransactionMessage,
   createTransactionPlanner,
   getAllSingleTransactionPlans,
-  InstructionPlan,
+  type InstructionPlan,
   pipe,
   setTransactionMessageFeePayerSigner,
   setTransactionMessageLifetimeUsingBlockhash,
@@ -20,16 +21,31 @@ import {
   getCreateMintInstructionPlan,
   getMintToATAInstructionPlanAsync,
 } from '@solana-program/token';
-import type { NosanaClient } from '../../../src/index.js';
+import type { NosanaClient } from '@nosana/kit';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const NOS_MINT_DECIMALS = 6;
-const DEFAULT_NOS_MINT_KEYPAIR_PATH =
-  'tests/scenarios/keys/devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP.json';
-const DEFAULT_NOS_MINT_AUTHORITY_KEYPAIR_PATH =
-  'tests/scenarios/keys/dumQVNHZ1KNcLmzjMaDPEA5vFCzwHEEcQmZ8JHmmCNH.json';
+const DEFAULT_NOS_MINT_KEYPAIR_PATH = path.resolve(
+  __dirname,
+  '..',
+  'keys',
+  'devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP.json'
+);
+const DEFAULT_NOS_MINT_AUTHORITY_KEYPAIR_PATH = path.resolve(
+  __dirname,
+  '..',
+  'keys',
+  'dumQVNHZ1KNcLmzjMaDPEA5vFCzwHEEcQmZ8JHmmCNH.json'
+);
+
 let cachedMintAuthority: TransactionSigner | null = null;
 let cachedMintAddress: Address | null = null;
 
+/**
+ * Load the NOS mint keypair signer from the bundled keys directory,
+ * or from a custom path via `LOCALNET_NOS_MINT_KEYPAIR` env var.
+ */
 export async function loadMintKeypairSigner() {
   const keypairPath = process.env.LOCALNET_NOS_MINT_KEYPAIR ?? DEFAULT_NOS_MINT_KEYPAIR_PATH;
   const resolvedPath = path.isAbsolute(keypairPath)
@@ -39,6 +55,10 @@ export async function loadMintKeypairSigner() {
   return createKeyPairSignerFromBytes(new Uint8Array(keypair));
 }
 
+/**
+ * Load the NOS mint authority signer from the bundled keys directory,
+ * or from a custom path via `LOCALNET_NOS_MINT_AUTHORITY_KEYPAIR` env var.
+ */
 export async function loadMintAuthoritySigner() {
   if (cachedMintAuthority) {
     return cachedMintAuthority;
@@ -53,9 +73,16 @@ export async function loadMintAuthoritySigner() {
   return cachedMintAuthority;
 }
 
+/**
+ * Ensure the NOS mint exists on the localnet validator.
+ * Creates it if it doesn't exist, validates the authority if it does.
+ */
 export async function ensureLocalnetMint(client: NosanaClient) {
   if (cachedMintAuthority && cachedMintAddress) {
-    return { mintAuthority: cachedMintAuthority, mintAddress: cachedMintAddress };
+    return {
+      mintAuthority: cachedMintAuthority,
+      mintAddress: cachedMintAddress,
+    };
   }
 
   const mintKeypair = await loadMintKeypairSigner();
@@ -105,6 +132,9 @@ export async function ensureLocalnetMint(client: NosanaClient) {
   return { mintAuthority: cachedMintAuthority!, mintAddress };
 }
 
+/**
+ * Execute a Solana instruction plan using the client's wallet as fee payer.
+ */
 export async function executeInstructionPlan(client: NosanaClient, plan: InstructionPlan) {
   const planner = createTransactionPlanner({
     createTransactionMessage: async () => {
@@ -121,11 +151,27 @@ export async function executeInstructionPlan(client: NosanaClient, plan: Instruc
   const messages = getAllSingleTransactionPlans(transactionPlan).map((p) => p.message);
 
   for (const message of messages) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const signed = await client.solana.signTransaction(message as any);
     await client.solana.sendTransaction(signed, { commitment: 'confirmed' });
   }
 }
 
+/**
+ * Mint NOS tokens to a recipient address on the localnet.
+ *
+ * @param client - A NosanaClient connected to the localnet
+ * @param recipient - The recipient wallet address
+ * @param amount - Amount of NOS tokens (in raw units) to mint
+ *
+ * @example
+ * ```ts
+ * import { getLocalnetClient, mintNosTo } from '@nosana/localnet';
+ *
+ * const client = await getLocalnetClient();
+ * await mintNosTo(client, client.wallet!.address, 1_000_000_000n);
+ * ```
+ */
 export async function mintNosTo(
   client: NosanaClient,
   recipient: string | ReturnType<typeof address>,

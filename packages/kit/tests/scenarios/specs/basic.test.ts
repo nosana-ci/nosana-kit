@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { getLocalnetClient } from '../helpers/setup.js';
+import { getScenarioClient } from '@nosana/scenario';
 
-describe('localnet basic', () => {
+describe('scenario: basic', () => {
   it('has a valid payer account', async () => {
-    const client = await getLocalnetClient();
+    const client = await getScenarioClient();
     const payerAddress = client.wallet?.address;
     expect(payerAddress).toBeDefined();
     const info = await client.solana.rpc
@@ -12,8 +12,16 @@ describe('localnet basic', () => {
     expect(info.value).not.toBeNull();
   });
 
-  it('has jobs, stake, and rewards programs on localnet', async () => {
-    const client = await getLocalnetClient();
+  it('has SOL and NOS balance', async () => {
+    const client = await getScenarioClient();
+    const solBalance = await client.solana.getBalance();
+    const nosBalance = await client.nos.getBalance();
+    expect(solBalance).toBeGreaterThan(0);
+    expect(nosBalance).toBeGreaterThan(0);
+  });
+
+  it('has jobs, stake, and rewards programs', async () => {
+    const client = await getScenarioClient();
     const jobsAddress = client.config.programs.jobsAddress;
     const stakeAddress = client.config.programs.stakeAddress;
     const rewardsAddress = client.config.programs.rewardsAddress;

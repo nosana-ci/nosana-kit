@@ -15,6 +15,8 @@ Monorepo for the [Nosana](https://nosana.com) developer toolkit: TypeScript pack
 | [@nosana/jobs-program](./packages/generated_clients/jobs) | Generated Solana jobs program client. |
 | [@nosana/stake-program](./packages/generated_clients/stake) | Generated Solana stake program client. |
 | [@nosana/merkle-distributor-program](./packages/generated_clients/merkle_distributor) | Generated Solana merkle distributor program client. |
+| [**@nosana/localnet**](./packages/localnet) | Docker-based Solana test validator with pre-baked Nosana programs. |
+| [**@nosana/scenario**](./packages/scenario) | Network-aware scenario test helpers (localnet / devnet / mainnet). |
 | [**@nosana/docs**](./docs) | Documentation site (VitePress). |
 
 For detailed SDK usage, see the [**Nosana Kit** README](./packages/kit/README.md).
@@ -99,6 +101,28 @@ pnpm --filter @nosana/docs dev      # Dev server
 pnpm --filter @nosana/docs build   # Production build
 pnpm --filter @nosana/docs preview # Preview built docs
 ```
+
+### Scenario Testing
+
+Run SDK integration tests against a local Solana validator with pre-baked Nosana programs:
+
+```bash
+# Start localnet and run scenario tests
+pnpm --filter @nosana/kit run test:scenario:localnet
+
+# Or manage the validator manually
+pnpm --filter @nosana/kit run localnet:up
+pnpm --filter @nosana/kit run test:scenario
+pnpm --filter @nosana/kit run localnet:down
+```
+
+Run the same tests against devnet or mainnet by setting environment variables:
+
+```bash
+NOSANA_NETWORK=devnet NOSANA_WALLET=~/.config/solana/id.json pnpm --filter @nosana/kit run test:scenario
+```
+
+See [`@nosana/localnet`](./packages/localnet) for Docker validator details and [`@nosana/scenario`](./packages/scenario) for the full API reference.
 
 ## License
 

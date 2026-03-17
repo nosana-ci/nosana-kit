@@ -9,6 +9,8 @@
     { "path": "./packages/generated_clients/jobs" },
     { "path": "./packages/generated_clients/stake" },
     { "path": "./packages/generated_clients/merkle_distributor" },
-    { "path": "./packages/kit" }
+    { "path": "./packages/kit" },
+    { "path": "./packages/localnet" },
+    { "path": "./packages/scenario" }
   ]
 }
