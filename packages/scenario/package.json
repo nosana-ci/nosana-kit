@@ -13,7 +13,12 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
-    "format:fix": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\""
+    "format:fix": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\"",
+    "test:scenario": "NODE_NO_WARNINGS=1 vitest run --config vitest.config.ts",
+    "test:scenario:localnet": "pnpm run localnet:up && pnpm run test:scenario",
+    "localnet:up": "docker compose -f ../localnet/docker/docker-compose.yml up -d --wait --force-recreate",
+    "localnet:down": "docker compose -f ../localnet/docker/docker-compose.yml down -v",
+    "localnet:logs": "docker compose -f ../localnet/docker/docker-compose.yml logs -f"
   },
   "keywords": [
     "nosana",
@@ -31,7 +36,8 @@
   },
   "devDependencies": {
     "prettier": "^3.7.4",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
   },
   "peerDependencies": {
     "vitest": ">=2.0.0"

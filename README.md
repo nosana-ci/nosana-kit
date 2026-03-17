@@ -108,18 +108,18 @@ Run SDK integration tests against a local Solana validator with pre-baked Nosana
 
 ```bash
 # Start localnet and run scenario tests
-pnpm --filter @nosana/kit run test:scenario:localnet
+pnpm --filter @nosana/scenario run test:scenario:localnet
 
 # Or manage the validator manually
-pnpm --filter @nosana/kit run localnet:up
-pnpm --filter @nosana/kit run test:scenario
-pnpm --filter @nosana/kit run localnet:down
+pnpm --filter @nosana/scenario run localnet:up
+pnpm --filter @nosana/scenario run test:scenario
+pnpm --filter @nosana/scenario run localnet:down
 ```
 
 Run the same tests against devnet or mainnet by setting environment variables:
 
 ```bash
-NOSANA_NETWORK=devnet NOSANA_WALLET=~/.config/solana/id.json pnpm --filter @nosana/kit run test:scenario
+NOSANA_NETWORK=devnet NOSANA_WALLET=~/.config/solana/id.json pnpm --filter @nosana/scenario run test:scenario
 ```
 
 See [`@nosana/localnet`](./packages/localnet) for Docker validator details and [`@nosana/scenario`](./packages/scenario) for the full API reference.

@@ -62,7 +62,7 @@ const globalWithScenario = globalThis as GlobalWithScenarioClient;
 // ---------------------------------------------------------------------------
 
 async function createLocalnetClientInstance(
-  options: LocalnetClientOptions = {},
+  options: LocalnetClientOptions = {}
 ): Promise<NosanaClient> {
   const wallet = options.wallet ?? (await generateKeyPairSigner());
   const client = createLocalnetClient({ ...options.config, wallet });

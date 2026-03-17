@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getScenarioClient } from '@nosana/scenario';
+import { getScenarioClient } from '../../src/index.js';
 
 describe('scenario: basic', () => {
   it('has a valid payer account', async () => {

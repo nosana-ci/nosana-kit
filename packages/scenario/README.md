@@ -62,15 +62,25 @@ export default defineScenarioVitestConfig({
 
 ### npm Scripts
 
-```json
-{
-  "scripts": {
-    "localnet:up": "docker compose -f node_modules/@nosana/localnet/docker/docker-compose.yml up -d --wait --force-recreate",
-    "localnet:down": "docker compose -f node_modules/@nosana/localnet/docker/docker-compose.yml down -v",
-    "test:scenario": "vitest run --config vitest.scenario.config.ts",
-    "test:scenario:localnet": "npm run localnet:up && npm run test:scenario"
-  }
-}
+These scripts are already included in `@nosana/scenario`'s `package.json`:
+
+| Script | Description |
+|--------|-------------|
+| `test:scenario` | Run scenario tests with vitest |
+| `test:scenario:localnet` | Start localnet + run scenario tests |
+| `localnet:up` | Start the Docker-based Solana validator |
+| `localnet:down` | Stop the validator and clean up |
+
+From the workspace root:
+
+```bash
+# Run everything
+pnpm --filter @nosana/scenario run test:scenario:localnet
+
+# Or step by step
+pnpm run localnet:up
+pnpm --filter @nosana/scenario run test:scenario
+pnpm run localnet:down
 ```
 
 ## API Reference

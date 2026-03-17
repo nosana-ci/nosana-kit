@@ -26,11 +26,11 @@ import { KEYS_DIR } from '@nosana/localnet';
 const NOS_MINT_DECIMALS = 6;
 const DEFAULT_NOS_MINT_KEYPAIR_PATH = path.join(
   KEYS_DIR,
-  'devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP.json',
+  'devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP.json'
 );
 const DEFAULT_NOS_MINT_AUTHORITY_KEYPAIR_PATH = path.join(
   KEYS_DIR,
-  'dumQVNHZ1KNcLmzjMaDPEA5vFCzwHEEcQmZ8JHmmCNH.json',
+  'dumQVNHZ1KNcLmzjMaDPEA5vFCzwHEEcQmZ8JHmmCNH.json'
 );
 
 let cachedMintAuthority: TransactionSigner | null = null;
@@ -84,7 +84,7 @@ export async function ensureLocalnetMint(client: NosanaClient) {
   const envMint = process.env.LOCALNET_NOS_MINT;
   if (envMint && address(envMint) !== mintKeypair.address) {
     throw new Error(
-      `LOCALNET_NOS_MINT (${envMint}) does not match mint keypair address (${mintKeypair.address}).`,
+      `LOCALNET_NOS_MINT (${envMint}) does not match mint keypair address (${mintKeypair.address}).`
     );
   }
   const mintAddress = envMint ? address(envMint) : mintKeypair.address;
@@ -116,7 +116,7 @@ export async function ensureLocalnetMint(client: NosanaClient) {
     if (mintAuthorityOnChain && mintAuthorityOnChain !== mintAuthority.address) {
       throw new Error(
         `Localnet NOS mint already exists with a different mint authority (${mintAuthorityOnChain}). ` +
-          'Reset the validator or provide the matching authority keypair.',
+          'Reset the validator or provide the matching authority keypair.'
       );
     }
   }
@@ -136,7 +136,7 @@ export async function executeInstructionPlan(client: NosanaClient, plan: Instruc
       return pipe(
         createTransactionMessage({ version: 0 }),
         (tx) => setTransactionMessageFeePayerSigner(client.wallet!, tx),
-        (tx) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx),
+        (tx) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx)
       );
     },
   });
@@ -157,7 +157,7 @@ export async function executeInstructionPlan(client: NosanaClient, plan: Instruc
 export async function mintNosTo(
   client: NosanaClient,
   recipient: string | ReturnType<typeof address>,
-  amount: bigint,
+  amount: bigint
 ) {
   const { mintAuthority, mintAddress } = await ensureLocalnetMint(client);
   const owner = typeof recipient === 'string' ? address(recipient) : recipient;

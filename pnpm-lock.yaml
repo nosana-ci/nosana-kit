@@ -23,12 +23,6 @@ importers:
       '@eslint/js':
         specifier: ^9.39.2
         version: 9.39.2
-      '@nosana/kit':
-        specifier: workspace:*
-        version: link:packages/kit
-      '@nosana/scenario':
-        specifier: workspace:*
-        version: link:packages/scenario
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.50.0
         version: 8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(typescript@5.9.3)
@@ -53,9 +47,6 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
-      vitest:
-        specifier: ^4.0.16
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.13)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2)
 
   docs:
     dependencies:
@@ -432,9 +423,6 @@ importers:
       '@solana/kit':
         specifier: 5.4.0
         version: 5.4.0(typescript@5.9.3)
-      vitest:
-        specifier: '>=2.0.0'
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.13)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2)
     devDependencies:
       prettier:
         specifier: ^3.7.4
@@ -442,6 +430,9 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      vitest:
+        specifier: ^4.0.16
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.13)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/types:
     dependencies:

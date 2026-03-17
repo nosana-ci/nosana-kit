@@ -52,7 +52,7 @@ scenario:npm test:scenario:
     - npm install -g pnpm@10.28.0
     - pnpm install --frozen-lockfile
     - pnpm --filter @nosana/scenario... run build
-    - pnpm run test:scenario:localnet
+    - pnpm --filter @nosana/scenario run test:scenario:localnet
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
