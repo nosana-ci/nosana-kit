@@ -39,29 +39,26 @@ async function main() {
   const anchorStakingIdl = JSON.parse(readFileSync(idlStakingPath, 'utf-8'));
   const merkleDistributorIdl = JSON.parse(readFileSync(idlMerkleDistributorPath, 'utf-8'));
 
-  // Generate clients
+  // Generate into package/src/ so we don't overwrite package.json, tsconfig.json, etc.
   const codamaJobs = createFromRoot(rootNodeFromAnchor(anchorJobsIdl as AnchorIdl));
 
-  const jobsPath = path.join(__dirname, '..', 'src', 'generated_clients', 'jobs');
+  const jobsPath = path.join(__dirname, '..', 'packages', 'generated_clients', 'jobs', 'src');
   ensureDir(jobsPath);
   codamaJobs.accept(renderJavaScriptVisitor(jobsPath));
   console.log('Processing enums in jobs...');
-  // Small delay to ensure files are written
   await new Promise((resolve) => setTimeout(resolve, 100));
   processEnumsInDirectory(jobsPath);
-  // Collect account indices from model and inject into files
   const accountIndices = codamaJobs.accept(createAccountIndicesVisitor());
   injectAccountIndicesIntoFiles(jobsPath, accountIndices);
 
   const codamaStaking = createFromRoot(rootNodeFromAnchor(anchorStakingIdl as AnchorIdl));
 
-  const stakingPath = path.join(__dirname, '..', 'src', 'generated_clients', 'staking');
+  const stakingPath = path.join(__dirname, '..', 'packages', 'generated_clients', 'stake', 'src');
   ensureDir(stakingPath);
   codamaStaking.accept(renderJavaScriptVisitor(stakingPath));
   console.log('Processing enums in staking...');
   await new Promise((resolve) => setTimeout(resolve, 100));
   processEnumsInDirectory(stakingPath);
-  // Collect account indices from model and inject into files
   const stakingAccountIndices = codamaStaking.accept(createAccountIndicesVisitor());
   injectAccountIndicesIntoFiles(stakingPath, stakingAccountIndices);
 
@@ -72,16 +69,16 @@ async function main() {
   const merkleDistributorPath = path.join(
     __dirname,
     '..',
-    'src',
+    'packages',
     'generated_clients',
-    'merkle_distributor'
+    'merkle_distributor',
+    'src'
   );
   ensureDir(merkleDistributorPath);
   codamaMerkleDistributor.accept(renderJavaScriptVisitor(merkleDistributorPath));
   console.log('Processing enums in merkle_distributor...');
   await new Promise((resolve) => setTimeout(resolve, 100));
   processEnumsInDirectory(merkleDistributorPath);
-  // Collect account indices from model and inject into files
   const merkleAccountIndices = codamaMerkleDistributor.accept(createAccountIndicesVisitor());
   injectAccountIndicesIntoFiles(merkleDistributorPath, merkleAccountIndices);
 

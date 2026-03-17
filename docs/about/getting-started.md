@@ -22,66 +22,104 @@ The web-based dashboard is perfect for getting started quickly without writing a
 
 - **Best for**: Visual management, quick deployments, learning the platform
 - **Get started**: Visit [deploy.nosana.com](https://deploy.nosana.com)
-- **Features**: 
+- **Features**:
   - Create and manage deployments visually
   - Monitor job status and logs
   - Manage credits and billing
-  - No installation required
 
 == REST API
 
 **Most Flexible**
 
-Direct HTTP API access gives you full control and works with any programming language.
+Direct HTTP API access works with any programming language.
 
-- **Best for**: Custom integrations, server-side applications, automation
+- **Best for**: Custom integrations, automation
 - **Get started**: [API Documentation](/api/intro)
-- **Features**:
-  - Full programmatic control
-  - Works with any language (Python, JavaScript, Go, etc.)
-  - Create, manage, and monitor deployments
-  - Vault management and credit operations
+
+```bash
+curl -X POST "https://dashboard.k8s.prd.nos.ci/api/deployments/create" \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Hello World",
+    "market": "7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq",
+    "job_definition": {
+      "ops": [{
+        "type": "container/run",
+        "id": "hello",
+        "args": {
+          "image": "ubuntu",
+          "cmd": "for i in `seq 1 30`; do echo $i; sleep 1; done"
+        }
+      }]
+    }
+  }'
+```
 
 == TypeScript SDK
 
-**Recommended for JavaScript/TypeScript**
+**Recommended for JS/TS**
 
-The `@nosana/kit` SDK provides a high-level, type-safe interface for Node.js and browser applications.
+High-level, type-safe interface for Node.js and browser applications.
 
-- **Best for**: JavaScript/TypeScript applications, web apps, Node.js services
+- **Best for**: Web apps, Node.js services
 - **Get started**: [SDK Documentation](/kit/)
-- **Installation**: `npm install @nosana/kit`
-- **Features**:
-  - Type-safe API client
-  - Automatic authentication handling
-  - Built-in error handling
-  - Support for both API key and wallet authentication
+
+```ts
+import { createNosanaClient } from '@nosana/kit';
+
+const client = createNosanaClient('mainnet', {
+  api: {
+    apiKey: process.env.NOSANA_API_KEY,
+  },
+});
+
+const deployment = await client.api.deployments.create({
+  name: 'Hello World',
+  market: '7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq',
+  timeout: 60,
+  replicas: 1,
+  strategy: 'SIMPLE',
+  job_definition: {
+    version: '0.1',
+    type: 'container',
+    meta: {
+      trigger: 'api',
+    },
+    ops: [{
+      type: 'container/run',
+      id: 'hello',
+      args: {
+        image: 'ubuntu',
+        cmd: 'for i in `seq 1 30`; do echo $i; sleep 1; done'
+      }
+    }]
+  }
+});
+```
 
 == CLI
 
 **Command Line**
 
-The Nosana CLI lets you run inference jobs directly from your terminal.
+Run inference jobs directly from your terminal.
 
-- **Best for**: Quick testing, scripts, CI/CD pipelines
+- **Best for**: Quick testing, scripts, CI/CD
 - **Get started**: [CLI Documentation](/inference/quick_start)
-- **Features**:
-  - Run jobs from command line
-  - Simple job submission
-  - Perfect for automation
+
+```bash
+nosana job post "for i in \`seq 1 30\`; do echo \$i; sleep 1; done" \
+  --market 7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq
+```
 
 == Blockchain Programs
 
 **Advanced**
 
-Direct interaction with Solana smart contracts for maximum control.
+Direct interaction with Solana smart contracts.
 
-- **Best for**: Advanced users, custom integrations, direct blockchain interaction
+- **Best for**: Direct blockchain interaction, custom integrations
 - **Get started**: [Programs Documentation](/programs/start)
-- **Features**:
-  - Direct on-chain interaction
-  - Full control over transactions
-  - Access to all protocol features
 
 :::
 
@@ -95,7 +133,8 @@ If you want to earn $NOS by providing GPU resources to the network:
   - 12GB+ RAM
   - 256GB+ NVMe SSD
   - Ubuntu 20.04+ (Linux recommended)
-- **Earnings**: Earn $NOS tokens for running jobs on your hardware
+- **Monitor your host & earnings**: Once your host is running, go to [host.nosana.com](https://host.nosana.com) to see its status, statistics, and $NOS earnings.
+- **View markets & queues**: Use [explore.nosana.com](https://explore.nosana.com) to inspect GPU markets, queues, and host positions.
 
 ## Understanding the Basics
 

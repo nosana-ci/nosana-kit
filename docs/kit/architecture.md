@@ -14,7 +14,7 @@ The SDK uses a functional architecture with factory functions for improved modul
 - **`ipfs/`** - IPFS integration for pinning and retrieving data
 - **`config/`** - Network configurations and defaults
 - **`utils/`** - Helper utilities and type conversions
-- **`generated_clients/`** - Auto-generated Solana program clients (exported as namespaces)
+- **`packages/generated_clients/`** - Auto-generated Solana program clients (exported as namespaces)
 
 All components use factory functions with explicit dependency injection, making the codebase modular, testable, and maintainable.
 

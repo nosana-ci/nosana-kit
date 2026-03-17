@@ -66,5 +66,6 @@ Follow these guides to become a GPU Host or list your hardware on the Nosana Net
 ## Host Your GPU
 
 After listing your hardware on the Nosana Network, you’re ready to start hosting! Launch your GPU Host to begin contributing compute power and earning rewards.
-
-👉 Get started today: [**Nosana Docs**](/hosts/grid-run)
+- **Run your host**: Follow [Running the Host](/hosts/grid-run)
+- **Monitor your host & earnings**: Once your host is running, go to [host.nosana.com](https://host.nosana.com) to see status, statistics, and $NOS earnings.
+- **Check markets & queues**: Use [explore.nosana.com](https://explore.nosana.com) to see the current market queue and activity.

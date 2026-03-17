@@ -1,0 +1,8 @@
+noop:
+  stage: prepare
+  image: alpine:3
+  script:
+    - echo "No package changes; skipping child pipeline."
+  rules:
+    - if: $ANY_CHANGED == "0"
+    - when: never

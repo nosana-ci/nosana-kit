@@ -1,13 +1,19 @@
 {
   "name": "@nosana/docs",
-  "version": "0.0.0",
+  "version": "2.1.8",
   "type": "module",
   "private": true,
   "scripts": {
     "dev": "vitepress dev .",
     "build": "pnpm run api && NODE_OPTIONS='--max-old-space-size=4096' vitepress build .",
-    "api": "cd .. && typedoc",
-    "preview": "vitepress preview ."
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "api": "cd .. && pnpm --filter @nosana/kit exec typedoc",
+    "preview": "vitepress preview .",
+    "test": "echo 'No tests' && exit 0",
+    "lint": "echo 'No lint' && exit 0",
+    "format": "echo 'No format' && exit 0",
+    "format:fix": "echo 'No format:fix' && exit 0"
   },
   "dependencies": {
     "@nosana/kit": "workspace:*"
@@ -16,6 +22,8 @@
     "@braintree/sanitize-url": "^7.0.0",
     "@shikijs/twoslash": "^3.20.0",
     "@shikijs/vitepress-twoslash": "^3.20.0",
+    "@solana-program/system": "0.10.0",
+    "@solana/kit": "5.4.0",
     "@vue/repl": "^4.0.0",
     "chart.js": "^4.5.1",
     "cytoscape": "^3.32.0",

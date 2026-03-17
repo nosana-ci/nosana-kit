@@ -1,26 +1,14 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "ES2020",
-    "lib": ["ES2020", "DOM"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "declaration": true,
-    "sourceMap": true,
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "allowImportingTsExtensions": false,
-    "isolatedModules": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "include": ["src/**/*", "tests/unit/SolanaService.test.ts"],
-  "exclude": ["node_modules", "tests", "dist", "**/*.test.ts", "**/*.spec.ts"]
+  "files": [],
+  "references": [
+    { "path": "./packages/types" },
+    { "path": "./packages/authorisation" },
+    { "path": "./packages/ipfs" },
+    { "path": "./packages/endpoints" },
+    { "path": "./packages/api" },
+    { "path": "./packages/generated_clients/jobs" },
+    { "path": "./packages/generated_clients/stake" },
+    { "path": "./packages/generated_clients/merkle_distributor" },
+    { "path": "./packages/kit" }
+  ]
 }

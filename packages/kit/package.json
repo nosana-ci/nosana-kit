@@ -1,0 +1,71 @@
+{
+  "name": "@nosana/kit",
+  "version": "2.1.8",
+  "description": "Nosana KIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "tsc --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "test": "NODE_NO_WARNINGS=1 vitest run",
+    "test:coverage": "NODE_NO_WARNINGS=1 vitest run --coverage",
+    "test:watch": "NODE_NO_WARNINGS=1 vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
+    "format:fix": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\"",
+    "publish:public": "pnpm run build && pnpm publish --access public"
+  },
+  "keywords": [
+    "nosana",
+    "solana",
+    "sdk",
+    "kit",
+    "blockchain"
+  ],
+  "author": "Nosana",
+  "license": "MIT",
+  "dependencies": {
+    "@nosana/api": "workspace:*",
+    "@nosana/authorization": "workspace:*",
+    "@nosana/endpoints": "workspace:*",
+    "@nosana/ipfs": "workspace:*",
+    "@nosana/jobs-program": "workspace:*",
+    "@nosana/merkle-distributor-program": "workspace:*",
+    "@nosana/stake-program": "workspace:*",
+    "@nosana/types": "workspace:*",
+    "@solana-program/compute-budget": "0.12.0",
+    "@solana-program/system": "0.10.0",
+    "@solana-program/token": "0.9.0",
+    "@solana/kit": "5.4.0",
+    "bs58": "6.0.0"
+  },
+  "devDependencies": {
+    "@nosana/kit": "file:.",
+    "@prettier/sync": "^0.6.1",
+    "@types/node": "^20.19.27",
+    "@vitest/coverage-v8": "^4.0.16",
+    "prettier": "^3.7.4",
+    "sass-embedded": "^1.97.2",
+    "ts-node": "^10.9.2",
+    "typedoc": "0.28.16",
+    "typedoc-plugin-frontmatter": "^1.3.1",
+    "typedoc-plugin-markdown": "^4.9.0",
+    "typedoc-plugin-mdn-links": "^5.0.10",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16",
+    "ws": "^8.18.0"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ]
+}

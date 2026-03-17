@@ -1,0 +1,47 @@
+{
+  "name": "@nosana/endpoints",
+  "version": "2.1.6",
+  "description": "Nosana endpoints module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "author": "Nosana",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "tsc --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint --fix ./src",
+    "format": "echo 'No format' && exit 0",
+    "format:fix": "echo 'No format:fix' && exit 0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.14",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "@vitest/coverage-v8": "^4.0.3",
+    "eslint": "^9.31.0",
+    "eslint-plugin-import": "^2.32.0",
+    "husky": "^9.1.7",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.3"
+  },
+  "dependencies": {
+    "@nosana/types": "workspace:*",
+    "bs58": "^5.0.0",
+    "tweetnacl": "^1.0.3"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  }
+}

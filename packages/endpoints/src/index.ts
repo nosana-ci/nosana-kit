@@ -1,0 +1,175 @@
+import bs58 from 'bs58';
+import nacl from 'tweetnacl';
+import type { ContainerRun, ExposedPort, JobDefinition, Operation, OperationArgsMap, OperationType } from '@nosana/types';
+
+const createHash = (inputString: string, idLength: number = 44): string => {
+  const base58Encoded = bs58.encode(
+    nacl.hash(new TextEncoder().encode(inputString)),
+  );
+  return base58Encoded.slice(0, idLength);
+};
+
+const isPrivate = (job: JobDefinition): boolean => {
+  return job.ops.some((op: Operation<OperationType>) => {
+    if (op.type !== 'container/run') return false;
+
+    const args = op.args as ContainerRun;
+    const expose = args.expose;
+
+    const isExposed =
+      (Array.isArray(expose) && expose.length > 0) ||
+      typeof expose === 'number' ||
+      typeof expose === 'string';
+
+    return isExposed && args.private === true;
+  });
+};
+
+const getExposePorts = (op: Operation<'container/run'>): ExposedPort[] => {
+  const expose = (op.args as OperationArgsMap['container/run']).expose;
+
+  if (!expose) return [];
+
+  const isOperator = (v: string | number | object): v is string =>
+    typeof v === 'string' && /^%%(ops|globals)\.[^%]+%%$/.test(v);
+
+  const isSpreadMarker = (v: string | number | object): boolean =>
+    typeof v === 'object' && v !== null && !Array.isArray(v) && '__spread__' in v;
+
+  if (typeof expose === 'number') {
+    return [{ port: expose, type: 'none' }];
+  }
+
+  if (typeof expose === 'string') {
+    // Skip dynamic operator strings; no concrete port to expose yet
+    if (isOperator(expose)) return [];
+    // Treat as concrete string port/range
+    return [{ port: expose, type: 'none' }];
+  }
+
+  if (Array.isArray(expose)) {
+    const out: ExposedPort[] = [];
+    for (const e of expose) {
+      if (typeof e === 'number') {
+        out.push({ port: e, type: 'none' });
+        continue;
+      }
+      if (typeof e === 'string') {
+        if (isOperator(e)) continue; // skip dynamic
+        out.push({ port: e, type: 'none' });
+        continue;
+      }
+      if (isSpreadMarker(e)) {
+        // dynamic spread marker; skip for concrete expose list
+        continue;
+      }
+      // assume ExposedPort shape; rely on typing for port union
+      out.push(e as ExposedPort);
+    }
+    return out;
+  }
+
+  return [];
+};
+
+const isOpExposed = (op: Operation<'container/run'>): boolean => {
+  const exposePorts = getExposePorts(op);
+  return exposePorts.length > 0;
+};
+
+const getExposeIdHash = (
+  flowId: string,
+  op: number | string,
+  port: number | string,
+): string => {
+  const idLength = 44;
+  const inputString = `${op}:${port}:${flowId}`;
+  return createHash(inputString, idLength);
+};
+
+export type ExposedService = {
+  hash: string;
+  opIndex: number;
+  opId: string;
+  port: number | string;
+  hasHealthCheck: boolean;
+};
+
+const getJobExposeIdHash = (job: JobDefinition, flowId: string): string[] => {
+  const hashes: string[] = [];
+
+  const privateMode = isPrivate(job);
+
+  if (privateMode) {
+    return ['private'];
+  }
+
+  Object.entries(job.ops).forEach(([, op], index) => {
+    if (isOpExposed(op as Operation<'container/run'>)) {
+      const exposePorts = getExposePorts(op as Operation<'container/run'>);
+
+      exposePorts.forEach((port) => {
+        const exposeId = getExposeIdHash(flowId, index, port.port);
+        hashes.push(exposeId);
+      });
+    }
+  });
+
+  return hashes;
+};
+
+const getJobExposedServices = (
+  job: JobDefinition,
+  flowId: string,
+): ExposedService[] => {
+  const hashes: ExposedService[] = [];
+
+  const privateMode = isPrivate(job);
+
+  if (privateMode) {
+    return [
+      {
+        hash: 'private',
+        opIndex: -1,
+        opId: '',
+        port: -1,
+        hasHealthCheck: false,
+      },
+    ];
+  }
+
+  Object.entries(job.ops).forEach(([, op], index) => {
+    if (isOpExposed(op as Operation<'container/run'>)) {
+      const exposePorts = getExposePorts(op as Operation<'container/run'>);
+
+      exposePorts.forEach((port) => {
+        const exposeId = getExposeIdHash(flowId, index, port.port);
+        hashes.push({
+          hash: exposeId,
+          opIndex: index,
+          opId: op.id,
+          port: port.port,
+          hasHealthCheck: !!port.health_checks,
+        });
+      });
+    }
+  });
+
+  return hashes;
+};
+
+// Extract validation functions for reuse
+export const isOperator = (v: string | number | object): v is string =>
+  typeof v === 'string' && /^%%(ops|globals)\.[^%]+%%$/.test(v);
+
+export const isSpreadMarker = (v: string | number | object): boolean =>
+  typeof v === 'object' && v !== null && !Array.isArray(v) && '__spread__' in v;
+
+export {
+  getJobExposedServices,
+  getJobExposeIdHash,
+  getExposeIdHash,
+  getExposePorts,
+  isOpExposed,
+  createHash,
+};
