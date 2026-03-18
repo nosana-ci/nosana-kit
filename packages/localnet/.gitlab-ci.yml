@@ -4,6 +4,7 @@ include:
 stages:
   - lint
   - build
+  - test
 
 localnet:npm format:
   stage: lint
