@@ -5,7 +5,7 @@ import { SYSTEM_PROGRAM_ADDRESS } from '@solana-program/system';
 import { open } from '../../../../../../src/services/programs/jobs/instructions/open.js';
 import * as programClient from '@nosana/jobs-program';
 import { createJobsProgram } from '../../../../../../src/services/programs/jobs/index.js';
-import { AddressFactory, MockClientFactory, sdkToProgramDeps } from '../../../../../setup/index.js';
+import { AddressFactory, MockClientFactory, sdkToProgramDeps } from '../../../../setup/index.js';
 
 // Test constants
 const DEFAULT_JOB_EXPIRATION = 86400; // 24 hours in seconds

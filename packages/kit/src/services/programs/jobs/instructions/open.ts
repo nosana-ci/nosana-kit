@@ -15,7 +15,7 @@ export type OpenParams = {
 
 export type OpenInstruction = ReturnType<typeof getOpenInstruction>;
 
-export type Open = (params: OpenParams) => Promise<OpenInstruction>;
+export type Open = (params?: OpenParams) => Promise<OpenInstruction>;
 
 export async function open(
   {
@@ -26,7 +26,7 @@ export async function open(
     jobTimeout,
     nodeStakeMinimum,
     payer,
-  }: OpenParams,
+  }: OpenParams = {},
   { config, deps, client, getRequiredWallet, getStaticAccounts }: InstructionsHelperParams
 ): Promise<OpenInstruction> {
   try {

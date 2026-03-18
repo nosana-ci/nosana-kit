@@ -10,7 +10,7 @@ import {
   MockClientFactory,
   RunAccountFactory,
   sdkToProgramDeps,
-} from '../../../../../setup/index.js';
+} from '../../../../setup/index.js';
 
 describe('end instruction', () => {
   let helperParams: Parameters<typeof end>[1];

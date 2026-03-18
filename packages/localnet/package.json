@@ -1,0 +1,54 @@
+{
+  "name": "@nosana/localnet",
+  "version": "2.1.8",
+  "description": "Nosana localnet: Solana test validator with pre-baked Nosana programs + localnet test helpers",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:with-deps": "pnpm run build",
+    "dev": "tsc --watch",
+    "dev:with-deps": "pnpm run dev",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
+    "format:fix": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\""
+  },
+  "keywords": [
+    "nosana",
+    "solana",
+    "localnet",
+    "testing",
+    "test-validator"
+  ],
+  "author": "Nosana",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.19.27",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "vitest": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  },
+  "files": [
+    "dist",
+    "docker",
+    "fixtures",
+    "keys",
+    "Dockerfile",
+    "package.json",
+    "README.md"
+  ]
+}

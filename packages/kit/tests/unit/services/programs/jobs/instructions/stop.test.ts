@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { stop } from '../../../../../../src/services/programs/jobs/instructions/stop.js';
 import * as programClient from '@nosana/jobs-program';
 import { createJobsProgram } from '../../../../../../src/services/programs/jobs/index.js';
-import { AddressFactory, MockClientFactory, sdkToProgramDeps } from '../../../../../setup/index.js';
+import { AddressFactory, MockClientFactory, sdkToProgramDeps } from '../../../../setup/index.js';
 
 describe('stop instruction', () => {
   let helperParams: Parameters<typeof stop>[1];

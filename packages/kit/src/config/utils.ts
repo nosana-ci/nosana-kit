@@ -22,6 +22,12 @@ const mergeConfigs = (
       ...defaultConfig.ipfs,
       ...customConfig.ipfs,
     },
+    programs: customConfig.programs
+      ? {
+          ...defaultConfig.programs,
+          ...customConfig.programs,
+        }
+      : defaultConfig.programs,
     api: customConfig.api
       ? {
           ...defaultConfig.api,
@@ -46,6 +52,18 @@ export const getNosanaConfig = (
     throw new NosanaError(`Unsupported Nosana network: ${network}`, ErrorCodes.INVALID_NETWORK);
   }
   return mergeConfigs(defaultConfig, config);
+};
+
+export const getLocalnetConfig = (config?: PartialClientConfig): ClientConfig => {
+  const devnetConfig = DEFAULT_CONFIGS[NosanaNetwork.DEVNET];
+  const localnetBase = mergeConfigs(devnetConfig, {
+    solana: {
+      cluster: 'localnet',
+      rpcEndpoint: 'http://127.0.0.1:8899',
+      wsEndpoint: 'ws://127.0.0.1:8900',
+    },
+  });
+  return mergeConfigs(localnetBase, config);
 };
 
 // Example: Initialize with default (Mainnet) or specific network, or custom config

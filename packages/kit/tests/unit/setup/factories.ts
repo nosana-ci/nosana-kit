@@ -22,11 +22,11 @@ import {
   type NosanaClient,
   type PartialClientConfig,
   type Wallet,
-} from '../../src/index.js';
+} from '../../../src/index.js';
 import * as programClient from '@nosana/jobs-program';
 import * as stakingClient from '@nosana/stake-program';
 import * as merkleDistributorClient from '@nosana/merkle-distributor-program';
-import { JobState, MarketQueueType } from '../../src/services/programs/jobs/index.js';
+import { JobState, MarketQueueType } from '../../../src/services/programs/jobs/index.js';
 import { NosanaNetwork } from '@nosana/types';
 
 /**

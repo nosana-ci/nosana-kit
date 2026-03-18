@@ -5,7 +5,7 @@
 /**
  * @group @nosana/kit
  */
-export { createNosanaClient } from './NosanaClient.js';
+export { createNosanaClient, createLocalnetClient } from './NosanaClient.js';
 
 /**
  * @group @nosana/kit
@@ -220,6 +220,7 @@ export type { SolanaService, SolanaServiceDeps } from './services/solana/SolanaS
  */
 export {
   DEFAULT_CONFIGS,
+  getLocalnetConfig,
   getNosanaConfig,
   type ClientConfig,
   type PartialClientConfig,

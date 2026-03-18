@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NosanaNetwork } from '@nosana/types';
 
-import { SignerFactory } from '../setup/index.js';
+import { SignerFactory } from './setup/index.js';
 import { createNosanaClient } from '../../src/index.js';
 import { DEFAULT_CONFIGS } from '../../src/config/defaultConfigs.js';
 import { ErrorCodes, NosanaError } from '../../src/errors/NosanaError.js';

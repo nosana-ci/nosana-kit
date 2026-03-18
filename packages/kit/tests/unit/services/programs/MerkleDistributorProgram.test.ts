@@ -15,7 +15,7 @@ import {
   MerkleDistributorAccountFactory,
   ClaimStatusAccountFactory,
   sdkToProgramDeps,
-} from '../../../setup/index.js';
+} from '../../setup/index.js';
 
 vi.mock('@solana-program/token', () => ({
   findAssociatedTokenPda: vi.fn(async () => ['ata']),

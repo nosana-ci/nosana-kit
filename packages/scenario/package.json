@@ -1,0 +1,59 @@
+{
+  "name": "@nosana/scenario",
+  "version": "2.1.8",
+  "description": "Nosana scenario test helpers: network-aware client setup for localnet, devnet, and mainnet",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "tsc --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
+    "format:fix": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\"",
+    "test:scenario": "NODE_NO_WARNINGS=1 vitest run --config vitest.config.ts",
+    "test:scenario:localnet": "pnpm run localnet:up && pnpm run test:scenario",
+    "localnet:up": "docker compose -f ../localnet/docker/docker-compose.yml up -d --wait --force-recreate",
+    "localnet:down": "docker compose -f ../localnet/docker/docker-compose.yml down -v",
+    "localnet:logs": "docker compose -f ../localnet/docker/docker-compose.yml logs -f"
+  },
+  "keywords": [
+    "nosana",
+    "solana",
+    "scenario",
+    "testing"
+  ],
+  "author": "Nosana",
+  "license": "MIT",
+  "dependencies": {
+    "@nosana/kit": "workspace:*",
+    "@nosana/localnet": "workspace:*",
+    "@solana-program/token": "0.9.0",
+    "@solana/kit": "5.4.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  },
+  "peerDependencies": {
+    "vitest": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ]
+}

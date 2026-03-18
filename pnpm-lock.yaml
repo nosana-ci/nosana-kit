@@ -393,6 +393,47 @@ importers:
         specifier: ^8.18.0
         version: 8.19.0
 
+  packages/localnet:
+    dependencies:
+      vitest:
+        specifier: '>=2.0.0'
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@20.19.30)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.19.27
+        version: 20.19.30
+      prettier:
+        specifier: ^3.7.4
+        version: 3.8.1
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/scenario:
+    dependencies:
+      '@nosana/kit':
+        specifier: workspace:*
+        version: link:../kit
+      '@nosana/localnet':
+        specifier: workspace:*
+        version: link:../localnet
+      '@solana-program/token':
+        specifier: 0.9.0
+        version: 0.9.0(@solana/kit@5.4.0(typescript@5.9.3))
+      '@solana/kit':
+        specifier: 5.4.0
+        version: 5.4.0(typescript@5.9.3)
+    devDependencies:
+      prettier:
+        specifier: ^3.7.4
+        version: 3.8.1
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.16
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.13)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2)
+
   packages/types:
     dependencies:
       typia:

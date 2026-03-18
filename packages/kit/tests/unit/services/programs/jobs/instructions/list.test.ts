@@ -4,7 +4,7 @@ import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 import { list } from '../../../../../../src/services/programs/jobs/instructions/list.js';
 import * as programClient from '@nosana/jobs-program';
 import { createJobsProgram } from '../../../../../../src/services/programs/jobs/index.js';
-import { AddressFactory, MockClientFactory, sdkToProgramDeps } from '../../../../../setup/index.js';
+import { AddressFactory, MockClientFactory, sdkToProgramDeps } from '../../../../setup/index.js';
 
 const IPFS_BYTES_LENGTH = 32;
 

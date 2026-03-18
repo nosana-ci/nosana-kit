@@ -17,7 +17,7 @@ import {
   RunAccountFactory,
   MarketAccountFactory,
   sdkToProgramDeps,
-} from '../../../setup/index.js';
+} from '../../setup/index.js';
 
 // Test constants
 const DEFAULT_JOB_PRICE = 1;

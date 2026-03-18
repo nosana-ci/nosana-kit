@@ -10,7 +10,7 @@ import {
   MockClientFactory,
   RunAccountFactory,
   sdkToProgramDeps,
-} from '../../../../../setup/index.js';
+} from '../../../../setup/index.js';
 
 const IPFS_BYTES_LENGTH = 32;
 const RUN_TIME_555 = 555;

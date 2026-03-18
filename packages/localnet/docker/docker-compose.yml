@@ -1,0 +1,18 @@
+services:
+  solana-localnet:
+    image: nosana/localnet:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: nosana-localnet
+    env_file:
+      - localnet.env
+    ports:
+      - "${LOCALNET_RPC_PORT:-8899}:8899"
+      - "${LOCALNET_WS_PORT:-8900}:8900"
+      - "${LOCALNET_GOSSIP_PORT:-8001}:8001"
+    healthcheck:
+      test: ["CMD", "solana", "cluster-version", "--url", "http://127.0.0.1:8899"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
