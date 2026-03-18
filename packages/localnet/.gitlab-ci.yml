@@ -19,6 +19,20 @@ variables:
 # then re-add it explicitly on the Node.js jobs below.
 before_script: []
 
+# Disable release/deploy jobs from docker-container.yml — versioning is handled
+# by Lerna in the root pipeline (deploy-patch / deploy-minor / deploy-major).
+release:
+  rules:
+    - when: never
+
+gitlab release:
+  rules:
+    - when: never
+
+auto deploy:
+  rules:
+    - when: never
+
 .pnpm_before: &pnpm_before
   - corepack enable
   - npm install -g corepack@latest
