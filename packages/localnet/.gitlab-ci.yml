@@ -1,47 +1,12 @@
 include:
   - local: .gitlab/ci/common.yml
-  - project: nosana-ci/tools/cicd/gitlab-ci
-    file: docker-container.yml
 
 stages:
   - lint
   - build
-  - test
-  - deploy
-
-variables:
-  DOCKERFILE_DIR: ./packages/localnet/
-  CONTAINER_PLATFORMS: linux/amd64
-  REG_REPOSITORY: nosana/localnet
-
-# Docker build/deploy jobs from docker-container.yml run in a Docker image without Node.js.
-# Clear the inherited before_script (corepack/pnpm setup) at pipeline level,
-# then re-add it explicitly on the Node.js jobs below.
-before_script: []
-
-# Disable release/deploy jobs from docker-container.yml — versioning is handled
-# by Lerna in the root pipeline (deploy-patch / deploy-minor / deploy-major).
-release:
-  rules:
-    - when: never
-
-gitlab release:
-  rules:
-    - when: never
-
-auto deploy:
-  rules:
-    - when: never
-
-.pnpm_before: &pnpm_before
-  - corepack enable
-  - npm install -g corepack@latest
-  - corepack prepare pnpm@10.28.0 --activate
 
 localnet:npm format:
-  image: node:22.22.0
   stage: lint
-  before_script: *pnpm_before
   script:
     - pnpm install --frozen-lockfile
     - pnpm --filter @nosana/localnet run format
@@ -50,9 +15,7 @@ localnet:npm format:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 localnet:npm lint:
-  image: node:22.22.0
   stage: lint
-  before_script: *pnpm_before
   script:
     - pnpm install --frozen-lockfile
     - pnpm --filter @nosana/localnet run lint
@@ -61,9 +24,7 @@ localnet:npm lint:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 localnet:npm build:
-  image: node:22.22.0
-  stage: lint
-  before_script: *pnpm_before
+  stage: build
   script:
     - pnpm install --frozen-lockfile
     - pnpm --filter @nosana/localnet run build
