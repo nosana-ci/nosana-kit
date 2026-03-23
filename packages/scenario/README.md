@@ -14,7 +14,7 @@ npm install --save-dev @nosana/scenario
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { getScenarioClient } from '@nosana/scenario';
+import { getScenarioClient, createMarket, listJob } from '@nosana/scenario';
 
 describe('scenario: basic', () => {
   it('works with the Nosana SDK', async () => {
@@ -22,8 +22,26 @@ describe('scenario: basic', () => {
     const balance = await client.solana.getBalance();
     expect(balance).toBeGreaterThan(0);
   });
+
+  it('creates a market and lists a job', async () => {
+    const marketAddress = await createMarket();
+    const jobAddress = await listJob({ market: marketAddress });
+    expect(jobAddress).toBeDefined();
+  });
 });
 ```
+
+### Multiple Clients
+
+Use the `key` option to create independently funded clients — useful for multi-party scenarios:
+
+```ts
+const deployer = await getScenarioClient();                          // cached as 'default'
+const node     = await getScenarioClient({ key: 'node' });           // separate wallet
+const node2    = await getScenarioClient({ key: 'node2' });          // another separate wallet
+```
+
+Each unique key gets its own keypair, SOL airdrop, and NOS mint on localnet.
 
 ### Run Against Different Networks
 
@@ -87,20 +105,11 @@ pnpm run localnet:down
 
 ### `getScenarioClient(options?): Promise<NosanaClient>`
 
-Returns a cached `NosanaClient` for the target network.
-
-The network is determined by (in order of precedence):
-1. `options.network`
-2. `NOSANA_NETWORK` environment variable
-3. `'localnet'` (default)
-
-The wallet is determined by (in order of precedence):
-1. `options.wallet`
-2. `NOSANA_WALLET` environment variable (path to a Solana keypair JSON file)
-3. Auto-generated keypair (localnet only)
+Returns a cached `NosanaClient` for the target network. Each unique `key` gets its own independently funded client instance.
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
+| `key` | `string` | `'default'` | Cache key — each unique key creates a separate client with its own wallet |
 | `network` | `'localnet' \| 'devnet' \| 'mainnet'` | `NOSANA_NETWORK` env or `'localnet'` | Target network |
 | `wallet` | `Wallet` | `NOSANA_WALLET` env or auto-generated (localnet) | Wallet signer |
 | `airdropAmount` | `bigint` | `2_000_000_000n` | SOL airdrop amount (localnet only) |
@@ -115,19 +124,99 @@ The wallet is determined by (in order of precedence):
 
 Returns a cached `NosanaClient` connected to localnet. Equivalent to `getScenarioClient({ network: 'localnet' })`.
 
-### `mintNosTo(client, recipient, amount): Promise<void>`
+---
+
+### Helper Functions
+
+All helper functions include built-in vitest `expect` assertions and accept an optional `clientOverride` parameter. When omitted, they use the default scenario client (`getScenarioClient()`).
+
+#### Jobs
+
+##### `createMarket(params?, clientOverride?): Promise<Address>`
+
+Create a market on-chain and return its address.
+
+```ts
+const marketAddress = await createMarket();
+const marketAddress = await createMarket({ jobPrice: 1000n });
+```
+
+##### `closeMarket(marketAddress, clientOverride?): Promise<void>`
+
+Close an existing market.
+
+```ts
+await closeMarket(marketAddress.toString());
+```
+
+##### `listJob(params, clientOverride?): Promise<Address>`
+
+List (submit) a job to a market and return the job address. `timeout` defaults to `3600` and `ipfsHash` defaults to a test hash — only `market` is required.
+
+```ts
+const jobAddress = await listJob({ market: marketAddress });
+const jobAddress = await listJob({ market: marketAddress, timeout: 7200 });
+```
+
+##### `joinMarketQueue(marketAddress, options?, clientOverride?): Promise<void>`
+
+Join a market's node queue. Verifies the node is queued by default.
+
+```ts
+const nodeClient = await getScenarioClient({ key: 'node' });
+await joinMarketQueue(marketAddress.toString(), {}, nodeClient);
+
+// Disable queue verification
+await joinMarketQueue(marketAddress.toString(), { verifyQueued: false }, nodeClient);
+```
+
+##### `waitForJobState(jobAddress, expectedState, clientOverride?): Promise<void>`
+
+Poll until a job reaches the expected state using vitest's `expect.poll`.
+
+```ts
+import { JobState } from '@nosana/scenario';
+
+await waitForJobState(jobAddress.toString(), JobState.RUNNING);
+```
+
+#### Nodes
+
+##### `finishJob(jobAddress, clientOverride?): Promise<void>`
+
+Finish (complete) a job as a node, submitting a default IPFS results hash.
+
+```ts
+const nodeClient = await getScenarioClient({ key: 'node' });
+await finishJob(jobAddress.toString(), nodeClient);
+```
+
+##### `verifyJobAssignedToNode(jobAddress, options?, clientOverride?): Promise<void>`
+
+Assert that a job is assigned to the client's wallet. Optionally verify the job state.
+
+```ts
+const nodeClient = await getScenarioClient({ key: 'node' });
+await verifyJobAssignedToNode(jobAddress.toString(), { expectedState: 1 }, nodeClient);
+```
+
+---
+
+### Utilities
+
+#### `mintNosTo(client, recipient, amount): Promise<void>`
 
 Mint NOS tokens to any address on the localnet.
 
-### `ensureLocalnetMint(client): Promise<{ mintAuthority, mintAddress }>`
+#### `ensureLocalnetMint(client): Promise<{ mintAuthority, mintAddress }>`
 
 Ensures the NOS mint exists on localnet. Creates it if it doesn't exist.
 
-### `executeInstructionPlan(client, plan): Promise<void>`
+#### `executeInstructionPlan(client, plan): Promise<void>`
 
 Execute a Solana instruction plan using the client's wallet as fee payer.
 
-### `defineScenarioVitestConfig(overrides?): object`
+#### `defineScenarioVitestConfig(overrides?): object`
 
 Returns a Vitest config object with the scenario setup file pre-configured.
 
@@ -138,4 +227,4 @@ Returns a Vitest config object with the scenario setup file pre-configured.
 
 ### Re-exports from `@nosana/kit`
 
-- `NosanaNetwork`, `type NosanaClient`, `type Wallet`, `type Address`
+- `NosanaNetwork`, `JobState`, `type NosanaClient`, `type Wallet`, `type Address`
