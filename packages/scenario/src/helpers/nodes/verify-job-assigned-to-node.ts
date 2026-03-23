@@ -2,9 +2,9 @@ import { address, type NosanaClient } from '@nosana/kit';
 import { expect } from 'vitest';
 import { resolveClient } from '../resolve-client.js';
 
-export interface VerifyJobAssignedOptions {
+export type VerifyJobAssignedOptions = {
   expectedState?: number;
-}
+};
 
 export async function verifyJobAssignedToNode(
   jobAddress: string,

@@ -163,7 +163,7 @@ async function createScenarioClientInstance(
     'localnet';
 
   if (network === 'localnet') {
-    return getLocalnetClient(options);
+    return createLocalnetClientInstance(options);
   }
 
   const wallet = options?.wallet ?? (await resolveWalletFromEnv());
