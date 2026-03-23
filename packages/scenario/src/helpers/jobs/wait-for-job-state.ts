@@ -5,7 +5,7 @@ import { resolveClient } from '../resolve-client.js';
 export async function waitForJobState(
   jobAddress: string,
   expectedState: JobState,
-  clientOverride?: NosanaClient,
+  clientOverride?: NosanaClient
 ): Promise<void> {
   const client = await resolveClient(clientOverride);
   const job = address(jobAddress);

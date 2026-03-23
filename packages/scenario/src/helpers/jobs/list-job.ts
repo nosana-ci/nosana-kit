@@ -7,8 +7,9 @@ const DEFAULT_TIMEOUT = 3600;
 const DEFAULT_IPFS_HASH = 'QmVp8m3Uq1Cm6JJ3NsuTMSGLNnqXa1mC85uV7YxBREQ78p';
 
 export async function listJob(
-  params: Omit<ListParams, 'timeout' | 'ipfsHash'> & Partial<Pick<ListParams, 'timeout' | 'ipfsHash'>>,
-  clientOverride?: NosanaClient,
+  params: Omit<ListParams, 'timeout' | 'ipfsHash'> &
+    Partial<Pick<ListParams, 'timeout' | 'ipfsHash'>>,
+  clientOverride?: NosanaClient
 ): Promise<Address> {
   const client = await resolveClient(clientOverride);
   const instruction = await client.jobs.list({
