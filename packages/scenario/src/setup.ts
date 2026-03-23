@@ -44,18 +44,24 @@ export interface ScenarioClientOptions extends LocalnetClientOptions {
    *   pointing to a Solana keypair JSON file).
    */
   network?: 'localnet' | 'devnet' | 'mainnet';
+
+  /**
+   * Cache key for the client instance. Each unique key gets its own
+   * independently funded client. Defaults to `'default'`.
+   */
+  key?: string;
 }
 
 type GlobalWithLocalnetClient = typeof globalThis & {
   __NOSANA_LOCALNET_CLIENT__?: Promise<NosanaClient>;
 };
 
-type GlobalWithScenarioClient = typeof globalThis & {
-  __NOSANA_SCENARIO_CLIENT__?: Promise<NosanaClient>;
+type GlobalWithScenarioClients = typeof globalThis & {
+  __NOSANA_SCENARIO_CLIENTS__?: Map<string, Promise<NosanaClient>>;
 };
 
 const globalWithLocalnet = globalThis as GlobalWithLocalnetClient;
-const globalWithScenario = globalThis as GlobalWithScenarioClient;
+const globalWithScenario = globalThis as GlobalWithScenarioClients;
 
 // ---------------------------------------------------------------------------
 // Localnet client
@@ -136,10 +142,16 @@ async function loadWalletFromFile(filePath: string) {
  * ```
  */
 export function getScenarioClient(options?: ScenarioClientOptions): Promise<NosanaClient> {
-  if (!globalWithScenario.__NOSANA_SCENARIO_CLIENT__) {
-    globalWithScenario.__NOSANA_SCENARIO_CLIENT__ = createScenarioClientInstance(options);
+  if (!globalWithScenario.__NOSANA_SCENARIO_CLIENTS__) {
+    globalWithScenario.__NOSANA_SCENARIO_CLIENTS__ = new Map();
   }
-  return globalWithScenario.__NOSANA_SCENARIO_CLIENT__;
+
+  const resolvedKey = options?.key ?? 'default';
+  const clients = globalWithScenario.__NOSANA_SCENARIO_CLIENTS__;
+  if (!clients.has(resolvedKey)) {
+    clients.set(resolvedKey, createScenarioClientInstance(options));
+  }
+  return clients.get(resolvedKey)!;
 }
 
 async function createScenarioClientInstance(

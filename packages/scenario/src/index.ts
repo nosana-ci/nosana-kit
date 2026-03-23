@@ -11,6 +11,17 @@ export {
   loadMintKeypairSigner,
   loadMintAuthoritySigner,
 } from './utils.js';
+export {
+  createMarket,
+  closeMarket,
+  listJob,
+  joinMarketQueue,
+  waitForJobState,
+  finishJob,
+  verifyJobAssignedToNode,
+  type JoinMarketQueueOptions,
+  type VerifyJobAssignedOptions,
+} from './helpers/index.js';
 export { scenarioVitestSetup } from './vitest-setup-fn.js';
 export { defineScenarioVitestConfig } from './vitest-config.js';
 
@@ -25,4 +36,4 @@ export {
 
 // Re-export commonly used types so consumers don't need a separate @nosana/kit import
 export type { NosanaClient, Wallet, Address } from '@nosana/kit';
-export { NosanaNetwork } from '@nosana/kit';
+export { NosanaNetwork, JobState } from '@nosana/kit';
