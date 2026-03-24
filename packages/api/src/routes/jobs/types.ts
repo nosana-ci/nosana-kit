@@ -43,6 +43,10 @@ export type NosanaApiExtendJobResponse =
 export type StopJobWithCreditsResponse =
   clientManagerOperations['postJobsByAddressStop']['responses'][200]['content']['application/json'];
 
+// Backward-compatible aliases used by @nosana/kit
+export type NosanaApiStopJobRequest = string;
+export type NosanaApiStopJobResponse = StopJobWithCreditsResponse;
+
 export interface NosanaJobsApi {
   get: (
     request: NosanaApiGetJobByAddressRequest,
