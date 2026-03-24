@@ -4,12 +4,7 @@ import { createIpfsClient, NosanaIpfsClient } from '@nosana/ipfs';
 import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/authorization';
 
 import { Logger } from './logger/Logger.js';
-import {
-  ClientConfig,
-  getLocalnetConfig,
-  getNosanaConfig,
-  PartialClientConfig,
-} from './config/index.js';
+import { ClientConfig, getNosanaConfig, PartialClientConfig } from './config/index.js';
 import { createJobsProgram, type JobsProgram } from './services/programs/jobs/index.js';
 import { createStakeProgram, type StakeProgram } from './services/programs/stake/index.js';
 import {
@@ -172,9 +167,4 @@ export function createNosanaClient(
 ): NosanaClient {
   const config = getNosanaConfig(network, customConfig);
   return createClientFromConfig(config, network);
-}
-
-export function createLocalnetClient(customConfig?: PartialClientConfig): NosanaClient {
-  const config = getLocalnetConfig(customConfig);
-  return createClientFromConfig(config, NosanaNetwork.DEVNET);
 }

@@ -1,8 +1,4 @@
-import {
-  vaultGetBalance,
-  vaultTopup,
-  vaultWithdraw,
-} from './actions/index.js';
+import { vaultGetBalance, vaultTopup, vaultWithdraw } from './actions/index.js';
 
 import type { TopupVaultOptions, Vault } from '../types.js';
 import type { RouteOptionsWithSigner } from '../../../types.js';
@@ -23,30 +19,29 @@ export function createVault(
   options: RouteOptionsWithSigner,
   created_at?: Date,
 ): Vault {
-
   return {
     address: vaultAddress,
     ...(created_at ? { created_at } : {}),
 
     /**
-       * Gets the current balance of the vault.
-       * TODO: Implementation in actions/vaultGetBalance.ts
+     * Gets the current balance of the vault.
+     * TODO: Implementation in actions/vaultGetBalance.ts
      */
     getBalance: async () => {
       return await vaultGetBalance(vaultAddress, options);
     },
 
     /**
-       * Tops up the vault with SOL and/or NOS.
-       * TODO: Implementation in actions/vaultTopup.ts
+     * Tops up the vault with SOL and/or NOS.
+     * TODO: Implementation in actions/vaultTopup.ts
      */
     topup: async (topupOptions: TopupVaultOptions) => {
       return await vaultTopup(vaultAddress, topupOptions, options);
     },
 
     /**
-       * Withdraws all tokens from the vault.
-       * TODO: Implementation in actions/vaultWithdraw.ts
+     * Withdraws all tokens from the vault.
+     * TODO: Implementation in actions/vaultWithdraw.ts
      */
     withdraw: async () => {
       await vaultWithdraw(vaultAddress, options);
