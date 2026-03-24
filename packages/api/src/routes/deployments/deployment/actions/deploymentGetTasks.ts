@@ -4,6 +4,14 @@ import { withPagination } from '../../../../utils/withPagination.js';
 import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type { DeploymentState, PaginationParams, TaskListResult } from '../../types.js';
 
+/**
+ * @returns Promise<TaskListResult>
+ * @throws Error if there is an error fetching the tasks
+ * @throws Error if the deployment is not found
+ * @description Fetches the tasks for the deployment.
+ * This will return the current tasks associated with the deployment.
+ * It is useful for monitoring the deployment's progress and status.
+ */
 export async function deploymentGetTasks(
   client: DeploymentManagerClient,
   state: DeploymentState,

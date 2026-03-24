@@ -4,6 +4,14 @@ import { withPagination } from '../../../../utils/withPagination.js';
 import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type { DeploymentRevisionsSearchParams, DeploymentState, RevisionListResult } from '../../types.js';
 
+/**
+ * @returns Promise<RevisionListResult>
+ * @throws Error if there is an error fetching the revisions
+ * @throws Error if the deployment is not found
+ * @description Fetches the revisions for the deployment.
+ * This will return all revisions associated with the deployment.
+ * It is useful for viewing the deployment history.
+ */
 export async function deploymentGetRevisions(
   client: DeploymentManagerClient,
   state: DeploymentState,

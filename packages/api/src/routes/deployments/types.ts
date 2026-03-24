@@ -1,4 +1,6 @@
-import type { JobDefinition } from '@nosana/types';
+import type {
+  JobDefinition,
+} from '@nosana/types';
 import type { components, paths } from '../../client/deployment-manager/schema.js';
 
 // Re-export types from @nosana/types for reuse
@@ -33,18 +35,6 @@ export type PaginatedResult<T> = T & {
   previousPage: (() => Promise<PaginatedResult<T>>) | null;
 }
 
-// Response types for paginated endpoints
-export type DeploymentJobs = paths['/api/deployments/{deployment}/jobs']['get']['responses']['200']['content']['application/json'];
-export type DeploymentRevisions = paths['/api/deployments/{deployment}/revisions']['get']['responses']['200']['content']['application/json'];
-export type DeploymentEvents = paths['/api/deployments/{deployment}/events']['get']['responses']['200']['content']['application/json'];
-export type DeploymentTasks = paths['/api/deployments/{deployment}/tasks']['get']['responses']['200']['content']['application/json'];
-
-// Item types extracted from paginated responses
-export type DeploymentJobItem = DeploymentJobs['jobs'][number];
-export type DeploymentRevisionItem = DeploymentRevisions['revisions'][number];
-export type DeploymentEventItem = DeploymentEvents['events'][number];
-export type DeploymentTaskItem = DeploymentTasks['tasks'][number];
-
 // Specific paginated result types
 export type DeploymentListResult = PaginatedResult<{ deployments: Deployment[] }>;
 export type ApiDeploymentListResult = PaginatedResult<{ deployments: ApiDeployment[] }>;
@@ -60,14 +50,11 @@ export type PaginationParams = {
   sort_order?: 'asc' | 'desc';
 };
 
-// Search params types from OpenAPI schema
-export type DeploymentsSearchParams = paths['/api/deployments']['get']['parameters']['query'];
-export type DeploymentJobsSearchParams = paths['/api/deployments/{deployment}/jobs']['get']['parameters']['query'];
-export type DeploymentEventsSearchParams = paths['/api/deployments/{deployment}/events']['get']['parameters']['query'];
-export type DeploymentRevisionsSearchParams = paths['/api/deployments/{deployment}/revisions']['get']['parameters']['query'];
-
-// Single job detail (richer type than list item)
-export type DeploymentJob = paths['/api/deployments/{deployment}/jobs/{job}']['get']['responses']['200']['content']['application/json'];
+// Response types for the new endpoints
+export type DeploymentJobs = paths['/api/deployments/{deployment}/jobs']['get']['responses']['200']['content']['application/json'];
+export type DeploymentRevisions = paths['/api/deployments/{deployment}/revisions']['get']['responses']['200']['content']['application/json'];
+export type DeploymentEvents = paths['/api/deployments/{deployment}/events']['get']['responses']['200']['content']['application/json'];
+export type DeploymentTasks = paths['/api/deployments/{deployment}/tasks']['get']['responses']['200']['content']['application/json'];
 
 export interface TopupVaultOptions {
   SOL?: number;
@@ -86,6 +73,20 @@ export interface Vault {
   topup: (options: TopupVaultOptions) => Promise<void>;
   withdraw: () => Promise<void>;
 }
+
+// Type for deployment job response
+export type DeploymentJob = paths['/api/deployments/{deployment}/jobs/{job}']['get']['responses']['200']['content']['application/json'];
+
+export type DeploymentsSearchParams = paths['/api/deployments']['get']['parameters']['query'];
+export type DeploymentJobsSearchParams = paths['/api/deployments/{deployment}/jobs']['get']['parameters']['query'];
+export type DeploymentEventsSearchParams = paths['/api/deployments/{deployment}/events']['get']['parameters']['query'];
+export type DeploymentRevisionsSearchParams = paths['/api/deployments/{deployment}/revisions']['get']['parameters']['query'];
+
+// Item types extracted from paginated responses
+export type DeploymentJobItem = DeploymentJobs['jobs'][number];
+export type DeploymentRevisionItem = DeploymentRevisions['revisions'][number];
+export type DeploymentEventItem = DeploymentEvents['events'][number];
+export type DeploymentTaskItem = DeploymentTasks['tasks'][number];
 
 // API deployment (with API key auth) - no vault
 export type ApiDeployment = DeploymentState & {

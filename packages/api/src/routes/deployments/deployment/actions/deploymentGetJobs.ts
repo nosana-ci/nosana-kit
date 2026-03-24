@@ -4,6 +4,14 @@ import { withPagination } from '../../../../utils/withPagination.js';
 import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type { DeploymentState, JobListResult, DeploymentJobsSearchParams } from '../../types.js';
 
+/**
+ * @returns Promise<JobListResult>
+ * @throws Error if there is an error fetching the jobs
+ * @throws Error if the deployment is not found
+ * @description Fetches the jobs for the deployment.
+ * This will return the current jobs associated with the deployment.
+ * It is useful for monitoring the deployment's job status.
+ */
 export async function deploymentGetJobs(
   client: DeploymentManagerClient,
   state: DeploymentState,
