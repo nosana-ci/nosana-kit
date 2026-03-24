@@ -26,7 +26,7 @@ export function createNosanaAuthApi(
     },
     async validateSession(cookieHeader?: string): Promise<ValidateSessionResponse> {
       const { data, error } = await client.POST('/auth/validate-session', {
-        body: cookieHeader ? { cookieHeader } : undefined,
+        body: cookieHeader ? { cookieHeader } : {},
       });
 
       if (error || !data) {

@@ -66,7 +66,9 @@ export function createNosanaHostsApi(clients: {
       return data as unknown as Record<string, unknown>;
     },
     async getStats(): Promise<Record<string, unknown>> {
-      const { data, error } = await client.GET('/nodes/stats', {});
+      const { data, error } = await client.GET('/nodes/stats', {
+        params: { query: {} },
+      });
 
       if (error || !data) {
         throw errorFormatter('Failed to get node stats', error);

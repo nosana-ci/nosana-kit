@@ -24,12 +24,11 @@ Complete reference for the `@nosana/api` SDK route groups and their correspondin
 | `validateSession()` | POST | `/auth/validate-session` | Validate SuperTokens session |
 | `validateApiKey()` | POST | `/auth/validate-api-key` | Validate API key |
 
-### `user` — User Profile & API Keys
+### `user` — API Keys
 **Client:** Client Manager
 
 | SDK method | HTTP | Path | Description |
 |---|---|---|---|
-| `getProfile()` | GET | `/user/profile` | Get authenticated user profile |
 | `apiKeys.create()` | POST | `/api-keys/` | Create API key |
 | `apiKeys.list()` | GET | `/api-keys/` | List user's API keys |
 | `apiKeys.get()` | GET | `/api-keys/{id}` | Get API key by ID |
@@ -42,8 +41,8 @@ Complete reference for the `@nosana/api` SDK route groups and their correspondin
 | SDK method | HTTP | Service | Path | Description |
 |---|---|---|---|---|
 | `get()` | GET | Blockchain Indexer | `/jobs/{address}` | Get job by address |
-| `list()` | GET | Blockchain Indexer | `/jobs/` | Query jobs (filter by state, market, node, poster, payer) |
-| `create()` | POST | Client Manager | `/jobs/list` | Create a job using credits |
+| `getAll()` | GET | Blockchain Indexer | `/jobs/` | Query jobs (filter by state, market, node, poster, payer) |
+| `list()` | POST | Client Manager | `/jobs/list` | Create a job using credits |
 | `extend()` | POST | Client Manager | `/jobs/{address}/extend` | Extend job duration using credits |
 | `stop()` | POST | Client Manager | `/jobs/{address}/stop` | Stop a job (refund remaining credits) |
 | `getRunning()` | GET | Blockchain Indexer | `/jobs/running` | Running jobs count per market |
@@ -160,7 +159,7 @@ Complete reference for the `@nosana/api` SDK route groups and their correspondin
 |---|---|---|---|
 | GET | `/health` | Health check | — |
 | **Jobs** | | | |
-| GET | `/jobs/` | List jobs (filter by state, market, node, poster, payer) | `jobs.list()` |
+| GET | `/jobs/` | List jobs (filter by state, market, node, poster, payer) | `jobs.getAll()` |
 | GET | `/jobs/{address}` | Get job by address | `jobs.get()` |
 | GET | `/jobs/running` | Running jobs count per market | `jobs.getRunning()` |
 | GET | `/jobs/running-nodes` | Running nodes for a market | `jobs.getRunningNodes()` |
@@ -186,8 +185,6 @@ Complete reference for the `@nosana/api` SDK route groups and their correspondin
 | POST | `/auth/validate-api-key` | — | Validate API key | `auth.validateApiKey()` |
 | POST | `/auth/sign-message/external` | Hybrid | Sign message for external service | `auth.signMessage()` |
 | ALL | `/auth/*` | — | SuperTokens proxy | — _(internal)_ |
-| **User** | | | | |
-| GET | `/user/profile` | SuperTokens | Get user profile | `user.getProfile()` |
 | **API Keys** | | | | |
 | POST | `/api-keys/` | Hybrid | Create API key | `user.apiKeys.create()` |
 | GET | `/api-keys/` | Hybrid | List user's API keys | `user.apiKeys.list()` |
@@ -214,7 +211,7 @@ Complete reference for the `@nosana/api` SDK route groups and their correspondin
 | GET | `/credits/admin/request/config` | Admin | Get free credit request config | — _(admin)_ |
 | POST | `/credits/admin/request/config` | Admin | Set free credit request config | — _(admin)_ |
 | **Jobs** | | | | |
-| POST | `/jobs/list` | Hybrid | Create job using credits | `jobs.create()` |
+| POST | `/jobs/list` | Hybrid | Create job using credits | `jobs.list()` |
 | POST | `/jobs/{address}/extend` | Hybrid | Extend job using credits | `jobs.extend()` |
 | POST | `/jobs/{address}/stop` | Hybrid | Stop job (refund credits) | `jobs.stop()` |
 | **Templates** | | | | |

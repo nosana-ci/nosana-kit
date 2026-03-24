@@ -35,8 +35,8 @@ describe('createNosanaJobsApi', () => {
     });
   });
 
-  describe('list', () => {
-    it('should return the jobs list', async () => {
+  describe('getAll', () => {
+    it('should return all jobs', async () => {
       (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({
         data: [global.TEST_MOCK_JOB],
         error: null,
@@ -46,7 +46,7 @@ describe('createNosanaJobsApi', () => {
         blockchainIndexer: global.TEST_MOCK_CLIENT,
         clientManager: global.TEST_MOCK_CLIENT,
       });
-      const result = await api.list();
+      const result = await api.getAll();
 
       expect(result).toEqual([global.TEST_MOCK_JOB]);
     });
@@ -62,12 +62,12 @@ describe('createNosanaJobsApi', () => {
         clientManager: global.TEST_MOCK_CLIENT,
       });
 
-      await expect(api.list()).rejects.toThrow('Failed to list jobs');
+      await expect(api.getAll()).rejects.toThrow('Failed to get all jobs');
     });
   });
 
-  describe('create', () => {
-    it('should return the created job response', async () => {
+  describe('list', () => {
+    it('should return the list job response', async () => {
       (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({
         data: global.TEST_MOCK_CREATE_JOB_RESPONSE,
         error: null,
@@ -77,7 +77,7 @@ describe('createNosanaJobsApi', () => {
         blockchainIndexer: global.TEST_MOCK_CLIENT,
         clientManager: global.TEST_MOCK_CLIENT,
       });
-      const result = await api.create(global.TEST_CREATE_JOB_REQUEST);
+      const result = await api.list(global.TEST_CREATE_JOB_REQUEST);
 
       expect(result).toEqual(global.TEST_MOCK_CREATE_JOB_RESPONSE);
     });
@@ -93,8 +93,8 @@ describe('createNosanaJobsApi', () => {
         clientManager: global.TEST_MOCK_CLIENT,
       });
 
-      await expect(api.create(global.TEST_CREATE_JOB_REQUEST)).rejects.toThrow(
-        'Failed to create job',
+      await expect(api.list(global.TEST_CREATE_JOB_REQUEST)).rejects.toThrow(
+        'Failed to list job',
       );
     });
   });
@@ -110,10 +110,10 @@ describe('createNosanaJobsApi', () => {
         blockchainIndexer: global.TEST_MOCK_CLIENT,
         clientManager: global.TEST_MOCK_CLIENT,
       });
-      const result = await api.extend(
-        '8TjrkaZmW2UFjpm2Va5LECJc7zoFrbUJETk6fPimGi9a',
-        { seconds: 3600 },
-      );
+      const result = await api.extend({
+        address: '8TjrkaZmW2UFjpm2Va5LECJc7zoFrbUJETk6fPimGi9a',
+        seconds: 3600,
+      });
 
       expect(result).toEqual(global.TEST_MOCK_EXTEND_JOB_RESPONSE);
     });
@@ -129,7 +129,7 @@ describe('createNosanaJobsApi', () => {
         clientManager: global.TEST_MOCK_CLIENT,
       });
 
-      await expect(api.extend('invalid', { seconds: 3600 })).rejects.toThrow(
+      await expect(api.extend({ address: 'invalid', seconds: 3600 })).rejects.toThrow(
         'Failed to extend job',
       );
     });

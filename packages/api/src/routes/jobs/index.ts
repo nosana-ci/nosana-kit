@@ -6,12 +6,12 @@ import type {
   NosanaJobsApi,
   NosanaApiGetJobByAddressRequest,
   NosanaApiGetJobByAddressResponse,
+  NosanaApiGetAllJobsRequest,
+  NosanaApiGetAllJobsResponse,
   NosanaApiListJobRequest,
   NosanaApiListJobResponse,
-  CreateJobWithCreditsRequest,
-  CreateJobWithCreditsResponse,
-  ExtendJobWithCreditsRequest,
-  ExtendJobWithCreditsResponse,
+  NosanaApiExtendJobRequest,
+  NosanaApiExtendJobResponse,
   StopJobWithCreditsResponse,
   Job,
   JobRunningNodesRequest,
@@ -48,9 +48,9 @@ export function createNosanaJobsApi(clients: {
 
       return data as unknown as NosanaApiGetJobByAddressResponse;
     },
-    async list(
-      request?: NosanaApiListJobRequest,
-    ): Promise<NosanaApiListJobResponse> {
+    async getAll(
+      request?: NosanaApiGetAllJobsRequest,
+    ): Promise<NosanaApiGetAllJobsResponse> {
       const { data, error } = await blockchainIndexer.GET('/jobs/', {
         params: {
           query: request ?? {},
@@ -58,28 +58,28 @@ export function createNosanaJobsApi(clients: {
       });
 
       if (error || !data) {
-        throw errorFormatter('Failed to list jobs', error);
+        throw errorFormatter('Failed to get all jobs', error);
       }
 
-      return data as unknown as NosanaApiListJobResponse;
+      return data as unknown as NosanaApiGetAllJobsResponse;
     },
-    async create(
-      request: CreateJobWithCreditsRequest,
-    ): Promise<CreateJobWithCreditsResponse> {
+    async list(
+      request: NosanaApiListJobRequest,
+    ): Promise<NosanaApiListJobResponse> {
       const { data, error } = await clientManager.POST('/jobs/list', {
         body: request,
       });
 
       if (error || !data) {
-        throw errorFormatter('Failed to create job', error);
+        throw errorFormatter('Failed to list job', error);
       }
 
       return data;
     },
-    async extend(
-      address: string,
-      request: ExtendJobWithCreditsRequest,
-    ): Promise<ExtendJobWithCreditsResponse> {
+    async extend({
+      address,
+      ...request
+    }: NosanaApiExtendJobRequest): Promise<NosanaApiExtendJobResponse> {
       const { data, error } = await clientManager.POST(
         '/jobs/{address}/extend',
         {

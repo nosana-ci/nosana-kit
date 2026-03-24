@@ -1,8 +1,9 @@
-import type { components, paths } from '../../client/client-manager/schema.js';
+import type { operations, paths } from '../../client/client-manager/schema.js';
 
-export type UserProfile = components['schemas']['UserProfile'];
-export type ApiKey = components['schemas']['ApiKey'];
-export type ApiKeyCreated = components['schemas']['ApiKeyCreated'];
+export type ApiKey =
+  operations['getApi-keysById']['responses'][200]['content']['application/json'];
+export type ApiKeyCreated =
+  operations['postApi-keys']['responses'][200]['content']['application/json'];
 
 export type CreateApiKeyRequest =
   paths['/api-keys/']['post']['requestBody']['content']['application/json'];
@@ -10,7 +11,6 @@ export type UpdateApiKeyRequest =
   paths['/api-keys/{id}/update']['post']['requestBody']['content']['application/json'];
 
 export interface NosanaUserApi {
-  getProfile: () => Promise<UserProfile>;
   apiKeys: {
     create: (request: CreateApiKeyRequest) => Promise<ApiKeyCreated>;
     list: () => Promise<{ keys: ApiKey[]; total: number }>;

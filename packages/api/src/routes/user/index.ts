@@ -3,7 +3,6 @@ import { errorFormatter } from '../../utils/errorFormatter.js';
 import type { ClientManagerClient } from '../../client/client-manager/index.js';
 import type {
   NosanaUserApi,
-  UserProfile,
   ApiKey,
   ApiKeyCreated,
   CreateApiKeyRequest,
@@ -17,15 +16,6 @@ export function createNosanaUserApi(clients: {
 }): NosanaUserApi {
   const { clientManager: client } = clients;
   return {
-    async getProfile(): Promise<UserProfile> {
-      const { data, error } = await client.GET('/user/profile', {});
-
-      if (error || !data) {
-        throw errorFormatter('Failed to get user profile', error);
-      }
-
-      return data;
-    },
     apiKeys: {
       async create(request: CreateApiKeyRequest): Promise<ApiKeyCreated> {
         const { data, error } = await client.POST('/api-keys/', {

@@ -1,5 +1,5 @@
 import type { operations } from '../../client/blockchain-indexer/schema.js';
-import type { components } from '../../client/client-manager/schema.js';
+import type { operations as clientManagerOperations } from '../../client/client-manager/schema.js';
 
 // Job type from the batch endpoint (which has proper typed responses)
 export type Job =
@@ -8,12 +8,22 @@ export type Job =
 // Request types from OpenAPI
 export type NosanaApiGetJobByAddressRequest =
   operations['getJobsByAddress']['parameters']['path']['address'];
-export type NosanaApiListJobRequest =
+export type NosanaApiGetAllJobsRequest =
   operations['getJobs']['parameters']['query'];
 
 // Response types
 export type NosanaApiGetJobByAddressResponse = Job;
-export type NosanaApiListJobResponse = Job[];
+export type NosanaApiGetAllJobsResponse = Job[];
+
+// Credit-based job listing (POST /jobs/list on client-manager)
+export type NosanaApiListJobRequest = {
+  ipfsHash: string;
+  market: string;
+  timeout?: number;
+  node?: string;
+};
+export type NosanaApiListJobResponse =
+  clientManagerOperations['postJobsList']['responses'][200]['content']['application/json'];
 
 // Query types for new routes
 export type JobRunningNodesRequest = operations['getJobsRunning-nodes']['parameters']['query'];
@@ -25,34 +35,27 @@ export type JobCountResponse = operations['getJobsCount']['responses'][200]['con
 export type JobBatchRequest = operations['postJobsBatch']['requestBody']['content']['application/json'];
 
 // Credit-based job operations (client-manager)
-export type CreateJobWithCreditsRequest = {
-  ipfsHash: string;
-  market: string;
-  timeout?: number;
-  node?: string;
-};
-export type CreateJobWithCreditsResponse =
-  components['schemas']['CreateJobWithCreditsResponse'];
-export type ExtendJobWithCreditsRequest = { seconds: number };
-export type ExtendJobWithCreditsResponse =
-  components['schemas']['ExtendJobWithCreditsResponse'];
+export type NosanaApiExtendJobRequest =
+  clientManagerOperations['postJobsByAddressExtend']['requestBody']['content']['application/json'] &
+  clientManagerOperations['postJobsByAddressExtend']['parameters']['path'];
+export type NosanaApiExtendJobResponse =
+  clientManagerOperations['postJobsByAddressExtend']['responses'][200]['content']['application/json'];
 export type StopJobWithCreditsResponse =
-  components['schemas']['StopJobWithCreditsResponse'];
+  clientManagerOperations['postJobsByAddressStop']['responses'][200]['content']['application/json'];
 
 export interface NosanaJobsApi {
   get: (
     request: NosanaApiGetJobByAddressRequest,
   ) => Promise<NosanaApiGetJobByAddressResponse>;
+  getAll: (
+    request?: NosanaApiGetAllJobsRequest,
+  ) => Promise<NosanaApiGetAllJobsResponse>;
   list: (
-    request?: NosanaApiListJobRequest,
+    request: NosanaApiListJobRequest,
   ) => Promise<NosanaApiListJobResponse>;
-  create: (
-    request: CreateJobWithCreditsRequest,
-  ) => Promise<CreateJobWithCreditsResponse>;
   extend: (
-    address: string,
-    request: ExtendJobWithCreditsRequest,
-  ) => Promise<ExtendJobWithCreditsResponse>;
+    request: NosanaApiExtendJobRequest,
+  ) => Promise<NosanaApiExtendJobResponse>;
   stop: (address: string) => Promise<StopJobWithCreditsResponse>;
   getRunning: () => Promise<Record<string, unknown>>;
   getRunningNodes: (request: JobRunningNodesRequest) => Promise<Record<string, unknown>>;

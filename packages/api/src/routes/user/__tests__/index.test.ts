@@ -6,28 +6,6 @@ describe('createNosanaUserApi', () => {
     clientManager: global.TEST_MOCK_CLIENT,
   });
 
-  describe('getProfile', () => {
-    it('should return the user profile', async () => {
-      const mockProfile = { id: 'user-1', email: 'test@example.com' };
-      (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({
-        data: mockProfile,
-        error: null,
-      });
-
-      const result = await api.getProfile();
-      expect(result).toEqual(mockProfile);
-    });
-
-    test('when an error is returned, it should throw a formatted error', async () => {
-      (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({
-        data: null,
-        error: { message: 'Unauthorized' },
-      });
-
-      await expect(api.getProfile()).rejects.toThrow('Failed to get user profile');
-    });
-  });
-
   describe('apiKeys', () => {
     describe('create', () => {
       it('should create an API key', async () => {
