@@ -47,7 +47,8 @@ localnet:npm build:
     DOCKER_CERT_PATH: ""
     DOCKERFILE_DIR: packages/localnet
     REG_REPOSITORY: nosana/localnet
-  before_script: []
+  before_script:
+    - apk add --no-cache git
 
 # Build & push to GitLab Registry on every MR / main commit.
 # This verifies the Docker image builds before a deploy is triggered.
@@ -92,7 +93,6 @@ localnet:docker:tag:
     - export DOCKER_TLS_CERTDIR=
     - export DOCKER_TLS_VERIFY=
     - export DOCKER_CERT_PATH=
-    - apk add --no-cache git
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - PARENT_SHA=$(git rev-parse HEAD~1)
