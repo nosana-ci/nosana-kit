@@ -58,8 +58,7 @@ localnet:docker:build:
   before_script:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - docker context create build
-    - docker buildx create --use build
+    - docker buildx create --use
     - docker buildx build
         --push
         --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
