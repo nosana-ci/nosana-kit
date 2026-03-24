@@ -7,7 +7,7 @@ Complete reference for the `@nosana/api` SDK route groups and their correspondin
 | Client | Framework | Base URL (mainnet) | Swagger | Schema status |
 |---|---|---|---|---|
 | **Blockchain Indexer** | Elysia | `https://blockchain-indexer.k8s.prd.nos.ci` | `/swagger` | ✅ Generated from swagger |
-| **Client Manager** | Elysia | `https://client-manager.k8s.prd.nosana.com` | ❌ None | ✅ Manually maintained |
+| **Client Manager** | Elysia | `https://client-manager.k8s.prd.nosana.com` | `/swagger` | ✅ Generated from swagger |
 | **Deployment Manager** | Fastify | `https://deployment-manager.k8s.prd.nos.ci` | `/documentation/json` | ✅ Generated from swagger |
 | **Host Manager** | Elysia | `https://host-manager.k8s.prd.nosana.com` | `/swagger` | ✅ Generated from swagger |
 
