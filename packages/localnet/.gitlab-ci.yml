@@ -43,6 +43,8 @@ localnet:npm build:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_VERIFY: ""
+    DOCKER_CERT_PATH: ""
     CONTAINER_PLATFORMS: linux/amd64
     DOCKERFILE_DIR: packages/localnet
     REG_REPOSITORY: nosana/localnet
