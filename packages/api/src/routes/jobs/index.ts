@@ -183,7 +183,7 @@ export function createNosanaJobsApi(clients: {
         throw errorFormatter('Failed to get jobs batch', error);
       }
 
-      return data as unknown as Job[];
+      return data;
     },
   };
 }

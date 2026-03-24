@@ -43,5 +43,5 @@ export function createNosanaClientManagerApiClient(
     client.use(authMiddleware);
   }
 
-  return client as ClientManagerClient;
+  return client;
 }

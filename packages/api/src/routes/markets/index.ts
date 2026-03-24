@@ -4,6 +4,7 @@ import type { HostManagerClient } from '../../client/host-manager/index.js';
 import type {
   Market,
   MarketRequiredResources,
+  MarketPriceResponse,
   NosanaMarketsApi,
 } from './types.js';
 
@@ -66,14 +67,14 @@ export function createNosanaMarketsApi(clients: {
 
       return data as unknown as Record<string, unknown>;
     },
-    async getPrice(): Promise<Record<string, unknown>> {
+    async getPrice(): Promise<MarketPriceResponse> {
       const { data, error } = await client.GET('/markets/price', {});
 
       if (error || !data) {
         throw errorFormatter('Failed to fetch NOS price', error);
       }
 
-      return data as unknown as Record<string, unknown>;
+      return data;
     },
     async getGpuTypes(): Promise<Record<string, unknown>[]> {
       const { data, error } = await client.GET('/markets/gpu-types', {});
