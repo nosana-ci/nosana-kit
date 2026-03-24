@@ -224,7 +224,18 @@ global.TEST_MOCK_DEPLOYMENT = {
   strategy: 'SIMPLE',
 };
 
-global.TEST_MOCK_DEPLOYMENTS_LIST = [global.TEST_MOCK_DEPLOYMENT];
+global.TEST_MOCK_DEPLOYMENTS_LIST = {
+  deployments: [global.TEST_MOCK_DEPLOYMENT],
+  pagination: {
+    cursor_next: null,
+    cursor_prev: null,
+    has_next_page: false,
+    has_previous_page: false,
+    page_size: 10,
+    current_page: 1,
+    total_items: 1
+  }
+};
 
 global.TEST_CREATE_DEPLOYMENT_REQUEST = {
   name: 'Pytorch Jupyter Notebook',

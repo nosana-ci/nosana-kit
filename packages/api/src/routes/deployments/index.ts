@@ -1,6 +1,7 @@
 import type { components } from '../../client/deployment-manager/schema.js';
 
 import { errorFormatter } from '../../utils/errorFormatter.js';
+import { withPagination } from '../../utils/withPagination.js';
 import { createVault as createVaultFn } from './deployment/createVault.js';
 import { createDeployment as createDeploymentFn } from './deployment/createDeployment.js';
 
@@ -16,6 +17,9 @@ import type {
   ApiDeploymentsApi,
   ApiDeployment,
   JobResults,
+  DeploymentListResult,
+  ApiDeploymentListResult,
+  DeploymentsSearchParams,
 } from './types.js';
 
 type DeploymentSchema = components['schemas']['Deployment'];
@@ -70,14 +74,26 @@ export function createDeploymentsApi(
     return createDeployment(data);
   };
 
-  const list = async () => {
-    const { data, error } = await client.GET('/api/deployments', {});
+  const list = async (searchParams?: DeploymentsSearchParams): Promise<DeploymentListResult | ApiDeploymentListResult> => {
+    const { data, error } = await client.GET('/api/deployments', {
+      params: {
+        query: {
+          ...searchParams,
+        },
+      },
+    });
 
     if (error || !data) {
       throw errorFormatter('Error listing deployments', error);
     }
 
-    return data.map((deployment) => createDeployment(deployment));
+    return withPagination(
+      {
+        ...data,
+        deployments: data.deployments.map((deployment) => createDeployment(deployment)),
+      },
+      (cursor) => list({ ...searchParams, cursor })
+    );
   };
 
   const pipe = async (

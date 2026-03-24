@@ -1,17 +1,22 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
+import { withPagination } from '../../../../utils/withPagination.js';
 
 import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
-import type { DeploymentState, DeploymentEventItem } from '../../types.js';
+import type { DeploymentState, DeploymentEventsSearchParams, EventListResult } from '../../types.js';
 
 export async function deploymentGetEvents(
   client: DeploymentManagerClient,
   state: DeploymentState,
-): Promise<DeploymentEventItem[]> {
+  searchParams?: DeploymentEventsSearchParams,
+): Promise<EventListResult> {
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/events',
     {
       params: {
         path: { deployment: state.id },
+        query: {
+          ...searchParams,
+        },
       },
     },
   );
@@ -20,5 +25,8 @@ export async function deploymentGetEvents(
     throw errorFormatter('Error getting deployment events', error);
   }
 
-  return data;
+  return withPagination(
+    data,
+    (cursor) => deploymentGetEvents(client, state, { ...searchParams, cursor })
+  );
 }

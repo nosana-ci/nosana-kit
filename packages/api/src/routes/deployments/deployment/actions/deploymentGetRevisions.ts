@@ -1,17 +1,22 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
+import { withPagination } from '../../../../utils/withPagination.js';
 
 import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
-import type { DeploymentState, DeploymentRevisionItem } from '../../types.js';
+import type { DeploymentRevisionsSearchParams, DeploymentState, RevisionListResult } from '../../types.js';
 
 export async function deploymentGetRevisions(
   client: DeploymentManagerClient,
   state: DeploymentState,
-): Promise<DeploymentRevisionItem[]> {
+  searchParams?: DeploymentRevisionsSearchParams,
+): Promise<RevisionListResult> {
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/revisions',
     {
       params: {
         path: { deployment: state.id },
+        query: {
+          ...searchParams,
+        },
       },
     },
   );
@@ -20,5 +25,8 @@ export async function deploymentGetRevisions(
     throw errorFormatter('Error getting deployment revisions', error);
   }
 
-  return data;
+  return withPagination(
+    data,
+    (cursor) => deploymentGetRevisions(client, state, { ...searchParams, cursor })
+  );
 }

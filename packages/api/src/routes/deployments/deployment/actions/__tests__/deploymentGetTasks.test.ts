@@ -18,7 +18,7 @@ describe('deploymentGetTasks', () => {
   describe('when data is returned', () => {
     beforeEach(() => {
       (mockClient.GET as Mock).mockResolvedValue({
-        data: global.TEST_MOCK_TASKS_LIST,
+        data: global.TEST_MOCK_TASKS_RESPONSE,
         error: null,
       });
     });
@@ -26,12 +26,17 @@ describe('deploymentGetTasks', () => {
     it('should successfully get tasks', async () => {
       const result = await deploymentGetTasks(mockClient, mockState);
 
-      expect(result).toEqual(global.TEST_MOCK_TASKS_LIST);
+      expect(result.tasks).toEqual(global.TEST_MOCK_TASKS_LIST);
       expect(mockClient.GET).toHaveBeenCalledWith(
         '/api/deployments/{deployment}/tasks',
         {
           params: {
             path: { deployment: mockState.id },
+            query: {
+              cursor: undefined,
+              limit: undefined,
+              sort_order: undefined,
+            },
           },
         },
       );

@@ -33,7 +33,7 @@ declare global {
 
   // Deployment fixtures
   var TEST_MOCK_DEPLOYMENT: Deployment;
-  var TEST_MOCK_DEPLOYMENTS_LIST: Deployment[];
+  var TEST_MOCK_DEPLOYMENTS_LIST: { deployments: Deployment[]; pagination: { cursor_next: string | null; cursor_prev: string | null; has_next_page: boolean; has_previous_page: boolean; page_size: number; current_page: number; total_items: number } };
   var TEST_CREATE_DEPLOYMENT_REQUEST: CreateDeployment;
   var TEST_MOCK_TASK: Task;
   var TEST_MOCK_TASKS_LIST: Task[];

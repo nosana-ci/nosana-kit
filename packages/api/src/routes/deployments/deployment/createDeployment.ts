@@ -22,10 +22,14 @@ import type {
   Deployment,
   DeploymentState,
   ApiDeployment,
-  DeploymentJobItem,
-  DeploymentRevisionItem,
-  DeploymentEventItem,
-  DeploymentTaskItem,
+  PaginationParams,
+  TaskListResult,
+  JobListResult,
+  RevisionListResult,
+  EventListResult,
+  DeploymentJobsSearchParams,
+  DeploymentRevisionsSearchParams,
+  DeploymentEventsSearchParams,
 } from '../types.js';
 import type {
   DeploymentRouteClients,
@@ -101,8 +105,8 @@ export function createDeployment(
    * This will return the current tasks associated with the deployment.
    * It is useful for monitoring the deployment's progress and status.
    */
-  const getTasks = async (): Promise<DeploymentTaskItem[]> => {
-    return await deploymentGetTasks(client, state);
+  const getTasks = async (params?: PaginationParams): Promise<TaskListResult> => {
+    return await deploymentGetTasks(client, state, params);
   };
 
   /**
@@ -186,8 +190,8 @@ export function createDeployment(
    * This will return the current jobs associated with the deployment.
    * It is useful for monitoring the deployment's job status.
    */
-  const getJobs = async (): Promise<DeploymentJobItem[]> => {
-    return await deploymentGetJobs(client, state);
+  const getJobs = async (searchParams?: DeploymentJobsSearchParams): Promise<JobListResult> => {
+    return await deploymentGetJobs(client, state, searchParams);
   };
 
   /**
@@ -199,8 +203,8 @@ export function createDeployment(
    * This will return all revisions associated with the deployment.
    * It is useful for viewing the deployment history.
    */
-  const getRevisions = async (): Promise<DeploymentRevisionItem[]> => {
-    return await deploymentGetRevisions(client, state);
+  const getRevisions = async (searchParams?: DeploymentRevisionsSearchParams): Promise<RevisionListResult> => {
+    return await deploymentGetRevisions(client, state, searchParams);
   };
 
   /**
@@ -212,8 +216,8 @@ export function createDeployment(
    * This will return all events associated with the deployment.
    * It is useful for monitoring deployment activity and debugging.
    */
-  const getEvents = async (): Promise<DeploymentEventItem[]> => {
-    return await deploymentGetEvents(client, state);
+  const getEvents = async (searchParams?: DeploymentEventsSearchParams): Promise<EventListResult> => {
+    return await deploymentGetEvents(client, state, searchParams);
   };
 
   /**
