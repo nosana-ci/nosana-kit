@@ -39,11 +39,11 @@ localnet:npm build:
 .localnet-docker:
   image: docker:24.0.7
   services:
-    - docker:24.0.7-dind
+    - name: docker:24.0.7-dind
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
-    DOCKER_TLS_VERIFY: ""
+    DOCKER_TLS_VERIFY: "0"
     DOCKER_CERT_PATH: ""
     DOCKERFILE_DIR: packages/localnet
     REG_REPOSITORY: nosana/localnet
@@ -58,6 +58,14 @@ localnet:docker:build:
     - export DOCKER_TLS_CERTDIR=
     - export DOCKER_TLS_VERIFY=
     - export DOCKER_CERT_PATH=
+    - |
+      echo "Waiting for Docker daemon..."
+      for i in $(seq 1 30); do
+        docker info >/dev/null 2>&1 && break
+        echo "  attempt $i/30 — retrying in 2s"
+        sleep 2
+      done
+      docker info >/dev/null 2>&1 || { echo "Docker daemon not available"; exit 1; }
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - docker build
