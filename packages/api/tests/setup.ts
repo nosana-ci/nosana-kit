@@ -308,5 +308,51 @@ global.TEST_MOCK_VAULTS_LIST = [
   },
 ];
 
+// Events/Jobs/Revisions pagination fixtures
+global.TEST_MOCK_EVENT = {
+  type: 'DEPLOYMENT_STARTED',
+  deployment: '8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH',
+  created_at: '2025-12-04T12:20:14.294Z',
+};
+
+global.TEST_MOCK_EVENTS_RESPONSE = {
+  events: [global.TEST_MOCK_EVENT],
+  pagination: {
+    cursor_next: null,
+    cursor_prev: null,
+    total_items: 1,
+  },
+};
+
+global.TEST_MOCK_DEPLOYMENT_JOB = {
+  job: '8TjrkaZmW2UFjpm2Va5LECJc7zoFrbUJETk6fPimGi9a',
+  status: 'RUNNING',
+  deployment: '8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH',
+};
+
+global.TEST_MOCK_DEPLOYMENT_JOBS_RESPONSE = {
+  jobs: [global.TEST_MOCK_DEPLOYMENT_JOB],
+  pagination: {
+    cursor_next: null,
+    cursor_prev: null,
+    total_items: 1,
+  },
+};
+
+global.TEST_MOCK_REVISION = {
+  revision: 1,
+  deployment: '8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH',
+  created_at: '2025-12-04T12:20:14.294Z',
+};
+
+global.TEST_MOCK_REVISIONS_RESPONSE = {
+  revisions: [global.TEST_MOCK_REVISION],
+  pagination: {
+    cursor_next: null,
+    cursor_prev: null,
+    total_items: 1,
+  },
+};
+
 // Mock Api responses
 global.TEST_MOCK_TRANSACTION_SIGNATURE = 'base64-encoded-transaction';
