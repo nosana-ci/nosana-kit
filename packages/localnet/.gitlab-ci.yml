@@ -55,6 +55,9 @@ localnet:docker:build:
   stage: build
   extends: .localnet-docker
   before_script:
+    - export DOCKER_TLS_CERTDIR=
+    - export DOCKER_TLS_VERIFY=
+    - export DOCKER_CERT_PATH=
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - docker build
@@ -78,6 +81,9 @@ localnet:docker:tag:
   stage: deploy
   extends: .localnet-docker
   before_script:
+    - export DOCKER_TLS_CERTDIR=
+    - export DOCKER_TLS_VERIFY=
+    - export DOCKER_CERT_PATH=
     - apk add --no-cache git
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
@@ -98,6 +104,9 @@ localnet:docker:push-hub:
   needs:
     - localnet:docker:tag
   before_script:
+    - export DOCKER_TLS_CERTDIR=
+    - export DOCKER_TLS_VERIFY=
+    - export DOCKER_CERT_PATH=
     - echo $REG_TOKEN | docker login -u $REG_USERNAME --password-stdin $REG_ENDPOINT
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
