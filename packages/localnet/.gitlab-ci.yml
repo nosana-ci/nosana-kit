@@ -5,6 +5,7 @@ stages:
   - lint
   - build
   - test
+  - deploy
 
 localnet:npm format:
   stage: lint
@@ -32,3 +33,84 @@ localnet:npm build:
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# ---------- Docker ----------
+
+.localnet-docker:
+  image: docker:24.0.7
+  services:
+    - docker:24.0.7-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    CONTAINER_PLATFORMS: linux/amd64
+    DOCKERFILE_DIR: packages/localnet
+    REG_REPOSITORY: nosana/localnet
+  before_script: []
+
+# Build & push to GitLab Registry on every MR / main commit.
+# This verifies the Docker image builds before a deploy is triggered.
+localnet:docker:build:
+  stage: build
+  extends: .localnet-docker
+  before_script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  script:
+    - docker context create build
+    - docker buildx create --use build
+    - docker buildx build
+        --push
+        --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+        --platform $CONTAINER_PLATFORMS
+        $DOCKERFILE_DIR
+  after_script:
+    - docker logout $CI_REGISTRY
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# ---------- Deploy (triggered by Lerna tags) ----------
+#
+# Lerna creates a version-bump commit + tag on main.
+# The tag sits on Lerna's commit; its parent (HEAD~1) is the commit
+# whose Docker image was already built and pushed to the registry.
+# We re-tag that existing image
+
+localnet:docker:tag:
+  stage: deploy
+  extends: .localnet-docker
+  before_script:
+    - apk add --no-cache git
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  script:
+    - PARENT_SHA=$(git rev-parse HEAD~1)
+    - echo "Re-tagging image from parent commit $PARENT_SHA"
+    - docker buildx imagetools create
+        $CI_REGISTRY_IMAGE:$PARENT_SHA
+        --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+        --tag $CI_REGISTRY_IMAGE:latest
+  after_script:
+    - docker logout $CI_REGISTRY
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
+
+localnet:docker:push-hub:
+  stage: deploy
+  extends: .localnet-docker
+  needs:
+    - localnet:docker:tag
+  before_script:
+    - echo $REG_TOKEN | docker login -u $REG_USERNAME --password-stdin $REG_ENDPOINT
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  script:
+    - docker buildx imagetools create
+        $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+        --tag $REG_REPOSITORY:$CI_COMMIT_TAG
+    - docker buildx imagetools create
+        $CI_REGISTRY_IMAGE:latest
+        --tag $REG_REPOSITORY:latest
+  after_script:
+    - docker logout $REG_ENDPOINT
+    - docker logout $CI_REGISTRY
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest" && $REG_USERNAME && $REG_TOKEN && $REG_ENDPOINT
