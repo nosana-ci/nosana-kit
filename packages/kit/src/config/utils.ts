@@ -54,18 +54,6 @@ export const getNosanaConfig = (
   return mergeConfigs(defaultConfig, config);
 };
 
-export const getLocalnetConfig = (config?: PartialClientConfig): ClientConfig => {
-  const devnetConfig = DEFAULT_CONFIGS[NosanaNetwork.DEVNET];
-  const localnetBase = mergeConfigs(devnetConfig, {
-    solana: {
-      cluster: 'localnet',
-      rpcEndpoint: 'http://127.0.0.1:8899',
-      wsEndpoint: 'ws://127.0.0.1:8900',
-    },
-  });
-  return mergeConfigs(localnetBase, config);
-};
-
 // Example: Initialize with default (Mainnet) or specific network, or custom config
 // const defaultConfig = getNosanaConfig();
 // const devConfig = getNosanaConfig(NosanaNetwork.DEVNET);

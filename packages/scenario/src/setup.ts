@@ -1,7 +1,6 @@
 import fs from 'fs';
 import { createKeyPairSignerFromBytes, generateKeyPairSigner } from '@solana/kit';
 import {
-  createLocalnetClient,
   createNosanaClient,
   NosanaNetwork,
   type NosanaClient,
@@ -71,7 +70,7 @@ async function createLocalnetClientInstance(
   options: LocalnetClientOptions = {}
 ): Promise<NosanaClient> {
   const wallet = options.wallet ?? (await generateKeyPairSigner());
-  const client = createLocalnetClient({ ...options.config, wallet });
+  const client = createNosanaClient(NosanaNetwork.LOCALNET, { ...options.config, wallet });
 
   const balance = await client.solana.getBalance(wallet.address);
   if (balance === 0) {

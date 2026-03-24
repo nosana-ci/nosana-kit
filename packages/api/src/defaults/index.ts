@@ -10,5 +10,10 @@ export const defaultConfig: Record<typeof NosanaNetwork[keyof typeof NosanaNetwo
     backend_url: 'https://dashboard.k8s.dev.nos.ci',
     client_manager_url: 'https://client-manager.k8s.dev.nosana.com',
     nos_address: 'devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP'
+  },
+  [NosanaNetwork.LOCALNET]: {
+    backend_url: 'https://dashboard.k8s.dev.nos.ci',
+    client_manager_url: 'https://client-manager.k8s.dev.nosana.com',
+    nos_address: 'devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP'
   }
 };
