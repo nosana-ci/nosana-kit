@@ -47,8 +47,7 @@ localnet:npm build:
     DOCKER_CERT_PATH: ""
     DOCKERFILE_DIR: packages/localnet
     REG_REPOSITORY: nosana/localnet
-  before_script:
-    - apk add --no-cache git
+  before_script: []
 
 # Build & push to GitLab Registry on every MR / main commit.
 # This verifies the Docker image builds before a deploy is triggered.
@@ -56,6 +55,7 @@ localnet:docker:build:
   stage: build
   extends: .localnet-docker
   before_script:
+    - apk add --no-cache git
     - export DOCKER_TLS_CERTDIR=
     - export DOCKER_TLS_VERIFY=
     - export DOCKER_CERT_PATH=
@@ -90,6 +90,7 @@ localnet:docker:tag:
   stage: deploy
   extends: .localnet-docker
   before_script:
+    - apk add --no-cache git
     - export DOCKER_TLS_CERTDIR=
     - export DOCKER_TLS_VERIFY=
     - export DOCKER_CERT_PATH=
