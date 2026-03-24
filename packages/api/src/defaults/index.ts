@@ -16,8 +16,10 @@ export const defaultConfig: Record<typeof NosanaNetwork[keyof typeof NosanaNetwo
     nos_address: 'devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP'
   },
   [NosanaNetwork.LOCALNET]: {
-    backend_url: 'https://dashboard.k8s.dev.nos.ci',
-    client_manager_url: 'https://client-manager.k8s.dev.nosana.com',
+    client_manager_url: 'http://localhost:3002',
+    host_manager_url: 'http://localhost:3004',
+    blockchain_indexer_url: 'http://localhost:3003',
+    deployment_manager_url: 'http://localhost:3001',
     nos_address: 'devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP'
   }
 };

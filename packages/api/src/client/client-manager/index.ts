@@ -1,7 +1,9 @@
-import createClient, { Client, type Middleware } from 'openapi-fetch';
+import createClient, { type Middleware } from 'openapi-fetch';
 
 import { defaultConfig } from '../../defaults/index.js';
 
+import type { paths } from './schema.js';
+import type { AuthenticatedClient } from '../type.utils.js';
 import type {
   NosanaNetwork,
   ApiKeyAuth,
@@ -9,43 +11,13 @@ import type {
   CreateNosanaApiOptions,
 } from '../../types.js';
 
-// Types for /auth/sign-message/external endpoint
-export interface SignMessageExternalRequest {
-  message: string;
-}
-
-export interface SignMessageExternalResponse {
-  message: string;
-  userAddress: string;
-  signature: string;
-}
-
-export interface ClientManagerApi {
-  '/auth/sign-message/external': {
-    post: {
-      requestBody: {
-        content: {
-          'application/json': SignMessageExternalRequest;
-        };
-      };
-      responses: {
-        200: {
-          content: {
-            'application/json': SignMessageExternalResponse;
-          };
-        };
-      };
-    };
-  };
-}
-
-export type ClientManagerClient = Client<ClientManagerApi>;
+export type ClientManagerClient = AuthenticatedClient<paths>;
 
 export function createNosanaClientManagerApiClient(
   environment: NosanaNetwork,
   authParams: ApiKeyAuth | SignerAuth | undefined,
   options: CreateNosanaApiOptions | undefined,
-) {
+): ClientManagerClient {
   const baseUrl =
     options?.client_manager_url ||
     defaultConfig[environment].client_manager_url;
@@ -62,7 +34,7 @@ export function createNosanaClientManagerApiClient(
     },
   };
 
-  const client = createClient<ClientManagerApi>({
+  const client = createClient<paths>({
     baseUrl,
     ...(options?.include_credentials ? { credentials: 'include' } : {}),
   });
@@ -71,5 +43,5 @@ export function createNosanaClientManagerApiClient(
     client.use(authMiddleware);
   }
 
-  return client;
+  return client as ClientManagerClient;
 }

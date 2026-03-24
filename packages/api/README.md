@@ -59,10 +59,17 @@ await vault.topup({ NOS: 100 });
 
 ## API Modules
 
-- `api.jobs` - Job management
-- `api.credits` - Credit balance
-- `api.markets` - Market data
-- `api.deployments` - Deployments and vaults
+- `api.auth` - Authentication (sign message, validate sessions/keys)
+- `api.user` - User profile & API key management
+- `api.jobs` - Job operations (list, create, extend, stop, stats)
+- `api.credits` - Credit balance, claiming & invitations
+- `api.markets` - GPU markets, pricing & resources
+- `api.deployments` - Deployment lifecycle & vaults
+- `api.templates` - Deployment templates
+- `api.hosts` - Node/host info, specs, benchmarks
+- `api.stats` - Platform statistics & price history
+
+See [API_ENDPOINTS.md](./API_ENDPOINTS.md) for the full endpoint reference.
 
 ## Development
 

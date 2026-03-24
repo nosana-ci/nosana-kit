@@ -1,7 +1,7 @@
 import { ClientManagerClient } from '../../client/client-manager/index.js';
 import { errorFormatter } from '../../utils/errorFormatter.js';
 
-import type { NosanaAuthApi } from './types.js';
+import type { NosanaAuthApi, ValidateSessionResponse, ValidateApiKeyResponse } from './types.js';
 
 export function createNosanaAuthApi(
   client: ClientManagerClient,
@@ -23,6 +23,28 @@ export function createNosanaAuthApi(
       }
 
       return data.signature;
+    },
+    async validateSession(cookieHeader?: string): Promise<ValidateSessionResponse> {
+      const { data, error } = await client.POST('/auth/validate-session', {
+        body: cookieHeader ? { cookieHeader } : undefined,
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to validate session', error);
+      }
+
+      return data;
+    },
+    async validateApiKey(apiKey: string): Promise<ValidateApiKeyResponse> {
+      const { data, error } = await client.POST('/auth/validate-api-key', {
+        body: { apiKey },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to validate API key', error);
+      }
+
+      return data;
     },
   };
 }

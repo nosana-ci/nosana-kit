@@ -1,14 +1,12 @@
-import { errorFormatter } from "../../../../utils/errorFormatter.js";
+import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
-import type { DeploymentManagerClient } from "../../../../client/index.js";
-import type { paths } from '@nosana/types';
-
-type DeploymentJob = paths["/api/deployments/{deployment}/jobs/{job}"]["get"]["responses"]["200"]["content"]["application/json"];
+import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
+import type { DeploymentJob } from '../../types.js';
 
 export async function deploymentGetJob(
   client: DeploymentManagerClient,
   deployment: string,
-  job: string
+  job: string,
 ): Promise<DeploymentJob> {
   const { data, error } = await client.GET(
     '/api/deployments/{deployment}/jobs/{job}',

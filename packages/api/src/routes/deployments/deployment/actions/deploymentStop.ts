@@ -16,7 +16,9 @@ export async function deploymentStop(
   client: DeploymentManagerClient,
   state: DeploymentState,
 ): Promise<void> {
-  if ([DeploymentStatus.STOPPING, DeploymentStatus.STOPPED].includes(state.status)) {
+  if (
+    [DeploymentStatus.STOPPING, DeploymentStatus.STOPPED].includes(state.status)
+  ) {
     throw new Error('Deployment is already stopped');
   }
 

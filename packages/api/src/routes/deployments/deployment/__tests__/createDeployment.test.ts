@@ -144,7 +144,6 @@ describe('createDeployment', () => {
       expect(actions.deploymentGetTasks).toHaveBeenCalledWith(
         global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
-        undefined,
       );
       expect(result).toEqual([]);
     });

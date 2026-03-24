@@ -14,7 +14,9 @@ export async function deploymentStart(
   client: DeploymentManagerClient,
   state: DeploymentState,
 ): Promise<void> {
-  if ([DeploymentStatus.STARTING, DeploymentStatus.RUNNING].includes(state.status)) {
+  if (
+    [DeploymentStatus.STARTING, DeploymentStatus.RUNNING].includes(state.status)
+  ) {
     throw new Error('Cannot start a deployment that is already running');
   }
 

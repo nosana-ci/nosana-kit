@@ -1,11 +1,14 @@
 import { createAuthenticatedClient } from '../createClient.js';
 import { defaultConfig } from '../../defaults/index.js';
 
-// Currently using the blockchain-indexer schema since the deployment manager serves the same API.
-// Switch to './schema.js' once the service is fully split.
-import type { paths } from '../blockchain-indexer/schema.js';
+import type { paths } from './schema.js';
 import type { AuthenticatedClient } from '../type.utils.js';
-import type { NosanaNetwork, ApiKeyAuth, SignerAuth, CreateNosanaApiOptions } from '../../types.js';
+import type {
+  NosanaNetwork,
+  ApiKeyAuth,
+  SignerAuth,
+  CreateNosanaApiOptions,
+} from '../../types.js';
 
 export type DeploymentManagerClient = AuthenticatedClient<paths>;
 
@@ -14,6 +17,8 @@ export function createDeploymentManagerClient(
   authParams: ApiKeyAuth | SignerAuth | undefined,
   options?: CreateNosanaApiOptions,
 ): DeploymentManagerClient {
-  const baseUrl = options?.deployment_manager_url || defaultConfig[environment].deployment_manager_url;
+  const baseUrl =
+    options?.deployment_manager_url ||
+    defaultConfig[environment].deployment_manager_url;
   return createAuthenticatedClient<paths>(baseUrl, authParams, options);
 }

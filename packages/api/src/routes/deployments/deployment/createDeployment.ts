@@ -13,7 +13,7 @@ import {
   deploymentUpdateActiveRevision,
   deploymentUpdateSchedule,
   deploymentGenerateAuthHeader,
-  deploymentDelete
+  deploymentDelete,
 } from './actions/index.js';
 import { createVault } from './createVault.js';
 
@@ -22,22 +22,29 @@ import type {
   Deployment,
   DeploymentState,
   ApiDeployment,
-  PaginationParams,
-  JobListResult,
-  RevisionListResult,
-  EventListResult,
-  TaskListResult,
-  DeploymentJobsSearchParams,
-  DeploymentRevisionsSearchParams,
-  DeploymentEventsSearchParams
+  DeploymentJobItem,
+  DeploymentRevisionItem,
+  DeploymentEventItem,
+  DeploymentTaskItem,
 } from '../types.js';
-import type { DeploymentRouteClients, DeploymentRouteClientsWithSigner } from '../../../types.js';
-import type { components } from '@nosana/types';
+import type {
+  DeploymentRouteClients,
+  DeploymentRouteClientsWithSigner,
+} from '../../../types.js';
+import type { components } from '../../../client/deployment-manager/schema.js';
 
 type DeploymentSchema = components['schemas']['Deployment'];
 
-export function createDeployment(deployment: DeploymentSchema, clients: DeploymentRouteClients, hasApiKey: true): ApiDeployment;
-export function createDeployment(deployment: DeploymentSchema, clients: DeploymentRouteClientsWithSigner, hasApiKey: false): Deployment;
+export function createDeployment(
+  deployment: DeploymentSchema,
+  clients: DeploymentRouteClients,
+  hasApiKey: true,
+): ApiDeployment;
+export function createDeployment(
+  deployment: DeploymentSchema,
+  clients: DeploymentRouteClientsWithSigner,
+  hasApiKey: false,
+): Deployment;
 
 export function createDeployment(
   deployment: DeploymentSchema,
@@ -94,8 +101,8 @@ export function createDeployment(
    * This will return the current tasks associated with the deployment.
    * It is useful for monitoring the deployment's progress and status.
    */
-  const getTasks = async (params?: PaginationParams): Promise<TaskListResult> => {
-    return await deploymentGetTasks(client, state, params);
+  const getTasks = async (): Promise<DeploymentTaskItem[]> => {
+    return await deploymentGetTasks(client, state);
   };
 
   /**
@@ -135,7 +142,7 @@ export function createDeployment(
   };
 
   /**
-   * @param active_revision 
+   * @param active_revision
    * @throws Error if there is an error updating the active revision
    * @returns Promise<void>
    * @description Updates the active revision for the deployment.
@@ -179,8 +186,8 @@ export function createDeployment(
    * This will return the current jobs associated with the deployment.
    * It is useful for monitoring the deployment's job status.
    */
-  const getJobs = async (searchParams?: DeploymentJobsSearchParams): Promise<JobListResult> => {
-    return await deploymentGetJobs(client, state, searchParams);
+  const getJobs = async (): Promise<DeploymentJobItem[]> => {
+    return await deploymentGetJobs(client, state);
   };
 
   /**
@@ -192,8 +199,8 @@ export function createDeployment(
    * This will return all revisions associated with the deployment.
    * It is useful for viewing the deployment history.
    */
-  const getRevisions = async (searchParams?: DeploymentRevisionsSearchParams): Promise<RevisionListResult> => {
-    return await deploymentGetRevisions(client, state, searchParams);
+  const getRevisions = async (): Promise<DeploymentRevisionItem[]> => {
+    return await deploymentGetRevisions(client, state);
   };
 
   /**
@@ -205,20 +212,20 @@ export function createDeployment(
    * This will return all events associated with the deployment.
    * It is useful for monitoring deployment activity and debugging.
    */
-  const getEvents = async (searchParams?: DeploymentEventsSearchParams): Promise<EventListResult> => {
-    return await deploymentGetEvents(client, state, searchParams);
+  const getEvents = async (): Promise<DeploymentEventItem[]> => {
+    return await deploymentGetEvents(client, state);
   };
 
   /**
-    * @throws Error if the deployment is not stopped
-    * @throws Error if there is an error deleting the deployment
-    * @returns Promise<void>
-    * @description Deletes the deployment permanently.
-    * This will remove the deployment and all associated data (jobs, results, revisions, events).
-    * The deployment must be in STOPPED state before it can be deleted.
-    * The vault associated with the deployment is NOT deleted.
-    * After successful deletion, the deployment object becomes unusable.
-    */
+   * @throws Error if the deployment is not stopped
+   * @throws Error if there is an error deleting the deployment
+   * @returns Promise<void>
+   * @description Deletes the deployment permanently.
+   * This will remove the deployment and all associated data (jobs, results, revisions, events).
+   * The deployment must be in STOPPED state before it can be deleted.
+   * The vault associated with the deployment is NOT deleted.
+   * After successful deletion, the deployment object becomes unusable.
+   */
   const deleteDeployment = async () => {
     return await deploymentDelete(client, state, () => {
       // @ts-expect-error Clear the state to prevent further interaction
@@ -227,9 +234,11 @@ export function createDeployment(
   };
 
   return Object.assign(state, {
-    ...(!hasApiKey && "solana" in clients ? {
-      vault: createVault(state.vault, clients, state.created_at)
-    } : {}),
+    ...(!hasApiKey && 'solana' in clients
+      ? {
+          vault: createVault(state.vault, clients, state.created_at),
+        }
+      : {}),
     start,
     stop,
     archive,
