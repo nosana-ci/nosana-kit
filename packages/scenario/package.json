@@ -1,6 +1,6 @@
 {
   "name": "@nosana/scenario",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Nosana scenario test helpers: network-aware client setup for localnet, devnet, and mainnet",
   "type": "module",
   "main": "dist/index.js",
