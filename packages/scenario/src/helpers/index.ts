@@ -1,6 +1,7 @@
 export {
   createMarket,
   closeMarket,
+  delistJob,
   listJob,
   joinMarketQueue,
   waitForJobState,
