@@ -1,8 +1,13 @@
 import { Address, Account, parseBase64RpcAccount, Base58EncodedBytes } from '@solana/kit';
-import type { ProgramDeps } from '../../../types.js';
+import type { ProgramDeps, Wallet } from '../../../types.js';
+import { NosanaError, ErrorCodes } from '../../../errors/NosanaError.js';
 import * as programClient from '@nosana/stake-program';
 import { convertBigIntToNumber, ConvertTypesForDb } from '../../../utils/index.js';
 import bs58 from 'bs58';
+
+import type { ProgramConfig } from '../../../config/types.js';
+import type { InstructionsHelperParams } from './instructions/types.js';
+import * as Instructions from './instructions/index.js';
 
 export type Stake = ConvertTypesForDb<programClient.StakeAccountArgs> & { address: Address };
 
@@ -12,9 +17,24 @@ export type Stake = ConvertTypesForDb<programClient.StakeAccountArgs> & { addres
  */
 export interface StakeProgram {
   /**
+   * Create a stake instruction for creating/initializing a stake account
+   */
+  stake: Instructions.CreateStake;
+
+  /**
+   * Derive the stake account PDA address for a given owner (defaults to wallet address)
+   */
+  getAddress(owner?: Address): Promise<Address>;
+
+  /**
    * Fetch a stake account by address
    */
   get(addr: Address): Promise<Stake>;
+
+  /**
+   * Fetch a stake account by owner address (defaults to wallet address)
+   */
+  getByOwner(owner?: Address): Promise<Stake>;
 
   /**
    * Fetch multiple stake accounts by address
@@ -47,7 +67,6 @@ export interface StakeProgram {
  * const stake = await stakeProgram.get('stake-address');
  * ```
  */
-import type { ProgramConfig } from '../../../config/types.js';
 
 export function createStakeProgram(deps: ProgramDeps, config: ProgramConfig): StakeProgram {
   const programId = config.stakeAddress;
@@ -65,7 +84,39 @@ export function createStakeProgram(deps: ProgramDeps, config: ProgramConfig): St
     };
   }
 
+  function getRequiredWallet(): Wallet {
+    const wallet = deps.getWallet();
+    if (!wallet) {
+      throw new NosanaError('Wallet is required for this operation', ErrorCodes.NO_WALLET);
+    }
+    return wallet;
+  }
+
+  function createInstructionsHelper(): InstructionsHelperParams {
+    return {
+      deps,
+      config,
+      client,
+      getRequiredWallet,
+      getNosATA: deps.nos.getATA,
+    };
+  }
+
   return {
+    async stake(params) {
+      return Instructions.stake(params, createInstructionsHelper());
+    },
+
+    async getAddress(owner?: Address): Promise<Address> {
+      const resolvedOwner = owner ?? getRequiredWallet().address;
+      return deps.solana.pda(['stake', config.nosTokenAddress, resolvedOwner], programId);
+    },
+
+    async getByOwner(owner?: Address): Promise<Stake> {
+      const addr = await this.getAddress(owner);
+      return this.get(addr);
+    },
+
     /**
      * Fetch a stake account by address
      */

@@ -145,6 +145,91 @@ describe('StakeProgram', () => {
       stake = createStakeProgram(sdkToProgramDeps(sdk), sdk.config.programs);
     });
 
+    describe('getAddress', () => {
+      it('should derive stake PDA for a given owner', async () => {
+        const owner = newAddr(500);
+        const expectedPda = newAddr(501);
+
+        sdk.solana.pda = vi.fn().mockResolvedValue(expectedPda);
+
+        const result = await stake.getAddress(owner);
+
+        expect(result).toBe(expectedPda);
+        expect(sdk.solana.pda).toHaveBeenCalledWith(
+          ['stake', sdk.config.programs.nosTokenAddress, owner],
+          sdk.config.programs.stakeAddress
+        );
+      });
+
+      it('should default to wallet address when owner is not provided', async () => {
+        const expectedPda = newAddr(502);
+        const walletAddr = newAddr(503);
+        (sdk as any).wallet = { address: walletAddr };
+
+        sdk.solana.pda = vi.fn().mockResolvedValue(expectedPda);
+
+        const result = await stake.getAddress();
+
+        expect(result).toBe(expectedPda);
+        expect(sdk.solana.pda).toHaveBeenCalledWith(
+          ['stake', sdk.config.programs.nosTokenAddress, walletAddr],
+          sdk.config.programs.stakeAddress
+        );
+      });
+    });
+
+    describe('getByOwner', () => {
+      it('should derive PDA and fetch the stake account', async () => {
+        const owner = newAddr(600);
+        const derivedPda = newAddr(601);
+        const stakeAmount = 5000;
+        const mockStake = makeStakeAccount(stakeAmount, derivedPda);
+
+        sdk.solana.pda = vi.fn().mockResolvedValue(derivedPda);
+        vi.spyOn(stakingClient, 'fetchStakeAccount' as any).mockResolvedValue(mockStake);
+
+        const result = await stake.getByOwner(owner);
+
+        expect(result.address).toBe(derivedPda);
+        expect(result.amount).toBe(stakeAmount);
+        expect(sdk.solana.pda).toHaveBeenCalledWith(
+          ['stake', sdk.config.programs.nosTokenAddress, owner],
+          sdk.config.programs.stakeAddress
+        );
+        expect(stakingClient.fetchStakeAccount).toHaveBeenCalledWith(sdk.solana.rpc, derivedPda);
+      });
+
+      it('should default to wallet address when owner is not provided', async () => {
+        const derivedPda = newAddr(602);
+        const walletAddr = newAddr(605);
+        (sdk as any).wallet = { address: walletAddr };
+        const mockStake = makeStakeAccount(DEFAULT_STAKE_AMOUNT, derivedPda);
+
+        sdk.solana.pda = vi.fn().mockResolvedValue(derivedPda);
+        vi.spyOn(stakingClient, 'fetchStakeAccount' as any).mockResolvedValue(mockStake);
+
+        const result = await stake.getByOwner();
+
+        expect(result.address).toBe(derivedPda);
+        expect(sdk.solana.pda).toHaveBeenCalledWith(
+          ['stake', sdk.config.programs.nosTokenAddress, walletAddr],
+          sdk.config.programs.stakeAddress
+        );
+      });
+
+      it('should propagate errors from get', async () => {
+        const owner = newAddr(603);
+        const derivedPda = newAddr(604);
+
+        sdk.solana.pda = vi.fn().mockResolvedValue(derivedPda);
+        vi.spyOn(stakingClient, 'fetchStakeAccount' as any).mockRejectedValue(
+          new Error('Account not found')
+        );
+
+        await expect(stake.getByOwner(owner)).rejects.toThrow('Account not found');
+      });
+    });
+
     describe('get', () => {
       it('should fetch and transform a single stake account', async () => {
         const addr = newAddr(300);
