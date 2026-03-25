@@ -36,7 +36,8 @@ export interface ScenarioClientOptions extends LocalnetClientOptions {
    * Network to run scenarios against. Defaults to `'localnet'`.
    * Can also be set via the `NOSANA_NETWORK` environment variable.
    *
-   * - `'localnet'` — connects to `http://127.0.0.1:8899`, generates a keypair,
+   * - `'localnet'` — connects to `http://127.0.0.1:8899` (override with
+   *   `SOLANA_RPC` / `SOLANA_WS` env vars), generates a keypair,
    *   airdrops SOL, and mints NOS tokens.
    * - `'devnet'` / `'mainnet'` — connects to the respective Nosana network.
    *   Requires a funded wallet (via `wallet` option or `NOSANA_WALLET` env var
@@ -70,7 +71,19 @@ async function createLocalnetClientInstance(
   options: LocalnetClientOptions = {}
 ): Promise<NosanaClient> {
   const wallet = options.wallet ?? (await generateKeyPairSigner());
-  const client = createNosanaClient(NosanaNetwork.LOCALNET, { ...options.config, wallet });
+
+  // Allow overriding the default localnet endpoints via environment variables.
+  const solanaOverrides: PartialClientConfig['solana'] = {};
+  if (process.env.SOLANA_RPC) solanaOverrides.rpcEndpoint = process.env.SOLANA_RPC;
+  if (process.env.SOLANA_WS) solanaOverrides.wsEndpoint = process.env.SOLANA_WS;
+
+  const config: PartialClientConfig = {
+    ...options.config,
+    solana: { ...solanaOverrides, ...options.config?.solana },
+    wallet,
+  };
+
+  const client = createNosanaClient(NosanaNetwork.LOCALNET, config);
 
   const balance = await client.solana.getBalance(wallet.address);
   if (balance === 0) {
