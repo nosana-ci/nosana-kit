@@ -13,8 +13,8 @@
     "build:with-deps": "pnpm run build",
     "dev": "tsc --watch",
     "dev:with-deps": "pnpm run dev",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
     "format:fix": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --write \"**/*.ts\""
   },
