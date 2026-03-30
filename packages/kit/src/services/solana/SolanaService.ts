@@ -466,12 +466,13 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       transaction: SendableTransaction & Transaction & TransactionWithBlockhashLifetime,
       options?: { commitment?: Commitment }
     ): Promise<Signature> {
+      let signature: Signature | undefined = undefined;
       try {
         // Ensure the transaction is sendable before attempting to send
         assertIsSendableTransaction(transaction);
 
         // Get the transaction signature for logging
-        const signature = getSignatureFromTransaction(transaction);
+        signature = getSignatureFromTransaction(transaction);
 
         deps.logger.info(`Sending transaction: ${signature}`);
 
@@ -484,9 +485,9 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
         return signature;
       } catch (error) {
-        const errorMessage = `Failed to send transaction: ${error instanceof Error ? error.message : String(error)}`;
+        const errorMessage = `Failed to send transaction ${signature ? `${signature}` : ''}: ${error instanceof Error ? error.message : String(error)}`;
         deps.logger.error(errorMessage);
-        throw new NosanaError(errorMessage, ErrorCodes.RPC_ERROR, error);
+        throw new NosanaError(errorMessage, ErrorCodes.RPC_ERROR, error, signature);
       }
     },
 
@@ -714,8 +715,8 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
         const transactionBlockhash =
           'lifetimeConstraint' in decompiled &&
-          decompiled.lifetimeConstraint &&
-          'blockhash' in decompiled.lifetimeConstraint
+            decompiled.lifetimeConstraint &&
+            'blockhash' in decompiled.lifetimeConstraint
             ? decompiled.lifetimeConstraint.blockhash
             : null;
 
