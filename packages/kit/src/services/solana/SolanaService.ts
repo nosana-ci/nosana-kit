@@ -715,8 +715,8 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
         const transactionBlockhash =
           'lifetimeConstraint' in decompiled &&
-            decompiled.lifetimeConstraint &&
-            'blockhash' in decompiled.lifetimeConstraint
+          decompiled.lifetimeConstraint &&
+          'blockhash' in decompiled.lifetimeConstraint
             ? decompiled.lifetimeConstraint.blockhash
             : null;
 
