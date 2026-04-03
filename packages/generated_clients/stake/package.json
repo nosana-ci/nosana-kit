@@ -12,10 +12,10 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
     "dev": "tsc --watch",
-    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "dev:with-deps": "pnpm --filter $npm_package_name... --parallel run dev",
     "test": "echo 'No tests' && exit 0",
     "lint": "echo 'No lint' && exit 0",
     "format": "echo 'No format' && exit 0",

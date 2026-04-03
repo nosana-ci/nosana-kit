@@ -9,7 +9,7 @@
   "scripts": {
     "build": "pnpm -r run build",
     "build:packages": "pnpm --filter \"./packages/**\" run build",
-    "dev": "pnpm -r run dev --parallel",
+    "dev": "pnpm -r --parallel run dev",
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format",

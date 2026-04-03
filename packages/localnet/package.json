@@ -9,7 +9,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "build:with-deps": "pnpm run build",
     "dev": "tsc --watch",
     "dev:with-deps": "pnpm run dev",

@@ -9,10 +9,10 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
     "dev": "tsc --watch",
-    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "dev:with-deps": "pnpm --filter $npm_package_name... --parallel run dev",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
