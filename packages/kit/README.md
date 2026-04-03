@@ -132,11 +132,35 @@ Main entry point for SDK interactions. Created using the `createNosanaClient()` 
 
 The SDK supports universal wallet configuration through a unified `Wallet` type that must support both message and transaction signing (`MessageSigner & TransactionSigner`). This enables compatibility with both browser wallets (wallet-standard) and keypair-based wallets.
 
-#### Wallet Requirements
+#### Keypair Helpers
 
-The wallet must implement both `MessageSigner` and `TransactionSigner` interfaces from `@solana/kit`. This allows the SDK to use the wallet for:
-- **Message signing** - For API authentication and authorization
-- **Transaction signing** - For on-chain operations
+The SDK provides convenient helper functions so you don't need to install `@solana/kit` directly:
+
+```typescript
+import {
+  createNosanaClient,
+  generateWallet,
+  loadWalletFromFile,
+  createWalletFromBase58,
+  createWalletFromBytes,
+} from '@nosana/kit';
+
+// Generate a new random wallet
+const wallet = await generateWallet();
+
+// Load from Solana CLI keypair file (defaults to ~/.config/solana/id.json)
+const wallet2 = await loadWalletFromFile();
+const wallet3 = await loadWalletFromFile('/path/to/keypair.json');
+
+// Create from a base58-encoded private key
+const wallet4 = await createWalletFromBase58('5MaiiCavjCmn9Hs...');
+
+// Create from raw bytes (Uint8Array or number[])
+const wallet5 = await createWalletFromBytes(new Uint8Array([174, 47, 154, ...]));
+
+const client = createNosanaClient();
+client.wallet = wallet;
+```
 
 #### Browser Wallets (Wallet-Standard)
 
@@ -153,29 +177,14 @@ const client = createNosanaClient();
 client.wallet = useWalletAccountSigner(account, currentChain);
 ```
 
-#### Keypair Wallets
-
-Seamless support for keypair-based wallets:
-
-```typescript
-import { createNosanaClient } from '@nosana/kit';
-import { generateKeyPairSigner } from '@solana/kit';
-
-// Create client
-const client = createNosanaClient();
-
-// Set keypair wallet
-const keypair = generateKeyPairSigner();
-client.wallet = keypair;
-```
-
 #### Configuration Options
 
 Wallets can be set at client initialization or dynamically assigned:
 
 ```typescript
-import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
-import type { Wallet } from '@nosana/kit';
+import { createNosanaClient, NosanaNetwork, generateWallet } from '@nosana/kit';
+
+const myWallet = await generateWallet();
 
 // Option 1: Set wallet during initialization
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
@@ -183,16 +192,12 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 });
 
 // Option 2: Set wallet dynamically
-const client = createNosanaClient();
-client.wallet = myWallet;
+const client2 = createNosanaClient();
+client2.wallet = myWallet;
 
 // Option 3: Change wallet at runtime
-client.wallet = anotherWallet;
+client2.wallet = anotherWallet;
 ```
-
-#### Type Safety
-
-The SDK leverages `@solana/kit` types for compile-time safety, ensuring wallet compatibility before runtime.
 
 ## Jobs Program API
 

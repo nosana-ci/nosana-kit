@@ -264,6 +264,20 @@ export type { ConvertTypesForDb } from './utils/convertBigIntToNumber.js';
 export { walletToAuthorizationSigner } from './utils/walletToAuthorizationSigner.js';
 
 // ============================================================================
+// @nosana/kit - Keypair Helpers
+// ============================================================================
+
+/**
+ * @group @nosana/kit
+ */
+export {
+  generateWallet,
+  createWalletFromBytes,
+  createWalletFromBase58,
+  loadWalletFromFile,
+} from './utils/keypair.js';
+
+// ============================================================================
 // @nosana/kit - Generated Clients (Namespaces)
 // ============================================================================
 
@@ -311,7 +325,13 @@ export type {
 /**
  * @group @solana/kit
  */
-export { address } from '@solana/kit';
+export {
+  address,
+  generateKeyPairSigner,
+  createKeyPairSignerFromBytes,
+  createKeyPairFromBytes,
+  createSignerFromKeyPair,
+} from '@solana/kit';
 
 import type { Address as SolanaAddress } from '@solana/kit';
 
