@@ -48,7 +48,7 @@ export async function generateWallet(): Promise<Wallet> {
  * @group @nosana/kit
  */
 export async function createWalletFromBytes(
-  bytes: Uint8Array | ReadonlyArray<number>,
+  bytes: Uint8Array | ReadonlyArray<number>
 ): Promise<Wallet> {
   const uint8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
   return await createKeyPairSignerFromBytes(uint8);
@@ -105,9 +105,7 @@ export async function createWalletFromBase58(base58Key: string): Promise<Wallet>
  *
  * @group @nosana/kit
  */
-export async function loadWalletFromFile(
-  filePath?: string,
-): Promise<Wallet> {
+export async function loadWalletFromFile(filePath?: string): Promise<Wallet> {
   const resolvedPath = filePath ?? getDefaultKeypairPath();
   const fileContent = await readFile(resolvedPath, 'utf8');
   const keyArray: number[] = JSON.parse(fileContent);
