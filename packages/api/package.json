@@ -11,10 +11,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
     "dev": "tsc --watch",
-    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "dev:with-deps": "pnpm --filter $npm_package_name... --parallel run dev",
     "clean": "rm -rf dist",
     "generate:types:dev": "openapi-typescript https://dashboard.k8s.dev.nos.ci/api/swagger/json -o src/client/schema.ts",
     "generate:types:prd": "openapi-typescript https://dashboard.k8s.prd.nos.ci/api/swagger/json -o src/client/schema.ts",
