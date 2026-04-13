@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "npmClient": "pnpm",
-  "version": "2.2.6",
+  "version": "2.2.5",
   "command": {
     "version": {
       "allowBranch": "main",
