@@ -336,7 +336,7 @@ export function createTokenService(
         const transferIx = getTransferInstruction({
           source: senderAta,
           destination: recipientAta,
-          authority: sender.address,
+          authority: sender,
           amount: amountBigInt,
         });
 
