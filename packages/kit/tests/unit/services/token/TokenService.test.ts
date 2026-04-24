@@ -732,5 +732,98 @@ describe('TokenService (nos)', () => {
         })
       ).rejects.toMatchObject({ code: 'NO_WALLET' });
     });
+
+    it('should use custom payer for ATA creation when payerForATA is provided', async () => {
+      const recipient = AddressFactory.createValid();
+      const customPayer = AddressFactory.createValid();
+
+      // Mock getCreateATAInstructionIfNeeded to return an instruction
+      const mockCreateAtaIx = {
+        programAddress: 'TokenProgram',
+        accounts: [],
+        data: new Uint8Array(),
+      };
+      const spy = vi
+        .spyOn(client.solana, 'getCreateATAInstructionIfNeeded')
+        .mockResolvedValue(mockCreateAtaIx as any);
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+        payerForATA: customPayer,
+      });
+
+      expect(instructions).toBeDefined();
+      expect(instructions.length).toBe(2);
+      expect(instructions[0]).toBe(mockCreateAtaIx);
+      expect(spy).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        recipient,
+        customPayer
+      );
+    });
+
+    it('should use custom payer address string for ATA creation when payerForATA is provided as string', async () => {
+      const recipient = AddressFactory.createValid();
+      const customPayerString = AddressFactory.createValid();
+
+      // Mock getCreateATAInstructionIfNeeded to return an instruction
+      const mockCreateAtaIx = {
+        programAddress: 'TokenProgram',
+        accounts: [],
+        data: new Uint8Array(),
+      };
+      const spy = vi
+        .spyOn(client.solana, 'getCreateATAInstructionIfNeeded')
+        .mockResolvedValue(mockCreateAtaIx as any);
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+        payerForATA: customPayerString,
+      });
+
+      expect(instructions).toBeDefined();
+      expect(instructions.length).toBe(2);
+      expect(instructions[0]).toBe(mockCreateAtaIx);
+      expect(spy).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        recipient,
+        customPayerString
+      );
+    });
+
+    it('should use custom TransactionSigner as payer for ATA creation when payerForATA is a signer', async () => {
+      const recipient = AddressFactory.createValid();
+      const customPayerSigner = await SignerFactory.createRandomSigner();
+
+      // Mock getCreateATAInstructionIfNeeded to return an instruction
+      const mockCreateAtaIx = {
+        programAddress: 'TokenProgram',
+        accounts: [],
+        data: new Uint8Array(),
+      };
+      const spy = vi
+        .spyOn(client.solana, 'getCreateATAInstructionIfNeeded')
+        .mockResolvedValue(mockCreateAtaIx as any);
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+        payerForATA: customPayerSigner,
+      });
+
+      expect(instructions).toBeDefined();
+      expect(instructions.length).toBe(2);
+      expect(instructions[0]).toBe(mockCreateAtaIx);
+      expect(spy).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        recipient,
+        customPayerSigner
+      );
+    });
   });
 });
