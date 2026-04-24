@@ -227,14 +227,16 @@ export interface SolanaService {
    * @param ata The associated token account address
    * @param mint The token mint address
    * @param owner The owner of the associated token account
-   * @param payer Optional payer for the account creation. If not provided, uses the wallet or service feePayer.
+   * @param payer Optional payer for the account creation. Can be a TransactionSigner (for full signing)
+   *              or an Address (for deferred signing scenarios where the payer signs later).
+   *              If not provided, uses the wallet or service feePayer.
    * @returns An instruction to create the ATA if it doesn't exist, or null if it already exists
    */
   getCreateATAInstructionIfNeeded(
     ata: Address,
     mint: Address,
     owner: Address,
-    payer?: TransactionSigner
+    payer?: TransactionSigner | Address
   ): Promise<Awaited<ReturnType<typeof getCreateAssociatedTokenIdempotentInstructionAsync>> | null>;
 }
 
@@ -590,7 +592,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       ata: Address,
       mint: Address,
       owner: Address,
-      payer?: TransactionSigner
+      payer?: TransactionSigner | Address
     ): Promise<Awaited<
       ReturnType<typeof getCreateAssociatedTokenIdempotentInstructionAsync>
     > | null> {
@@ -613,8 +615,15 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
           );
         }
 
+        // If payer is an Address (string), wrap it so the instruction builder accepts it.
+        // The signature will be collected later when the transaction is signed by the payer.
+        const payerSigner: TransactionSigner =
+          typeof instructionPayer === 'string'
+            ? ({ address: instructionPayer } as TransactionSigner)
+            : instructionPayer;
+
         const instruction = await getCreateAssociatedTokenIdempotentInstructionAsync({
-          payer: instructionPayer,
+          payer: payerSigner,
           ata,
           owner,
           mint,

@@ -73,12 +73,17 @@ export interface TokenService {
    * @param params.to Recipient address
    * @param params.amount Amount in token base units (number or bigint)
    * @param params.from Optional sender TransactionSigner. If not provided, uses wallet from client.
+   * @param params.payerForATA Optional payer for creating the recipient's ATA. Can be a TransactionSigner
+   *                           (for full signing) or an Address (for deferred signing scenarios where the
+   *                           payer signs later, e.g., as the transaction fee payer).
+   *                           If not provided, uses the sender as the ATA payer.
    * @returns Array of instructions (create ATA instruction if needed, then transfer instruction)
    */
   transfer(params: {
     to: Address | string;
     amount: number | bigint;
     from?: TransactionSigner;
+    payerForATA?: TransactionSigner | Address | string;
   }): Promise<Instruction[]>;
 }
 
@@ -283,12 +288,17 @@ export function createTokenService(
      * @param params.to Recipient address
      * @param params.amount Amount in token base units (number or bigint)
      * @param params.from Optional sender TransactionSigner. If not provided, uses wallet from client.
+     * @param params.payerForATA Optional payer for creating the recipient's ATA. Can be a TransactionSigner
+     *                           (for full signing) or an Address (for deferred signing scenarios where the
+     *                           payer signs later, e.g., as the transaction fee payer).
+     *                           If not provided, uses the sender as the ATA payer.
      * @returns Array of instructions (create ATA instruction if needed, then transfer instruction)
      */
     async transfer(params: {
       to: Address | string;
       amount: number | bigint;
       from?: TransactionSigner;
+      payerForATA?: TransactionSigner | Address | string;
     }): Promise<
       | [ReturnType<typeof getTransferInstruction>]
       | [
@@ -324,12 +334,18 @@ export function createTokenService(
         // Find recipient's ATA
         const recipientAta = await this.getATA(recipient);
 
-        // Check if recipient ATA exists and get create instruction if needed
+        // Determine payer for ATA creation: use payerForATA if provided, otherwise use sender.
+        // payerForATA may be a TransactionSigner, an Address, or a string address.
+        const payerForATA =
+          typeof params.payerForATA === 'string'
+            ? address(params.payerForATA)
+            : (params.payerForATA ?? sender);
+
         const createAtaInstruction = await deps.solana.getCreateATAInstructionIfNeeded(
           recipientAta,
           tokenMint,
           recipient,
-          sender
+          payerForATA
         );
 
         // Create transfer instruction
