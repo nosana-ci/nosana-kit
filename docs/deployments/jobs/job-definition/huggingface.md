@@ -25,9 +25,10 @@ As an example, let's say you want to use the following LLM: [TinyLlama/TinyLlama
 
 In order to load this model into the Docker Runtime of your Nosana job you will need to specify a `resources` array. This array will take objects with the following properties:
 
-- `repo` - This is the name of the repo you want to download, `<username>/<repo-name>`
-- `type` - Here the type of the resource needs to be specified, for HuggingFace resources it's `HF`
-- `target` - Lastly we need to define the path where the resources will be downloaded to
+- `repo` - The name of the repo to download, formatted as `<username>/<repo-name>`.
+- `type` - The type of the Nosana resource, for HuggingFace resources this is `HF`.
+- `target` - The path where the resources will be downloaded to in the container.
+- `files` - (optional) An array of file names to download from the repo, useful when you only need a subset.
 
 ## Example
 
