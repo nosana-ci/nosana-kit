@@ -1,6 +1,6 @@
 {
   "name": "@nosana/stake-program",
-  "version": "2.2.12",
+  "version": "2.2.13",
   "description": "Nosana Stake program generated client",
   "type": "module",
   "main": "dist/index.js",
