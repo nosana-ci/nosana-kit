@@ -1,6 +1,6 @@
 {
   "name": "@nosana/merkle-distributor-program",
-  "version": "2.2.6",
+  "version": "2.2.12",
   "description": "Nosana Merkle Distributor program generated client",
   "type": "module",
   "main": "dist/index.js",

@@ -1,6 +1,6 @@
 {
   "name": "@nosana/localnet",
-  "version": "2.2.9",
+  "version": "2.2.12",
   "description": "Nosana localnet: Solana test validator with pre-baked Nosana programs + localnet test helpers",
   "type": "module",
   "main": "dist/index.js",
