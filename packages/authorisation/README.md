@@ -305,3 +305,5 @@ MIT © Nosana
 
 - `tweetnacl` - Cryptographic library
 - `bs58` - Base58 encoding
+
+For more info go to [learn.nosana.com](https://learn.nosana.com)

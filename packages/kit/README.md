@@ -1695,7 +1695,7 @@ MIT
 
 ## Links
 
-- [Nosana Documentation](https://docs.nosana.com)
+- [Nosana Documentation](https://learn.nosana.com)
 - [Nosana Network](https://nosana.com)
 - [GitHub Repository](https://github.com/nosana-ci/nosana-kit)
 - [NPM Package](https://www.npmjs.com/package/@nosana/kit)

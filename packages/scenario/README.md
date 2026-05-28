@@ -228,3 +228,5 @@ Returns a Vitest config object with the scenario setup file pre-configured.
 ### Re-exports from `@nosana/kit`
 
 - `NosanaNetwork`, `JobState`, `type NosanaClient`, `type Wallet`, `type Address`
+
+For more info go to [learn.nosana.com](https://learn.nosana.com)

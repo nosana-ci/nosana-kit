@@ -174,3 +174,5 @@ MIT
 ## Author
 
 Nosana
+
+For more info go to [learn.nosana.com](https://learn.nosana.com)

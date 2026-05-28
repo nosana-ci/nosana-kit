@@ -108,3 +108,5 @@ ships with this package in `keys/`, so anyone can mint NOS tokens on localnet.
 
 On devnet/mainnet, the real NOS token uses a different authority whose key is
 not public — that's why localnet uses its own mint authority.
+
+For more info go to [learn.nosana.com](https://learn.nosana.com)
