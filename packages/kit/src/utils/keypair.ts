@@ -5,7 +5,6 @@ import {
   generateKeyPairSigner,
   getBase58Encoder,
 } from '@solana/kit';
-import { readFile } from 'fs/promises';
 
 import type { Wallet } from '../types.js';
 
@@ -106,6 +105,7 @@ export async function createWalletFromBase58(base58Key: string): Promise<Wallet>
  * @group @nosana/kit
  */
 export async function loadWalletFromFile(filePath?: string): Promise<Wallet> {
+  const { readFile } = await import('node:fs/promises');
   const resolvedPath = filePath ?? getDefaultKeypairPath();
   const fileContent = await readFile(resolvedPath, 'utf8');
   const keyArray: number[] = JSON.parse(fileContent);
