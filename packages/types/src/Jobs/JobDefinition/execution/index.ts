@@ -10,4 +10,5 @@ type GroupDependencies = {
 
 export type Execution = {
   group?: string;
+  timeout?: number;
 } & GroupDependencies
