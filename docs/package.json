@@ -1,6 +1,6 @@
 {
   "name": "@nosana/docs",
-  "version": "2.2.15",
+  "version": "2.2.16",
   "type": "module",
   "private": true,
   "scripts": {
