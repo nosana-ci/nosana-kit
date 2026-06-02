@@ -24,7 +24,12 @@ export type { Wallet, ProgramDeps } from './types.js';
 /**
  * @group @nosana/kit
  */
-export { createJobsProgram, JobState, MarketQueueType } from './services/programs/jobs/index.js';
+export {
+  createJobsProgram,
+  getNetworkFee,
+  JobState,
+  MarketQueueType,
+} from './services/programs/jobs/index.js';
 
 /**
  * @group @nosana/kit

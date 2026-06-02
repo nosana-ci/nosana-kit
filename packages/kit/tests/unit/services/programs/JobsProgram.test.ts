@@ -4,11 +4,13 @@ import { solBytesArrayToIpfsHash } from '@nosana/ipfs';
 
 import {
   createJobsProgram,
+  getNetworkFee,
   type JobsProgram,
   JobState,
   MarketQueueType,
   MonitorEventType,
 } from '../../../../src/services/programs/jobs/index.js';
+import { getNetworkFee as getNetworkFeeFromPackage } from '../../../../src/index.js';
 import * as programClient from '@nosana/jobs-program';
 import {
   AddressFactory,
@@ -28,6 +30,7 @@ const RUN_TIME_888 = 888;
 const RUN_TIME_555 = 555;
 const RUN_TIME_777 = 777;
 const IPFS_BYTES_LENGTH = 32;
+const JOB_POSTING_NETWORK_FEE = 0.1;
 
 // Helper functions
 const baseSdk = () => MockClientFactory.createBasic();
@@ -40,6 +43,13 @@ const makeMarketAccount = () => MarketAccountFactory.create();
 const makeMonitorSdk = () => MockClientFactory.createMockWithSubscriptions();
 
 describe('JobsProgram', () => {
+  describe('getNetworkFee', () => {
+    it('returns the hardcoded 10% fee ratio and is exported from the package root', () => {
+      expect(getNetworkFee()).toBe(JOB_POSTING_NETWORK_FEE);
+      expect(getNetworkFeeFromPackage()).toBe(JOB_POSTING_NETWORK_FEE);
+    });
+  });
+
   describe('transforms', () => {
     let jobs: JobsProgram;
 
