@@ -2,6 +2,9 @@ import type { ContainerCreateVolume, ContainerRun } from "../args/index.js";
 import type { Execution } from "../execution/index.js";
 import type { OperationResults } from "../results/index.js";
 import type { tags } from "typia";
+import { OPERATION_ID_VALIDATE } from "./rules.js";
+
+export * from "./rules.js";
 
 export type OperationArgsMap = {
   'container/run': ContainerRun;
@@ -11,9 +14,6 @@ export type OperationArgsMap = {
 export type OperationType = keyof OperationArgsMap;
 
 export type Ops = Array<Operation<OperationType>>;
-
-// Operation ID – mirrors @nosana/sdk/src/types/job.ts
-export const OPERATION_ID_VALIDATE = `typeof $input === "string" && !$input.includes(" ")` as const;
 
 export type OperationId = string &
   tags.TagBase<{

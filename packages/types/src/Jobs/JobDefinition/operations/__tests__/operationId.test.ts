@@ -1,4 +1,4 @@
-import { OPERATION_ID_VALIDATE } from "../index.js";
+import { OPERATION_ID_VALIDATE } from "../rules.js";
 
 const validateOperationId = new Function(
   "$input",
