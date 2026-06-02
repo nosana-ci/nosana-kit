@@ -1,3 +1,5 @@
+import typia, { type IValidation } from "typia";
+
 /**
  * api        - we receive and send via an endpoint endpoint
  * api-listen - we create an endpoint to listen for incoming requests
@@ -20,3 +22,6 @@ export interface Logistics {
   send: Logistic;
   receive: Logistic;
 }
+
+export const validateLogistics: (input: unknown) => IValidation<Logistics> =
+  typia.createValidateEquals<Logistics>();

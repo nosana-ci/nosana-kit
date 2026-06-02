@@ -1,3 +1,4 @@
+import typia, { type IValidation } from "typia";
 import type { CMDArray, CMDString, Env, GPU, Image, Variables, WorkDir } from "../args/index.js";
 
 export interface Global {
@@ -8,3 +9,6 @@ export interface Global {
   work_dir?: WorkDir;
   variables?: Variables
 }
+
+export const validateGlobal: (input: unknown) => IValidation<Global> =
+  typia.createValidateEquals<Global>();
