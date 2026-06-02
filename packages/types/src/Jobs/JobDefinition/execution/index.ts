@@ -1,3 +1,5 @@
+import typia, { type IValidation } from "typia";
+
 type GroupDependencies = {
   depends_on?: never
   stop_if_dependent_stops?: never;
@@ -12,3 +14,6 @@ export type Execution = {
   group?: string;
   timeout?: number;
 } & GroupDependencies
+
+export const validateExecution: (input: unknown) => IValidation<Execution> =
+  typia.createValidateEquals<Execution>();
