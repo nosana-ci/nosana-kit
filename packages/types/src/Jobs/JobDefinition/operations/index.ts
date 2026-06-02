@@ -1,8 +1,8 @@
+import typia, { type IValidation, tags } from "typia";
 import type { ContainerCreateVolume, ContainerRun } from "../args/index.js";
 import type { Execution } from "../execution/index.js";
 import type { OperationResults } from "../results/index.js";
-import type { tags } from "typia";
-import { OPERATION_ID_VALIDATE } from "./rules.js";
+import { OPERATION_ID_VALIDATE, OPS_UNIQUE_BY_ID_VALIDATE } from "./rules.js";
 
 export * from "./rules.js";
 
@@ -14,6 +14,16 @@ export type OperationArgsMap = {
 export type OperationType = keyof OperationArgsMap;
 
 export type Ops = Array<Operation<OperationType>>;
+
+export type UniqueById = tags.TagBase<{
+  kind: 'uniqueBy';
+  target: 'array';
+  value: 'id';
+  validate: typeof OPS_UNIQUE_BY_ID_VALIDATE;
+  message: 'ops[*].id must be unique';
+}>;
+
+export type OpsWithRule = Ops & UniqueById;
 
 export type OperationId = string &
   tags.TagBase<{
@@ -31,3 +41,13 @@ export type Operation<T extends OperationType> = {
   results?: OperationResults;
   execution?: Execution;
 };
+
+export const validateOperation: (
+  input: unknown,
+) => IValidation<Operation<OperationType>> =
+  typia.createValidateEquals<Operation<OperationType>>();
+
+export const validateOps: (
+  input: unknown,
+) => IValidation<OpsWithRule> =
+  typia.createValidateEquals<OpsWithRule>();
