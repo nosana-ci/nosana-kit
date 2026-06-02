@@ -56,6 +56,17 @@ export type { SimpleMonitorEvent, MonitorEvent } from './monitor/index.js';
 export type PostParams = Instructions.ListParams | Instructions.AssignParams;
 export type PostInstruction = Instructions.ListInstruction | Instructions.AssignInstruction;
 
+export const JOB_POSTING_NETWORK_FEE = 0.1;
+
+/**
+ * Returns the current network fee ratio applied when posting jobs.
+ * A value of 0.1 represents a 10% fee.
+ * @group @nosana/kit
+ */
+export function getNetworkFee(): number {
+  return JOB_POSTING_NETWORK_FEE;
+}
+
 /**
  * Jobs program interface
  * @group @nosana/kit
