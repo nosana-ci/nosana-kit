@@ -128,4 +128,54 @@ Run the following command to get the result of the job:
 nosana job get FQTP2F5hNP2rNGUtQm4Annrx462PgxPcSA6ND6ToPTxH
 ```
 
+## List Jobs
+
+The `nosana job list` command displays all jobs posted by your wallet in a formatted table. By default it filters by your current wallet address as the poster.
+
+```sh
+nosana job list
+```
+
+You should see output similar to:
+
+```
+┌──────────────────────────────────────────────┬───────────┬──────────────────────────────────────────────┬──────────────────────────┐
+│ ADDRESS                                      │ STATE     │ MARKET                                       │ TIME                     │
+├──────────────────────────────────────────────┼───────────┼──────────────────────────────────────────────┼──────────────────────────┤
+│ CokNDp75ad6SB5km7GmrAPvPV9zsHSoVcrVAp9FpJAEC │ COMPLETED │ 7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq │ 7/3/2025, 10:30:28 AM    │
+│ 5sXFLRGEtXuybDsECZ4TDJ43pFST97uyD6cckFpYNXhD │ COMPLETED │ 3EWVbggirRpDY2npzPDA7k21yzwz5wgwGxVVv6zCnRpa │ 8/6/2024, 3:49:15 PM     │
+└──────────────────────────────────────────────┴───────────┴──────────────────────────────────────────────┴──────────────────────────┘
+```
+
+### Options
+
+| Option | Description |
+|---|---|
+| `--limit <number>` | Maximum number of jobs to return (1–50) |
+| `--offset <number>` | Number of jobs to skip, used for pagination |
+| `--state <state>` | Filter by job state: `QUEUED`, `RUNNING`, `COMPLETED`, or `STOPPED` |
+| `--market <address>` | Filter by market address |
+| `--node <address>` | Filter by node address |
+| `--poster <address>` | Filter by poster address (defaults to current wallet) |
+| `--payer <address>` | Filter by payer address |
+| `--time-start <timestamp>` | Only show jobs created after this Unix timestamp |
+| `--time-end <timestamp>` | Only show jobs created before this Unix timestamp |
+| `--network <network>` | Network to run on: `mainnet` (default) or `devnet` |
+| `--wallet <path>` | Path to wallet private key (default: `~/.nosana/nosana_key.json`) |
+| `--format <type>` | Output format: `text` (default) or `json` |
+
+### Examples
+
+List your 10 most recent completed jobs:
+
+```sh
+nosana job list --state COMPLETED --limit 10
+```
+
+Filter jobs by a specific market:
+
+```sh
+nosana job list --market 7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq
+```
+
 Next, we will learn how to create a Nosana Job Definition to access Nosana's powerful features, such as using GPUs and spinning up an instance to connect to an endpoint. Learn more about the [Job Definition](/deployments/jobs/job-definition/intro) structure and capabilities.
