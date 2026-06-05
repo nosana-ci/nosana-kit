@@ -9,7 +9,7 @@ Nosana offers a variety of GPU markets tailored to different needs. Below is a c
 - **Market Name**: Type of NVIDIA GPU available.
 - **Address of Market**: Address to use with the `--market` flag in the `nosana job post` command.
 
-For real-time updates on prices, job timeouts, queue lengths, and more, visit the [Nosana explorer](https://dashboard.nosana.com/markets).
+For real-time updates on prices, job timeouts, queue lengths, and more, visit the [Nosana explorer](https://explore.nosana.com/markets).
 
 ## CLI commands
 

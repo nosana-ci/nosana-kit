@@ -57,9 +57,9 @@ ipfs uploaded:	https://nosana.mypinata.cloud/ipfs/QmSPZj2WxyxUJyMxqrn6iKUrHezKcn
 posting job to market 97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf for price 0.000115 NOS/s (total: 0.8280 NOS)
 job posted with tx 4j23fa4pNpggoexbP47Cw6oqRor2BJdH9PRAHNKbo396gttASv2KqZmfBDQN4MPs7L9oWeNJesfrekx2qP7Yf1ys!
 Service will be exposed at https://7TsqMbiD6HPhJzHpMGB45fCPMwS5fZzCCgFHfhQZt5c7.node.k8s.prd.nos.ci
-Job:		https://dashboard.nosana.com/jobs/FKcGZH5xAfDycNi8F4KqYvPW6QA4Azu5AYsEDjT7UEus
+Job:		https://explore.nosana.com/jobs/FKcGZH5xAfDycNi8F4KqYvPW6QA4Azu5AYsEDjT7UEus
 JSON flow:	https://nosana.mypinata.cloud/ipfs/QmSPZj2WxyxUJyMxqrn6iKUrHezKcnjNKdWbi4VLDSGQBB
-Market:		https://dashboard.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
+Market:		https://explore.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
 Price:		0.000115 NOS/s
 Status:		RUNNING
 
@@ -78,12 +78,12 @@ At the end of the output logs we will see the transcription.
  |_| \_|\___/|___/\__,_|_| |_|\__,_|
 
 Network:	mainnet
-Job:		https://dashboard.nosana.com/jobs/FKcGZH5xAfDycNi8F4KqYvPW6QA4Azu5AYsEDjT7UEus
+Job:		https://explore.nosana.com/jobs/FKcGZH5xAfDycNi8F4KqYvPW6QA4Azu5AYsEDjT7UEus
 JSON flow:	https://nosana.mypinata.cloud/ipfs/QmSPZj2WxyxUJyMxqrn6iKUrHezKcnjNKdWbi4VLDSGQBB
-Market:		https://dashboard.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
+Market:		https://explore.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
 Price:		0.000115 NOS/s
 Status:		COMPLETED
-Node:		https://dashboard.nosana.com/nodes/EQbm8WokowUrZ1aV1wDLB8TutPoYSphVrnrP7ig4C1z8
+Node:		https://explore.nosana.com/nodes/EQbm8WokowUrZ1aV1wDLB8TutPoYSphVrnrP7ig4C1z8
 Start Time:	Mon Jul 29 2024 10:37:29 GMT-0400 (Atlantic Standard Time)
 Duration:	127 seconds
 Total Costs:	0.014605 NOS

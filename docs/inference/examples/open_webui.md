@@ -64,9 +64,9 @@ ipfs uploaded:	https://nosana.mypinata.cloud/ipfs/QmajmxiSFDfaZ4YmwsV92iqCz8LPZy
 posting job to market 97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf for price 0.000115 NOS/s (total: 0.8280 NOS)
 job posted with tx 62TjXTM2rme78RCpM7pZ5YAkCHLmybqHvWrYfTigrjMooBqww99Qn1BoGWtkcWVA5CCuWy3H2PgANWr7PaqsWBtg!
 Service will be exposed at https://ChiscJkoWFYwiZrCPzWd1wKBeDonMqaekq7eCAqTt1YC.node.k8s.prd.nos.ci
-Job:		https://dashboard.nosana.com/jobs/41s1bL8CYBctRgz6jCAYfUSxd8zueUkneHXHeMXVE3p5
+Job:		https://explore.nosana.com/jobs/41s1bL8CYBctRgz6jCAYfUSxd8zueUkneHXHeMXVE3p5
 JSON flow:	https://nosana.mypinata.cloud/ipfs/QmajmxiSFDfaZ4YmwsV92iqCz8LPZyLjKjjfqJ6m7kgWjw
-Market:		https://dashboard.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
+Market:		https://explore.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
 Price:		0.000115 NOS/s
 Status:		RUNNING
 

@@ -70,9 +70,9 @@ Now, deploy the Nosana Job Definition with the following command:
 nosana job post --file hf.json --market nvidia-3090 --timeout 10
 ```
 
-In this command, we specify that we want to deploy our job to the [NVIDIA-3090 market](https://dashboard.nosana.com/markets/CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ), and that we want it to run for 10 minutes.
+In this command, we specify that we want to deploy our job to the [NVIDIA-3090 market](https://explore.nosana.com/markets/CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ), and that we want it to run for 10 minutes.
 
 ## Conclusion
 
-By following these steps, you can efficiently load resources into your Nosana job, leveraging the power of HuggingFace and S3. For more information, explore additional resources on [Nosana documentation](https://docs.nosana.com) and [HuggingFace](https://huggingface.co/).
+By following these steps, you can efficiently load resources into your Nosana job, leveraging the power of HuggingFace and S3. For more information, explore additional resources on [Nosana documentation](https://lean.nosana.com) and [HuggingFace](https://huggingface.co/).
 
