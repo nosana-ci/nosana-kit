@@ -23,4 +23,13 @@ describe("OperationId", () => {
   ])("rejects IDs with spaces: %s", (id) => {
     expect(validateOperationId(id)).toBe(false);
   });
+
+  it.each([
+    "my.id",
+    ".leading",
+    "trailing.",
+    "a.b.c"
+  ])("rejects IDs with full stops: %s", (id) => {
+    expect(validateOperationId(id)).toBe(false);
+  });
 });
