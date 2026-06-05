@@ -31,7 +31,7 @@ export type OperationId = string &
     target: 'string';
     value: 'operationId';
     validate: typeof OPERATION_ID_VALIDATE;
-    message: 'ops[*].id must be a string and not contain spaces';
+    message: 'ops[*].id must be a string and not contain spaces or full stops';
   }>;
 
 export type Operation<T extends OperationType> = {

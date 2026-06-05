@@ -9,7 +9,7 @@
 
 // Operation ID – mirrors @nosana/sdk/src/types/job.ts
 export const OPERATION_ID_VALIDATE =
-  `typeof $input === "string" && !$input.includes(" ")` as const;
+  `typeof $input === "string" && !$input.includes(" ") && !$input.includes(".")` as const;
 
 export const OPS_UNIQUE_BY_ID_VALIDATE = `Array.isArray($input) && (()=>{
     const seen = new Set();
