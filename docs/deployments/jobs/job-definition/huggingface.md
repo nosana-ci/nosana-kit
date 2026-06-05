@@ -74,5 +74,5 @@ In this command, we specify that we want to deploy our job to the [NVIDIA-3090 m
 
 ## Conclusion
 
-By following these steps, you can efficiently load resources into your Nosana job, leveraging the power of HuggingFace and S3. For more information, explore additional resources on [Nosana documentation](https://lean.nosana.com) and [HuggingFace](https://huggingface.co/).
+By following these steps, you can efficiently load resources into your Nosana job, leveraging the power of HuggingFace and S3. For more information, explore additional resources on [Nosana documentation](https://learn.nosana.com) and [HuggingFace](https://huggingface.co/).
 
