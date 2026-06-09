@@ -20,7 +20,7 @@ describe('scenario: basic', () => {
   it('works with the Nosana SDK', async () => {
     const client = await getScenarioClient();
     const balance = await client.solana.getBalance();
-    expect(balance).toBeGreaterThan(0);
+    expect(balance).toBeGreaterThan(0n);
   });
 
   it('creates a market and lists a job', async () => {

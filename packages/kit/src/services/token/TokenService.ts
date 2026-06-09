@@ -2,18 +2,22 @@ import { Address, address, Base58EncodedBytes, Instruction, TransactionSigner } 
 import { NosanaError, ErrorCodes } from '../../errors/NosanaError.js';
 import { Logger } from '../../logger/Logger.js';
 import { Wallet } from '../../types.js';
+import { resolveAddressOrWallet } from '../../utils/resolveAddressOrWallet.js';
 import {
   TOKEN_PROGRAM_ADDRESS,
   getTransferInstruction,
   findAssociatedTokenPda,
   getCreateAssociatedTokenIdempotentInstructionAsync,
 } from '@solana-program/token';
+import type { BalanceInfo, SolanaService } from '../solana/index.js';
 
 // Standard SPL token account size
 const TOKEN_ACCOUNT_SIZE = 165;
 
 // Offset of mint address in token account data structure
 const MINT_OFFSET = 0;
+
+const DEFAULT_TOKEN_DECIMALS = 6;
 
 export interface TokenAccount {
   pubkey: Address;
@@ -27,7 +31,10 @@ export interface TokenAccountWithBalance extends TokenAccount {
   uiAmount: number;
 }
 
-import type { SolanaService } from '../solana/index.js';
+export interface TokenBalanceInfo extends BalanceInfo {
+  mint: Address;
+  tokenAccount: Address | null;
+}
 
 /**
  * Dependencies for TokenService
@@ -45,6 +52,7 @@ export interface TokenServiceDeps {
  */
 export interface TokenServiceConfig {
   tokenAddress: Address;
+  decimals?: number;
 }
 
 /**
@@ -56,15 +64,16 @@ export interface TokenService {
     includeZeroBalance?: boolean;
     excludePdaAccounts?: boolean;
   }): Promise<TokenAccountWithBalance[]>;
-  getTokenAccountForAddress(owner: string | Address): Promise<TokenAccountWithBalance | null>;
-  getBalance(owner?: string | Address): Promise<number>;
+  getBalance(owner?: string | Address): Promise<bigint>;
+  getBalanceInfo(owner?: string | Address): Promise<TokenBalanceInfo>;
   /**
    * Get the associated token account address for a given owner.
    *
-   * @param owner The owner address
+   * @param owner Optional owner address. If not provided, uses the wallet address.
    * @returns The associated token account address
+   * @throws {NosanaError} If neither owner nor wallet is provided
    */
-  getATA(owner: Address | string): Promise<Address>;
+  getATA(owner?: Address | string): Promise<Address>;
   /**
    * Get instruction(s) to transfer SPL tokens from one address to another.
    * May return 1 or 2 instructions depending on whether the recipient's associated token account needs to be created.
@@ -94,6 +103,68 @@ export function createTokenService(
   deps: TokenServiceDeps,
   config: TokenServiceConfig
 ): TokenService {
+  const fetchTokenAccount = async (owner: Address): Promise<TokenAccountWithBalance | null> => {
+    try {
+      const tokenMint = config.tokenAddress;
+
+      deps.logger.debug(`Fetching token account for owner: ${owner}`);
+
+      // Use getTokenAccountsByOwner to fetch token accounts for this owner filtered by token mint
+      const response = await deps.solana.rpc
+        .getTokenAccountsByOwner(owner, { mint: tokenMint }, { encoding: 'jsonParsed' })
+        .send();
+
+      if (response.value.length === 0) {
+        deps.logger.debug(`No token account found for owner: ${owner}`);
+        return null;
+      }
+
+      // Typically there should only be one token account per owner per mint
+      const accountInfo = response.value[0];
+      const parsed = accountInfo.account.data.parsed.info;
+
+      deps.logger.info(
+        `Found token account for owner ${owner}: balance = ${parsed.tokenAmount.uiAmount}`
+      );
+
+      return {
+        pubkey: accountInfo.pubkey,
+        owner: parsed.owner,
+        mint: parsed.mint,
+        amount: BigInt(parsed.tokenAmount.amount),
+        decimals: parsed.tokenAmount.decimals,
+        uiAmount: parsed.tokenAmount.uiAmount ?? 0,
+      };
+    } catch (error) {
+      deps.logger.error(`Failed to fetch token account for owner: ${error}`);
+      throw new NosanaError('Failed to fetch token account', ErrorCodes.RPC_ERROR, error);
+    }
+  };
+
+  const getBalanceInfo = async (owner?: string | Address): Promise<TokenBalanceInfo> => {
+    const ownerAddr = resolveAddressOrWallet({
+      value: owner,
+      getWallet: deps.getWallet,
+    });
+    const account = await fetchTokenAccount(ownerAddr);
+    const amount = account?.amount ?? 0n;
+    const decimals = account?.decimals ?? config.decimals ?? DEFAULT_TOKEN_DECIMALS;
+
+    return {
+      owner: ownerAddr,
+      mint: config.tokenAddress,
+      tokenAccount: account?.pubkey ?? null,
+      amount,
+      decimals,
+      uiAmount: account?.uiAmount ?? Number(amount) / 10 ** decimals,
+    };
+  };
+
+  const getBalance = async (owner?: string | Address): Promise<bigint> => {
+    const balance = await getBalanceInfo(owner);
+    return balance.amount;
+  };
+
   return {
     /**
      * Retrieve all token accounts for all token holders
@@ -189,86 +260,27 @@ export function createTokenService(
     },
 
     /**
-     * Retrieve the token account for a specific owner address
-     *
-     * @param owner - The owner address to query
-     * @returns The token account with balance, or null if no account exists
-     */
-    async getTokenAccountForAddress(
-      owner: string | Address
-    ): Promise<TokenAccountWithBalance | null> {
-      try {
-        const ownerAddr = typeof owner === 'string' ? address(owner) : owner;
-        const tokenMint = config.tokenAddress;
-
-        deps.logger.debug(`Fetching token account for owner: ${ownerAddr}`);
-
-        // Use getTokenAccountsByOwner to fetch token accounts for this owner filtered by token mint
-        const response = await deps.solana.rpc
-          .getTokenAccountsByOwner(ownerAddr, { mint: tokenMint }, { encoding: 'jsonParsed' })
-          .send();
-
-        if (response.value.length === 0) {
-          deps.logger.debug(`No token account found for owner: ${ownerAddr}`);
-          return null;
-        }
-
-        // Typically there should only be one token account per owner per mint
-        const accountInfo = response.value[0];
-        const parsed = accountInfo.account.data.parsed.info;
-
-        deps.logger.info(
-          `Found token account for owner ${ownerAddr}: balance = ${parsed.tokenAmount.uiAmount}`
-        );
-
-        return {
-          pubkey: accountInfo.pubkey,
-          owner: parsed.owner,
-          mint: parsed.mint,
-          amount: BigInt(parsed.tokenAmount.amount),
-          decimals: parsed.tokenAmount.decimals,
-          uiAmount: parsed.tokenAmount.uiAmount ?? 0,
-        };
-      } catch (error) {
-        deps.logger.error(`Failed to fetch token account for owner: ${error}`);
-        throw new NosanaError('Failed to fetch token account', ErrorCodes.RPC_ERROR, error);
-      }
-    },
-
-    /**
-     * Get the token balance for a specific owner address
-     * Convenience method that returns just the balance
+     * Get the token balance for a specific owner address.
      *
      * @param owner - Optional owner address to query. If not provided, uses the wallet address.
-     * @returns The token balance as a UI amount (with decimals), or 0 if no account exists
+     * @returns The token balance in base units, or 0 if no account exists
      * @throws {NosanaError} If neither owner nor wallet is provided
      */
-    async getBalance(owner?: string | Address): Promise<number> {
-      let ownerAddr: Address;
-      if (owner) {
-        ownerAddr = typeof owner === 'string' ? address(owner) : owner;
-      } else {
-        const wallet = deps.getWallet();
-        if (!wallet) {
-          throw new NosanaError(
-            'No wallet found and no owner address provided',
-            ErrorCodes.NO_WALLET
-          );
-        }
-        ownerAddr = wallet.address;
-      }
-      const account = await this.getTokenAccountForAddress(ownerAddr);
-      return account ? account.uiAmount : 0;
-    },
+    getBalance,
+
+    getBalanceInfo,
 
     /**
      * Get the associated token account address for a given owner.
      *
-     * @param owner The owner address
+     * @param owner Optional owner address. If not provided, uses the wallet address.
      * @returns The associated token account address
      */
-    async getATA(owner: Address | string): Promise<Address> {
-      const ownerAddr = typeof owner === 'string' ? address(owner) : owner;
+    async getATA(owner?: Address | string): Promise<Address> {
+      const ownerAddr = resolveAddressOrWallet({
+        value: owner,
+        getWallet: deps.getWallet,
+      });
       const tokenMint = config.tokenAddress;
 
       const [ata] = await findAssociatedTokenPda({

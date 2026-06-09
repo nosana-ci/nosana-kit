@@ -29,41 +29,34 @@ const userAccounts: TokenAccountWithBalance[] = await client.nos.getAllTokenHold
 console.log(`User-owned accounts: ${userAccounts.length}`);
 ```
 
-## Get Token Account for Address
-
-Retrieve the NOS token account for a specific owner.
-
-```ts twoslash
-import { createNosanaClient } from '@nosana/kit';
-const client = createNosanaClient();
-// ---cut---
-import { address } from '@nosana/kit';
-import type { TokenAccountWithBalance } from '@nosana/kit';
-const account: TokenAccountWithBalance | null = await client.nos.getTokenAccountForAddress(address('owner-address'));
-
-if (account) {
-  console.log('Token Account:', account.pubkey);
-  console.log('Owner:', account.owner);
-  console.log('Balance:', account.uiAmount, 'NOS');
-  console.log('Raw Amount:', account.amount.toString());
-  console.log('Decimals:', account.decimals);
-} else {
-  console.log('No NOS token account found');
-}
-```
-
 ## Get Balance
 
-Convenience method to get just the NOS balance for an address.
+Convenience method to get the exact NOS balance for an address in token base units.
 
 ```ts twoslash
 import { createNosanaClient } from '@nosana/kit';
 const client = createNosanaClient();
 // ---cut---
 import { address } from '@nosana/kit';
-const balance: number = await client.nos.getBalance(address('owner-address'));
-console.log(`Balance: ${balance} NOS`);
-// Returns 0 if no token account exists
+const balance: bigint = await client.nos.getBalance(address('owner-address'));
+console.log(`Balance: ${balance} base units`);
+// Returns 0n if no token account exists
+```
+
+## Get Balance Info
+
+Get the exact amount together with display-oriented token metadata.
+
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address } from '@nosana/kit';
+const balance = await client.nos.getBalanceInfo(address('owner-address'));
+console.log(`Token Account: ${balance.tokenAccount}`);
+console.log(`Balance: ${balance.uiAmount} NOS`);
+console.log(`Raw Amount: ${balance.amount}`);
+console.log(`Decimals: ${balance.decimals}`);
 ```
 
 ## Transfer Tokens
@@ -103,7 +96,7 @@ The function automatically:
 ## Type Definitions
 
 ```ts
-import type { Address, TokenAccount, TokenAccountWithBalance } from '@nosana/kit';
+import type { Address, TokenAccount, TokenAccountWithBalance, TokenBalanceInfo } from '@nosana/kit';
 
 interface TokenAccount {
   pubkey: Address;
@@ -115,6 +108,15 @@ interface TokenAccount {
 
 interface TokenAccountWithBalance extends TokenAccount {
   uiAmount: number; // Balance with decimals applied
+}
+
+interface TokenBalanceInfo {
+  owner: Address;
+  mint: Address;
+  tokenAccount: Address | null;
+  amount: bigint;
+  decimals: number;
+  uiAmount: number;
 }
 ```
 

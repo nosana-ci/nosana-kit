@@ -26,8 +26,11 @@ const createApiSolanaIntegration = (
   { solana, nos }: NosanaApiDeps
 ): ExternalSolanaFunctions => ({
   getBalance: async (address: string) => {
-    const [SOL, NOS] = await Promise.all([solana.getBalance(address), nos.getBalance(address)]);
-    return { SOL: SOL / 1e9, NOS };
+    const [SOL, NOS] = await Promise.all([
+      solana.getBalanceInfo(address),
+      nos.getBalanceInfo(address),
+    ]);
+    return { SOL: SOL.uiAmount, NOS: NOS.uiAmount };
   },
   transferTokensToRecipient: async (
     recipient: string,

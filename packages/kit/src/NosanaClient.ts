@@ -89,6 +89,7 @@ const createClientFromConfig = (config: ClientConfig, network: NosanaNetwork): N
     },
     {
       tokenAddress: config.programs.nosTokenAddress,
+      decimals: 6,
     }
   );
 

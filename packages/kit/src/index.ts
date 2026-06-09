@@ -199,6 +199,7 @@ export type {
   TokenService,
   TokenAccount,
   TokenAccountWithBalance,
+  TokenBalanceInfo,
 } from './services/token/index.js';
 
 /**
@@ -214,7 +215,12 @@ export { createSolanaService } from './services/solana/SolanaService.js';
 /**
  * @group @nosana/kit
  */
-export type { SolanaService, SolanaServiceDeps } from './services/solana/SolanaService.js';
+export type {
+  BalanceInfo,
+  SolBalanceInfo,
+  SolanaService,
+  SolanaServiceDeps,
+} from './services/solana/SolanaService.js';
 
 // ============================================================================
 // @nosana/kit - Configuration

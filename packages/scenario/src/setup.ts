@@ -86,7 +86,7 @@ async function createLocalnetClientInstance(
   const client = createNosanaClient(NosanaNetwork.LOCALNET, config);
 
   const balance = await client.solana.getBalance(wallet.address);
-  if (balance === 0) {
+  if (balance === 0n) {
     await client.solana.airdrop({
       recipient: wallet.address,
       amount: options.airdropAmount ?? 2_000_000_000n,
