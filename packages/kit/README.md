@@ -879,6 +879,9 @@ sendTransaction(
 // Get account balance
 getBalance(address?: Address | string): Promise<bigint>
 
+// Get account balance with display metadata
+getBalanceInfo(address?: Address | string): Promise<SolBalanceInfo>
+
 // Derive program derived address
 pda(seeds: Array<Address | string>, programId: Address): Promise<Address>
 
@@ -907,6 +910,10 @@ const signature = await client.solana.sendTransaction(signedTransaction);
 // Check account balance
 const balance = await client.solana.getBalance('address');
 console.log(`Balance: ${balance} lamports`);
+
+// Or get exact lamports plus display metadata
+const balanceInfo = await client.solana.getBalanceInfo('address');
+console.log(`Balance: ${balanceInfo.uiAmount} SOL`);
 
 // Derive PDA
 const pda = await client.solana.pda(['seed1', 'seed2'], programAddress);
@@ -1407,32 +1414,26 @@ const activeUsers = await client.nos.getAllTokenHolders({
 console.log(`Active user accounts: ${activeUsers.length}`);
 ```
 
-### Get Token Account for Address
-
-Retrieve the NOS token account for a specific owner:
-
-```typescript
-const account = await client.nos.getTokenAccountForAddress('owner-address');
-
-if (account) {
-  console.log('Token Account:', account.pubkey);
-  console.log('Owner:', account.owner);
-  console.log('Balance:', account.uiAmount, 'NOS');
-  console.log('Raw Amount:', account.amount.toString());
-  console.log('Decimals:', account.decimals);
-} else {
-  console.log('No NOS token account found');
-}
-```
-
 ### Get Balance
 
-Convenience method to get just the NOS balance for an address:
+Convenience method to get the exact NOS balance for an address in token base units:
 
 ```typescript
 const balance = await client.nos.getBalance('owner-address');
-console.log(`Balance: ${balance} NOS`);
-// Returns 0 if no token account exists
+console.log(`Balance: ${balance} base units`);
+// Returns 0n if no token account exists
+```
+
+### Get Balance Info
+
+Get the exact amount together with display-oriented token metadata:
+
+```typescript
+const balance = await client.nos.getBalanceInfo('owner-address');
+console.log(`Token Account: ${balance.tokenAccount}`);
+console.log(`Balance: ${balance.uiAmount} NOS`);
+console.log(`Raw Amount: ${balance.amount}`);
+console.log(`Decimals: ${balance.decimals}`);
 ```
 
 ### Transfer Tokens
@@ -1473,6 +1474,15 @@ interface TokenAccount {
 
 interface TokenAccountWithBalance extends TokenAccount {
   uiAmount: number; // Balance with decimals applied
+}
+
+interface TokenBalanceInfo {
+  owner: Address;
+  mint: Address;
+  tokenAccount: Address | null;
+  amount: bigint;
+  decimals: number;
+  uiAmount: number;
 }
 ```
 

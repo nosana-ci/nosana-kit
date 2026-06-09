@@ -48,6 +48,12 @@ sendTransaction(
 getBalance(address?: Address | string): Promise<bigint>
 ```
 
+### Get Balance Info
+
+```ts
+getBalanceInfo(address?: Address | string): Promise<SolBalanceInfo>
+```
+
 ### Derive PDA
 
 ```ts
@@ -92,8 +98,12 @@ const signedTransaction = await client.solana.signTransaction(transactionMessage
 const signature3: Signature = await client.solana.sendTransaction(signedTransaction);
 
 // Check account balance
-const balance: number = await client.solana.getBalance(address('address'));
+const balance: bigint = await client.solana.getBalance(address('address'));
 console.log(`Balance: ${balance} lamports`);
+
+// Or get exact lamports plus display metadata
+const balanceInfo = await client.solana.getBalanceInfo(address('address'));
+console.log(`Balance: ${balanceInfo.uiAmount} SOL`);
 
 // Derive PDA
 const pda: Address = await client.solana.pda(['seed1', 'seed2'], programAddress);

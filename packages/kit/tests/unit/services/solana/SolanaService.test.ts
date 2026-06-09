@@ -456,7 +456,7 @@ describe('SolanaService', () => {
 
       const balance = await service.getBalance(testAddress);
 
-      expect(balance).toBe(Number(mockBalance));
+      expect(balance).toBe(mockBalance);
     });
 
     it('returns balance for wallet when no address provided', async () => {
@@ -464,8 +464,22 @@ describe('SolanaService', () => {
 
       const balance = await service.getBalance();
 
-      expect(balance).toBe(Number(mockBalance));
+      expect(balance).toBe(mockBalance);
       expect(service.rpc.getBalance).toHaveBeenCalledWith(wallet.address);
+    });
+
+    it('returns balance info for valid address', async () => {
+      const service = createService(() => undefined);
+
+      const balance = await service.getBalanceInfo(testAddress);
+
+      expect(balance).toEqual({
+        owner: testAddress,
+        mint: 'SOL',
+        amount: mockBalance,
+        decimals: 9,
+        uiAmount: Number(mockBalance) / 1e9,
+      });
     });
 
     it('throws when no wallet and no address provided', async () => {

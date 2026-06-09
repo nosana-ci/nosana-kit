@@ -134,7 +134,7 @@ const client = createNosanaClient();
 // ---cut---
 // Check account balance
 import { address } from '@nosana/kit';
-const balance: number = await client.solana.getBalance(address('address'));
+const balance: bigint = await client.solana.getBalance(address('address'));
 console.log(`Balance: ${balance} lamports`);
 ```
 

@@ -54,7 +54,10 @@ import { Logger } from '../../logger/Logger.js';
 import { Wallet } from '../../types.js';
 import { SolanaConfig } from '../../config/types.js';
 import { convertHttpToWebSocketUrl } from '../../utils/convertHttpToWebSocketUrl.js';
+import { resolveAddressOrWallet } from '../../utils/resolveAddressOrWallet.js';
 import { resolvePriorityFeeMicroLamports } from './priorityFees.js';
+
+const SOL_DECIMALS = 9;
 
 /**
  * Factory function to create an estimateAndSetComputeUnitLimit function
@@ -84,6 +87,18 @@ export interface SolanaServiceDeps {
   getWallet: () => Wallet | undefined;
 }
 
+export interface BalanceInfo {
+  owner: Address;
+  mint: Address | 'SOL';
+  amount: bigint;
+  decimals: number;
+  uiAmount: number;
+}
+
+export interface SolBalanceInfo extends BalanceInfo {
+  mint: 'SOL';
+}
+
 /**
  * Solana service interface
  * @group @nosana/kit
@@ -105,10 +120,18 @@ export interface SolanaService {
    * Get the SOL balance for a specific address.
    *
    * @param addressStr - Optional address to query. If not provided, uses the wallet address.
-   * @returns The SOL balance in lamports as a number
+   * @returns The SOL balance in lamports
    * @throws {NosanaError} If neither address nor wallet is provided
    */
-  getBalance(addressStr?: string | Address): Promise<number>;
+  getBalance(addressStr?: string | Address): Promise<bigint>;
+  /**
+   * Get SOL balance metadata for a specific address.
+   *
+   * @param addressStr - Optional address to query. If not provided, uses the wallet address.
+   * @returns Exact lamports plus display-oriented SOL metadata
+   * @throws {NosanaError} If neither address nor wallet is provided
+   */
+  getBalanceInfo(addressStr?: string | Address): Promise<SolBalanceInfo>;
   /**
    * Build a transaction message from instructions.
    * This function creates a transaction message with fee payer, blockhash, and instructions.
@@ -265,6 +288,52 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
   // Store feePayer in a mutable variable, initialized from config
   let feePayer: TransactionSigner | undefined = config.feePayer;
 
+  const fetchBalance = async (addr: Address): Promise<bigint> => {
+    deps.logger.debug(`Getting balance for address: ${addr}`);
+    const balance = await rpc.getBalance(addr).send();
+    return balance.value;
+  };
+
+  const getBalance = async (addressStr?: string | Address): Promise<bigint> => {
+    try {
+      const addr = resolveAddressOrWallet({
+        value: addressStr,
+        getWallet: deps.getWallet,
+      });
+      return await fetchBalance(addr);
+    } catch (error) {
+      if (error instanceof NosanaError) {
+        throw error;
+      }
+      deps.logger.error(`Failed to get balance: ${error}`);
+      throw new NosanaError('Failed to get balance', ErrorCodes.RPC_ERROR, error);
+    }
+  };
+
+  const getBalanceInfo = async (addressStr?: string | Address): Promise<SolBalanceInfo> => {
+    try {
+      const owner = resolveAddressOrWallet({
+        value: addressStr,
+        getWallet: deps.getWallet,
+      });
+      const amount = await getBalance(owner);
+
+      return {
+        owner,
+        mint: 'SOL',
+        amount,
+        decimals: SOL_DECIMALS,
+        uiAmount: Number(amount) / 10 ** SOL_DECIMALS,
+      };
+    } catch (error) {
+      if (error instanceof NosanaError) {
+        throw error;
+      }
+      deps.logger.error(`Failed to get balance info: ${error}`);
+      throw new NosanaError('Failed to get balance info', ErrorCodes.RPC_ERROR, error);
+    }
+  };
+
   return {
     config,
     rpc,
@@ -326,31 +395,9 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       return pda;
     },
 
-    async getBalance(addressStr?: string | Address): Promise<number> {
-      try {
-        // Use wallet address if no address is provided
-        let addr: Address;
-        if (addressStr) {
-          addr = address(addressStr);
-        } else {
-          const wallet = deps.getWallet();
-          if (!wallet) {
-            throw new NosanaError('No wallet found and no address provided', ErrorCodes.NO_WALLET);
-          }
-          addr = wallet.address;
-        }
+    getBalance,
 
-        deps.logger.debug(`Getting balance for address: ${addr}`);
-        const balance = await rpc.getBalance(addr).send();
-        return Number(balance.value);
-      } catch (error) {
-        if (error instanceof NosanaError) {
-          throw error;
-        }
-        deps.logger.error(`Failed to get balance: ${error}`);
-        throw new NosanaError('Failed to get balance', ErrorCodes.RPC_ERROR, error);
-      }
-    },
+    getBalanceInfo,
 
     /**
      * Build a transaction message from instructions
