@@ -7,16 +7,21 @@ import { createNosanaClient, type NosanaClient, TokenService } from '../../../..
 import { SignerFactory, AddressFactory } from '../../setup/index.js';
 
 vi.mock('../../../../src/logger/Logger.js', () => {
-  return {
-    Logger: {
-      getInstance: vi.fn().mockReturnValue({
-        debug: vi.fn(),
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-      }),
-    },
+  const mockLogger = {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   };
+  class Logger {
+    constructor() {
+      return mockLogger;
+    }
+    static getInstance() {
+      return mockLogger;
+    }
+  }
+  return { Logger };
 });
 // Mock @solana/kit module
 vi.mock('@solana/kit', async (importOriginal) => {
