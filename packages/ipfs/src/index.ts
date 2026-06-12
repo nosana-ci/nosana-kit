@@ -25,5 +25,6 @@ export function createIpfsClient(config?: Partial<IPFSConfig>): NosanaIpfsClient
   }
 }
 
+export { defaultIPFSConfig } from "./defaults/index.js"
 export * from "./utils/encoding.js"
 export type * from "./types.js"
