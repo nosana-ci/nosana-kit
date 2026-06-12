@@ -42,3 +42,5 @@ docs/.vitepress/cache/
 
 # Generated API docs
 docs/kit/reference/
+
+CLAUDE.md

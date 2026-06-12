@@ -11,9 +11,7 @@ const USDC_MINT_ADDRESS: Address = address('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGk
 const USDC_DEVNET_MINT_ADDRESS: Address = address('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');
 
 // The RPC API key below (and the IPFS JWT in defaultIPFSConfig) is intentionally
-// public: it is a scoped, rate-limited key shared with the community as a default.
-// Override via custom config for production use.
-
+// public: they are scoped, rate-limited keys shared with the community as defaults.
 export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
   mainnet: {
     solana: {
