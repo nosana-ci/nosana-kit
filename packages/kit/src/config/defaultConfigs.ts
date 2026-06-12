@@ -33,7 +33,9 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
       rewardsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].rewards),
       stakeAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].stake),
       poolsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].pools),
-      merkleDistributorAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].merkleDistributor),
+      merkleDistributorAddress: address(
+        NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].merkleDistributor
+      ),
     },
     logLevel: 'error' as LogLevel,
   },
@@ -57,7 +59,9 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
       rewardsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].rewards),
       stakeAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].stake),
       poolsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].pools),
-      merkleDistributorAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].merkleDistributor),
+      merkleDistributorAddress: address(
+        NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].merkleDistributor
+      ),
     },
     logLevel: 'debug' as LogLevel,
   },
@@ -82,7 +86,9 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
       rewardsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].rewards),
       stakeAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].stake),
       poolsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].pools),
-      merkleDistributorAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].merkleDistributor),
+      merkleDistributorAddress: address(
+        NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].merkleDistributor
+      ),
     },
     logLevel: 'debug' as LogLevel,
   },
