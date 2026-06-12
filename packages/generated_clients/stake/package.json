@@ -2,6 +2,13 @@
   "name": "@nosana/stake-program",
   "version": "2.2.13",
   "description": "Nosana Stake program generated client",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
+    "directory": "packages/generated_clients/stake"
+  },
+  "license": "MIT",
+  "author": "Nosana",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

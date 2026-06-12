@@ -2,6 +2,13 @@
   "name": "@nosana/merkle-distributor-program",
   "version": "2.2.13",
   "description": "Nosana Merkle Distributor program generated client",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
+    "directory": "packages/generated_clients/merkle_distributor"
+  },
+  "license": "MIT",
+  "author": "Nosana",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

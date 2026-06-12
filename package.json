@@ -34,5 +34,11 @@
     "lerna": "^9.0.4",
     "tsx": "^4.19.0",
     "typescript": "^5.9.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git"
+  },
+  "license": "MIT",
+  "author": "Nosana"
 }
