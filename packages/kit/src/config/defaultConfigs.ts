@@ -1,5 +1,5 @@
 import { address, type Address } from '@solana/kit';
-import { NOS_MINT_ADDRESSES, NosanaNetwork } from '@nosana/types';
+import { NOS_MINT_ADDRESSES, NOSANA_PROGRAM_ADDRESSES, NosanaNetwork } from '@nosana/types';
 import { defaultIPFSConfig } from '@nosana/ipfs';
 
 import type { ClientConfig } from './types.js';
@@ -29,11 +29,11 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
     ipfs: { ...defaultIPFSConfig },
     programs: {
       nosTokenAddress: address(NOS_MINT_ADDRESSES[NosanaNetwork.MAINNET]),
-      jobsAddress: address('nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM'),
-      rewardsAddress: address('nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp'),
-      stakeAddress: address('nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE'),
-      poolsAddress: address('nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD'),
-      merkleDistributorAddress: address('merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425'),
+      jobsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].jobs),
+      rewardsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].rewards),
+      stakeAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].stake),
+      poolsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].pools),
+      merkleDistributorAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].merkleDistributor),
     },
     logLevel: 'error' as LogLevel,
   },
@@ -53,11 +53,11 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
     ipfs: { ...defaultIPFSConfig },
     programs: {
       nosTokenAddress: address(NOS_MINT_ADDRESSES[NosanaNetwork.DEVNET]),
-      jobsAddress: address('nosJTmGQxvwXy23vng5UjkTbfv91Bzf9jEuro78dAGR'),
-      rewardsAddress: address('nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp'),
-      stakeAddress: address('nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE'),
-      poolsAddress: address('nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD'),
-      merkleDistributorAddress: address('merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425'),
+      jobsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].jobs),
+      rewardsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].rewards),
+      stakeAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].stake),
+      poolsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].pools),
+      merkleDistributorAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].merkleDistributor),
     },
     logLevel: 'debug' as LogLevel,
   },
@@ -78,11 +78,11 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
     ipfs: { ...defaultIPFSConfig },
     programs: {
       nosTokenAddress: address(NOS_MINT_ADDRESSES[NosanaNetwork.LOCALNET]),
-      jobsAddress: address('nosJTmGQxvwXy23vng5UjkTbfv91Bzf9jEuro78dAGR'),
-      rewardsAddress: address('nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp'),
-      stakeAddress: address('nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE'),
-      poolsAddress: address('nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD'),
-      merkleDistributorAddress: address('merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425'),
+      jobsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].jobs),
+      rewardsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].rewards),
+      stakeAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].stake),
+      poolsAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].pools),
+      merkleDistributorAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].merkleDistributor),
     },
     logLevel: 'debug' as LogLevel,
   },
