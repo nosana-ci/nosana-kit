@@ -1,5 +1,6 @@
 import { address, type Address } from '@solana/kit';
-import type { NosanaNetwork } from '@nosana/types';
+import { NOS_MINT_ADDRESSES, NosanaNetwork } from '@nosana/types';
+import { defaultIPFSConfig } from '@nosana/ipfs';
 
 import type { ClientConfig } from './types.js';
 import type { LogLevel } from '../logger/Logger.js';
@@ -9,9 +10,9 @@ const SOL_MINT_ADDRESS: Address = address('So11111111111111111111111111111111111
 const USDC_MINT_ADDRESS: Address = address('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
 const USDC_DEVNET_MINT_ADDRESS: Address = address('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');
 
-// The RPC API key and IPFS JWT below are intentionally public: they are scoped,
-// rate-limited keys shared with the community as defaults. Override via custom
-// config for production use.
+// The RPC API key below (and the IPFS JWT in defaultIPFSConfig) is intentionally
+// public: it is a scoped, rate-limited key shared with the community as a default.
+// Override via custom config for production use.
 
 export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
   mainnet: {
@@ -27,13 +28,9 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
         accountAddresses: [SOL_MINT_ADDRESS, USDC_MINT_ADDRESS],
       },
     },
-    ipfs: {
-      api: 'https://api.pinata.cloud',
-      jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJmZDUwODE1NS1jZDJhLTRlMzYtYWI4MC0wNmMxNjRmZWY1MTkiLCJlbWFpbCI6Implc3NlQG5vc2FuYS5pbyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImlkIjoiRlJBMSIsImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxfV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiI1YzVhNWM2N2RlYWU2YzNhNzEwOCIsInNjb3BlZEtleVNlY3JldCI6ImYxOWFjZDUyZDk4ZTczNjU5MmEyY2IzZjQwYWUxNGE2ZmYyYTkxNDJjZTRiN2EzZGQ5OTYyOTliMmJkN2IzYzEiLCJpYXQiOjE2ODY3NzE5Nzl9.r4_pWCCT79Jis6L3eegjdBdAt5MpVd1ymDkBuNE25g8',
-      gateway: 'https://nosana.mypinata.cloud/ipfs/',
-    },
+    ipfs: { ...defaultIPFSConfig },
     programs: {
-      nosTokenAddress: address('nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7'),
+      nosTokenAddress: address(NOS_MINT_ADDRESSES[NosanaNetwork.MAINNET]),
       jobsAddress: address('nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM'),
       rewardsAddress: address('nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp'),
       stakeAddress: address('nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE'),
@@ -55,13 +52,9 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
         accountAddresses: [SOL_MINT_ADDRESS, USDC_DEVNET_MINT_ADDRESS],
       },
     },
-    ipfs: {
-      api: 'https://api.pinata.cloud',
-      jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJmZDUwODE1NS1jZDJhLTRlMzYtYWI4MC0wNmMxNjRmZWY1MTkiLCJlbWFpbCI6Implc3NlQG5vc2FuYS5pbyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImlkIjoiRlJBMSIsImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxfV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiI1YzVhNWM2N2RlYWU2YzNhNzEwOCIsInNjb3BlZEtleVNlY3JldCI6ImYxOWFjZDUyZDk4ZTczNjU5MmEyY2IzZjQwYWUxNGE2ZmYyYTkxNDJjZTRiN2EzZGQ5OTYyOTliMmJkN2IzYzEiLCJpYXQiOjE2ODY3NzE5Nzl9.r4_pWCCT79Jis6L3eegjdBdAt5MpVd1ymDkBuNE25g8',
-      gateway: 'https://nosana.mypinata.cloud/ipfs/',
-    },
+    ipfs: { ...defaultIPFSConfig },
     programs: {
-      nosTokenAddress: address('devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP'),
+      nosTokenAddress: address(NOS_MINT_ADDRESSES[NosanaNetwork.DEVNET]),
       jobsAddress: address('nosJTmGQxvwXy23vng5UjkTbfv91Bzf9jEuro78dAGR'),
       rewardsAddress: address('nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp'),
       stakeAddress: address('nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE'),
@@ -84,13 +77,9 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
         accountAddresses: [SOL_MINT_ADDRESS, USDC_DEVNET_MINT_ADDRESS],
       },
     },
-    ipfs: {
-      api: 'https://api.pinata.cloud',
-      jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJmZDUwODE1NS1jZDJhLTRlMzYtYWI4MC0wNmMxNjRmZWY1MTkiLCJlbWFpbCI6Implc3NlQG5vc2FuYS5pbyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImlkIjoiRlJBMSIsImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxfV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiI1YzVhNWM2N2RlYWU2YzNhNzEwOCIsInNjb3BlZEtleVNlY3JldCI6ImYxOWFjZDUyZDk4ZTczNjU5MmEyY2IzZjQwYWUxNGE2ZmYyYTkxNDJjZTRiN2EzZGQ5OTYyOTliMmJkN2IzYzEiLCJpYXQiOjE2ODY3NzE5Nzl9.r4_pWCCT79Jis6L3eegjdBdAt5MpVd1ymDkBuNE25g8',
-      gateway: 'https://nosana.mypinata.cloud/ipfs/',
-    },
+    ipfs: { ...defaultIPFSConfig },
     programs: {
-      nosTokenAddress: address('devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP'),
+      nosTokenAddress: address(NOS_MINT_ADDRESSES[NosanaNetwork.LOCALNET]),
       jobsAddress: address('nosJTmGQxvwXy23vng5UjkTbfv91Bzf9jEuro78dAGR'),
       rewardsAddress: address('nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp'),
       stakeAddress: address('nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE'),
