@@ -4,7 +4,7 @@
   "description": "Nosana Stake program generated client",
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/nosana-ci/tools/sdk/kit.git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
     "directory": "packages/generated_clients/stake"
   },
   "license": "MIT",

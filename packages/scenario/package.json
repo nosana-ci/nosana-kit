@@ -33,7 +33,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/nosana-ci/tools/sdk/kit.git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
     "directory": "packages/scenario"
   },
   "dependencies": {
