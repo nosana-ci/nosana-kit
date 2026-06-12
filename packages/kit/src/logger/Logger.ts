@@ -12,7 +12,7 @@ export class Logger {
   public prefix: string = '[Nosana]';
   public enabled: boolean = true;
 
-  private constructor(options?: LoggerOptions) {
+  constructor(options?: LoggerOptions) {
     if (options) {
       this.level = options.level || this.level;
       this.prefix = options.prefix || this.prefix;
@@ -20,6 +20,11 @@ export class Logger {
     }
   }
 
+  /**
+   * @deprecated Use `new Logger(options)` instead. The shared instance ignores
+   * `options` on every call after the first, so per-client configuration
+   * (e.g. `logLevel`) is silently dropped.
+   */
   public static getInstance(options?: LoggerOptions): Logger {
     if (!Logger.instance) {
       Logger.instance = new Logger(options);

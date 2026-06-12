@@ -16,7 +16,14 @@ describe('Logger', () => {
     consoleError = vi.spyOn(console, 'error').mockImplementation(() => {}) as any;
   });
 
-  it('creates a singleton instance', () => {
+  it('creates independent instances with their own configuration', () => {
+    const a = new Logger({ level: 'debug' });
+    const b = new Logger({ level: 'error' });
+    expect(a.level).toBe('debug');
+    expect(b.level).toBe('error');
+  });
+
+  it('getInstance returns a shared instance (deprecated)', () => {
     const a = Logger.getInstance();
     const b = Logger.getInstance();
     expect(a).toBe(b);
@@ -28,7 +35,7 @@ describe('Logger', () => {
     const warnMessage = 'warn message';
     const errorMessage = 'error message';
 
-    const logger = Logger.getInstance({ level: 'debug', enabled: true });
+    const logger = new Logger({ level: 'debug', enabled: true });
     logger.debug(debugMessage);
     logger.info(infoMessage);
     logger.warn(warnMessage);
@@ -44,7 +51,7 @@ describe('Logger', () => {
     const infoMessage = 'info message';
     const errorMessage = 'error message';
 
-    const logger = Logger.getInstance({ enabled: false });
+    const logger = new Logger({ enabled: false });
     logger.info(infoMessage);
     logger.error(errorMessage);
 
@@ -56,7 +63,7 @@ describe('Logger', () => {
     const warnMessage = 'warn message';
     const errorMessage = 'error message';
 
-    const logger = Logger.getInstance({ level: 'warn' });
+    const logger = new Logger({ level: 'warn' });
     logger.debug('debug message');
     logger.info('info message');
     logger.warn(warnMessage);
@@ -71,7 +78,7 @@ describe('Logger', () => {
   it('allows changing log level at runtime', () => {
     const debugMessage = 'debug message';
 
-    const logger = Logger.getInstance({ level: 'warn' });
+    const logger = new Logger({ level: 'warn' });
     logger.debug(debugMessage);
     expect(consoleDebug).not.toHaveBeenCalled();
 
@@ -83,7 +90,7 @@ describe('Logger', () => {
   it('allows enabling and disabling at runtime', () => {
     const infoMessage = 'info message';
 
-    const logger = Logger.getInstance();
+    const logger = new Logger();
     logger.disable();
     logger.info(infoMessage);
     expect(consoleInfo).not.toHaveBeenCalled();
@@ -97,7 +104,7 @@ describe('Logger', () => {
     const customPrefix = 'TEST';
     const infoMessage = 'info message';
 
-    const logger = Logger.getInstance({ prefix: customPrefix });
+    const logger = new Logger({ prefix: customPrefix });
     logger.info(infoMessage);
 
     expect(consoleInfo).toHaveBeenCalledWith(expect.stringContaining(customPrefix));

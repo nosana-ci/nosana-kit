@@ -218,6 +218,15 @@ describe('NosanaClient', () => {
       // Logger level is set to the corresponding string level
       expect(client.logger.level).toBe(customLogLevel);
     });
+
+    it('applies log levels independently per client', () => {
+      const clientA = createNosanaClient(NosanaNetwork.MAINNET, { logLevel: 'debug' });
+      const clientB = createNosanaClient(NosanaNetwork.MAINNET, { logLevel: 'error' });
+
+      expect(clientA.logger).not.toBe(clientB.logger);
+      expect(clientA.logger.level).toBe('debug');
+      expect(clientB.logger.level).toBe('error');
+    });
   });
 
   describe('API configuration', () => {

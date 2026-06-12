@@ -44,9 +44,8 @@ async function main() {
 
   const jobsPath = path.join(__dirname, '..', 'packages', 'generated_clients', 'jobs', 'src');
   ensureDir(jobsPath);
-  codamaJobs.accept(renderJavaScriptVisitor(jobsPath));
+  await codamaJobs.accept(renderJavaScriptVisitor(jobsPath));
   console.log('Processing enums in jobs...');
-  await new Promise((resolve) => setTimeout(resolve, 100));
   processEnumsInDirectory(jobsPath);
   const accountIndices = codamaJobs.accept(createAccountIndicesVisitor());
   injectAccountIndicesIntoFiles(jobsPath, accountIndices);
@@ -55,9 +54,8 @@ async function main() {
 
   const stakingPath = path.join(__dirname, '..', 'packages', 'generated_clients', 'stake', 'src');
   ensureDir(stakingPath);
-  codamaStaking.accept(renderJavaScriptVisitor(stakingPath));
+  await codamaStaking.accept(renderJavaScriptVisitor(stakingPath));
   console.log('Processing enums in staking...');
-  await new Promise((resolve) => setTimeout(resolve, 100));
   processEnumsInDirectory(stakingPath);
   const stakingAccountIndices = codamaStaking.accept(createAccountIndicesVisitor());
   injectAccountIndicesIntoFiles(stakingPath, stakingAccountIndices);
@@ -75,9 +73,8 @@ async function main() {
     'src'
   );
   ensureDir(merkleDistributorPath);
-  codamaMerkleDistributor.accept(renderJavaScriptVisitor(merkleDistributorPath));
+  await codamaMerkleDistributor.accept(renderJavaScriptVisitor(merkleDistributorPath));
   console.log('Processing enums in merkle_distributor...');
-  await new Promise((resolve) => setTimeout(resolve, 100));
   processEnumsInDirectory(merkleDistributorPath);
   const merkleAccountIndices = codamaMerkleDistributor.accept(createAccountIndicesVisitor());
   injectAccountIndicesIntoFiles(merkleDistributorPath, merkleAccountIndices);

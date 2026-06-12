@@ -16,7 +16,7 @@ export type NosanaIpfsClient = {
 };
 
 export function createIpfsClient(config?: Partial<IPFSConfig>): NosanaIpfsClient {
-  const fetchClient = createIPFSFetchClient(Object.assign(defaultIPFSConfig, config));
+  const fetchClient = createIPFSFetchClient({ ...defaultIPFSConfig, ...config });
 
   return {
     pin: async (data: object) => await pin(data, fetchClient),

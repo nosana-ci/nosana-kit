@@ -9,6 +9,10 @@ const SOL_MINT_ADDRESS: Address = address('So11111111111111111111111111111111111
 const USDC_MINT_ADDRESS: Address = address('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
 const USDC_DEVNET_MINT_ADDRESS: Address = address('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');
 
+// The RPC API key and IPFS JWT below are intentionally public: they are scoped,
+// rate-limited keys shared with the community as defaults. Override via custom
+// config for production use.
+
 export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
   mainnet: {
     solana: {
