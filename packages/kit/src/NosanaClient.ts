@@ -65,7 +65,7 @@ export interface NosanaClient {
  * ```
  */
 const createClientFromConfig = (config: ClientConfig, network: NosanaNetwork): NosanaClient => {
-  const logger = Logger.getInstance({ level: config.logLevel });
+  const logger = new Logger({ level: config.logLevel });
 
   // Wallet management
   let wallet: Wallet | undefined = config.wallet;

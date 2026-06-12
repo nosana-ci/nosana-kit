@@ -82,6 +82,22 @@ describe('createIPFSFetchClient', () => {
       expect(error?.message).toContain('Failed to fetch data from IPFS: 404 Not Found');
     });
 
+    it('should return error when response is not ok even if it has a body', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ...baseFetchResponse,
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        text: async () => 'Invalid JWT'
+      } as Response);
+
+      const [data, error] = await client.GET(TEST_PATH);
+
+      expect(data).toBeUndefined();
+      expect(error).toBeInstanceOf(Error);
+      expect(error?.message).toContain('Failed to fetch data from IPFS: 401 Unauthorized');
+    });
+
     it('should handle fetch errors', async () => {
       const fetchError = new Error('Network error');
       vi.mocked(fetch).mockRejectedValueOnce(fetchError);
