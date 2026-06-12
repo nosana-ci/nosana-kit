@@ -13,6 +13,7 @@
     "build:with-deps": "pnpm run build",
     "dev": "tsc --watch",
     "dev:with-deps": "pnpm run dev",
+    "test": "echo 'No tests' && exit 0",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
@@ -27,6 +28,11 @@
   ],
   "author": "Nosana",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/nosana-ci/tools/sdk/kit.git",
+    "directory": "packages/localnet"
+  },
   "devDependencies": {
     "@types/node": "^20.19.27",
     "prettier": "^3.7.4",

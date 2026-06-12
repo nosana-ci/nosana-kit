@@ -48,5 +48,12 @@
     "vitepress-plugin-mermaid": {
       "vitepress": "^2.0.0-alpha.15"
     }
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/nosana-ci/tools/sdk/kit.git",
+    "directory": "docs"
+  },
+  "license": "MIT",
+  "author": "Nosana"
 }

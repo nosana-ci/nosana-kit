@@ -7,6 +7,11 @@
   "type": "module",
   "author": "Nosana",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/nosana-ci/tools/sdk/kit.git",
+    "directory": "packages/authorisation"
+  },
   "files": [
     "dist"
   ],
@@ -25,7 +30,6 @@
     "format:fix": "echo 'No format:fix' && exit 0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
     "@types/node": "^24.0.14",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
@@ -33,11 +37,11 @@
     "eslint": "^9.31.0",
     "husky": "^9.1.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.3",
     "vitest": "^4.0.3"
   },
   "dependencies": {
-    "bs58": "^5.0.0",
+    "bs58": "^6.0.0",
     "buffer": "^6.0.3",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1"
