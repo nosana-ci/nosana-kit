@@ -1,4 +1,4 @@
-import type { Instruction, ReadonlyUint8Array } from '@solana/kit';
+import { getBase16Decoder, type Instruction, type ReadonlyUint8Array } from '@solana/kit';
 import {
   ASSIGN_DISCRIMINATOR,
   CLOSE_DISCRIMINATOR,
@@ -34,13 +34,11 @@ export const DISCRIMINATORS: Record<JobsInstructionName, ReadonlyUint8Array> = {
   end: END_DISCRIMINATOR,
 };
 
+const base16 = getBase16Decoder();
+
 /** Hex-encode the first {@link DISCRIMINATOR_LENGTH} bytes of a byte array. */
 export function discriminatorHex(bytes: ReadonlyUint8Array): string {
-  let hex = '';
-  for (let i = 0; i < DISCRIMINATOR_LENGTH && i < bytes.length; i++) {
-    hex += bytes[i].toString(16).padStart(2, '0');
-  }
-  return hex;
+  return base16.decode(bytes.slice(0, DISCRIMINATOR_LENGTH));
 }
 
 // hex(discriminator) -> instruction name, built once from the table above.

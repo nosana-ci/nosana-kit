@@ -87,6 +87,15 @@ export interface JobsBatchTransactionResult extends BatchTransactionResult {
 
 export const JOB_POSTING_NETWORK_FEE = 0.1;
 
+// Account roles whose plural is not just role + "s"; used to key the aggregated
+// `accounts` view (e.g. `accounts.authorities`). Regular roles fall through to +"s".
+const IRREGULAR_ROLE_PLURALS: Record<string, string> = { authority: 'authorities' };
+
+/** Pluralise an account role name for the aggregated `accounts` view. */
+function pluralizeRole(role: string): string {
+  return IRREGULAR_ROLE_PLURALS[role] ?? `${role}s`;
+}
+
 /**
  * Returns the current network fee ratio applied when posting jobs.
  * A value of 0.1 represents a 10% fee.
@@ -925,7 +934,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
         for (const instruction of decoded) {
           if (!instruction) continue;
           for (const [role, account] of Object.entries(instruction.accounts)) {
-            (accounts[`${role}s`] ??= []).push(account);
+            (accounts[pluralizeRole(role)] ??= []).push(account);
           }
         }
         return { ...result, decoded, accounts };

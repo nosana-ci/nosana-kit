@@ -26,13 +26,13 @@ describe('getJobsInstructionComputeUnits', () => {
     expect(getJobsInstructionComputeUnits(completeIx)).toBe(JOBS_COMPUTE_UNITS.complete);
   });
 
-  it('returns undefined for an unknown (non-jobs) instruction', () => {
+  it('falls back to the default for an unknown (non-jobs) instruction', () => {
     const ix = makeIx(new Uint8Array([9, 9, 9, 9, 9, 9, 9, 9, 0, 0]));
-    expect(getJobsInstructionComputeUnits(ix)).toBeUndefined();
+    expect(getJobsInstructionComputeUnits(ix)).toBe(200_000);
   });
 
-  it('returns undefined when the instruction data is shorter than a discriminator', () => {
+  it('falls back to the default when the instruction data is shorter than a discriminator', () => {
     const ix = makeIx(new Uint8Array([1, 2, 3]));
-    expect(getJobsInstructionComputeUnits(ix)).toBeUndefined();
+    expect(getJobsInstructionComputeUnits(ix)).toBe(200_000);
   });
 });
