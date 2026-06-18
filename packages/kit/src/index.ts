@@ -39,6 +39,23 @@ export type { JobsProgram, Job, Market, Run } from './services/programs/jobs/ind
 /**
  * @group @nosana/kit
  */
+export {
+  getJobsInstructionComputeUnits,
+  getJobsInstructionName,
+  decodeJobsInstruction,
+  type DecodedJobsInstruction,
+  JOBS_COMPUTE_UNITS,
+  type JobsInstructionName,
+} from './services/programs/jobs/index.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type { JobsBatchTransactionResult } from './services/programs/jobs/index.js';
+
+/**
+ * @group @nosana/kit
+ */
 export type {
   List,
   ListParams,
@@ -220,6 +237,7 @@ export type {
   SolBalanceInfo,
   SolanaService,
   SolanaServiceDeps,
+  BatchTransactionResult,
 } from './services/solana/SolanaService.js';
 
 // ============================================================================
@@ -273,6 +291,16 @@ export type { ConvertTypesForDb } from './utils/convertBigIntToNumber.js';
  * @group @nosana/kit
  */
 export { walletToAuthorizationSigner } from './utils/walletToAuthorizationSigner.js';
+
+/**
+ * @group @nosana/kit
+ */
+export {
+  packInstructions,
+  TRANSACTION_SIZE_LIMIT,
+  MAX_COMPUTE_UNITS,
+  type PackInstructionsOptions,
+} from './utils/packInstructions.js';
 
 // ============================================================================
 // @nosana/kit - Keypair Helpers

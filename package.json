@@ -15,6 +15,7 @@
     "format": "pnpm -r run format",
     "format:fix": "pnpm -r run format:fix",
     "generate-clients": "pnpm exec tsx scripts/generate-clients.ts",
+    "gen:cu": "pnpm --filter @nosana/scenario run gen:cu",
     "version": "true",
     "version:patch": "lerna version patch --yes",
     "version:force": "lerna version patch --yes --force-publish",

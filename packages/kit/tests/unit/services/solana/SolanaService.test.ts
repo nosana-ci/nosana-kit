@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import type { Instruction } from '@solana/kit';
+import { type Instruction, AccountRole, generateKeyPairSigner } from '@solana/kit';
 import { getTransferSolInstructionDataDecoder } from '@solana-program/system';
+import { getSetComputeUnitLimitInstruction } from '@solana-program/compute-budget';
 
 import { createSolanaService } from '../../../../src/services/solana/index.js';
 import { PROTOCOL } from '../../../../src/utils/convertHttpToWebSocketUrl.js';
@@ -447,6 +448,151 @@ describe('SolanaService', () => {
       expect(service.sendAndConfirmTransaction).toHaveBeenCalledWith(expect.any(Object), {
         commitment,
       });
+    });
+  });
+
+  describe('buildSignAndSendBatch', () => {
+    // Build instructions large enough that only one fits per transaction, so a
+    // handful of them deterministically pack into one bucket each.
+    async function makeLargeInstructions(count: number): Promise<Instruction[]> {
+      const signers = await Promise.all(
+        Array.from({ length: count * 10 }, () => generateKeyPairSigner())
+      );
+      return Array.from({ length: count }, (_, i) => ({
+        programAddress: AddressFactory.createValid(),
+        accounts: Array.from({ length: 10 }, (_, j) => ({
+          address: signers[i * 10 + j].address,
+          role: AccountRole.READONLY,
+        })),
+        data: new Uint8Array(400).fill(i % 256),
+      }));
+    }
+
+    it('packs into multiple transactions and reports each as fulfilled', async () => {
+      const { service } = await createWalletAndService();
+      const instructions = await makeLargeInstructions(3);
+
+      const results = await service.buildSignAndSendBatch(instructions);
+
+      // One transaction per large instruction.
+      expect(results).toHaveLength(3);
+      expect(results.every((r) => r.status === 'fulfilled')).toBe(true);
+      expect(results.every((r) => r.signature === mockSignature)).toBe(true);
+      // Every instruction is accounted for across the buckets.
+      expect(results.flatMap((r) => r.instructions)).toHaveLength(3);
+      expect(service.sendAndConfirmTransaction).toHaveBeenCalledTimes(3);
+    });
+
+    it('keeps everything in one transaction when it fits', async () => {
+      const { service } = await createWalletAndService();
+      const instructions = [makeInstruction(), makeInstruction()];
+
+      const results = await service.buildSignAndSendBatch(instructions);
+
+      expect(results).toHaveLength(1);
+      expect(results[0].status).toBe('fulfilled');
+      expect(results[0].instructions).toHaveLength(2);
+    });
+
+    it('reports groupIndices so each transaction maps back to its input groups', async () => {
+      const { service } = await createWalletAndService();
+      // Three large instructions => one per transaction (each its own group).
+      const large = await makeLargeInstructions(3);
+      const split = await service.buildSignAndSendBatch(large);
+      expect(split.map((r) => r.groupIndices)).toEqual([[0], [1], [2]]);
+
+      // Two small instructions => packed together => both groups in one tx.
+      const small = [makeInstruction(), makeInstruction()];
+      const packed = await service.buildSignAndSendBatch(small);
+      expect(packed).toHaveLength(1);
+      expect(packed[0].groupIndices).toEqual([0, 1]);
+    });
+
+    it('sends all transactions and reports per-transaction failures without throwing', async () => {
+      const wallet = await SignerFactory.createTestSigner();
+
+      // One send rejects, the rest succeed.
+      const rpcError = new Error('rpc error');
+      const mockSendAndConfirm = vi
+        .fn()
+        .mockRejectedValueOnce(rpcError)
+        .mockResolvedValue(undefined);
+      solanaKitMock.sendAndConfirmTransactionFactory.mockReturnValueOnce(mockSendAndConfirm as any);
+
+      const service = createService(() => wallet);
+      const instructions = await makeLargeInstructions(3);
+
+      const results = await service.buildSignAndSendBatch(instructions);
+
+      // No throw: every transaction is attempted and reported.
+      expect(results).toHaveLength(3);
+      expect(mockSendAndConfirm).toHaveBeenCalledTimes(3);
+      expect(results.filter((r) => r.status === 'rejected')).toHaveLength(1);
+      expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(2);
+      const rejected = results.find((r) => r.status === 'rejected');
+      expect(rejected?.error).toBeDefined();
+    });
+
+    it('throws when an atomic group cannot fit in a single transaction', async () => {
+      const { service } = await createWalletAndService();
+      // A single group of many large instructions cannot be split.
+      const giant = await makeLargeInstructions(5);
+
+      await expect(service.buildSignAndSendBatch([giant])).rejects.toMatchObject({
+        code: 'TRANSACTION_ERROR',
+      });
+    });
+
+    it('prepends a compute-unit limit summed from the per-instruction estimate', async () => {
+      const { service } = await createWalletAndService();
+      const instructions = [makeInstruction(), makeInstruction()]; // pack into one tx
+      const spy = vi.spyOn(service, 'buildTransaction');
+
+      await service.buildSignAndSendBatch(instructions, { computeUnits: 30_000 });
+
+      // First instruction of the (single) transaction is the summed limit: 2 × 30k.
+      const passed = spy.mock.calls[0][0] as Instruction[];
+      const reference = getSetComputeUnitLimitInstruction({ units: 60_000 });
+      expect(passed[0].programAddress).toBe(reference.programAddress);
+      expect(passed[0].data).toEqual(reference.data);
+      spy.mockRestore();
+    });
+
+    it('does not prepend a static limit when estimateComputeUnits is set', async () => {
+      const { service } = await createWalletAndService();
+      const instructions = [makeInstruction()];
+      const spy = vi.spyOn(service, 'buildTransaction');
+
+      await service.buildSignAndSendBatch(instructions, { estimateComputeUnits: true });
+
+      // The bucket is passed through untouched (no compute-budget instruction prepended).
+      const passed = spy.mock.calls[0][0] as Instruction[];
+      expect(passed).toHaveLength(1);
+      expect(passed[0]).toBe(instructions[0]);
+      spy.mockRestore();
+    });
+
+    it('sends sequentially and still reports every transaction on a failure', async () => {
+      const wallet = await SignerFactory.createTestSigner();
+
+      // The middle send rejects; the others succeed.
+      const rpcError = new Error('rpc error');
+      const mockSendAndConfirm = vi
+        .fn()
+        .mockResolvedValueOnce(undefined)
+        .mockRejectedValueOnce(rpcError)
+        .mockResolvedValue(undefined);
+      solanaKitMock.sendAndConfirmTransactionFactory.mockReturnValueOnce(mockSendAndConfirm as any);
+
+      const service = createService(() => wallet);
+      const instructions = await makeLargeInstructions(3);
+
+      const results = await service.buildSignAndSendBatch(instructions, { sequential: true });
+
+      expect(results).toHaveLength(3);
+      expect(mockSendAndConfirm).toHaveBeenCalledTimes(3);
+      expect(results.filter((r) => r.status === 'rejected')).toHaveLength(1);
+      expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(2);
     });
   });
 
