@@ -14,7 +14,7 @@ import type {
   TransactionSigner,
 } from '@solana/kit';
 import type { ProgramDeps, Wallet } from '../../../types.js';
-import type { BatchTransactionResult } from '../../solana/SolanaService.js';
+import type { BatchTransactionResult, SignedBatchTransaction } from '../../solana/SolanaService.js';
 import { getJobsInstructionComputeUnits } from './computeUnits.js';
 import { decodeJobsInstruction, type DecodedJobsInstruction } from './decode.js';
 import {
@@ -85,6 +85,19 @@ export interface JobsBatchTransactionResult extends BatchTransactionResult {
   accounts: Record<string, Address[]>;
 }
 
+/**
+ * A {@link SignedBatchTransaction} enriched with the same decoded view as
+ * {@link JobsBatchTransactionResult}, so the per-bucket job/run addresses are
+ * available without decoding the raw instructions. Returned by {@link JobsProgram.signBatch}.
+ * @group @nosana/kit
+ */
+export interface SignedJobsBatchTransaction extends SignedBatchTransaction {
+  /** Each instruction in the transaction, decoded to its name and labelled accounts. */
+  decoded: Array<DecodedJobsInstruction | undefined>;
+  /** Accounts grouped by pluralised role (e.g. `accounts.jobs`, `accounts.runs`). See {@link JobsBatchTransactionResult.accounts}. */
+  accounts: Record<string, Address[]>;
+}
+
 export const JOB_POSTING_NETWORK_FEE = 0.1;
 
 // Account roles whose plural is not just role + "s"; used to key the aggregated
@@ -94,6 +107,26 @@ const IRREGULAR_ROLE_PLURALS: Record<string, string> = { authority: 'authorities
 /** Pluralise an account role name for the aggregated `accounts` view. */
 function pluralizeRole(role: string): string {
   return IRREGULAR_ROLE_PLURALS[role] ?? `${role}s`;
+}
+
+/**
+ * Decode a transaction's instructions and group the accounts they reference by
+ * (pluralised) role. Shared by `sendBatch` and `signBatch` so both enrich their
+ * results identically.
+ */
+function decodeBatchInstructions(instructions: Instruction[]): {
+  decoded: Array<DecodedJobsInstruction | undefined>;
+  accounts: Record<string, Address[]>;
+} {
+  const decoded = instructions.map((instruction) => decodeJobsInstruction(instruction));
+  const accounts: Record<string, Address[]> = {};
+  for (const instruction of decoded) {
+    if (!instruction) continue;
+    for (const [role, account] of Object.entries(instruction.accounts)) {
+      (accounts[pluralizeRole(role)] ??= []).push(account);
+    }
+  }
+  return { decoded, accounts };
 }
 
 /**
@@ -343,6 +376,47 @@ export interface JobsProgram {
       sequential?: boolean;
     }
   ): Promise<JobsBatchTransactionResult[]>;
+
+  /**
+   * Bulk-pack and **sign** jobs instructions without sending them — the build-and
+   * -sign-only counterpart to {@link sendBatch}. Returns one signed, base64
+   * transaction per packed bucket for a separate process to persist and broadcast
+   * later (persist-before-send idempotency: a crash mid-send can replay the
+   * identical signed transaction, which the chain dedups by signature).
+   *
+   * Each bucket is signed with all of its embedded signers (the fresh job/run
+   * keypairs minted by each `list`/`assign` plus the fee payer), and the result
+   * carries the same `decoded`/`accounts` view as {@link sendBatch} so the
+   * per-bucket job/run addresses are available without decoding raw accounts.
+   *
+   * Compute-unit limits are set statically from the measured table (no simulation),
+   * since nothing is sent. Bucket atomicity applies: for operations whose
+   * instructions can already be settled (e.g. STOP/END on a finished job), a single
+   * failing instruction fails its whole bucket — pre-filter and/or use smaller
+   * buckets. LIST never hits this (every `list` mints fresh accounts).
+   *
+   * @example
+   * ```typescript
+   * const signed = await client.jobs.signBatch(await client.jobs.listMany(params, 7));
+   * for (const tx of signed) {
+   *   await persist({ blob: tx.blob, lastValidBlockHeight: tx.lastValidBlockHeight, jobs: tx.accounts.jobs });
+   *   // ...later, from a separate process: rpc.sendTransaction(tx.blob, { encoding: 'base64' })
+   * }
+   * ```
+   *
+   * @param groups Atomic instruction groups to bulk together.
+   * @param options Optional configuration (fee payer, limits). No `commitment`/`sequential` — nothing is sent.
+   * @returns One signed, un-sent transaction per packed bucket, in packing order.
+   */
+  signBatch(
+    groups: Array<Instruction | Instruction[]>,
+    options?: {
+      feePayer?: TransactionSigner;
+      maxComputeUnits?: number;
+      estimateComputeUnits?: boolean;
+      maxTransactionSize?: number;
+    }
+  ): Promise<SignedJobsBatchTransaction[]>;
 
   /**
    * Monitor program account updates using async iterators.
@@ -926,19 +1000,26 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       // Decode each transaction's instructions so callers can recover the accounts
       // they created or acted on (e.g. the job/run minted by a `list`), and group
       // those accounts by role for the quick "give me the created jobs" view.
-      return results.map((result) => {
-        const decoded = result.instructions.map((instruction) =>
-          decodeJobsInstruction(instruction)
-        );
-        const accounts: Record<string, Address[]> = {};
-        for (const instruction of decoded) {
-          if (!instruction) continue;
-          for (const [role, account] of Object.entries(instruction.accounts)) {
-            (accounts[pluralizeRole(role)] ??= []).push(account);
-          }
-        }
-        return { ...result, decoded, accounts };
+      return results.map((result) => ({
+        ...result,
+        ...decodeBatchInstructions(result.instructions),
+      }));
+    },
+    async signBatch(groups, options) {
+      // Build + sign without sending, for persist-before-send idempotency. CU is
+      // set statically from the measured table (no simulation): signBatch never
+      // sends, so there is no evolving chain state for a simulation to reflect, and
+      // the bulk use case (LIST) has a fixed per-instruction cost.
+      const signed = await deps.solana.buildAndSignBatch(groups, {
+        ...options,
+        computeUnits: getJobsInstructionComputeUnits,
       });
+      // Same decoded/accounts enrichment as sendBatch, so the per-bucket job/run
+      // addresses are available without decoding the raw instructions.
+      return signed.map((transaction) => ({
+        ...transaction,
+        ...decodeBatchInstructions(transaction.instructions),
+      }));
     },
     /**
      * Monitor program account updates using async iterators.

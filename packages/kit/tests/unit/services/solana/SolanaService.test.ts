@@ -596,6 +596,44 @@ describe('SolanaService', () => {
     });
   });
 
+  describe('buildAndSignBatch', () => {
+    // Instructions large enough that only one fits per transaction.
+    async function makeLargeInstructions(count: number): Promise<Instruction[]> {
+      const signers = await Promise.all(
+        Array.from({ length: count * 10 }, () => generateKeyPairSigner())
+      );
+      return Array.from({ length: count }, (_, i) => ({
+        programAddress: AddressFactory.createValid(),
+        accounts: Array.from({ length: 10 }, (_, j) => ({
+          address: signers[i * 10 + j].address,
+          role: AccountRole.READONLY,
+        })),
+        data: new Uint8Array(400).fill(i % 256),
+      }));
+    }
+
+    it('packs and signs one un-sent blob per bucket, and never broadcasts', async () => {
+      const { service } = await createWalletAndService();
+      const instructions = await makeLargeInstructions(3); // one bucket each
+      const sendSpy = vi.spyOn(service, 'sendTransaction');
+      // Real serialization needs a fully compiled tx the signing mock doesn't produce,
+      // so stub it; the round-trip serialization is covered by the localnet test.
+      vi.spyOn(service, 'serializeTransaction').mockReturnValue('BASE64_BLOB');
+
+      const signed = await service.buildAndSignBatch(instructions);
+
+      expect(signed).toHaveLength(3);
+      // The defining property: it signs but never sends.
+      expect(sendSpy).not.toHaveBeenCalled();
+      expect(signed.every((s) => s.blob === 'BASE64_BLOB')).toBe(true);
+      expect(signed.every((s) => s.signature === mockSignature)).toBe(true);
+      expect(signed.every((s) => s.lastValidBlockHeight === mockLastValidBlockHeight)).toBe(true);
+      // groupIndices maps each blob back to the input instructions.
+      expect(signed.map((s) => s.groupIndices)).toEqual([[0], [1], [2]]);
+      expect(signed[0].instructions).toHaveLength(1);
+    });
+  });
+
   describe('getBalance', () => {
     it('returns balance for valid address', async () => {
       const service = createService(() => undefined);

@@ -239,4 +239,37 @@ describe('JobsProgram', () => {
       expect(results[0].decoded).toEqual([undefined]);
     });
   });
+
+  describe('signBatch', () => {
+    it('passes through the signed result and enriches it like sendBatch', async () => {
+      const ixA = makeListInstruction(addr(1));
+      const ixB = makeListInstruction(addr(2));
+      const buildAndSign = vi.fn().mockResolvedValue([
+        {
+          blob: 'BASE64_BLOB',
+          signature: 'sig',
+          lastValidBlockHeight: 123n,
+          instructions: [ixA, ixB],
+          groupIndices: [0, 1],
+        },
+      ]);
+      (deps.solana as unknown as { buildAndSignBatch: unknown }).buildAndSignBatch = buildAndSign;
+
+      const signed = await jobs.signBatch([ixA, ixB]);
+
+      // Signed (un-sent) fields pass straight through.
+      expect(signed).toHaveLength(1);
+      expect(signed[0].blob).toBe('BASE64_BLOB');
+      expect(signed[0].signature).toBe('sig');
+      expect(signed[0].lastValidBlockHeight).toBe(123n);
+      // Same decoded/accounts enrichment as sendBatch.
+      expect(signed[0].accounts.jobs).toEqual([addr(1), addr(2)]);
+      expect(signed[0].decoded.map((d) => d?.name)).toEqual(['list', 'list']);
+      // Prices instructions with the static jobs table (no simulation).
+      expect(buildAndSign).toHaveBeenCalledWith(
+        [ixA, ixB],
+        expect.objectContaining({ computeUnits: expect.any(Function) })
+      );
+    });
+  });
 });

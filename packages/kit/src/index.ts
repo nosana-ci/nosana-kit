@@ -51,7 +51,10 @@ export {
 /**
  * @group @nosana/kit
  */
-export type { JobsBatchTransactionResult } from './services/programs/jobs/index.js';
+export type {
+  JobsBatchTransactionResult,
+  SignedJobsBatchTransaction,
+} from './services/programs/jobs/index.js';
 
 /**
  * @group @nosana/kit
@@ -238,6 +241,7 @@ export type {
   SolanaService,
   SolanaServiceDeps,
   BatchTransactionResult,
+  SignedBatchTransaction,
 } from './services/solana/SolanaService.js';
 
 // ============================================================================
