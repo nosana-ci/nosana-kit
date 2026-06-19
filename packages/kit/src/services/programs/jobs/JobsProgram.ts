@@ -370,6 +370,7 @@ export interface JobsProgram {
     options?: {
       feePayer?: TransactionSigner;
       commitment?: 'processed' | 'confirmed' | 'finalized';
+      computeUnitMargin?: number;
       maxComputeUnits?: number;
       estimateComputeUnits?: boolean;
       maxTransactionSize?: number;
@@ -390,10 +391,20 @@ export interface JobsProgram {
    * per-bucket job/run addresses are available without decoding raw accounts.
    *
    * Compute-unit limits are set statically from the measured table (no simulation),
-   * since nothing is sent. Bucket atomicity applies: for operations whose
-   * instructions can already be settled (e.g. STOP/END on a finished job), a single
-   * failing instruction fails its whole bucket — pre-filter and/or use smaller
-   * buckets. LIST never hits this (every `list` mints fresh accounts).
+   * since nothing is sent — then scaled by `computeUnitMargin` (default 3). The
+   * margin matters because jobs CU grows with market-queue depth (~131 CU/entry for
+   * `list`) and the table is a shallow measurement: a transaction signed now but
+   * broadcast later against a deeper queue could exceed a tight static limit and
+   * fail the whole bucket on landing. The protocol caps a queue at depth 250
+   * (worst-case `list` ≈51,900 CU), so the default 3 (budget ≈69,000, ~depth 380)
+   * covers the entire legal range with headroom. To size it explicitly, use
+   * `computeUnitMargin >= (≈19000 + 131·D_max) / 23000`. Over-provisioning only costs
+   * fee — `list` packing is size-bound, so a larger margin does not reduce density.
+   *
+   * Bucket atomicity applies: for operations whose instructions can already be
+   * settled (e.g. STOP/END on a finished job), a single failing instruction fails
+   * its whole bucket — pre-filter and/or use smaller buckets. LIST never hits this
+   * (every `list` mints fresh accounts).
    *
    * @example
    * ```typescript
@@ -406,12 +417,14 @@ export interface JobsProgram {
    *
    * @param groups Atomic instruction groups to bulk together.
    * @param options Optional configuration (fee payer, limits). No `commitment`/`sequential` — nothing is sent.
+   * @param options.computeUnitMargin Multiplier on each instruction's static compute-unit estimate (default 3, covers the protocol's max queue depth of 250). Raise it only for deeper-than-protocol scenarios.
    * @returns One signed, un-sent transaction per packed bucket, in packing order.
    */
   signBatch(
     groups: Array<Instruction | Instruction[]>,
     options?: {
       feePayer?: TransactionSigner;
+      computeUnitMargin?: number;
       maxComputeUnits?: number;
       estimateComputeUnits?: boolean;
       maxTransactionSize?: number;
@@ -1006,11 +1019,17 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       }));
     },
     async signBatch(groups, options) {
-      // Build + sign without sending, for persist-before-send idempotency. CU is
-      // set statically from the measured table (no simulation): signBatch never
-      // sends, so there is no evolving chain state for a simulation to reflect, and
-      // the bulk use case (LIST) has a fixed per-instruction cost.
+      // Build + sign without sending, for persist-before-send idempotency. CU is set
+      // statically from the measured table (no simulation): signBatch never sends, so
+      // there is no chain state for a simulation to reflect at sign time. But jobs CU
+      // grows with market-queue depth (~131 CU/entry for list) and the table is a
+      // shallow measurement, so a transaction broadcast later against a deeper queue
+      // could exceed a tight static limit. The protocol caps a queue at depth 250,
+      // where a single list costs ~51,900 CU (19,131 + 131·250) vs. the 23,000 table
+      // value — so a 3x margin (budget ~69,000, ~depth 380) covers the entire legal
+      // range with headroom. Callers can override `computeUnitMargin`.
       const signed = await deps.solana.buildAndSignBatch(groups, {
+        computeUnitMargin: 3,
         ...options,
         computeUnits: getJobsInstructionComputeUnits,
       });

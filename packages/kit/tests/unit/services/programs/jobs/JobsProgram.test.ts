@@ -265,11 +265,33 @@ describe('JobsProgram', () => {
       // Same decoded/accounts enrichment as sendBatch.
       expect(signed[0].accounts.jobs).toEqual([addr(1), addr(2)]);
       expect(signed[0].decoded.map((d) => d?.name)).toEqual(['list', 'list']);
-      // Prices instructions with the static jobs table (no simulation).
+      // Prices instructions with the static jobs table, and over-provisions by
+      // default (3x covers the protocol's max queue depth) so a tx broadcast later
+      // against a deeper queue still lands.
       expect(buildAndSign).toHaveBeenCalledWith(
         [ixA, ixB],
-        expect.objectContaining({ computeUnits: expect.any(Function) })
+        expect.objectContaining({ computeUnits: expect.any(Function), computeUnitMargin: 3 })
       );
+    });
+
+    it('lets the caller override the default compute-unit margin', async () => {
+      const buildAndSign = vi.fn().mockResolvedValue([]);
+      (deps.solana as unknown as { buildAndSignBatch: unknown }).buildAndSignBatch = buildAndSign;
+
+      await jobs.signBatch([makeListInstruction(addr(1))], { computeUnitMargin: 5 });
+
+      expect(buildAndSign).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ computeUnitMargin: 5 })
+      );
+    });
+
+    it('throws (does not return a partial result) when build-and-sign fails', async () => {
+      (deps.solana as unknown as { buildAndSignBatch: unknown }).buildAndSignBatch = vi
+        .fn()
+        .mockRejectedValue(new Error('sign failed'));
+
+      await expect(jobs.signBatch([makeListInstruction(addr(1))])).rejects.toThrow('sign failed');
     });
   });
 });

@@ -272,6 +272,7 @@ export interface SolanaService {
       feePayer?: TransactionSigner;
       commitment?: 'processed' | 'confirmed' | 'finalized';
       computeUnits?: number | ((instruction: Instruction) => number | undefined);
+      computeUnitMargin?: number;
       maxComputeUnits?: number;
       estimateComputeUnits?: boolean;
       maxTransactionSize?: number;
@@ -296,8 +297,15 @@ export interface SolanaService {
    * Performs no network send. Each transaction is signed against its own freshly
    * fetched blockhash, so `lastValidBlockHeight` may differ per bucket.
    *
+   * Because the transaction is signed now but may be broadcast later — potentially
+   * against a deeper, costlier state than when it was signed — the static
+   * compute-unit estimate can under-budget at land time. Use `computeUnitMargin` to
+   * over-provision the baked-in limit (the cost of over-budgeting is only fee, and
+   * for size-bound batches it does not reduce packing density).
+   *
    * @param groups Atomic instruction groups to bulk together.
    * @param options Same packing options as {@link buildSignAndSendBatch} (no `commitment`/`sequential`, which only apply to sending).
+   * @param options.computeUnitMargin Multiplier on each instruction's compute-unit estimate (default 1). Raise it (>1) to over-provision the limit for transactions broadcast later against a costlier state.
    * @returns One signed, un-sent transaction per packed bucket, in packing order.
    */
   buildAndSignBatch(
@@ -305,6 +313,7 @@ export interface SolanaService {
     options?: {
       feePayer?: TransactionSigner;
       computeUnits?: number | ((instruction: Instruction) => number | undefined);
+      computeUnitMargin?: number;
       maxComputeUnits?: number;
       estimateComputeUnits?: boolean;
       maxTransactionSize?: number;
@@ -486,6 +495,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
     options?: {
       feePayer?: TransactionSigner;
       computeUnits?: number | ((instruction: Instruction) => number | undefined);
+      computeUnitMargin?: number;
       maxComputeUnits?: number;
       estimateComputeUnits?: boolean;
       maxTransactionSize?: number;
@@ -497,12 +507,19 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       throw new NosanaError('No wallet found and no feePayer provided', ErrorCodes.NO_WALLET);
     }
 
-    // Per-instruction compute-unit estimate, with a safe fallback for unknown instructions.
+    // Per-instruction compute-unit estimate, with a safe fallback for unknown
+    // instructions, scaled by an optional safety margin. The margin raises both the
+    // baked-in compute-unit limit and the packing bound — used to over-provision when
+    // a static estimate may under-budget at land time (e.g. a transaction that is
+    // signed now but broadcast later against a deeper, costlier market queue).
     const cuOption = options?.computeUnits;
-    const resolveComputeUnits: (ix: Instruction) => number =
+    const margin = Math.max(options?.computeUnitMargin ?? 1, 0);
+    const baseComputeUnits: (ix: Instruction) => number =
       typeof cuOption === 'function'
         ? (ix) => cuOption(ix) ?? DEFAULT_INSTRUCTION_COMPUTE_UNITS
         : () => cuOption ?? DEFAULT_INSTRUCTION_COMPUTE_UNITS;
+    const resolveComputeUnits = (ix: Instruction): number =>
+      Math.ceil(baseComputeUnits(ix) * margin);
     // Never exceed Solana's hard per-transaction cap, even if a larger value is passed.
     const maxCU = Math.min(options?.maxComputeUnits ?? MAX_COMPUTE_UNITS, MAX_COMPUTE_UNITS);
     // Set the compute-unit limit statically unless the caller opts into simulation.
@@ -812,6 +829,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
         feePayer?: TransactionSigner;
         commitment?: Commitment;
         computeUnits?: number | ((instruction: Instruction) => number | undefined);
+        computeUnitMargin?: number;
         maxComputeUnits?: number;
         estimateComputeUnits?: boolean;
         maxTransactionSize?: number;
@@ -875,6 +893,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       options?: {
         feePayer?: TransactionSigner;
         computeUnits?: number | ((instruction: Instruction) => number | undefined);
+        computeUnitMargin?: number;
         maxComputeUnits?: number;
         estimateComputeUnits?: boolean;
         maxTransactionSize?: number;

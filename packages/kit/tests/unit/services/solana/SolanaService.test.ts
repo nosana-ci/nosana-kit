@@ -632,6 +632,28 @@ describe('SolanaService', () => {
       expect(signed.map((s) => s.groupIndices)).toEqual([[0], [1], [2]]);
       expect(signed[0].instructions).toHaveLength(1);
     });
+
+    it('scales the baked-in compute-unit limit by computeUnitMargin', async () => {
+      const { service } = await createWalletAndService();
+      const instructions = [makeInstruction(), makeInstruction()]; // pack into one tx
+      vi.spyOn(service, 'serializeTransaction').mockReturnValue('BLOB');
+      const spy = vi.spyOn(service, 'buildTransaction');
+
+      await service.buildAndSignBatch(instructions, { computeUnits: 30_000, computeUnitMargin: 2 });
+
+      // Limit = sum(per-instruction units) × margin = (30k + 30k) × 2 = 120k.
+      const passed = spy.mock.calls[0][0] as Instruction[];
+      const reference = getSetComputeUnitLimitInstruction({ units: 120_000 });
+      expect(passed[0].data).toEqual(reference.data);
+    });
+
+    it('throws (no partial result) if any bucket fails to build or sign', async () => {
+      const { service } = await createWalletAndService();
+      const instructions = await makeLargeInstructions(2);
+      vi.spyOn(service, 'buildTransaction').mockRejectedValue(new Error('build failed'));
+
+      await expect(service.buildAndSignBatch(instructions)).rejects.toThrow('build failed');
+    });
   });
 
   describe('getBalance', () => {

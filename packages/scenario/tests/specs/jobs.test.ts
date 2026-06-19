@@ -87,11 +87,13 @@ describe('scenario: jobs/market', () => {
     expect(createdJobs).toHaveLength(7);
 
     // Broadcast the blobs from OUTSIDE the kit (raw RPC) — proving they are
-    // self-contained and broadcastable later by a separate process.
+    // self-contained and broadcastable later by a separate process. The signature
+    // returned at sign time is exactly the one the chain lands the tx under.
     for (const tx of signed) {
-      await client.solana.rpc
+      const broadcastSignature = await client.solana.rpc
         .sendTransaction(tx.blob as Base64EncodedWireTransaction, { encoding: 'base64' })
         .send();
+      expect(broadcastSignature).toBe(tx.signature);
     }
 
     // Wait for all jobs to land on-chain.
