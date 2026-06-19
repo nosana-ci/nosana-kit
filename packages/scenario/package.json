@@ -11,6 +11,7 @@
   "scripts": {
     "build": "tsc --build",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "gen:cu": "pnpm exec tsx scripts/measure-compute-units.ts",
     "dev": "tsc --watch",
     "dev:with-deps": "pnpm --filter $npm_package_name... --parallel run dev",
     "lint": "eslint ./src",
