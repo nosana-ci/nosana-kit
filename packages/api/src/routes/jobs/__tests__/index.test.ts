@@ -59,6 +59,22 @@ describe('createNosanaJobsApi', () => {
       expect(path).toEqual('/api/jobs/list');
       expect(options.headers).toEqual({ 'Idempotency-Key': 'idem-list-1' });
     });
+
+    test('it surfaces the HTTP status and Retry-After on a coded 409 control response', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({
+        data: null,
+        error: { code: 'IDEMPOTENCY_KEY_IN_PROGRESS', message: 'In progress' },
+        response: new Response(null, { status: 409, headers: { 'Retry-After': '5' } }),
+      });
+
+      const api = createNosanaJobsApi(global.TEST_MOCK_CLIENT);
+
+      await expect(api.list(global.TEST_CREATE_JOB_REQUEST)).rejects.toMatchObject({
+        code: 'IDEMPOTENCY_KEY_IN_PROGRESS',
+        statusCode: 409,
+        retryAfter: '5',
+      });
+    });
   });
 
   describe('extend', () => {
