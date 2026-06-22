@@ -45,4 +45,43 @@ describe('errorFormatter', () => {
     expect(err.message).toBe('Failed');
     expect(err.details).toBe(123);
   });
+
+  describe('with a response', () => {
+    it('takes statusCode from response.status when the body has none', () => {
+      const response = new Response(null, { status: 409 });
+      const err = errorFormatter('Failed', { code: 'IDEMPOTENCY_KEY_IN_PROGRESS' }, response);
+
+      expect(err.code).toBe('IDEMPOTENCY_KEY_IN_PROGRESS');
+      expect(err.statusCode).toBe(409);
+    });
+
+    it('prefers a body statusCode over response.status', () => {
+      const response = new Response(null, { status: 500 });
+      const err = errorFormatter('Failed', { error: 'Bad', statusCode: 400 }, response);
+
+      expect(err.statusCode).toBe(400);
+    });
+
+    it('captures the Retry-After header', () => {
+      const response = new Response(null, { status: 409, headers: { 'Retry-After': '5' } });
+      const err = errorFormatter('Failed', { code: 'IDEMPOTENCY_KEY_IN_PROGRESS' }, response);
+
+      expect(err.retryAfter).toBe('5');
+    });
+
+    it('still records the status for a body-less proxy error', () => {
+      const response = new Response(null, { status: 502 });
+      const err = errorFormatter('Failed', undefined, response);
+
+      expect(err.message).toBe('Failed');
+      expect(err.statusCode).toBe(502);
+    });
+
+    it('leaves retryAfter undefined when the header is absent', () => {
+      const response = new Response(null, { status: 409 });
+      const err = errorFormatter('Failed', { message: 'nope' }, response);
+
+      expect(err.retryAfter).toBeUndefined();
+    });
+  });
 });
