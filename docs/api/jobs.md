@@ -78,6 +78,40 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
 
 :::
 
+### Control responses
+
+A rejected idempotent request throws a `NosanaApiError`. When the server returns
+a machine-readable control code it is lifted onto `error.code`; `error.statusCode`
+is always set, and `error.retryAfter` (seconds) is populated from `Retry-After`
+when present. The kit exports the code constants and a type guard so you branch
+on the contract instead of hardcoding strings — *what* each code means for your
+retry policy is up to you.
+
+```ts
+import { IdempotencyCode, isNosanaApiError } from '@nosana/kit';
+
+try {
+  await client.api.jobs.list(request, { idempotencyKey: key });
+} catch (error) {
+  if (!isNosanaApiError(error)) throw error; // network/timeout — no response
+
+  switch (error.code) {
+    case IdempotencyCode.IN_PROGRESS:
+      // A matching request is still in flight — retry the SAME key later.
+      // error.retryAfter holds the suggested delay in seconds, when provided.
+      break;
+    case IdempotencyCode.EXPIRED:
+      // The prepared transaction is dead — re-post with a fresh key.
+      break;
+    case IdempotencyCode.PAYLOAD_MISMATCH:
+      // Same key reused with a different payload — do not retry.
+      break;
+    default:
+      // No idempotency code: an ordinary error (use error.statusCode).
+  }
+}
+```
+
 ## Get Job by Address
 
 Retrieve information about a specific job:

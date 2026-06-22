@@ -1,4 +1,4 @@
-import { errorFormatter } from '../errorFormatter.js';
+import { errorFormatter, isNosanaApiError } from '../errorFormatter.js';
 
 describe('errorFormatter', () => {
   test('when called with only a message, it should return an error with that message', () => {
@@ -62,11 +62,11 @@ describe('errorFormatter', () => {
       expect(err.statusCode).toBe(400);
     });
 
-    it('captures the Retry-After header', () => {
+    it('parses the Retry-After header into seconds (number)', () => {
       const response = new Response(null, { status: 409, headers: { 'Retry-After': '5' } });
       const err = errorFormatter('Failed', { code: 'IDEMPOTENCY_KEY_IN_PROGRESS' }, response);
 
-      expect(err.retryAfter).toBe('5');
+      expect(err.retryAfter).toBe(5);
     });
 
     it('still records the status for a body-less proxy error', () => {
@@ -77,11 +77,33 @@ describe('errorFormatter', () => {
       expect(err.statusCode).toBe(502);
     });
 
-    it('leaves retryAfter undefined when the header is absent', () => {
-      const response = new Response(null, { status: 409 });
-      const err = errorFormatter('Failed', { message: 'nope' }, response);
+    it('leaves retryAfter undefined when the header is absent or unparseable', () => {
+      const noHeader = errorFormatter('Failed', { message: 'nope' }, new Response(null, { status: 409 }));
+      expect(noHeader.retryAfter).toBeUndefined();
 
-      expect(err.retryAfter).toBeUndefined();
+      const garbage = new Response(null, { status: 409, headers: { 'Retry-After': 'soon' } });
+      expect(errorFormatter('Failed', {}, garbage).retryAfter).toBeUndefined();
     });
+  });
+});
+
+describe('isNosanaApiError', () => {
+  it('returns true for an error carrying a numeric statusCode', () => {
+    const err = errorFormatter('Failed', { code: 'X' }, new Response(null, { status: 409 }));
+
+    expect(isNosanaApiError(err)).toBe(true);
+    // narrows without casting
+    if (isNosanaApiError(err)) {
+      expect(err.statusCode).toBe(409);
+    }
+  });
+
+  it('returns false for a network-style error with no status', () => {
+    expect(isNosanaApiError(new TypeError('Failed to fetch'))).toBe(false);
+  });
+
+  it('returns false for non-error values', () => {
+    expect(isNosanaApiError(undefined)).toBe(false);
+    expect(isNosanaApiError({ statusCode: 409 })).toBe(false);
   });
 });

@@ -24,6 +24,8 @@
     "generate:types:dev": "openapi-typescript https://dashboard.k8s.dev.nos.ci/api/swagger/json -o src/client/schema.ts",
     "generate:types:prd": "openapi-typescript https://dashboard.k8s.prd.nos.ci/api/swagger/json -o src/client/schema.ts",
     "generate:types:local": "openapi-typescript http://localhost:3000/api/swagger/json -o src/client/schema.ts",
+    "generate:types:client-manager:dev": "openapi-typescript https://client-manager.k8s.dev.nos.ci/swagger/json -o src/client/clientManagerSchema.ts",
+    "generate:types:client-manager:prd": "openapi-typescript https://client-manager.k8s.prd.nos.ci/swagger/json -o src/client/clientManagerSchema.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

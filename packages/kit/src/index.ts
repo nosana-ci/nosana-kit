@@ -529,7 +529,7 @@ export {
 /**
  * @group @nosana/api
  */
-export { createNosanaApi, generateIdempotencyKey } from '@nosana/api';
+export { createNosanaApi, generateIdempotencyKey, IdempotencyCode, isNosanaApiError } from '@nosana/api';
 
 /**
  * @group @nosana/api
@@ -537,6 +537,7 @@ export { createNosanaApi, generateIdempotencyKey } from '@nosana/api';
 export type {
   // Core types
   NosanaApi,
+  NosanaApiError,
   CreateNosanaApiOptions,
   ApiKeyAuth,
   SignerAuth,

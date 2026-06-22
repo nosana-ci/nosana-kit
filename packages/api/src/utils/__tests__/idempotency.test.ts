@@ -1,4 +1,14 @@
-import { generateIdempotencyKey } from '../idempotency.js';
+import { generateIdempotencyKey, IdempotencyCode } from '../idempotency.js';
+
+describe('IdempotencyCode', () => {
+  test('it exposes the three control codes by their wire values', () => {
+    expect(IdempotencyCode).toEqual({
+      IN_PROGRESS: 'IDEMPOTENCY_KEY_IN_PROGRESS',
+      EXPIRED: 'IDEMPOTENCY_KEY_EXPIRED',
+      PAYLOAD_MISMATCH: 'IDEMPOTENCY_KEY_PAYLOAD_MISMATCH',
+    });
+  });
+});
 
 describe('generateIdempotencyKey', () => {
   test('it returns a string', () => {

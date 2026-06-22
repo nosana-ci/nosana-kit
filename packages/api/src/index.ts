@@ -56,11 +56,13 @@ export function createNosanaApi(
 }
 
 // Export helpers
-export { generateIdempotencyKey } from './utils/idempotency.js';
+export { generateIdempotencyKey, IdempotencyCode } from './utils/idempotency.js';
+export { isNosanaApiError } from './utils/errorFormatter.js';
 
 // Export types
 export * from './types.js';
 export type { CreateNosanaApiOptions as ApiConfig, CreateNosanaApiOptions } from './types.js';
+export type { NosanaApiError } from './utils/errorFormatter.js';
 
 // Export request/response types
 export type * from './routes/jobs/types.js';

@@ -72,7 +72,7 @@ describe('createNosanaJobsApi', () => {
       await expect(api.list(global.TEST_CREATE_JOB_REQUEST)).rejects.toMatchObject({
         code: 'IDEMPOTENCY_KEY_IN_PROGRESS',
         statusCode: 409,
-        retryAfter: '5',
+        retryAfter: 5,
       });
     });
   });
