@@ -529,7 +529,7 @@ export {
 /**
  * @group @nosana/api
  */
-export { createNosanaApi } from '@nosana/api';
+export { createNosanaApi, generateIdempotencyKey } from '@nosana/api';
 
 /**
  * @group @nosana/api
@@ -543,6 +543,7 @@ export type {
   ApiConfig,
   // Job API types
   NosanaJobsApi,
+  NosanaJobActionOptions,
   NosanaApiListJobRequest,
   NosanaApiListJobResponse,
   NosanaApiGetJobByAddressRequest,

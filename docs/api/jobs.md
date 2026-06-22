@@ -18,6 +18,66 @@ Use the Jobs API when you need to:
 - Extend a running job's execution time
 - Stop a running job
 
+## Idempotency
+
+The **Post**, **Extend**, and **Stop** operations accept an optional idempotency
+key. When you provide one, it is sent as the `Idempotency-Key` request header and
+the API de-duplicates retried requests that share the same key — so a network
+retry won't create a second job or apply an action twice.
+
+The key is completely optional: omitting it leaves request behaviour unchanged.
+Generate a unique value per logical operation and **reuse the same value when you
+retry that operation** — a different key per attempt provides no de-duplication.
+
+The SDK ships a `generateIdempotencyKey()` helper (a UUID generator that works in
+Node and the browser) so you don't have to reach for `crypto` yourself.
+
+:::tabs
+
+== @nosana/kit
+
+Pass an `idempotencyKey` in the options object (the last argument):
+
+```ts
+import { generateIdempotencyKey } from '@nosana/kit';
+
+const key = generateIdempotencyKey();
+
+const result = await client.api.jobs.list(
+  {
+    ipfsHash: 'QmYourJobDefinitionIPFSHash',
+    market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ',
+  },
+  { idempotencyKey: key },
+);
+
+// Retrying the SAME operation? Pass the SAME key so it is de-duplicated:
+await client.api.jobs.list(
+  {
+    ipfsHash: 'QmYourJobDefinitionIPFSHash',
+    market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ',
+  },
+  { idempotencyKey: key },
+);
+```
+
+== HTTP API
+
+Send the `Idempotency-Key` header:
+
+```bash
+curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
+  -H "Authorization: Bearer nos_xxx_your_api_key" \
+  -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ipfsHash": "QmYourJobDefinitionIPFSHash",
+    "market": "CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ"
+  }'
+```
+
+:::
+
 ## Get Job by Address
 
 Retrieve information about a specific job:
@@ -61,22 +121,27 @@ Post a job to the Nosana Network using credits. The job definition must be uploa
 
 ```ts
 // Post a job using credits
-const job = await client.api.jobs.list({
-  ipfsHash: 'QmYourJobDefinitionIPFSHash',
-  market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ',
-  timeout: 60, // Optional: timeout in minutes
-  node: 'node-address', // Optional: specific node to run on
-});
+const job = await client.api.jobs.list(
+  {
+    ipfsHash: 'QmYourJobDefinitionIPFSHash',
+    market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ',
+    timeout: 60, // Optional: timeout in minutes
+    node: 'node-address', // Optional: specific node to run on
+  },
+  // Optional: see the "Idempotency" section above.
+  { idempotencyKey: generateIdempotencyKey() },
+);
 
-console.log('Job Address:', job.address);
-console.log('Job State:', job.state);
+console.log('Job Address:', job.job);
 ```
 
 == HTTP API
 
 ```bash
+# The Idempotency-Key header is optional.
 curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
   -H "Authorization: Bearer nos_xxx_your_api_key" \
+  -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
   -H "Content-Type: application/json" \
   -d '{
     "ipfsHash": "QmYourJobDefinitionIPFSHash",
@@ -140,20 +205,26 @@ Extend the execution time of a running job:
 
 ```ts
 // Extend job execution time
-const result = await client.api.jobs.extend({
-  address: 'job-address-here',
-  timeout: 120, // Additional minutes
-});
+const result = await client.api.jobs.extend(
+  {
+    address: 'job-address-here',
+    seconds: 3600, // Additional seconds
+  },
+  // Optional: see the "Idempotency" section above.
+  { idempotencyKey: generateIdempotencyKey() },
+);
 ```
 
 == HTTP API
 
 ```bash
+# The Idempotency-Key header is optional.
 curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/{address}/extend \
   -H "Authorization: Bearer nos_xxx_your_api_key" \
+  -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
   -H "Content-Type: application/json" \
   -d '{
-    "timeout": 120
+    "seconds": 3600
   }'
 ```
 
@@ -170,13 +241,20 @@ Stop a running job:
 ```ts
 // Stop a running job
 const result = await client.api.jobs.stop('job-address-here');
+
+// Optionally pass an idempotency key (see the "Idempotency" section above):
+const stopped = await client.api.jobs.stop('job-address-here', {
+  idempotencyKey: generateIdempotencyKey(),
+});
 ```
 
 == HTTP API
 
 ```bash
+# The Idempotency-Key header is optional.
 curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/{address}/stop \
-  -H "Authorization: Bearer nos_xxx_your_api_key"
+  -H "Authorization: Bearer nos_xxx_your_api_key" \
+  -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11"
 ```
 
 :::

@@ -38,6 +38,27 @@ describe('createNosanaJobsApi', () => {
 
       await expect(api.list(global.TEST_CREATE_JOB_REQUEST)).rejects.toThrow('Failed to list job');
     });
+
+    it('should not attach an Idempotency-Key header when no key is provided', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: global.TEST_MOCK_CREATE_JOB_RESPONSE, error: null });
+
+      const api = createNosanaJobsApi(global.TEST_MOCK_CLIENT);
+      await api.list(global.TEST_CREATE_JOB_REQUEST);
+
+      const [, options] = (global.TEST_MOCK_CLIENT.POST as Mock).mock.calls[0];
+      expect(options.headers).toBeUndefined();
+    });
+
+    it('should attach the Idempotency-Key header when a key is provided', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: global.TEST_MOCK_CREATE_JOB_RESPONSE, error: null });
+
+      const api = createNosanaJobsApi(global.TEST_MOCK_CLIENT);
+      await api.list(global.TEST_CREATE_JOB_REQUEST, { idempotencyKey: 'idem-list-1' });
+
+      const [path, options] = (global.TEST_MOCK_CLIENT.POST as Mock).mock.calls[0];
+      expect(path).toEqual('/api/jobs/list');
+      expect(options.headers).toEqual({ 'Idempotency-Key': 'idem-list-1' });
+    });
   });
 
   describe('extend', () => {
@@ -57,6 +78,17 @@ describe('createNosanaJobsApi', () => {
 
       await expect(api.extend(global.TEST_EXTEND_JOB_REQUEST)).rejects.toThrow('Failed to extend job');
     });
+
+    it('should attach the Idempotency-Key header when a key is provided', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: global.TEST_MOCK_EXTEND_JOB_RESPONSE, error: null });
+
+      const api = createNosanaJobsApi(global.TEST_MOCK_CLIENT);
+      await api.extend(global.TEST_EXTEND_JOB_REQUEST, { idempotencyKey: 'idem-extend-1' });
+
+      const [path, options] = (global.TEST_MOCK_CLIENT.POST as Mock).mock.calls[0];
+      expect(path).toEqual('/api/jobs/{address}/extend');
+      expect(options.headers).toEqual({ 'Idempotency-Key': 'idem-extend-1' });
+    });
   });
 
   describe('stop', () => {
@@ -75,6 +107,17 @@ describe('createNosanaJobsApi', () => {
       const api = createNosanaJobsApi(global.TEST_MOCK_CLIENT);
 
       await expect(api.stop('invalid')).rejects.toThrow('Failed to stop job');
+    });
+
+    it('should attach the Idempotency-Key header when a key is provided', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: global.TEST_MOCK_STOP_JOB_RESPONSE, error: null });
+
+      const api = createNosanaJobsApi(global.TEST_MOCK_CLIENT);
+      await api.stop('A22xnkSkpBd4a7ExfwZnfFpUbMc1zRBT6NyzVHzf1S6Q', { idempotencyKey: 'idem-stop-1' });
+
+      const [path, options] = (global.TEST_MOCK_CLIENT.POST as Mock).mock.calls[0];
+      expect(path).toEqual('/api/jobs/{address}/stop');
+      expect(options.headers).toEqual({ 'Idempotency-Key': 'idem-stop-1' });
     });
   });
 });

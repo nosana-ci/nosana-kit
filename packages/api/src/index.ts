@@ -55,6 +55,9 @@ export function createNosanaApi(
   };
 }
 
+// Export helpers
+export { generateIdempotencyKey } from './utils/idempotency.js';
+
 // Export types
 export * from './types.js';
 export type { CreateNosanaApiOptions as ApiConfig, CreateNosanaApiOptions } from './types.js';

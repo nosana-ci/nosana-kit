@@ -14,9 +14,18 @@ export type NosanaApiExtendJobResponse = operations['postApiJobsByAddressExtend'
 export type NosanaApiStopJobResponse = operations['postApiJobsByAddressStop']['responses'][200]['content']['application/json'];
 export type NosanaApiGetJobByAddressResponse = operations['getApiJobsByAddress']['responses'][200]['content']['application/json'];
 
+export interface NosanaJobActionOptions {
+  /**
+   * Optional idempotency key. When provided it is sent as the `Idempotency-Key`
+   * request header so the API can safely de-duplicate retried requests. The
+   * header is fully optional and omitting it leaves behaviour unchanged.
+   */
+  idempotencyKey?: string;
+}
+
 export interface NosanaJobsApi {
   get: (request: NosanaApiGetJobByAddressRequest) => Promise<NosanaApiGetJobByAddressResponse>;
-  list: (request: NosanaApiListJobRequest) => Promise<NosanaApiListJobResponse>;
-  extend: (request: NosanaApiExtendJobRequest) => Promise<NosanaApiExtendJobResponse>;
-  stop: (request: NosanaApiStopJobRequest) => Promise<NosanaApiStopJobResponse>;
+  list: (request: NosanaApiListJobRequest, options?: NosanaJobActionOptions) => Promise<NosanaApiListJobResponse>;
+  extend: (request: NosanaApiExtendJobRequest, options?: NosanaJobActionOptions) => Promise<NosanaApiExtendJobResponse>;
+  stop: (request: NosanaApiStopJobRequest, options?: NosanaJobActionOptions) => Promise<NosanaApiStopJobResponse>;
 }
