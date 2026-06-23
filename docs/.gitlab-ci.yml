@@ -8,18 +8,23 @@ include:
 
 docs:build:
   stage: build
-  # The docs build (vitepress + twoslash) peaks at ~3.6 GB and is CPU-heavy.
-  # Give it explicit headroom; the heap cap in docs/package.json is sized to fit
-  # under this memory limit. Ignored if the runner disallows resource overwrite.
+  # The docs site (vitepress + twoslash) is a heavy build (~3.6 GB, CPU-bound).
+  # It must never gate the release: allow_failure keeps a hung/failed docs build
+  # from blocking the dependent release pipeline, and a tight timeout makes it
+  # fail fast (minutes) instead of hanging until the 1h job deadline.
+  allow_failure: true
+  timeout: 20m
+  # Resource hints (only take effect if the runner permits resource overwrite;
+  # confirmed ignored on the current runner — left for when overwrite is enabled).
   variables:
     KUBERNETES_CPU_REQUEST: "2"
     KUBERNETES_CPU_LIMIT: "4"
     KUBERNETES_MEMORY_REQUEST: "8Gi"
     KUBERNETES_MEMORY_LIMIT: "8Gi"
   script:
-    # Diagnostic: surface the pod's actual cgroup limits so the real constraint
-    # is visible in the log if the build still struggles.
-    - 'echo "=== pod limits: mem.max=$(cat /sys/fs/cgroup/memory.max 2>/dev/null || cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>/dev/null || echo unknown) cpus=$(nproc 2>/dev/null || echo unknown) ==="'
+    # Diagnostic: print the pod's real cgroup memory limit + CPU count via Node
+    # (the shell cgroup path read returned "unknown" on this image).
+    - "node -e \"console.log('=== pod: mem.constrainedGB=' + (process.constrainedMemory()/1073741824).toFixed(2) + ' availGB=' + (process.availableMemory()/1073741824).toFixed(2) + ' cpus=' + require('os').availableParallelism() + ' ===')\""
     - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" packages/kit/package.json
     - pnpm install --frozen-lockfile
     - pnpm --filter @nosana/kit run build:with-deps
