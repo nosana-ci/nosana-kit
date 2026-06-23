@@ -57,7 +57,7 @@ export function createNosanaApi(
 
 // Export helpers
 export { generateIdempotencyKey, IdempotencyCode } from './utils/idempotency.js';
-export { isNosanaApiError } from './utils/errorFormatter.js';
+export { isNosanaApiError, isIdempotencyControlSignal } from './utils/errorFormatter.js';
 
 // Export types
 export * from './types.js';

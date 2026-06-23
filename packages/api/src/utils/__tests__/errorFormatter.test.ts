@@ -1,4 +1,4 @@
-import { errorFormatter, isNosanaApiError } from '../errorFormatter.js';
+import { errorFormatter, isNosanaApiError, isIdempotencyControlSignal } from '../errorFormatter.js';
 
 describe('errorFormatter', () => {
   test('when called with only a message, it should return an error with that message', () => {
@@ -105,5 +105,34 @@ describe('isNosanaApiError', () => {
   it('returns false for non-error values', () => {
     expect(isNosanaApiError(undefined)).toBe(false);
     expect(isNosanaApiError({ statusCode: 409 })).toBe(false);
+  });
+});
+
+describe('isIdempotencyControlSignal', () => {
+  it('is true for a coded 409 control response', () => {
+    const err = errorFormatter(
+      'Failed',
+      { code: 'IDEMPOTENCY_KEY_IN_PROGRESS', message: 'in progress' },
+      new Response(null, { status: 409 }),
+    );
+
+    expect(isIdempotencyControlSignal(err)).toBe(true);
+  });
+
+  it('is false for a code-less error (ordinary rejection)', () => {
+    const err = errorFormatter('Failed', { message: 'not found' }, new Response(null, { status: 404 }));
+
+    expect(isIdempotencyControlSignal(err)).toBe(false);
+  });
+
+  it('is false for a present-but-unknown (non-idempotency) code', () => {
+    const err = errorFormatter('Failed', { code: 'SOME_OTHER_DOMAIN_CODE', message: 'x' }, new Response(null, { status: 409 }));
+
+    expect(isNosanaApiError(err)).toBe(true);
+    expect(isIdempotencyControlSignal(err)).toBe(false);
+  });
+
+  it('is false for a network error', () => {
+    expect(isIdempotencyControlSignal(new TypeError('Failed to fetch'))).toBe(false);
   });
 });

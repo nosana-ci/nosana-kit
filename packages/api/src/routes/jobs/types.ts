@@ -27,9 +27,37 @@ export type NosanaApiStopJobRequest = operations['postApiJobsByAddressStop']['pa
 
 // Response types from OpenAPI
 export type NosanaApiListJobResponse = operations['postApiJobsList']['responses'][200]['content']['application/json'];
-export type NosanaApiExtendJobResponse = operations['postApiJobsByAddressExtend']['responses'][200]['content']['application/json'];
-export type NosanaApiStopJobResponse = operations['postApiJobsByAddressStop']['responses'][200]['content']['application/json'];
 export type NosanaApiGetJobByAddressResponse = operations['getApiJobsByAddress']['responses'][200]['content']['application/json'];
+
+// Extend/Stop responses are hand-defined to match the client-manager contract
+// (lockstep-checked in clientManagerSchema.lockstep.ts). The dashboard's
+// generated schema lags these shapes, and sourcing them from the CM schema
+// directly would pull that large generated module into the public type graph.
+
+/**
+ * Response from extending a single job. `tx` is `null` and `credits` is omitted
+ * when the job was already terminal — a confirmed no-op, nothing was charged.
+ */
+export interface NosanaApiExtendJobResponse {
+  tx: string | null;
+  job: string;
+  credits?: {
+    costUSD: number;
+    creditsUsed: number;
+    reservationId: string;
+  };
+}
+
+/**
+ * Response from stopping a single job. `tx` is `null` with
+ * `outcome: "already_terminal"` when the job was already terminal.
+ */
+export interface NosanaApiStopJobResponse {
+  tx: string | null;
+  job: string;
+  delisted: boolean;
+  outcome?: 'delisted' | 'ended' | 'already_terminal';
+}
 
 export interface NosanaJobActionOptions {
   /**

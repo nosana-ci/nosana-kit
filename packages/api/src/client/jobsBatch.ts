@@ -13,6 +13,12 @@ export interface NosanaApiJobsBatchItem {
   status: 'confirmed' | 'expired';
   job?: string;
   run?: string;
+  /**
+   * On-chain transaction signature (base58). Items packed into the same
+   * transaction share one `tx`; absent on `expired` items and on already-terminal
+   * no-ops (nothing was sent).
+   */
+  tx?: string;
 }
 
 /** Response shape shared by all jobs batch endpoints. */

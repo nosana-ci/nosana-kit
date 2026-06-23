@@ -419,7 +419,7 @@ export interface paths {
         put?: never;
         /**
          * Extend a job using credits
-         * @description Extend a job using credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...). Pass an `Idempotency-Key` header to make the call safely retryable (the extension is applied at most once per key). Extending a terminal job returns a code-less 409 (NOT_EXTENDABLE) — non-retryable.
+         * @description Extend a job using credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...). Pass an `Idempotency-Key` header to make the call safely retryable (the extension is applied at most once per key). An already-terminal job is an idempotent no-op: 200 with a null `tx` and no `credits` (nothing is charged).
          */
         post: operations["postJobsByAddressExtend"];
         delete?: never;
@@ -459,7 +459,7 @@ export interface paths {
         put?: never;
         /**
          * Bulk-extend jobs using credits
-         * @description Bulk-extend jobs in the fewest packed transactions. Requires an `Idempotency-Key` header (one key per batch). Per-item results report each extension by `index` — `confirmed` or `expired` (re-post the expired ones under a fresh key). A terminal job rejects the whole batch (409).
+         * @description Bulk-extend jobs in the fewest packed transactions. Requires an `Idempotency-Key` header (one key per batch). Per-item results report each extension by `index` — `confirmed` or `expired` (re-post the expired ones under a fresh key). An already-terminal job is a `confirmed` no-op (no `tx`); the rest still extend.
          */
         post: operations["postJobsExtendBatch"];
         delete?: never;
@@ -712,9 +712,9 @@ export interface components {
             };
         };
         ExtendJobWithCreditsResponse: {
-            tx: string;
+            tx: (string | null) | null;
             job: string;
-            credits: {
+            credits?: {
                 costUSD: number;
                 creditsUsed: number;
                 reservationId: string;
@@ -732,6 +732,8 @@ export interface components {
                 status: "confirmed" | "expired";
                 job?: string;
                 run?: string;
+                /** @description On-chain transaction signature (base58). */
+                tx?: string;
             }[];
         };
     };
@@ -2051,7 +2053,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Per-item results by `index`: `confirmed` (with its job/run address) or `expired` — re-post only the expired items under a fresh key. */
+            /** @description Per-item results by `index`: `confirmed` (with its job/run address and the packed tx's `tx` signature) or `expired` — re-post only the expired items under a fresh key. `tx` is absent on an already-terminal no-op (nothing was sent); items packed into the same on-chain tx share one `tx`. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2130,7 +2132,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Job extended and charged to credits. */
+            /** @description Job extended and charged to credits. An already-terminal job is an idempotent no-op: `tx` is null and `credits` is omitted (nothing was charged). */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2166,7 +2168,7 @@ export interface operations {
                     "application/json": components["schemas"]["JobError"];
                 };
             };
-            /** @description Either an idempotency control signal (has `code`: IDEMPOTENCY_KEY_*) or a code-less, non-retryable rejection because the job is in a terminal, non-extendable state. Branch on the presence of `code`. */
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
             409: {
                 headers: {
                     /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
@@ -2276,7 +2278,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Per-item results by `index`: `confirmed` (with its job/run address) or `expired` — re-post only the expired items under a fresh key. */
+            /** @description Per-item results by `index`: `confirmed` (with its job/run address and the packed tx's `tx` signature) or `expired` — re-post only the expired items under a fresh key. `tx` is absent on an already-terminal no-op (nothing was sent); items packed into the same on-chain tx share one `tx`. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2312,7 +2314,7 @@ export interface operations {
                     "application/json": components["schemas"]["JobError"];
                 };
             };
-            /** @description Either an idempotency control signal (has `code`: IDEMPOTENCY_KEY_*) or a code-less, non-retryable rejection because the job is in a terminal, non-extendable state. Branch on the presence of `code`. */
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
             409: {
                 headers: {
                     /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
@@ -2361,7 +2363,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Per-item results by `index`: `confirmed` (with its job/run address) or `expired` — re-post only the expired items under a fresh key. */
+            /** @description Per-item results by `index`: `confirmed` (with its job/run address and the packed tx's `tx` signature) or `expired` — re-post only the expired items under a fresh key. `tx` is absent on an already-terminal no-op (nothing was sent); items packed into the same on-chain tx share one `tx`. */
             200: {
                 headers: {
                     [name: string]: unknown;

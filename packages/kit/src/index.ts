@@ -534,6 +534,7 @@ export {
   generateIdempotencyKey,
   IdempotencyCode,
   isNosanaApiError,
+  isIdempotencyControlSignal,
 } from '@nosana/api';
 
 /**

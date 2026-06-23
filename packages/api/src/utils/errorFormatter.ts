@@ -1,3 +1,8 @@
+import { IdempotencyCode } from './idempotency.js';
+
+/** The known idempotency control codes, for a sound runtime membership check. */
+const IDEMPOTENCY_CODES: ReadonlySet<string> = new Set(Object.values(IdempotencyCode));
+
 /**
  * Error shape every kit request rejects with, once it has reached the server
  * and come back with a status. `statusCode` is guaranteed (it comes from the
@@ -6,8 +11,10 @@
  */
 export interface NosanaApiError extends Error {
   /**
-   * Server machine code, when present — one of {@link IdempotencyCode}, or
-   * another domain code. Branch on this before `statusCode`.
+   * Free-form server machine code, when present. May be an {@link IdempotencyCode}
+   * (a control signal) or another domain code — so do not assume it is one of the
+   * idempotency codes. Use {@link isIdempotencyControlSignal} to detect and narrow
+   * to the idempotency control codes.
    */
   code?: string;
   /** HTTP status (`body.statusCode ?? response.status`). */
@@ -70,6 +77,23 @@ export function isNosanaApiError(err: unknown): err is NosanaApiError {
     err instanceof Error &&
     typeof (err as Partial<NosanaApiError>).statusCode === 'number'
   );
+}
+
+/**
+ * Narrows a caught value to a coded idempotency **control signal** — a `409`
+ * whose body carries a known {@link IdempotencyCode} (`IN_PROGRESS` → retry the
+ * same key, `EXPIRED` → fresh key, `PAYLOAD_MISMATCH` → fatal).
+ *
+ * The membership check is what makes the `code: IdempotencyCode` narrowing
+ * sound: `NosanaApiError.code` is a free-form server code, so this returns
+ * `false` for a code-less error, a network failure, *and* any non-idempotency
+ * code — all of which the caller should treat as ordinary rejections. An
+ * exhaustive `switch` over the narrowed `code` is therefore genuinely exhaustive.
+ */
+export function isIdempotencyControlSignal(
+  err: unknown,
+): err is NosanaApiError & { code: IdempotencyCode } {
+  return isNosanaApiError(err) && err.code != null && IDEMPOTENCY_CODES.has(err.code);
 }
 
 /**

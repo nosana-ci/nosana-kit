@@ -80,20 +80,22 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
 
 ### Control responses
 
-A rejected idempotent request throws a `NosanaApiError`. When the server returns
-a machine-readable control code it is lifted onto `error.code`; `error.statusCode`
-is always set, and `error.retryAfter` (seconds) is populated from `Retry-After`
-when present. The kit exports the code constants and a type guard so you branch
-on the contract instead of hardcoding strings — *what* each code means for your
-retry policy is up to you.
+A rejected request throws a `NosanaApiError`. `error.statusCode` is always set,
+and `error.retryAfter` (seconds) is populated from `Retry-After` when present.
+
+The key distinction is **`code`, not the HTTP status**: a `409` that carries a
+machine-readable `code` is a *control signal* (retry / fresh-key / fatal); any
+error **without** a `code` is an ordinary rejection. Use `isIdempotencyControlSignal`
+to make that split, then branch on the exported `IdempotencyCode` constants —
+*what* each code means for your retry policy is up to you.
 
 ```ts
-import { IdempotencyCode, isNosanaApiError } from '@nosana/kit';
+import { IdempotencyCode, isIdempotencyControlSignal } from '@nosana/kit';
 
 try {
   await client.api.jobs.list(request, { idempotencyKey: key });
 } catch (error) {
-  if (!isNosanaApiError(error)) throw error; // network/timeout — no response
+  if (!isIdempotencyControlSignal(error)) throw error; // ordinary error or network failure
 
   switch (error.code) {
     case IdempotencyCode.IN_PROGRESS:
@@ -106,8 +108,6 @@ try {
     case IdempotencyCode.PAYLOAD_MISMATCH:
       // Same key reused with a different payload — do not retry.
       break;
-    default:
-      // No idempotency code: an ordinary error (use error.statusCode).
   }
 }
 ```
@@ -247,6 +247,12 @@ const result = await client.api.jobs.extend(
   // Optional: see the "Idempotency" section above.
   { idempotencyKey: generateIdempotencyKey() },
 );
+
+// `tx` is null (and `credits` is omitted) when the job was already terminal —
+// a confirmed no-op, nothing was charged. Extending a terminal job never errors.
+if (result.tx === null) {
+  // already finished — nothing to do
+}
 ```
 
 == HTTP API
@@ -305,7 +311,7 @@ Every batch returns per-item results addressed by request `index`:
 ```json
 {
   "items": [
-    { "index": 0, "status": "confirmed", "job": "job-address", "run": "run-address" },
+    { "index": 0, "status": "confirmed", "job": "job-address", "run": "run-address", "tx": "tx-signature" },
     { "index": 1, "status": "expired" }
   ]
 }
@@ -313,6 +319,9 @@ Every batch returns per-item results addressed by request `index`:
 
 - `confirmed` — the item landed (its `job`/`run` are included for posts).
 - `expired` — the item did not land; **re-post only those items under a fresh key**.
+- `tx` — the on-chain signature, useful for tracing. Items packed into the same
+  transaction share one `tx`; it's absent on `expired` items and on already-terminal
+  no-ops (extend/stop of a finished job, where nothing is sent).
 
 If a batch is still confirming you'll get a `409 IDEMPOTENCY_KEY_IN_PROGRESS` —
 retry with the **same** batch key; items that already landed stay landed. See

@@ -10,6 +10,11 @@
 import { IdempotencyCode } from '../utils/idempotency.js';
 
 import type {
+  NosanaApiExtendJobResponse,
+  NosanaApiStopJobResponse,
+} from '../routes/jobs/types.js';
+
+import type {
   NosanaApiJobsBatchResponse,
   NosanaApiListJobBatchRequest,
   NosanaApiExtendJobBatchRequest,
@@ -41,4 +46,12 @@ export type ExtendJobBatchRequestMatchesSpec = Assert<
 >;
 export type StopJobBatchRequestMatchesSpec = Assert<
   Equal<NosanaApiStopJobBatchRequest, JsonBody<operations['postJobsStopBatch']>>
+>;
+
+// Errors if the hand-defined single-op response types drift from the spec.
+export type ExtendJobResponseMatchesSpec = Assert<
+  Equal<NosanaApiExtendJobResponse, components['schemas']['ExtendJobWithCreditsResponse']>
+>;
+export type StopJobResponseMatchesSpec = Assert<
+  Equal<NosanaApiStopJobResponse, components['schemas']['StopJobWithCreditsResponse']>
 >;
