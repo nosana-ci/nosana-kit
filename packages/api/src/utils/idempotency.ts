@@ -1,5 +1,3 @@
-import type { components } from '../client/clientManagerSchema.js';
-
 /**
  * Machine-readable control codes the API returns (as a `409` with the code in
  * the body, lifted onto {@link NosanaApiError.code}) for an idempotent request.
@@ -8,10 +6,11 @@ import type { components } from '../client/clientManagerSchema.js';
  * fresh-key is the caller's policy. Removing or renaming a member is a breaking
  * change, so consumers branching on these get a compile signal if they drift.
  *
- * The runtime constants are the value source; their union type is sourced from
- * the client-manager OpenAPI spec (`clientManagerSchema.ts`, regenerated via
- * `pnpm generate:types:client-manager:dev`). The lockstep assertion below makes
- * the two diverging a compile error, so the kit and the CM stay in sync.
+ * These constants are kept in lockstep with the client-manager OpenAPI spec by a
+ * compile-time assertion in `../client/clientManagerSchema.lockstep.ts` (which
+ * is intentionally *not* part of the public import graph, so the large generated
+ * schema stays out of consumers' type graph). Regenerate the schema with
+ * `pnpm generate:types:client-manager:dev`.
  *
  * - `IN_PROGRESS` — a matching request is still in flight; retry the same key
  *   later (honouring `retryAfter`).
@@ -22,22 +21,9 @@ export const IdempotencyCode = {
   IN_PROGRESS: 'IDEMPOTENCY_KEY_IN_PROGRESS',
   EXPIRED: 'IDEMPOTENCY_KEY_EXPIRED',
   PAYLOAD_MISMATCH: 'IDEMPOTENCY_KEY_PAYLOAD_MISMATCH',
-} as const satisfies Record<string, IdempotencyCode>;
+} as const;
 
-/** The control-code union, sourced directly from the CM OpenAPI spec. */
-export type IdempotencyCode = components['schemas']['IdempotencyCode'];
-
-// Compile-time lockstep: the runtime constants above must exactly cover the
-// spec's enum. Regenerating clientManagerSchema.ts after the CM adds, removes,
-// or renames a code breaks this assertion until the constants are updated.
-// Exported only so it counts as "used"; intentionally not re-exported from the
-// package root, so it is not part of the public API.
-type _Equal<A, B> =
-  (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
-type _Assert<T extends true> = T;
-export type _IdempotencyCodeMatchesSpec = _Assert<
-  _Equal<(typeof IdempotencyCode)[keyof typeof IdempotencyCode], IdempotencyCode>
->;
+export type IdempotencyCode = (typeof IdempotencyCode)[keyof typeof IdempotencyCode];
 
 /**
  * Generates a unique idempotency key suitable for the optional `idempotencyKey`
