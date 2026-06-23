@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "vitepress dev .",
-    "build": "pnpm run api && NODE_OPTIONS='--max-old-space-size=4096' vitepress build .",
+    "build": "pnpm run api && NODE_OPTIONS='--max-old-space-size=8192' vitepress build .",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
     "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
     "api": "cd .. && pnpm --filter @nosana/kit exec typedoc",
