@@ -8,7 +8,18 @@ include:
 
 docs:build:
   stage: build
+  # The docs build (vitepress + twoslash) peaks at ~3.6 GB and is CPU-heavy.
+  # Give it explicit headroom; the heap cap in docs/package.json is sized to fit
+  # under this memory limit. Ignored if the runner disallows resource overwrite.
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
+    KUBERNETES_CPU_LIMIT: "4"
+    KUBERNETES_MEMORY_REQUEST: "8Gi"
+    KUBERNETES_MEMORY_LIMIT: "8Gi"
   script:
+    # Diagnostic: surface the pod's actual cgroup limits so the real constraint
+    # is visible in the log if the build still struggles.
+    - 'echo "=== pod limits: mem.max=$(cat /sys/fs/cgroup/memory.max 2>/dev/null || cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>/dev/null || echo unknown) cpus=$(nproc 2>/dev/null || echo unknown) ==="'
     - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" packages/kit/package.json
     - pnpm install --frozen-lockfile
     - pnpm --filter @nosana/kit run build:with-deps
