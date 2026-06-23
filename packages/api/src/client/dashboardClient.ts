@@ -3,12 +3,18 @@ import createClient, { type Middleware } from 'openapi-fetch';
 import { defaultConfig } from '../defaults/index.js';
 
 import type { paths } from './schema.js';
+import type { JobsBatchPaths } from './jobsBatch.js';
 import type { AuthenticatedClient, AuthenticatedPaths } from './type.utils.js';
 import type { NosanaNetwork, ApiKeyAuth, SignerAuth, CreateNosanaApiOptions } from '../types.js';
 
 export type * from './schema.js';
+export type * from './jobsBatch.js';
 
-export type QueryClient = AuthenticatedClient<paths>;
+// The dashboard proxies the client-manager batch endpoints, which the generated
+// dashboard `schema` does not (yet) describe — merge them in so they are typed.
+type DashboardPaths = paths & JobsBatchPaths;
+
+export type QueryClient = AuthenticatedClient<DashboardPaths>;
 
 export function createNosanaDashboardApiClient(
   environment: NosanaNetwork,
@@ -31,7 +37,7 @@ export function createNosanaDashboardApiClient(
     }
   };
 
-  const client = createClient<AuthenticatedPaths<paths>>({
+  const client = createClient<AuthenticatedPaths<DashboardPaths>>({
     baseUrl: backend_url,
     ...(options?.include_credentials ? { credentials: 'include' } : {}),
   });

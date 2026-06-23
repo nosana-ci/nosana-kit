@@ -4,6 +4,7 @@ import type { QueryClient } from '../../client/index.js';
 import type {
   NosanaJobsApi,
   NosanaJobActionOptions,
+  NosanaJobBatchOptions,
   NosanaApiExtendJobRequest,
   NosanaApiExtendJobResponse,
   NosanaApiStopJobRequest,
@@ -11,7 +12,11 @@ import type {
   NosanaApiGetJobByAddressRequest,
   NosanaApiGetJobByAddressResponse,
   NosanaApiListJobRequest,
-  NosanaApiListJobResponse
+  NosanaApiListJobResponse,
+  NosanaApiListJobBatchRequest,
+  NosanaApiExtendJobBatchRequest,
+  NosanaApiStopJobBatchRequest,
+  NosanaApiJobsBatchResponse
 } from './types.js';
 
 export * from './types.js';
@@ -82,6 +87,42 @@ export function createNosanaJobsApi(client: QueryClient): NosanaJobsApi {
 
       if (error || !data) {
         throw errorFormatter('Failed to stop job', error, response);
+      }
+
+      return data;
+    },
+    async listBatch(request: NosanaApiListJobBatchRequest, options: NosanaJobBatchOptions): Promise<NosanaApiJobsBatchResponse> {
+      const { data, error, response } = await client.POST('/api/jobs/list/batch', {
+        body: request,
+        headers: { 'Idempotency-Key': options.idempotencyKey },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to list job batch', error, response);
+      }
+
+      return data;
+    },
+    async extendBatch(request: NosanaApiExtendJobBatchRequest, options: NosanaJobBatchOptions): Promise<NosanaApiJobsBatchResponse> {
+      const { data, error, response } = await client.POST('/api/jobs/extend/batch', {
+        body: request,
+        headers: { 'Idempotency-Key': options.idempotencyKey },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to extend job batch', error, response);
+      }
+
+      return data;
+    },
+    async stopBatch(request: NosanaApiStopJobBatchRequest, options: NosanaJobBatchOptions): Promise<NosanaApiJobsBatchResponse> {
+      const { data, error, response } = await client.POST('/api/jobs/stop/batch', {
+        body: request,
+        headers: { 'Idempotency-Key': options.idempotencyKey },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to stop job batch', error, response);
       }
 
       return data;

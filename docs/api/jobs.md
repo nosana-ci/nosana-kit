@@ -293,6 +293,137 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/{address}/stop \
 
 :::
 
+## Batch Operations
+
+Post, extend, or stop **many jobs in one request**, packed into the fewest
+transactions. Unlike the single-job calls, batch endpoints **require** an
+`Idempotency-Key` header (one key per batch) — the request is rejected with
+`400` if it is missing.
+
+Every batch returns per-item results addressed by request `index`:
+
+```json
+{
+  "items": [
+    { "index": 0, "status": "confirmed", "job": "job-address", "run": "run-address" },
+    { "index": 1, "status": "expired" }
+  ]
+}
+```
+
+- `confirmed` — the item landed (its `job`/`run` are included for posts).
+- `expired` — the item did not land; **re-post only those items under a fresh key**.
+
+If a batch is still confirming you'll get a `409 IDEMPOTENCY_KEY_IN_PROGRESS` —
+retry with the **same** batch key; items that already landed stay landed. See
+[Control responses](#control-responses) for the error contract.
+
+### Batch Post
+
+:::tabs
+
+== @nosana/kit
+
+```ts
+import { generateIdempotencyKey } from '@nosana/kit';
+
+const result = await client.api.jobs.listBatch(
+  {
+    jobs: [
+      { ipfsHash: 'QmJobDefinitionA', market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ', timeout: 3600 },
+      { ipfsHash: 'QmJobDefinitionB', market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ' },
+    ],
+  },
+  { idempotencyKey: generateIdempotencyKey() }, // required
+);
+
+const expired = result.items.filter((i) => i.status === 'expired');
+// re-post `expired` under a fresh key
+```
+
+== HTTP API
+
+```bash
+# The Idempotency-Key header is REQUIRED for batch endpoints (400 if omitted).
+curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list/batch \
+  -H "Authorization: Bearer nos_xxx_your_api_key" \
+  -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jobs": [
+      { "ipfsHash": "QmJobDefinitionA", "market": "CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ", "timeout": 3600 },
+      { "ipfsHash": "QmJobDefinitionB", "market": "CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ" }
+    ]
+  }'
+```
+
+:::
+
+### Batch Extend
+
+:::tabs
+
+== @nosana/kit
+
+```ts
+const result = await client.api.jobs.extendBatch(
+  {
+    jobs: [
+      { jobAddress: 'job-address-1', seconds: 3600 },
+      { jobAddress: 'job-address-2', seconds: 600 },
+    ],
+  },
+  { idempotencyKey: generateIdempotencyKey() }, // required
+);
+```
+
+== HTTP API
+
+```bash
+curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/extend/batch \
+  -H "Authorization: Bearer nos_xxx_your_api_key" \
+  -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jobs": [
+      { "jobAddress": "job-address-1", "seconds": 3600 },
+      { "jobAddress": "job-address-2", "seconds": 600 }
+    ]
+  }'
+```
+
+:::
+
+### Batch Stop
+
+:::tabs
+
+== @nosana/kit
+
+```ts
+const result = await client.api.jobs.stopBatch(
+  { jobs: [{ jobAddress: 'job-address-1' }, { jobAddress: 'job-address-2' }] },
+  { idempotencyKey: generateIdempotencyKey() }, // required
+);
+```
+
+== HTTP API
+
+```bash
+curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/stop/batch \
+  -H "Authorization: Bearer nos_xxx_your_api_key" \
+  -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jobs": [
+      { "jobAddress": "job-address-1" },
+      { "jobAddress": "job-address-2" }
+    ]
+  }'
+```
+
+:::
+
 ## Job States
 
 Jobs progress through the following states:

@@ -550,6 +550,7 @@ export type {
   // Job API types
   NosanaJobsApi,
   NosanaJobActionOptions,
+  NosanaJobBatchOptions,
   NosanaApiListJobRequest,
   NosanaApiListJobResponse,
   NosanaApiGetJobByAddressRequest,
@@ -558,6 +559,11 @@ export type {
   NosanaApiExtendJobResponse,
   NosanaApiStopJobRequest,
   NosanaApiStopJobResponse,
+  NosanaApiListJobBatchRequest,
+  NosanaApiExtendJobBatchRequest,
+  NosanaApiStopJobBatchRequest,
+  NosanaApiJobsBatchResponse,
+  NosanaApiJobsBatchItem,
   // Credits API types
   NosanaCreditsApi,
   Balance,

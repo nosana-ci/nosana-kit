@@ -136,4 +136,59 @@ describe('createNosanaJobsApi', () => {
       expect(options.headers).toEqual({ 'Idempotency-Key': 'idem-stop-1' });
     });
   });
+
+  describe('batch', () => {
+    const BATCH_RESPONSE = {
+      items: [
+        { index: 0, status: 'confirmed', job: 'JobAddr1', run: 'RunAddr1' },
+        { index: 1, status: 'expired' },
+      ],
+    };
+
+    it('listBatch posts to the batch endpoint with the required Idempotency-Key and returns items', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: BATCH_RESPONSE, error: null });
+
+      const api = createNosanaJobsApi(global.TEST_MOCK_CLIENT);
+      const request = { jobs: [{ ipfsHash: 'Qm...', market: 'MarketAddr' }] };
+      const result = await api.listBatch(request, { idempotencyKey: 'batch-list-1' });
+
+      const [path, options] = (global.TEST_MOCK_CLIENT.POST as Mock).mock.calls[0];
+      expect(path).toEqual('/api/jobs/list/batch');
+      expect(options.body).toEqual(request);
+      expect(options.headers).toEqual({ 'Idempotency-Key': 'batch-list-1' });
+      expect(result).toEqual(BATCH_RESPONSE);
+    });
+
+    it('extendBatch posts to the batch endpoint with the key', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: BATCH_RESPONSE, error: null });
+
+      const api = createNosanaJobsApi(global.TEST_MOCK_CLIENT);
+      await api.extendBatch({ jobs: [{ jobAddress: 'JobAddr1', seconds: 600 }] }, { idempotencyKey: 'batch-extend-1' });
+
+      const [path, options] = (global.TEST_MOCK_CLIENT.POST as Mock).mock.calls[0];
+      expect(path).toEqual('/api/jobs/extend/batch');
+      expect(options.headers).toEqual({ 'Idempotency-Key': 'batch-extend-1' });
+    });
+
+    it('stopBatch posts to the batch endpoint with the key', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: BATCH_RESPONSE, error: null });
+
+      const api = createNosanaJobsApi(global.TEST_MOCK_CLIENT);
+      await api.stopBatch({ jobs: [{ jobAddress: 'JobAddr1' }] }, { idempotencyKey: 'batch-stop-1' });
+
+      const [path, options] = (global.TEST_MOCK_CLIENT.POST as Mock).mock.calls[0];
+      expect(path).toEqual('/api/jobs/stop/batch');
+      expect(options.headers).toEqual({ 'Idempotency-Key': 'batch-stop-1' });
+    });
+
+    test('when an error is returned, it should throw a formatted error', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: null, error: { message: 'Idempotency-Key required' } });
+
+      const api = createNosanaJobsApi(global.TEST_MOCK_CLIENT);
+
+      await expect(
+        api.listBatch({ jobs: [] }, { idempotencyKey: 'batch-list-err' }),
+      ).rejects.toThrow('Failed to list job batch');
+    });
+  });
 });

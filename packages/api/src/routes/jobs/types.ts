@@ -1,5 +1,22 @@
 import { operations } from "../../client/schema.js";
 
+import type {
+  NosanaApiListJobBatchRequest,
+  NosanaApiExtendJobBatchRequest,
+  NosanaApiStopJobBatchRequest,
+  NosanaApiJobsBatchResponse,
+  NosanaApiJobsBatchItem,
+} from '../../client/jobsBatch.js';
+
+// Re-export the batch wire types as part of the public API surface.
+export type {
+  NosanaApiListJobBatchRequest,
+  NosanaApiExtendJobBatchRequest,
+  NosanaApiStopJobBatchRequest,
+  NosanaApiJobsBatchResponse,
+  NosanaApiJobsBatchItem,
+};
+
 // Request types from OpenAPI
 export type NosanaApiGetJobByAddressRequest = operations['getApiJobsByAddress']['parameters']['path']['address'];
 export type NosanaApiListJobRequest = operations['postApiJobsList']['requestBody']['content']['application/json'];
@@ -23,9 +40,21 @@ export interface NosanaJobActionOptions {
   idempotencyKey?: string;
 }
 
+export interface NosanaJobBatchOptions {
+  /**
+   * Idempotency key for the batch (one key per batch). **Required** — the batch
+   * endpoints reject the request with `400` if it is omitted. Reuse the same key
+   * when retrying the batch; already-landed items stay landed.
+   */
+  idempotencyKey: string;
+}
+
 export interface NosanaJobsApi {
   get: (request: NosanaApiGetJobByAddressRequest) => Promise<NosanaApiGetJobByAddressResponse>;
   list: (request: NosanaApiListJobRequest, options?: NosanaJobActionOptions) => Promise<NosanaApiListJobResponse>;
   extend: (request: NosanaApiExtendJobRequest, options?: NosanaJobActionOptions) => Promise<NosanaApiExtendJobResponse>;
   stop: (request: NosanaApiStopJobRequest, options?: NosanaJobActionOptions) => Promise<NosanaApiStopJobResponse>;
+  listBatch: (request: NosanaApiListJobBatchRequest, options: NosanaJobBatchOptions) => Promise<NosanaApiJobsBatchResponse>;
+  extendBatch: (request: NosanaApiExtendJobBatchRequest, options: NosanaJobBatchOptions) => Promise<NosanaApiJobsBatchResponse>;
+  stopBatch: (request: NosanaApiStopJobBatchRequest, options: NosanaJobBatchOptions) => Promise<NosanaApiJobsBatchResponse>;
 }
