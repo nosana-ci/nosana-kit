@@ -1,361 +1,430 @@
 # API Endpoints
 
-Complete reference for the `@nosana/api` SDK route groups and their corresponding service endpoints.
+Complete reference for the `@nosana/api` SDK route groups and the prd service endpoints they map to. Generated from the live prd OpenAPI specs.
+
+Every service is called **directly** (no dashboard proxy). The SDK exposes curated, ergonomic methods for the consumer- and node-facing routes (below), and the **raw typed clients** for everything else.
 
 ## Clients
 
-| Client | Framework | Base URL (mainnet) | Swagger | Schema status |
-|---|---|---|---|---|
-| **Blockchain Indexer** | Elysia | `https://blockchain-indexer.k8s.prd.nos.ci` | `/swagger` | ✅ Generated from swagger |
-| **Client Manager** | Elysia | `https://client-manager.k8s.prd.nosana.com` | `/swagger` | ✅ Generated from swagger |
-| **Deployment Manager** | Fastify | `https://deployment-manager.k8s.prd.nos.ci` | `/documentation/json` | ✅ Generated from swagger |
-| **Host Manager** | Elysia | `https://host-manager.k8s.prd.nosana.com` | `/swagger` | ✅ Generated from swagger |
+| Client | Framework | Base URL (mainnet) | Swagger |
+|---|---|---|---|
+| **Blockchain Indexer** | Elysia | `https://blockchain-indexer.k8s.prd.nos.ci` | `/swagger/json` |
+| **Client Manager** | Elysia | `https://client-manager.k8s.prd.nosana.com` | `/swagger/json` |
+| **Deployment Manager** | Fastify | `https://deployment-manager.k8s.prd.nos.ci` | `/documentation/json` |
+| **Host Manager** | Elysia | `https://host-manager.k8s.prd.nosana.com` | `/swagger/json` |
+
+> Client Manager & Host Manager run on `*.nosana.com`; Blockchain Indexer & Deployment Manager on `*.nos.ci`. Dev uses the `.dev.` variants; localnet uses `localhost:{3002,3003,3001,3004}`.
+
+## Raw typed clients (`api.clients`)
+
+Any endpoint not wrapped by a curated method below is still reachable — fully typed — through the underlying per-service `openapi-fetch` clients, with auth applied automatically:
+
+```ts
+const api = createNosanaApi(network, auth);
+
+api.clients.clientManager     // every Client Manager route
+api.clients.hostManager       // every Host Manager route (incl. admin)
+api.clients.blockchainIndexer // every Blockchain Indexer route
+api.clients.deploymentManager // every Deployment Manager route
+
+// e.g. an admin route not exposed as a curated method:
+await api.clients.hostManager.POST('/nodes/ban', { body: { /* typed */ } });
+```
+
+Path, params and response are all type-checked against the generated schema.
 
 ---
 
 ## SDK Route Groups
+
+All groups are wired into `createNosanaApi()`.
 
 ### `auth` — Authentication
 **Client:** Client Manager
 
 | SDK method | HTTP | Path | Description |
 |---|---|---|---|
-| `signMessage()` | POST | `/auth/sign-message/external` | Sign message for external service auth |
-| `validateSession()` | POST | `/auth/validate-session` | Validate SuperTokens session |
-| `validateApiKey()` | POST | `/auth/validate-api-key` | Validate API key |
+| `auth.signMessage()` | POST | `/auth/sign-message/external` | Sign message for external service authentication |
+| `auth.validateApiKey()` | POST | `/auth/validate-api-key` | Validate API key |
+| `auth.validateSession()` | POST | `/auth/validate-session` | Validate session |
 
 ### `user` — API Keys
 **Client:** Client Manager
 
 | SDK method | HTTP | Path | Description |
 |---|---|---|---|
-| `apiKeys.create()` | POST | `/api-keys/` | Create API key |
-| `apiKeys.list()` | GET | `/api-keys/` | List user's API keys |
-| `apiKeys.get()` | GET | `/api-keys/{id}` | Get API key by ID |
-| `apiKeys.update()` | POST | `/api-keys/{id}/update` | Update API key |
-| `apiKeys.delete()` | POST | `/api-keys/{id}/delete` | Delete API key |
+| `user.apiKeys.create()` | POST | `/api-keys/` | Create API Key |
+| `user.apiKeys.delete()` | POST | `/api-keys/{id}/delete` | Delete API Key |
+| `user.apiKeys.get()` | GET | `/api-keys/{id}` | Get API Key |
+| `user.apiKeys.list()` | GET | `/api-keys/` | Get API Keys |
+| `user.apiKeys.update()` | POST | `/api-keys/{id}/update` | Update API Key |
 
 ### `jobs` — Job Operations
-**Clients:** Blockchain Indexer (reads) + Client Manager (writes)
+**Client:** Blockchain Indexer (reads) + Client Manager (writes)
 
-| SDK method | HTTP | Service | Path | Description |
-|---|---|---|---|---|
-| `get()` | GET | Blockchain Indexer | `/jobs/{address}` | Get job by address |
-| `getAll()` | GET | Blockchain Indexer | `/jobs/` | Query jobs (filter by state, market, node, poster, payer) |
-| `list()` | POST | Client Manager | `/jobs/list` | Create a job using credits |
-| `extend()` | POST | Client Manager | `/jobs/{address}/extend` | Extend job duration using credits |
-| `stop()` | POST | Client Manager | `/jobs/{address}/stop` | Stop a job (refund remaining credits) |
-| `getRunning()` | GET | Blockchain Indexer | `/jobs/running` | Running jobs count per market |
-| `getRunningNodes()` | GET | Blockchain Indexer | `/jobs/running-nodes` | Running nodes for a market |
-| `getLongRunning()` | GET | Blockchain Indexer | `/jobs/long-running` | Long-running jobs |
-| `getStats()` | GET | Blockchain Indexer | `/jobs/stats` | Aggregated job statistics |
-| `getStatsTimestamps()` | GET | Blockchain Indexer | `/jobs/stats/timestamps` | Job timestamps |
-| `getCount()` | GET | Blockchain Indexer | `/jobs/count` | Count jobs by state |
-| `getBatch()` | POST | Blockchain Indexer | `/jobs/batch` | Get jobs by addresses (max 100) |
+| SDK method | HTTP | Path | Description |
+|---|---|---|---|
+| `jobs.extend()` | POST | `/jobs/{address}/extend` | Extend a job using credits |
+| `jobs.extendBatch()` | POST | `/jobs/extend/batch` | Bulk-extend jobs using credits |
+| `jobs.get()` | GET | `/jobs/{address}` | Get job by address |
+| `jobs.getAll()` | GET | `/jobs/` | List jobs |
+| `jobs.getBatch()` | POST | `/jobs/batch` | Get jobs by addresses |
+| `jobs.getCount()` | GET | `/jobs/count` | Count jobs |
+| `jobs.getLongRunning()` | GET | `/jobs/long-running` | Get long-running jobs |
+| `jobs.getRunning()` | GET | `/jobs/running` | Get running jobs count per market |
+| `jobs.getRunningNodes()` | GET | `/jobs/running-nodes` | Get running nodes for a market |
+| `jobs.getStats()` | GET | `/jobs/stats` | Get job statistics |
+| `jobs.getStatsTimestamps()` | GET | `/jobs/stats/timestamps` | Get job timestamps |
+| `jobs.getStatsTimestampsHours()` | GET | `/jobs/stats/timestamps-hours` | Get GPU compute hours over time |
+| `jobs.list()` | POST | `/jobs/list` | Create a job using credits |
+| `jobs.listBatch()` | POST | `/jobs/list/batch` | Bulk-create jobs using credits |
+| `jobs.stop()` | POST | `/jobs/{address}/stop` | Stop a job paid with credits |
+| `jobs.stopBatch()` | POST | `/jobs/stop/batch` | Bulk-stop jobs using credits |
 
 ### `credits` — Credit Balance & Management
 **Client:** Client Manager
 
 | SDK method | HTTP | Path | Description |
 |---|---|---|---|
-| `balance()` | GET | `/credits/balance` | Get user's credit balance |
-| `claim()` | POST | `/credits/claim` | Claim a credit code |
-| `request()` | POST | `/credits/request` | Request free credits |
-| `checkEligibility()` | GET | `/credits/request/eligibility` | Check free credit eligibility |
-| `invitations.get()` | GET | `/credits/invitations/{token}` | Get invitation details (public) |
-| `invitations.claim()` | POST | `/credits/invitations/{token}/claim` | Claim invitation credits |
+| `credits.balance()` | GET | `/credits/balance` | Get credit balance |
+| `credits.checkEligibility()` | GET | `/credits/request/eligibility` | Check credit request eligibility |
+| `credits.claim()` | POST | `/credits/claim` | Claim a credit code |
+| `credits.getSpendingHistory()` | GET | `/credits/spending-history` | Get credit spending history |
+| `credits.getTransactions()` | GET | `/credits/transactions` | List credit transactions |
+| `credits.invitations.claim()` | POST | `/credits/invitations/{token}/claim` | Claim a credit invitation |
+| `credits.invitations.get()` | GET | `/credits/invitations/{token}` | Get invitation by token |
+| `credits.request()` | POST | `/credits/request` | Request free credits |
 
 ### `markets` — GPU Markets & Pricing
 **Client:** Host Manager
 
 | SDK method | HTTP | Path | Description |
 |---|---|---|---|
-| `get()` | GET | `/markets/{id}` | Get market by ID |
-| `list()` | GET | `/markets/` | List all markets |
-| `getRequiredResources()` | GET | `/markets/{id}/required-resources` | Get required resources for a market |
-| `getPrices()` | GET | `/markets/prices` | All market prices |
-| `getPrice()` | GET | `/markets/price` | Current NOS token price (USD) |
-| `getGpuTypes()` | GET | `/markets/gpu-types` | List GPU types |
-| `getDockerImages()` | GET | `/markets/docker-images` | List Docker images |
+| `markets.get()` | GET | `/markets/{id}` |  |
+| `markets.getDockerImage()` | GET | `/markets/docker-images/{id}` |  |
+| `markets.getDockerImages()` | GET | `/markets/docker-images` |  |
+| `markets.getPrice()` | GET | `/markets/price` | Get current NOS token price in USD |
+| `markets.getPrices()` | GET | `/markets/prices` |  |
+| `markets.getRemoteResource()` | GET | `/markets/remote-resources/{id}` |  |
+| `markets.getRemoteResources()` | GET | `/markets/remote-resources` |  |
+| `markets.getRequiredResources()` | GET | `/markets/{id}/required-resources` |  |
+| `markets.list()` | GET | `/markets/` |  |
 
 ### `deployments` — Deployment Lifecycle
 **Client:** Deployment Manager
 
 | SDK method | HTTP | Path | Description |
 |---|---|---|---|
-| `create()` | POST | `/api/deployments/create` | Create new deployment |
-| `get()` | GET | `/api/deployments/{deployment}` | Get deployment by ID |
-| `list()` | GET | `/api/deployments` | List all deployments |
-| `pipe()` | — | — | Chain operations on a deployment |
-| _deployment_.`start()` | POST | `/api/deployments/{deployment}/start` | Start deployment |
-| _deployment_.`stop()` | POST | `/api/deployments/{deployment}/stop` | Stop deployment |
-| _deployment_.`archive()` | POST | `/api/deployments/{deployment}/archive` | Archive deployment |
-| _deployment_.`delete()` | DELETE | `/api/deployments/{deployment}` | Delete deployment |
-| _deployment_.`getTasks()` | GET | `/api/deployments/{deployment}/tasks` | Get scheduled tasks |
-| _deployment_.`getJobs()` | GET | `/api/deployments/{deployment}/jobs` | Get deployment jobs |
-| _deployment_.`getJob()` | GET | `/api/deployments/{deployment}/jobs/{job}` | Get specific job |
-| _deployment_.`getRevisions()` | GET | `/api/deployments/{deployment}/revisions` | Get revisions |
-| _deployment_.`getEvents()` | GET | `/api/deployments/{deployment}/events` | Get events |
-| _deployment_.`createRevision()` | POST | `/api/deployments/{deployment}/create-revision` | Create revision |
-| _deployment_.`updateReplicaCount()` | PATCH | `/api/deployments/{deployment}/update-replica-count` | Update replica count |
-| _deployment_.`updateActiveRevision()` | PATCH | `/api/deployments/{deployment}/update-active-revision` | Switch active revision |
-| _deployment_.`updateTimeout()` | PATCH | `/api/deployments/{deployment}/update-timeout` | Update timeout |
-| _deployment_.`updateSchedule()` | PATCH | `/api/deployments/{deployment}/update-schedule` | Update schedule |
-| _deployment_.`generateAuthHeader()` | GET | `/api/deployments/{deployment}/header` | Get deployment auth header |
-| `getJobDefinition()` | GET | `/api/deployments/jobs/{job}/job-definition` | Get job definition (node-facing) |
-| `submitJobResults()` | POST | `/api/deployments/jobs/{job}/results` | Submit job results (node-facing) |
-| `vaults.create()` | POST | `/api/deployments/vaults/create` | Create shared vault |
-| `vaults.list()` | GET | `/api/deployments/vaults` | List vaults |
-| _vault_.`topup()` | — | — | Transfer SOL/NOS to vault (Solana tx) |
-| _vault_.`withdraw()` | POST | `/api/deployments/vaults/{vault}/withdraw` | Withdraw from vault |
-| _vault_.`getBalance()` | — | — | Get vault SOL/NOS balance (Solana RPC) |
+| `deployments.create()` | POST | `/deployments/create` | Create a new deployment. |
+| `deployments.get()` | GET | `/deployments/{deployment}` | Get a specific deployment by ID. |
+| `deployments.getJobDefinition()` | GET | `/deployments/jobs/{job}/job-definition` | Returns the job definition for a job. |
+| `deployments.list()` | GET | `/deployments` | List all user deployments. |
+| `deployments.pipe().archive()` | POST | `/deployments/{deployment}/archive` | Archive a deployment |
+| `deployments.pipe().createRevision()` | POST | `/deployments/{deployment}/create-revision` | Create a new deployment revision. |
+| `deployments.pipe().delete()` | DELETE | `/deployments/{deployment}` | Delete a deployment permanently |
+| `deployments.pipe().generateAuthHeader()` | GET | `/deployments/{deployment}/header` | Get header for a specific deployment. |
+| `deployments.pipe().getEvents()` | GET | `/deployments/{deployment}/events` | Get events for a specific deployment. |
+| `deployments.pipe().getJob()` | GET | `/deployments/{deployment}/jobs/{job}` | Get a specific deployment job by ID. |
+| `deployments.pipe().getJobs()` | GET | `/deployments/{deployment}/jobs` | Get jobs for a specific deployment. |
+| `deployments.pipe().getRevisions()` | GET | `/deployments/{deployment}/revisions` | Get revisions for a specific deployment. |
+| `deployments.pipe().getTasks()` | GET | `/deployments/{deployment}/tasks` | Get scheduled tasks for a specific deployment. |
+| `deployments.pipe().start()` | POST | `/deployments/{deployment}/start` | Start an existing deployment. |
+| `deployments.pipe().stop()` | POST | `/deployments/{deployment}/stop` | Stop a deployment |
+| `deployments.pipe().updateActiveRevision()` | PATCH | `/deployments/{deployment}/update-active-revision` | Update deployment active revision. |
+| `deployments.pipe().updateName()` | PATCH | `/deployments/{deployment}/update-name` | Update the name of a deployment |
+| `deployments.pipe().updateReplicaCount()` | PATCH | `/deployments/{deployment}/update-replica-count` | Update the replica count of a deployment |
+| `deployments.pipe().updateSchedule()` | PATCH | `/deployments/{deployment}/update-schedule` | Update deployment schedule. |
+| `deployments.pipe().updateTimeout()` | PATCH | `/deployments/{deployment}/update-timeout` | Update deployment timeout |
+| `deployments.submitJobResults()` | POST | `/deployments/jobs/{job}/results` | Post results for your running job. |
+| `deployments.vaults.create()` | POST | `/deployments/vaults/create` | Create a shared vault. |
+| `deployments.vaults.list()` | GET | `/deployments/vaults` | List all user vaults. |
+| `deployments.vaults.pipe().withdraw()` | POST | `/deployments/vaults/{vault}/withdraw` | Withdraw from a vault. |
 
 ### `templates` — Deployment Templates
 **Client:** Client Manager
 
 | SDK method | HTTP | Path | Description |
 |---|---|---|---|
-| `list()` | GET | `/templates/` | List all templates |
-| `getAllGrouped()` | GET | `/templates/grouped` | Templates grouped by category |
-| `get()` | GET | `/templates/{id}` | Get template by ID |
-| `getVariant()` | GET | `/templates/{id}/{variantId}` | Get template variant |
+| `templates.get()` | GET | `/templates/{id}` | Get template by ID |
+| `templates.getAllGrouped()` | GET | `/templates/grouped` | Get templates grouped by category |
+| `templates.getVariant()` | GET | `/templates/{id}/{variantId}` | Get template variant |
+| `templates.list()` | GET | `/templates/` | List all templates |
 
 ### `hosts` — Nodes & GPU Hosts
 **Client:** Host Manager
 
 | SDK method | HTTP | Path | Description |
 |---|---|---|---|
-| `list()` | GET | `/nodes/` | List all nodes |
-| `get()` | GET | `/nodes/{id}` | Get node details |
-| `getSpecs()` | GET | `/nodes/{id}/specs` | Get node system specs |
-| `getAvailableGpus()` | GET | `/nodes/available-gpus` | Available GPU types |
-| `getStats()` | GET | `/nodes/stats` | Node statistics |
-| `getQueuedNodes()` | GET | `/nodes/queued-nodes` | Queued nodes for market |
-| `getUptime()` | GET | `/nodes/heartbeats/uptime/{node}` | Node uptime percentage |
-| `getByCountry()` | GET | `/stats/nodes-country` | Node distribution by country |
-| `getAvailableHosts()` | GET | `/hosts/` | Available hosts matching filter criteria |
-| `getFilters()` | GET | `/hosts/filters` | GPU filter options |
-| `getBenchmarkReport()` | GET | `/benchmarks/node-report` | Node benchmark report |
-| `getTemplatePerformance()` | GET | `/benchmarks/node-template-performance/{nodeId}` | Node template performance |
-| `getBenchmarkSummary()` | GET | `/benchmarks/markets/benchmark-summary` | Per-market benchmark summary |
+| `hosts.get()` | GET | `/nodes/{id}` |  |
+| `hosts.getAvailableGpus()` | GET | `/nodes/available-gpus` |  |
+| `hosts.getByCountry()` | GET | `/stats/nodes-country` |  |
+| `hosts.getFull()` | GET | `/nodes/{id}/full` |  |
+| `hosts.getInfo()` | GET | `/nodes/{id}/info` |  |
+| `hosts.getMarketRelation()` | GET | `/nodes/market-relation` |  |
+| `hosts.getMetrics()` | GET | `/nodes/{id}/metrics` |  |
+| `hosts.getMinimumRequiredVersion()` | GET | `/nodes/minimum-required-version` |  |
+| `hosts.getQueuedNodes()` | GET | `/nodes/queued-nodes` |  |
+| `hosts.getRecentBenchmarks()` | GET | `/nodes/{id}/recent-benchmarks` |  |
+| `hosts.getRequestMarket()` | GET | `/nodes/request-market` |  |
+| `hosts.getRewards()` | GET | `/nodes/rewards` |  |
+| `hosts.getRewardsById()` | GET | `/nodes/{id}/rewards` |  |
+| `hosts.getUptime()` | GET | `/nodes/heartbeats/uptime/{node}` |  |
+| `hosts.getWithAccess()` | GET | `/nodes/with-access` |  |
+| `hosts.heartbeat()` | POST | `/nodes/heartbeat` |  |
+| `hosts.list()` | GET | `/nodes/` |  |
+| `hosts.payment()` | POST | `/nodes/payment` |  |
+| `hosts.postMetrics()` | POST | `/nodes/{id}/metrics` |  |
+| `hosts.register()` | POST | `/nodes/register` |  |
+| `hosts.syncNode()` | POST | `/nodes/sync-node` |  |
+| `hosts.updateAddress()` | PATCH | `/nodes/{id}/address` |  |
+| `hosts.updateContact()` | PATCH | `/nodes/{id}/contact` |  |
 
 ### `stats` — Statistics & Analytics
 **Client:** Blockchain Indexer
 
 | SDK method | HTTP | Path | Description |
 |---|---|---|---|
-| `get()` | GET | `/stats/` | Latest aggregated statistics |
-| `getPrice()` | GET | `/stats/price` | NOS token price |
-| `getSpendingHistory()` | GET | `/stats/spending-history` | Spending history |
-| `getEarningHistory()` | GET | `/stats/earning-history` | Node earnings history |
+| `stats.get()` | GET | `/stats/` | Get the latest statistics |
+| `stats.getEarningHistory()` | GET | `/stats/earning-history` | Flexible endpoint to retrieve earning history of node with custom date |
+| `stats.getPrice()` | GET | `/stats/price` | Get NOS price for a date or timestamp |
+| `stats.getSpendingHistory()` | GET | `/stats/spending-history` | Flexible endpoint to retrieve spending history with custom date ranges |
+
+### `payments` — Payment Methods & Purchases
+**Client:** Client Manager
+
+| SDK method | HTTP | Path | Description |
+|---|---|---|---|
+| `payments.addMethod()` | POST | `/payments/setup-intent` | Add payment method |
+| `payments.createPaymentIntent()` | POST | `/payments/payment-intent` | Create PaymentIntent |
+| `payments.deleteMethod()` | DELETE | `/payments/methods/{id}` | Delete payment method |
+| `payments.listMethods()` | GET | `/payments/methods` | List payment methods |
+| `payments.listPurchases()` | GET | `/payments/purchases` | List credit purchases |
+| `payments.setDefaultMethod()` | PUT | `/payments/methods/{id}/default` | Set default payment method |
+
+### `newsletter` — Newsletter
+**Client:** Client Manager
+
+| SDK method | HTTP | Path | Description |
+|---|---|---|---|
+| `newsletter.subscribe()` | POST | `/newsletter/subscribe` | Subscribe To Newsletter |
+
+### `benchmarks` — Benchmark Data & Node Benchmarks
+**Client:** Host Manager
+
+| SDK method | HTTP | Path | Description |
+|---|---|---|---|
+| `benchmarks.getMarketMetricAggregates()` | GET | `/benchmarks/market-metric-aggregates` |  |
+| `benchmarks.getMarketThresholds()` | GET | `/benchmarks/market-thresholds` |  |
+| `benchmarks.getMetricProcessors()` | GET | `/benchmarks/metric-processors` |  |
+| `benchmarks.getMetrics()` | GET | `/benchmarks/metrics` |  |
+| `benchmarks.getOperations()` | GET | `/benchmarks/operations` |  |
+| `benchmarks.getPrediction()` | POST | `/benchmarks/{id}/prediction` |  |
+| `benchmarks.getRecent()` | GET | `/benchmarks/recent` |  |
+| `benchmarks.getTemplatesConfig()` | GET | `/benchmark-templates/config` | Current stored benchmark templates — operations + metrics + their thre |
+| `benchmarks.getTemplatesRefresh()` | GET | `/benchmark-templates/refresh` | Preview the benchmark template diff against stored github operations ( |
+| `benchmarks.getThresholds()` | GET | `/benchmarks/thresholds` |  |
+| `benchmarks.getVersion()` | GET | `/benchmarks/benchmark-version` |  |
+| `benchmarks.seed()` | POST | `/benchmarks/{id}/seed` |  |
+| `benchmarks.submitResults()` | POST | `/benchmarks/{id}/submit-results` |  |
 
 ---
 
-## All Endpoints by Service
+## All prd endpoints by service
+
+Legend: a method name = exposed as a curated SDK method; **—** = reachable only via the raw `api.clients.<service>` client (admin/ops/infra).
 
 ### Blockchain Indexer
 
-| Method | Path | Description | SDK Group |
+| Method | Path | Description | SDK |
 |---|---|---|---|
-| GET | `/health` | Health check | — |
-| **Jobs** | | | |
-| GET | `/jobs/` | List jobs (filter by state, market, node, poster, payer) | `jobs.getAll()` |
+| GET | `/health` |  | — |
+| GET | `/jobs/` | List jobs | `jobs.getAll()` |
 | GET | `/jobs/{address}` | Get job by address | `jobs.get()` |
-| GET | `/jobs/running` | Running jobs count per market | `jobs.getRunning()` |
-| GET | `/jobs/running-nodes` | Running nodes for a market | `jobs.getRunningNodes()` |
-| GET | `/jobs/long-running` | Long-running jobs | `jobs.getLongRunning()` |
-| GET | `/jobs/stats` | Aggregated job statistics | `jobs.getStats()` |
-| GET | `/jobs/stats/timestamps` | Job timestamps | `jobs.getStatsTimestamps()` |
-| GET | `/jobs/count` | Count jobs by state | `jobs.getCount()` |
-| POST | `/jobs/batch` | Get jobs by addresses (max 100) | `jobs.getBatch()` |
-| **Stats** | | | |
-| GET | `/stats/` | Latest statistics | `stats.get()` |
-| GET | `/stats/price` | NOS price | `stats.getPrice()` |
-| GET | `/stats/spending-history` | Spending history | `stats.getSpendingHistory()` |
-| GET | `/stats/earning-history` | Node earnings history | `stats.getEarningHistory()` |
+| POST | `/jobs/batch` | Get jobs by addresses | `jobs.getBatch()` |
+| GET | `/jobs/count` | Count jobs | `jobs.getCount()` |
+| GET | `/jobs/long-running` | Get long-running jobs | `jobs.getLongRunning()` |
+| GET | `/jobs/running` | Get running jobs count per market | `jobs.getRunning()` |
+| GET | `/jobs/running-nodes` | Get running nodes for a market | `jobs.getRunningNodes()` |
+| GET | `/jobs/stats` | Get job statistics | `jobs.getStats()` |
+| GET | `/jobs/stats/timestamps` | Get job timestamps | `jobs.getStatsTimestamps()` |
+| GET | `/jobs/stats/timestamps-hours` | Get GPU compute hours over time | `jobs.getStatsTimestampsHours()` |
+| GET | `/metrics` |  | — |
+| GET | `/stats/` | Get the latest statistics | `stats.get()` |
+| GET | `/stats/earning-history` | Flexible endpoint to retrieve earning history of node with custom date | `stats.getEarningHistory()` |
+| GET | `/stats/price` | Get NOS price for a date or timestamp | `stats.getPrice()` |
+| GET | `/stats/spending-history` | Flexible endpoint to retrieve spending history with custom date ranges | `stats.getSpendingHistory()` |
 
 ### Client Manager
 
-| Method | Path | Auth | Description | SDK Group |
-|---|---|---|---|---|
-| GET | `/` | — | Status check | — |
-| GET | `/health` | — | Health check | — |
-| **Auth** | | | | |
-| POST | `/auth/validate-session` | — | Validate SuperTokens session | `auth.validateSession()` |
-| POST | `/auth/validate-api-key` | — | Validate API key | `auth.validateApiKey()` |
-| POST | `/auth/sign-message/external` | Hybrid | Sign message for external service | `auth.signMessage()` |
-| ALL | `/auth/*` | — | SuperTokens proxy | — _(internal)_ |
-| **API Keys** | | | | |
-| POST | `/api-keys/` | Hybrid | Create API key | `user.apiKeys.create()` |
-| GET | `/api-keys/` | Hybrid | List user's API keys | `user.apiKeys.list()` |
-| GET | `/api-keys/{id}` | Hybrid | Get API key | `user.apiKeys.get()` |
-| POST | `/api-keys/{id}/update` | Hybrid | Update API key | `user.apiKeys.update()` |
-| POST | `/api-keys/{id}/delete` | Hybrid | Delete API key | `user.apiKeys.delete()` |
-| **Credits** | | | | |
-| GET | `/credits/balance` | SuperTokens | Get credit balance | `credits.balance()` |
-| POST | `/credits/claim` | SuperTokens | Claim credit code | `credits.claim()` |
-| POST | `/credits/request` | SuperTokens | Request free credits | `credits.request()` |
-| GET | `/credits/request/eligibility` | SuperTokens | Check free credit eligibility | `credits.checkEligibility()` |
-| GET | `/credits/invitations/{token}` | — | Get invitation details | `credits.invitations.get()` |
-| POST | `/credits/invitations/{token}/claim` | SuperTokens | Claim invitation | `credits.invitations.claim()` |
-| GET | `/credits/admin/codes` | Admin | List credit codes | — _(admin)_ |
-| GET | `/credits/admin/accounts` | Admin | List user accounts | — _(admin)_ |
-| GET | `/credits/admin/accounts/{userId}` | Admin | Get user account | — _(admin)_ |
-| POST | `/credits/admin/codes` | Admin | Create credit code | — _(admin)_ |
-| POST | `/credits/admin/codes/{code}/update` | Admin | Update credit code | — _(admin)_ |
-| POST | `/credits/admin/codes/{code}/delete` | Admin | Delete credit code | — _(admin)_ |
-| POST | `/credits/admin/invitations` | Admin | Create invitation | — _(admin)_ |
-| POST | `/credits/admin/invitations/bulk` | Admin | Create bulk invitations | — _(admin)_ |
-| GET | `/credits/admin/user-credit-alert-threshold-usd` | Admin | Get alert threshold | — _(admin)_ |
-| POST | `/credits/admin/user-credit-alert-threshold-usd` | Admin | Set alert threshold | — _(admin)_ |
-| GET | `/credits/admin/request/config` | Admin | Get free credit request config | — _(admin)_ |
-| POST | `/credits/admin/request/config` | Admin | Set free credit request config | — _(admin)_ |
-| **Jobs** | | | | |
-| POST | `/jobs/list` | Hybrid | Create job using credits | `jobs.list()` |
-| POST | `/jobs/{address}/extend` | Hybrid | Extend job using credits | `jobs.extend()` |
-| POST | `/jobs/{address}/stop` | Hybrid | Stop job (refund credits) | `jobs.stop()` |
-| **Templates** | | | | |
-| GET | `/templates/` | — | List all templates | `templates.list()` |
-| GET | `/templates/grouped` | — | Templates grouped by category | `templates.getAllGrouped()` |
-| GET | `/templates/{id}` | — | Get template by ID | `templates.get()` |
-| GET | `/templates/{id}/{variantId}` | — | Get template variant | `templates.getVariant()` |
-| **Tracker** | | | | |
-| GET | `/tracker/` | Admin | List tracked wallets | — _(admin)_ |
-| POST | `/tracker/` | Admin | Add tracked wallet | — _(admin)_ |
-| POST | `/tracker/{name}/update` | Admin | Update tracked wallet | — _(admin)_ |
-| POST | `/tracker/{name}/delete` | Admin | Delete tracked wallet | — _(admin)_ |
-| **Deployments** | | | | |
-| ALL | `/deployments/*` | Optional | Proxy to deployment-manager | — _(proxy)_ |
+| Method | Path | Description | SDK |
+|---|---|---|---|
+| GET | `/` |  | — |
+| GET | `/api-keys/` | Get API Keys | `user.apiKeys.list()` |
+| POST | `/api-keys/` | Create API Key | `user.apiKeys.create()` |
+| GET | `/api-keys/{id}` | Get API Key | `user.apiKeys.get()` |
+| POST | `/api-keys/{id}/delete` | Delete API Key | `user.apiKeys.delete()` |
+| POST | `/api-keys/{id}/update` | Update API Key | `user.apiKeys.update()` |
+| POST | `/auth/sign-message/external` | Sign message for external service authentication | `auth.signMessage()` |
+| POST | `/auth/validate-api-key` | Validate API key | `auth.validateApiKey()` |
+| POST | `/auth/validate-session` | Validate session | `auth.validateSession()` |
+| GET | `/credits/balance` | Get credit balance | `credits.balance()` |
+| POST | `/credits/claim` | Claim a credit code | `credits.claim()` |
+| GET | `/credits/invitations/{token}` | Get invitation by token | `credits.invitations.get()` |
+| POST | `/credits/invitations/{token}/claim` | Claim a credit invitation | `credits.invitations.claim()` |
+| POST | `/credits/request` | Request free credits | `credits.request()` |
+| GET | `/credits/request/eligibility` | Check credit request eligibility | `credits.checkEligibility()` |
+| GET | `/credits/spending-history` | Get credit spending history | `credits.getSpendingHistory()` |
+| GET | `/credits/transactions` | List credit transactions | `credits.getTransactions()` |
+| GET | `/health` |  | — |
+| POST | `/jobs/{address}/extend` | Extend a job using credits | `jobs.extend()` |
+| POST | `/jobs/{address}/stop` | Stop a job paid with credits | `jobs.stop()` |
+| POST | `/jobs/extend/batch` | Bulk-extend jobs using credits | `jobs.extendBatch()` |
+| POST | `/jobs/list` | Create a job using credits | `jobs.list()` |
+| POST | `/jobs/list/batch` | Bulk-create jobs using credits | `jobs.listBatch()` |
+| POST | `/jobs/stop/batch` | Bulk-stop jobs using credits | `jobs.stopBatch()` |
+| GET | `/metrics` |  | — |
+| POST | `/newsletter/subscribe` | Subscribe To Newsletter | `newsletter.subscribe()` |
+| GET | `/payments/methods` | List payment methods | `payments.listMethods()` |
+| DELETE | `/payments/methods/{id}` | Delete payment method | `payments.deleteMethod()` |
+| PUT | `/payments/methods/{id}/default` | Set default payment method | `payments.setDefaultMethod()` |
+| POST | `/payments/payment-intent` | Create PaymentIntent | `payments.createPaymentIntent()` |
+| GET | `/payments/purchases` | List credit purchases | `payments.listPurchases()` |
+| POST | `/payments/setup-intent` | Add payment method | `payments.addMethod()` |
+| POST | `/payments/webhooks/stripe` | Stripe webhook | — |
+| GET | `/templates/` | List all templates | `templates.list()` |
+| GET | `/templates/{id}` | Get template by ID | `templates.get()` |
+| GET | `/templates/{id}/{variantId}` | Get template variant | `templates.getVariant()` |
+| GET | `/templates/grouped` | Get templates grouped by category | `templates.getAllGrouped()` |
 
 ### Deployment Manager
 
-| Method | Path | Description | SDK Group |
+| Method | Path | Description | SDK |
 |---|---|---|---|
-| GET | `/` | Health check | — |
-| GET | `/stats` | Get stats | — |
-| **Deployments** | | | |
-| GET | `/api/deployments` | List all deployments | `deployments.list()` |
-| GET | `/api/deployments/{deployment}` | Get deployment by ID | `deployments.get()` |
-| DELETE | `/api/deployments/{deployment}` | Delete deployment | `deployments.pipe().delete()` |
-| POST | `/api/deployments/create` | Create new deployment | `deployments.create()` |
-| POST | `/api/deployments/{deployment}/start` | Start deployment | `deployments.pipe().start()` |
-| POST | `/api/deployments/{deployment}/stop` | Stop deployment | `deployments.pipe().stop()` |
-| POST | `/api/deployments/{deployment}/archive` | Archive deployment | `deployments.pipe().archive()` |
-| POST | `/api/deployments/{deployment}/create-revision` | Create revision | `deployments.pipe().createRevision()` |
-| PATCH | `/api/deployments/{deployment}/update-active-revision` | Switch active revision | `deployments.pipe().updateActiveRevision()` |
-| PATCH | `/api/deployments/{deployment}/update-replica-count` | Update replica count | `deployments.pipe().updateReplicaCount()` |
-| PATCH | `/api/deployments/{deployment}/update-schedule` | Update schedule | `deployments.pipe().updateSchedule()` |
-| PATCH | `/api/deployments/{deployment}/update-timeout` | Update timeout | `deployments.pipe().updateTimeout()` |
-| GET | `/api/deployments/{deployment}/tasks` | Get scheduled tasks | `deployments.pipe().getTasks()` |
-| GET | `/api/deployments/{deployment}/header` | Get deployment header | `deployments.pipe().generateAuthHeader()` |
-| GET | `/api/deployments/{deployment}/jobs` | Get deployment jobs | `deployments.pipe().getJobs()` |
-| GET | `/api/deployments/{deployment}/jobs/{job}` | Get specific job | `deployments.pipe().getJob()` |
-| GET | `/api/deployments/{deployment}/revisions` | Get revisions | `deployments.pipe().getRevisions()` |
-| GET | `/api/deployments/{deployment}/events` | Get events | `deployments.pipe().getEvents()` |
-| **Jobs (node-facing)** | | | |
-| GET | `/api/deployments/jobs/{job}/job-definition` | Get job definition | `deployments.getJobDefinition()` |
-| POST | `/api/deployments/jobs/{job}/results` | Submit job results | `deployments.submitJobResults()` |
-| **Vaults** | | | |
-| GET | `/api/deployments/vaults` | List vaults | `deployments.vaults.list()` |
-| POST | `/api/deployments/vaults/create` | Create shared vault | `deployments.vaults.create()` |
-| POST | `/api/deployments/vaults/{vault}/withdraw` | Withdraw from vault | `deployments.vaults.pipe().withdraw()` |
+| GET | `/deployments` | List all user deployments. | `deployments.list()` |
+| DELETE | `/deployments/{deployment}` | Delete a deployment permanently | `deployments.pipe().delete()` |
+| GET | `/deployments/{deployment}` | Get a specific deployment by ID. | `deployments.get()` |
+| POST | `/deployments/{deployment}/archive` | Archive a deployment | `deployments.pipe().archive()` |
+| POST | `/deployments/{deployment}/create-revision` | Create a new deployment revision. | `deployments.pipe().createRevision()` |
+| GET | `/deployments/{deployment}/events` | Get events for a specific deployment. | `deployments.pipe().getEvents()` |
+| GET | `/deployments/{deployment}/header` | Get header for a specific deployment. | `deployments.pipe().generateAuthHeader()` |
+| GET | `/deployments/{deployment}/jobs` | Get jobs for a specific deployment. | `deployments.pipe().getJobs()` |
+| GET | `/deployments/{deployment}/jobs/{job}` | Get a specific deployment job by ID. | `deployments.pipe().getJob()` |
+| GET | `/deployments/{deployment}/revisions` | Get revisions for a specific deployment. | `deployments.pipe().getRevisions()` |
+| POST | `/deployments/{deployment}/start` | Start an existing deployment. | `deployments.pipe().start()` |
+| POST | `/deployments/{deployment}/stop` | Stop a deployment | `deployments.pipe().stop()` |
+| GET | `/deployments/{deployment}/tasks` | Get scheduled tasks for a specific deployment. | `deployments.pipe().getTasks()` |
+| PATCH | `/deployments/{deployment}/update-active-revision` | Update deployment active revision. | `deployments.pipe().updateActiveRevision()` |
+| PATCH | `/deployments/{deployment}/update-name` | Update the name of a deployment | `deployments.pipe().updateName()` |
+| PATCH | `/deployments/{deployment}/update-replica-count` | Update the replica count of a deployment | `deployments.pipe().updateReplicaCount()` |
+| PATCH | `/deployments/{deployment}/update-schedule` | Update deployment schedule. | `deployments.pipe().updateSchedule()` |
+| PATCH | `/deployments/{deployment}/update-timeout` | Update deployment timeout | `deployments.pipe().updateTimeout()` |
+| POST | `/deployments/create` | Create a new deployment. | `deployments.create()` |
+| GET | `/deployments/jobs/{job}/job-definition` | Returns the job definition for a job. | `deployments.getJobDefinition()` |
+| POST | `/deployments/jobs/{job}/results` | Post results for your running job. | `deployments.submitJobResults()` |
+| GET | `/deployments/vaults` | List all user vaults. | `deployments.vaults.list()` |
+| POST | `/deployments/vaults/{vault}/withdraw` | Withdraw from a vault. | `deployments.vaults.pipe().withdraw()` |
+| POST | `/deployments/vaults/create` | Create a shared vault. | `deployments.vaults.create()` |
 
 ### Host Manager
 
-| Method | Path | Description | SDK Group |
+| Method | Path | Description | SDK |
 |---|---|---|---|
-| GET | `/health` | Health check | — |
-| GET | `/rpc` | Solana RPC URL | — |
-| **Markets** | | | |
-| GET | `/markets/` | List markets | `markets.list()` |
-| GET | `/markets/{id}` | Get market by ID | `markets.get()` |
-| GET | `/markets/{id}/required-resources` | Get market required resources | `markets.getRequiredResources()` |
-| GET | `/markets/prices` | All market prices | `markets.getPrices()` |
-| GET | `/markets/price` | Current NOS price (USD) | `markets.getPrice()` |
-| GET | `/markets/gpu-types` | List GPU types | `markets.getGpuTypes()` |
-| GET | `/markets/gpu-types/{id}` | Get GPU type by ID | — |
-| GET | `/markets/docker-images` | List Docker images | `markets.getDockerImages()` |
-| GET | `/markets/docker-images/{id}` | Get Docker image by ID | — |
-| GET | `/markets/remote-resources` | List required resources | — |
-| GET | `/markets/remote-resources/{id}` | Get resource by ID | — |
-| POST | `/markets/` | Create market (admin) | — _(admin)_ |
-| PUT | `/markets/{id}` | Update market (admin) | — _(admin)_ |
-| DELETE | `/markets/{id}` | Delete market (admin) | — _(admin)_ |
-| POST | `/markets/gpu-types` | Add GPU type (admin) | — _(admin)_ |
-| PUT | `/markets/gpu-types/{id}` | Update GPU type (admin) | — _(admin)_ |
-| DELETE | `/markets/gpu-types/{id}` | Delete GPU type (admin) | — _(admin)_ |
-| POST | `/markets/docker-images` | Add Docker image (admin) | — _(admin)_ |
-| PUT | `/markets/docker-images/{id}` | Update Docker image (admin) | — _(admin)_ |
-| DELETE | `/markets/docker-images/{id}` | Delete Docker image (admin) | — _(admin)_ |
-| POST | `/markets/remote-resources` | Add remote resource (admin) | — _(admin)_ |
-| PUT | `/markets/remote-resources/{id}` | Update remote resource (admin) | — _(admin)_ |
-| DELETE | `/markets/remote-resources/{id}` | Delete remote resource (admin) | — _(admin)_ |
-| POST | `/markets/update-prices` | Refresh market prices (admin) | — _(admin)_ |
-| **Nodes** | | | |
-| GET | `/nodes/` | List nodes | `hosts.list()` |
-| GET | `/nodes/{id}` | Get node details (wallet) | `hosts.get()` |
-| GET | `/nodes/{id}/full` | Get full node info (admin) | — _(admin)_ |
-| GET | `/nodes/{id}/specs` | Get node system specs | `hosts.getSpecs()` |
-| GET | `/nodes/{id}/info` | Get private node info (admin) | — _(admin)_ |
-| GET | `/nodes/available-gpus` | Available GPUs | `hosts.getAvailableGpus()` |
-| GET | `/nodes/stats` | Node statistics | `hosts.getStats()` |
-| GET | `/nodes/minimum-required-version` | Min node version | — |
-| GET | `/nodes/with-access` | Nodes with market access | — |
-| GET | `/nodes/queued-nodes` | Queued nodes | `hosts.getQueuedNodes()` |
-| GET | `/nodes/market-relation` | Market relation | — |
-| GET | `/nodes/metrics` | Metric definitions | — |
-| POST | `/nodes/onboard` | Onboard node (admin) | — _(admin)_ |
-| POST | `/nodes/upgrade` | Upgrade node (admin) | — _(admin)_ |
-| POST | `/nodes/assign-node` | Assign node to market (admin) | — _(admin)_ |
-| POST | `/nodes/remove-market-assignment` | Remove assignment (admin) | — _(admin)_ |
-| POST | `/nodes/change-market` | Change node market (wallet) | — _(wallet)_ |
-| POST | `/nodes/sync-node` | Sync node state | — _(wallet)_ |
-| POST | `/nodes/register` | Register node (wallet) | — _(wallet)_ |
-| GET | `/nodes/request-market` | Request market assignment (wallet) | — _(wallet)_ |
-| POST | `/nodes/join-test-grid` | Join test grid (wallet) | — _(wallet)_ |
-| POST | `/nodes/revoke` | Revoke node (admin) | — _(admin)_ |
-| PUT | `/nodes/minimum-required-version` | Update required version (admin) | — _(admin)_ |
-| POST | `/nodes/{id}/submit-system-specs` | Submit system specs (SDK) | — _(SDK internal)_ |
-| PATCH | `/nodes/{id}/address` | Update node address (wallet) | — _(wallet)_ |
-| POST | `/nodes/{id}/check-market` | Check market compatibility (wallet) | — _(wallet)_ |
-| POST | `/nodes/heartbeat` | Node heartbeat (wallet) | — _(wallet)_ |
-| POST | `/nodes/payment` | Request NOS payment (wallet) | — _(wallet)_ |
-| GET | `/nodes/heartbeats/uptime/{node}` | Node uptime % | `hosts.getUptime()` |
-| GET | `/nodes/heartbeats/next-max` | Next max heartbeats (admin) | — _(admin)_ |
-| POST | `/nodes/heartbeats/next-max` | Set next max heartbeats (admin) | — _(admin)_ |
-| GET | `/nodes/heartbeats/uptime-reward-threshold-percentage` | Threshold % (admin) | — _(admin)_ |
-| POST | `/nodes/heartbeats/uptime-reward-threshold-percentage` | Set threshold % (admin) | — _(admin)_ |
-| POST | `/nodes/heartbeats/aggregate-historical` | Backfill aggregation (admin) | — _(admin)_ |
-| **Hosts** | | | |
-| GET | `/hosts/` | Available hosts matching filter criteria | `hosts.getAvailableHosts()` |
-| GET | `/hosts/filters` | GPU filter options | `hosts.getFilters()` |
-| **Benchmarks** | | | |
-| GET | `/benchmarks/node-report` | Node benchmark report | `hosts.getBenchmarkReport()` |
-| GET | `/benchmarks/node-template-performance/{nodeId}` | Node template performance | `hosts.getTemplatePerformance()` |
-| GET | `/benchmarks/benchmark-version` | Current benchmark version | — |
-| GET | `/benchmarks/markets/benchmark-summary` | Per-market benchmark summary | `hosts.getBenchmarkSummary()` |
-| POST | `/benchmarks/{id}/submit-results` | Submit benchmark results (wallet) | — _(wallet)_ |
-| POST | `/benchmarks/submit` | Unified benchmark submission | — _(wallet)_ |
-| POST | `/benchmarks/admin-trigger-anti-spoof` | Trigger anti-spoof (admin) | — _(admin)_ |
-| POST | `/benchmarks/admin-trigger-validation` | Verify anti-spoof results (admin) | — _(admin)_ |
-| POST | `/benchmarks/admin-target` | Target nodes for anti-spoof (admin) | — _(admin)_ |
-| POST | `/benchmarks/benchmark-version` | Update benchmark version (admin) | — _(admin)_ |
-| GET | `/benchmarks/thresholds` | List onboarding thresholds (admin) | — _(admin)_ |
-| POST | `/benchmarks/thresholds/create` | Create threshold (admin) | — _(admin)_ |
-| POST | `/benchmarks/thresholds/{id}/update` | Update threshold (admin) | — _(admin)_ |
-| DELETE | `/benchmarks/thresholds/{id}/delete` | Delete threshold (admin) | — _(admin)_ |
-| GET | `/benchmarks/benchmarks` | List onboarding benchmarks (admin) | — _(admin)_ |
-| POST | `/benchmarks/benchmarks/create` | Create benchmark (admin) | — _(admin)_ |
-| POST | `/benchmarks/benchmarks/{id}/update` | Update benchmark (admin) | — _(admin)_ |
-| DELETE | `/benchmarks/benchmarks/{id}/delete` | Delete benchmark (admin) | — _(admin)_ |
-| POST | `/benchmarks/admin-clear-benchmark-data` | Clear benchmark data (admin) | — _(admin)_ |
-| POST | `/benchmarks/selector` | Template benchmark selector (admin) | — _(admin)_ |
-| **Errors** | | | |
-| POST | `/errors/report` | Report node error (SDK) | — _(SDK internal)_ |
-| GET | `/errors/` | List errors (admin) | — _(admin)_ |
-| **Stats** | | | |
-| GET | `/stats/nodes-country` | Node distribution by country | `hosts.getByCountry()` |
-| **Templates** | | | |
-| GET | `/templates/` | List templates | — _(host-manager copy)_ |
-| GET | `/templates/{id}` | Get template by ID | — _(host-manager copy)_ |
-| POST | `/templates/admin-refresh` | Refresh from GitHub (admin) | — _(admin)_ |
+| POST | `/benchmark-templates/apply` | Apply the operation/metric diff, the supplied human-reviewed threshold | — |
+| GET | `/benchmark-templates/config` | Current stored benchmark templates — operations + metrics + their thre | `benchmarks.getTemplatesConfig()` |
+| GET | `/benchmark-templates/refresh` | Preview the benchmark template diff against stored github operations ( | `benchmarks.getTemplatesRefresh()` |
+| POST | `/benchmarks/{id}/prediction` |  | `benchmarks.getPrediction()` |
+| POST | `/benchmarks/{id}/seed` |  | `benchmarks.seed()` |
+| POST | `/benchmarks/{id}/submit-results` |  | `benchmarks.submitResults()` |
+| GET | `/benchmarks/benchmark-version` |  | `benchmarks.getVersion()` |
+| POST | `/benchmarks/benchmark-version` |  | — |
+| GET | `/benchmarks/market-metric-aggregates` |  | `benchmarks.getMarketMetricAggregates()` |
+| GET | `/benchmarks/market-thresholds` |  | `benchmarks.getMarketThresholds()` |
+| POST | `/benchmarks/market-thresholds/create` |  | — |
+| DELETE | `/benchmarks/market-thresholds/delete` |  | — |
+| POST | `/benchmarks/market-thresholds/describe` |  | — |
+| POST | `/benchmarks/market-thresholds/update` |  | — |
+| GET | `/benchmarks/metric-processors` |  | `benchmarks.getMetricProcessors()` |
+| GET | `/benchmarks/metrics` |  | `benchmarks.getMetrics()` |
+| DELETE | `/benchmarks/metrics/{key}/delete` |  | — |
+| POST | `/benchmarks/metrics/{key}/update` |  | — |
+| POST | `/benchmarks/metrics/create` |  | — |
+| GET | `/benchmarks/operations` |  | `benchmarks.getOperations()` |
+| DELETE | `/benchmarks/operations/{id}/delete` |  | — |
+| POST | `/benchmarks/operations/{id}/update` |  | — |
+| POST | `/benchmarks/operations/create` |  | — |
+| GET | `/benchmarks/recent` |  | `benchmarks.getRecent()` |
+| GET | `/benchmarks/thresholds` |  | `benchmarks.getThresholds()` |
+| DELETE | `/benchmarks/thresholds/{id}/delete` |  | — |
+| POST | `/benchmarks/thresholds/{id}/update` |  | — |
+| POST | `/benchmarks/thresholds/create` |  | — |
+| GET | `/config/export` | Dump the full threshold-system configuration (groups, operations, metr | — |
+| GET | `/errors/` | List error logs (admin) | — |
+| POST | `/errors/report` | Submit error log (SDK) | — |
+| GET | `/health` |  | — |
+| GET | `/markets/` |  | `markets.list()` |
+| DELETE | `/markets/{id}` |  | — |
+| GET | `/markets/{id}` |  | `markets.get()` |
+| PUT | `/markets/{id}` |  | — |
+| GET | `/markets/{id}/required-resources` |  | `markets.getRequiredResources()` |
+| GET | `/markets/docker-images` |  | `markets.getDockerImages()` |
+| POST | `/markets/docker-images` |  | — |
+| DELETE | `/markets/docker-images/{id}` |  | — |
+| GET | `/markets/docker-images/{id}` |  | `markets.getDockerImage()` |
+| PUT | `/markets/docker-images/{id}` |  | — |
+| GET | `/markets/price` | Get current NOS token price in USD | `markets.getPrice()` |
+| GET | `/markets/prices` |  | `markets.getPrices()` |
+| GET | `/markets/remote-resources` |  | `markets.getRemoteResources()` |
+| POST | `/markets/remote-resources` |  | — |
+| DELETE | `/markets/remote-resources/{id}` |  | — |
+| GET | `/markets/remote-resources/{id}` |  | `markets.getRemoteResource()` |
+| PUT | `/markets/remote-resources/{id}` |  | — |
+| POST | `/markets/update-prices` | Manually trigger market price update (admin) | — |
+| GET | `/metrics` |  | — |
+| GET | `/node-under-maintenance` | Public maintenance health-check (no auth) | — |
+| GET | `/nodes/` |  | `hosts.list()` |
+| GET | `/nodes/{id}` |  | `hosts.get()` |
+| PATCH | `/nodes/{id}/address` |  | `hosts.updateAddress()` |
+| PATCH | `/nodes/{id}/contact` |  | `hosts.updateContact()` |
+| GET | `/nodes/{id}/full` |  | `hosts.getFull()` |
+| GET | `/nodes/{id}/info` |  | `hosts.getInfo()` |
+| GET | `/nodes/{id}/metrics` |  | `hosts.getMetrics()` |
+| POST | `/nodes/{id}/metrics` |  | `hosts.postMetrics()` |
+| GET | `/nodes/{id}/notes` |  | — |
+| POST | `/nodes/{id}/notes` |  | — |
+| DELETE | `/nodes/{id}/notes/{noteId}` |  | — |
+| PATCH | `/nodes/{id}/notes/{noteId}` |  | — |
+| GET | `/nodes/{id}/recent-benchmarks` |  | `hosts.getRecentBenchmarks()` |
+| GET | `/nodes/{id}/rewards` |  | `hosts.getRewardsById()` |
+| POST | `/nodes/assign-node` |  | — |
+| GET | `/nodes/available-gpus` |  | `hosts.getAvailableGpus()` |
+| POST | `/nodes/ban` |  | — |
+| POST | `/nodes/demote` |  | — |
+| POST | `/nodes/heartbeat` |  | `hosts.heartbeat()` |
+| POST | `/nodes/heartbeats/aggregate-historical` |  | — |
+| GET | `/nodes/heartbeats/next-max` |  | — |
+| POST | `/nodes/heartbeats/next-max` |  | — |
+| GET | `/nodes/heartbeats/uptime-reward-threshold-percentage` |  | — |
+| POST | `/nodes/heartbeats/uptime-reward-threshold-percentage` |  | — |
+| GET | `/nodes/heartbeats/uptime/{node}` |  | `hosts.getUptime()` |
+| POST | `/nodes/invalidate-metrics` |  | — |
+| POST | `/nodes/kick-from-queue` |  | — |
+| GET | `/nodes/market-relation` |  | `hosts.getMarketRelation()` |
+| GET | `/nodes/minimum-required-version` |  | `hosts.getMinimumRequiredVersion()` |
+| PUT | `/nodes/minimum-required-version` |  | — |
+| POST | `/nodes/move-market` |  | — |
+| POST | `/nodes/payment` |  | `hosts.payment()` |
+| POST | `/nodes/promote` |  | — |
+| GET | `/nodes/queued-nodes` |  | `hosts.getQueuedNodes()` |
+| POST | `/nodes/register` |  | `hosts.register()` |
+| POST | `/nodes/remove-market-assignment` |  | — |
+| GET | `/nodes/request-market` |  | `hosts.getRequestMarket()` |
+| GET | `/nodes/rewards` |  | `hosts.getRewards()` |
+| POST | `/nodes/sync-node` |  | `hosts.syncNode()` |
+| POST | `/nodes/unban` |  | — |
+| GET | `/nodes/with-access` |  | `hosts.getWithAccess()` |
+| GET | `/rpc` |  | — |
+| GET | `/stats/nodes-country` |  | `hosts.getByCountry()` |
+
+---
+
+_Coverage: 116 of 172 prd endpoints exposed as curated SDK methods; the remaining 56 (admin / ops / infra) are reachable via `api.clients`._
