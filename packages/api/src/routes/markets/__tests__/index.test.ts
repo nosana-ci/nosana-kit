@@ -186,4 +186,22 @@ describe('createNosanaMarketsApi', () => {
       await expect(api.getDockerImages()).rejects.toThrow('Failed to fetch Docker images');
     });
   });
+
+  const api = createNosanaMarketsApi({ hostManager: global.TEST_MOCK_CLIENT });
+  const extra: Array<[string, () => Promise<unknown>, string]> = [
+    ['getDockerImage', () => api.getDockerImage('img-1'), 'Failed to fetch Docker image'],
+    ['getRemoteResources', () => api.getRemoteResources(), 'Failed to fetch remote resources'],
+    ['getRemoteResource', () => api.getRemoteResource('res-1'), 'Failed to fetch remote resource'],
+  ];
+
+  describe.each(extra)('%s', (_name, call, errMsg) => {
+    it('returns data', async () => {
+      (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({ data: { ok: true }, error: null });
+      expect(await call()).toEqual({ ok: true });
+    });
+    it('throws a formatted error', async () => {
+      (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({ data: null, error: { message: 'x' } });
+      await expect(call()).rejects.toThrow(errMsg);
+    });
+  });
 });

@@ -137,4 +137,36 @@ describe('createNosanaHostsApi', () => {
       await expect(api.getByCountry()).rejects.toThrow('Failed to get nodes by country');
     });
   });
+
+  // [httpVerb, name, call, errorMessage]
+  const extra: Array<['GET' | 'POST' | 'PATCH', string, () => Promise<unknown>, string]> = [
+    ['GET', 'getWithAccess', () => api.getWithAccess(), 'Failed to get nodes with access'],
+    ['GET', 'getRewards', () => api.getRewards(), 'Failed to get node rewards'],
+    ['GET', 'getRequestMarket', () => api.getRequestMarket(), 'Failed to request market'],
+    ['GET', 'getMarketRelation', () => api.getMarketRelation(), 'Failed to get market relation'],
+    ['GET', 'getMinimumRequiredVersion', () => api.getMinimumRequiredVersion(), 'Failed to get minimum required version'],
+    ['GET', 'getFull', () => api.getFull('n1'), 'Failed to get full node'],
+    ['GET', 'getInfo', () => api.getInfo('n1'), 'Failed to get node info'],
+    ['GET', 'getMetrics', () => api.getMetrics('n1'), 'Failed to get node metrics'],
+    ['GET', 'getRewardsById', () => api.getRewardsById('n1'), 'Failed to get node rewards'],
+    ['GET', 'getRecentBenchmarks', () => api.getRecentBenchmarks('n1'), 'Failed to get recent benchmarks'],
+    ['POST', 'register', () => api.register({} as never), 'Failed to register node'],
+    ['POST', 'syncNode', () => api.syncNode({} as never), 'Failed to sync node'],
+    ['POST', 'heartbeat', () => api.heartbeat(), 'Failed to send heartbeat'],
+    ['POST', 'payment', () => api.payment(), 'Failed to process node payment'],
+    ['POST', 'postMetrics', () => api.postMetrics('n1', {} as never), 'Failed to post node metrics'],
+    ['PATCH', 'updateAddress', () => api.updateAddress('n1', {} as never), 'Failed to update node address'],
+    ['PATCH', 'updateContact', () => api.updateContact('n1', {} as never), 'Failed to update node contact'],
+  ];
+
+  describe.each(extra)('%s %s', (verb, _name, call, errMsg) => {
+    it('returns data', async () => {
+      (global.TEST_MOCK_CLIENT[verb] as Mock).mockResolvedValue({ data: { ok: true }, error: null });
+      expect(await call()).toEqual({ ok: true });
+    });
+    it('throws a formatted error', async () => {
+      (global.TEST_MOCK_CLIENT[verb] as Mock).mockResolvedValue({ data: null, error: { message: 'x' } });
+      await expect(call()).rejects.toThrow(errMsg);
+    });
+  });
 });

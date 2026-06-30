@@ -201,4 +201,21 @@ describe('createNosanaCreditsApi', () => {
       });
     });
   });
+
+  const historyApi = createNosanaCreditsApi({ clientManager: global.TEST_MOCK_CLIENT });
+  const extra: Array<[string, () => Promise<unknown>, string]> = [
+    ['getSpendingHistory', () => historyApi.getSpendingHistory({ start_date: '2025-01-01' } as never), 'Failed to fetch credit spending history'],
+    ['getTransactions', () => historyApi.getTransactions({ limit: 10, offset: 0 } as never), 'Failed to list credit transactions'],
+  ];
+
+  describe.each(extra)('%s', (_name, call, errMsg) => {
+    it('returns data', async () => {
+      (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({ data: { ok: true }, error: null });
+      expect(await call()).toEqual({ ok: true });
+    });
+    it('throws a formatted error', async () => {
+      (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({ data: null, error: { message: 'x' } });
+      await expect(call()).rejects.toThrow(errMsg);
+    });
+  });
 });
