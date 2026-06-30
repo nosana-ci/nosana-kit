@@ -24,12 +24,37 @@ export type { Wallet, ProgramDeps } from './types.js';
 /**
  * @group @nosana/kit
  */
-export { createJobsProgram, JobState, MarketQueueType } from './services/programs/jobs/index.js';
+export {
+  createJobsProgram,
+  getNetworkFee,
+  JobState,
+  MarketQueueType,
+} from './services/programs/jobs/index.js';
 
 /**
  * @group @nosana/kit
  */
 export type { JobsProgram, Job, Market, Run } from './services/programs/jobs/index.js';
+
+/**
+ * @group @nosana/kit
+ */
+export {
+  getJobsInstructionComputeUnits,
+  getJobsInstructionName,
+  decodeJobsInstruction,
+  type DecodedJobsInstruction,
+  JOBS_COMPUTE_UNITS,
+  type JobsInstructionName,
+} from './services/programs/jobs/index.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
+  JobsBatchTransactionResult,
+  SignedJobsBatchTransaction,
+} from './services/programs/jobs/index.js';
 
 /**
  * @group @nosana/kit
@@ -194,6 +219,7 @@ export type {
   TokenService,
   TokenAccount,
   TokenAccountWithBalance,
+  TokenBalanceInfo,
 } from './services/token/index.js';
 
 /**
@@ -209,7 +235,14 @@ export { createSolanaService } from './services/solana/SolanaService.js';
 /**
  * @group @nosana/kit
  */
-export type { SolanaService, SolanaServiceDeps } from './services/solana/SolanaService.js';
+export type {
+  BalanceInfo,
+  SolBalanceInfo,
+  SolanaService,
+  SolanaServiceDeps,
+  BatchTransactionResult,
+  SignedBatchTransaction,
+} from './services/solana/SolanaService.js';
 
 // ============================================================================
 // @nosana/kit - Configuration
@@ -263,6 +296,30 @@ export type { ConvertTypesForDb } from './utils/convertBigIntToNumber.js';
  */
 export { walletToAuthorizationSigner } from './utils/walletToAuthorizationSigner.js';
 
+/**
+ * @group @nosana/kit
+ */
+export {
+  packInstructions,
+  TRANSACTION_SIZE_LIMIT,
+  MAX_COMPUTE_UNITS,
+  type PackInstructionsOptions,
+} from './utils/packInstructions.js';
+
+// ============================================================================
+// @nosana/kit - Keypair Helpers
+// ============================================================================
+
+/**
+ * @group @nosana/kit
+ */
+export {
+  generateWallet,
+  createWalletFromBytes,
+  createWalletFromBase58,
+  loadWalletFromFile,
+} from './utils/keypair.js';
+
 // ============================================================================
 // @nosana/kit - Generated Clients (Namespaces)
 // ============================================================================
@@ -311,7 +368,13 @@ export type {
 /**
  * @group @solana/kit
  */
-export { address } from '@solana/kit';
+export {
+  address,
+  generateKeyPairSigner,
+  createKeyPairSignerFromBytes,
+  createKeyPairFromBytes,
+  createSignerFromKeyPair,
+} from '@solana/kit';
 
 import type { Address as SolanaAddress } from '@solana/kit';
 
@@ -466,7 +529,13 @@ export {
 /**
  * @group @nosana/api
  */
-export { createNosanaApi } from '@nosana/api';
+export {
+  createNosanaApi,
+  generateIdempotencyKey,
+  IdempotencyCode,
+  isNosanaApiError,
+  isIdempotencyControlSignal,
+} from '@nosana/api';
 
 /**
  * @group @nosana/api
@@ -474,12 +543,15 @@ export { createNosanaApi } from '@nosana/api';
 export type {
   // Core types
   NosanaApi,
+  NosanaApiError,
   CreateNosanaApiOptions,
   ApiKeyAuth,
   SignerAuth,
   ApiConfig,
   // Job API types
   NosanaJobsApi,
+  NosanaJobActionOptions,
+  NosanaJobBatchOptions,
   NosanaApiListJobRequest,
   NosanaApiListJobResponse,
   NosanaApiGetJobByAddressRequest,
@@ -488,6 +560,11 @@ export type {
   NosanaApiExtendJobResponse,
   NosanaApiStopJobRequest,
   NosanaApiStopJobResponse,
+  NosanaApiListJobBatchRequest,
+  NosanaApiExtendJobBatchRequest,
+  NosanaApiStopJobBatchRequest,
+  NosanaApiJobsBatchResponse,
+  NosanaApiJobsBatchItem,
   // Credits API types
   NosanaCreditsApi,
   Balance,

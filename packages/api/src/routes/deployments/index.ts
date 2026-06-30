@@ -47,7 +47,7 @@ export function createDeploymentsApi(
       : createDeploymentFn(data, clients, true);
 
   const create = async (deploymentBody: CreateDeployment) => {
-    const { data, error } = await client.POST('/api/deployments/create', {
+    const { data, error } = await client.POST('/deployments/create', {
       body: deploymentBody as DeploymentCreateBody,
     });
 
@@ -59,7 +59,7 @@ export function createDeploymentsApi(
   };
 
   const get = async (deployment: string) => {
-    const { data, error } = await client.GET('/api/deployments/{deployment}', {
+    const { data, error } = await client.GET('/deployments/{deployment}', {
       params: {
         path: {
           deployment,
@@ -75,7 +75,7 @@ export function createDeploymentsApi(
   };
 
   const list = async (searchParams?: DeploymentsSearchParams): Promise<DeploymentListResult | ApiDeploymentListResult> => {
-    const { data, error } = await client.GET('/api/deployments', {
+    const { data, error } = await client.GET('/deployments', {
       params: {
         query: {
           ...searchParams,
@@ -123,7 +123,7 @@ export function createDeploymentsApi(
     }
 
     const { data, error } = await client.POST(
-      '/api/deployments/vaults/create',
+      '/deployments/vaults/create',
       {},
     );
 
@@ -139,7 +139,7 @@ export function createDeploymentsApi(
       throw errorFormatter('Creating a vault requires signer authentication');
     }
 
-    const { data, error } = await client.GET('/api/deployments/vaults', {});
+    const { data, error } = await client.GET('/deployments/vaults', {});
 
     if (error || !data) {
       throw errorFormatter('Error listing vaults', error);
@@ -152,7 +152,7 @@ export function createDeploymentsApi(
 
   const getJobDefinition = async (job: string) => {
     const { data, error } = await client.GET(
-      '/api/deployments/jobs/{job}/job-definition',
+      '/deployments/jobs/{job}/job-definition',
       {
         params: { path: { job } },
       },
@@ -167,7 +167,7 @@ export function createDeploymentsApi(
 
   const submitJobResults = async (job: string, results: JobResults) => {
     const { error } = await client.POST(
-      '/api/deployments/jobs/{job}/results',
+      '/deployments/jobs/{job}/results',
       {
         params: { path: { job } },
         body: results,

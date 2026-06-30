@@ -18,7 +18,7 @@ export async function vaultWithdraw(
   vaultAddress: string,
   { deploymentManager: client, solana: { deserializeSignSendAndConfirmTransaction } }: DeploymentRouteClientsWithSigner
 ): Promise<void> {
-  const { data, error } = await client.POST('/api/deployments/vaults/{vault}/withdraw', {
+  const { data, error } = await client.POST('/deployments/vaults/{vault}/withdraw', {
     params: {
       path: {
         vault: vaultAddress,

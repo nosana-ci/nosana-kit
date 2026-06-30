@@ -52,7 +52,11 @@ export function createNosanaTemplatesApi(clients: {
         throw errorFormatter('Failed to get template variant', error);
       }
 
-      return data;
+      // The CM OpenAPI spec does not (yet) declare a response schema for
+      // `/templates/{id}/{variantId}`, so `data` comes through untyped. It
+      // returns the same shape as `GET /templates/{id}`; once the backend spec
+      // declares the response, this assertion can be removed.
+      return data as Template;
     },
   };
 }

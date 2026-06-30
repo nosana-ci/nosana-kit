@@ -35,16 +35,10 @@ describe('deploymentUpdateReplicaCount', () => {
     });
   });
 
-  test('when replicas is less than 1, it should throw assertion error', async () => {
-    await expect(
-      deploymentUpdateReplicaCount(0, mockClient, mockState),
-    ).rejects.toThrow('Replica count must be at least 1');
-  });
-
   test('when replicas is negative, it should throw assertion error', async () => {
     await expect(
       deploymentUpdateReplicaCount(-1, mockClient, mockState),
-    ).rejects.toThrow('Replica count must be at least 1');
+    ).rejects.toThrow('Replica count must be at least 0');
   });
 
   test('when api returns error, it should throw formatted error', async () => {

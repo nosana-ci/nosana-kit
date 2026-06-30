@@ -9,7 +9,7 @@ export async function deploymentUpdateSchedule(
   state: DeploymentState,
 ): Promise<void> {
   const { data, error } = await client.PATCH(
-    `/api/deployments/{deployment}/update-schedule`,
+    `/deployments/{deployment}/update-schedule`,
     {
       params: { path: { deployment: state.id } },
       body: { schedule },

@@ -15,7 +15,7 @@ It means that you do not have NVIDIA drivers installed. To install them, downloa
 ::: details Solution
 It means that you did not install and configure the Nvidia Container Toolkit correctly:
 
-- [Nvidia instructions for Ubuntu](/hosts/grid-ubuntu.html#guide-to-install-nvidia-container-toolkit)
+- [Nvidia instructions for Ubuntu](/hosts/grid-run.html#guide-to-install-nvidia-container-toolkit)
   :::
 
 ### Docker

@@ -1,6 +1,6 @@
 {
   "name": "@nosana/localnet",
-  "version": "2.2.4",
+  "version": "2.3.1",
   "description": "Nosana localnet: Solana test validator with pre-baked Nosana programs + localnet test helpers",
   "type": "module",
   "main": "dist/index.js",
@@ -9,10 +9,11 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "build:with-deps": "pnpm run build",
     "dev": "tsc --watch",
     "dev:with-deps": "pnpm run dev",
+    "test": "echo 'No tests' && exit 0",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
@@ -27,6 +28,11 @@
   ],
   "author": "Nosana",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
+    "directory": "packages/localnet"
+  },
   "devDependencies": {
     "@types/node": "^20.19.27",
     "prettier": "^3.7.4",

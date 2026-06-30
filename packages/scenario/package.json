@@ -1,6 +1,6 @@
 {
   "name": "@nosana/scenario",
-  "version": "2.2.5",
+  "version": "2.6.1",
   "description": "Nosana scenario test helpers: network-aware client setup for localnet, devnet, and mainnet",
   "type": "module",
   "main": "dist/index.js",
@@ -9,10 +9,11 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "gen:cu": "pnpm exec tsx scripts/measure-compute-units.ts",
     "dev": "tsc --watch",
-    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "dev:with-deps": "pnpm --filter $npm_package_name... --parallel run dev",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"**/*.ts\"",
@@ -31,6 +32,11 @@
   ],
   "author": "Nosana",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
+    "directory": "packages/scenario"
+  },
   "dependencies": {
     "@nosana/kit": "workspace:*",
     "@nosana/localnet": "workspace:*",

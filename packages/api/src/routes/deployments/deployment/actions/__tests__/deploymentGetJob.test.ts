@@ -25,7 +25,7 @@ describe('deploymentGetJob', () => {
 
       expect(result).toEqual(mockJob);
       expect(mockClient.GET).toHaveBeenCalledWith(
-        '/api/deployments/{deployment}/jobs/{job}',
+        '/deployments/{deployment}/jobs/{job}',
         {
           params: { path: { deployment: deploymentId, job: jobId } },
         },

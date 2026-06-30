@@ -9,9 +9,14 @@ import type {
   Account,
   Base58EncodedBytes,
   GetProgramAccountsMemcmpFilter,
+  Instruction,
   ReadonlyUint8Array,
+  TransactionSigner,
 } from '@solana/kit';
 import type { ProgramDeps, Wallet } from '../../../types.js';
+import type { BatchTransactionResult, SignedBatchTransaction } from '../../solana/SolanaService.js';
+import { getJobsInstructionComputeUnits } from './computeUnits.js';
+import { decodeJobsInstruction, type DecodedJobsInstruction } from './decode.js';
 import {
   getStaticAccounts as getStaticAccountsFn,
   type StaticAccounts,
@@ -55,6 +60,83 @@ export type { SimpleMonitorEvent, MonitorEvent } from './monitor/index.js';
 // Re-export post types (union of list and assign)
 export type PostParams = Instructions.ListParams | Instructions.AssignParams;
 export type PostInstruction = Instructions.ListInstruction | Instructions.AssignInstruction;
+
+export type { DecodedJobsInstruction } from './decode.js';
+
+/**
+ * A {@link BatchTransactionResult} enriched with the decoded jobs instructions it
+ * contained. `decoded[i]` corresponds to `instructions[i]` and is `undefined` for
+ * any instruction that is not a recognised jobs instruction.
+ *
+ * Use it to recover accounts a transaction created or acted on — e.g. the `job`
+ * and `run` addresses minted by each `list` — without a separate `*Many` helper.
+ * @group @nosana/kit
+ */
+export interface JobsBatchTransactionResult extends BatchTransactionResult {
+  /** Each instruction in the transaction, decoded to its name and labelled accounts. */
+  decoded: Array<DecodedJobsInstruction | undefined>;
+  /**
+   * All accounts the transaction's instructions referenced, grouped by their
+   * (pluralised) role name across every instruction in the transaction — e.g.
+   * `accounts.jobs` is every `job` address, `accounts.runs` every `run`. This is
+   * the quick "just give me the created jobs" view; use {@link decoded} together
+   * with `groupIndices` when you need to tie an account back to a specific input.
+   */
+  accounts: Record<string, Address[]>;
+}
+
+/**
+ * A {@link SignedBatchTransaction} enriched with the same decoded view as
+ * {@link JobsBatchTransactionResult}, so the per-bucket job/run addresses are
+ * available without decoding the raw instructions. Returned by {@link JobsProgram.signBatch}.
+ * @group @nosana/kit
+ */
+export interface SignedJobsBatchTransaction extends SignedBatchTransaction {
+  /** Each instruction in the transaction, decoded to its name and labelled accounts. */
+  decoded: Array<DecodedJobsInstruction | undefined>;
+  /** Accounts grouped by pluralised role (e.g. `accounts.jobs`, `accounts.runs`). See {@link JobsBatchTransactionResult.accounts}. */
+  accounts: Record<string, Address[]>;
+}
+
+export const JOB_POSTING_NETWORK_FEE = 0.1;
+
+// Account roles whose plural is not just role + "s"; used to key the aggregated
+// `accounts` view (e.g. `accounts.authorities`). Regular roles fall through to +"s".
+const IRREGULAR_ROLE_PLURALS: Record<string, string> = { authority: 'authorities' };
+
+/** Pluralise an account role name for the aggregated `accounts` view. */
+function pluralizeRole(role: string): string {
+  return IRREGULAR_ROLE_PLURALS[role] ?? `${role}s`;
+}
+
+/**
+ * Decode a transaction's instructions and group the accounts they reference by
+ * (pluralised) role. Shared by `sendBatch` and `signBatch` so both enrich their
+ * results identically.
+ */
+function decodeBatchInstructions(instructions: Instruction[]): {
+  decoded: Array<DecodedJobsInstruction | undefined>;
+  accounts: Record<string, Address[]>;
+} {
+  const decoded = instructions.map((instruction) => decodeJobsInstruction(instruction));
+  const accounts: Record<string, Address[]> = {};
+  for (const instruction of decoded) {
+    if (!instruction) continue;
+    for (const [role, account] of Object.entries(instruction.accounts)) {
+      (accounts[pluralizeRole(role)] ??= []).push(account);
+    }
+  }
+  return { decoded, accounts };
+}
+
+/**
+ * Returns the current network fee ratio applied when posting jobs.
+ * A value of 0.1 represents a 10% fee.
+ * @group @nosana/kit
+ */
+export function getNetworkFee(): number {
+  return JOB_POSTING_NETWORK_FEE;
+}
 
 /**
  * Jobs program interface
@@ -109,6 +191,23 @@ export interface JobsProgram {
    */
   list: Instructions.List;
   /**
+   * Build many list instructions at once — the bulk-create counterpart to
+   * {@link list}. Each instruction mints its own fresh job/run accounts. Returns
+   * instructions only; pass them to {@link sendBatch} to send them in the fewest
+   * transactions.
+   *
+   * Call it with the same params repeated `count` times, or with one entry per job
+   * when the jobs differ.
+   *
+   * @example
+   * ```typescript
+   * const instructions = await client.jobs.listMany({ market, ipfsHash, timeout }, 7);
+   * const results = await client.jobs.sendBatch(instructions);
+   * ```
+   */
+  listMany(params: Instructions.ListParams, count: number): Promise<Instructions.ListInstruction[]>;
+  listMany(params: Instructions.ListParams[]): Promise<Instructions.ListInstruction[]>;
+  /**
    * Post a new job to the marketplace (can list or assign based on params)
    */
   post(
@@ -119,13 +218,35 @@ export interface JobsProgram {
    */
   assign: Instructions.Assign;
   /**
+   * Assign many jobs at once — the bulk counterpart to {@link assign}. Each
+   * instruction mints its own fresh job/run accounts. Call with the same params
+   * repeated `count` times, or with one entry per job when they differ. Returns
+   * instructions only; pass them to {@link sendBatch}.
+   */
+  assignMany(
+    params: Instructions.AssignParams,
+    count: number
+  ): Promise<Instructions.AssignInstruction[]>;
+  assignMany(params: Instructions.AssignParams[]): Promise<Instructions.AssignInstruction[]>;
+  /**
    *  Extend an existing job's timeout
    */
   extend: Instructions.Extend;
   /**
+   * Extend many jobs at once — the bulk counterpart to {@link extend}. Takes one
+   * params entry per job (each carries its own `timeout`); pass the result to
+   * {@link sendBatch}.
+   */
+  extendMany(params: Instructions.ExtendParams[]): Promise<Instructions.ExtendInstruction[]>;
+  /**
    * Delist a job from the marketplace
    */
   delist: Instructions.Delist;
+  /**
+   * Delist many jobs at once — the bulk counterpart to {@link delist}. Takes the
+   * job addresses and returns one instruction each; pass them to {@link sendBatch}.
+   */
+  delistMany(jobs: Address[]): Promise<Instructions.DelistInstruction[]>;
   /**
    * Create a new market
    */
@@ -139,6 +260,11 @@ export interface JobsProgram {
    */
   close: Instructions.Close;
   /**
+   * Close many markets at once — the bulk counterpart to {@link close}. Takes the
+   * market addresses and returns one instruction each; pass them to {@link sendBatch}.
+   */
+  closeMany(markets: Address[]): Promise<Instructions.CloseInstruction[]>;
+  /**
    * Close a market (synonym for close)
    */
   closeMarket: Instructions.Close;
@@ -146,6 +272,11 @@ export interface JobsProgram {
    * Stop a running job
    */
   end: Instructions.End;
+  /**
+   * End many running jobs at once — the bulk counterpart to {@link end}. Takes the
+   * job addresses and returns one instruction each; pass them to {@link sendBatch}.
+   */
+  endMany(jobs: Address[]): Promise<Instructions.EndInstruction[]>;
   /**
    * Enters the MarketAccount queue, or create a RunAccount.
    */
@@ -155,17 +286,150 @@ export interface JobsProgram {
    */
   finish: Instructions.Finish;
   /**
+   * Finish many jobs at once — the bulk counterpart to {@link finish}. Each entry
+   * may expand to several instructions (token-account setup plus the finish), so
+   * this returns one atomic group per job; pass the result to {@link sendBatch},
+   * which keeps each group in a single transaction.
+   */
+  finishMany(params: Instructions.FinishParams[]): Promise<Instructions.FinishInstructions[]>;
+  /**
    * Post the result for a JobAccount to finish it and get paid.
    */
   complete: Instructions.Complete;
+  /**
+   * Complete many jobs at once — the bulk counterpart to {@link complete}. Takes
+   * one params entry per job (each carries its own result hash); pass the result
+   * to {@link sendBatch}.
+   */
+  completeMany(params: Instructions.CompleteParams[]): Promise<Instructions.CompleteInstruction[]>;
   /**
    * Quit a JobAccount that you have started.
    */
   quit: Instructions.Quit;
   /**
+   * Quit many runs at once — the bulk counterpart to {@link quit}. Takes the run
+   * addresses and returns one instruction each; pass them to {@link sendBatch}.
+   */
+  quitMany(runs: Address[]): Promise<Instructions.QuitInstruction[]>;
+  /**
    * Exit the node queue
    */
   stop: Instructions.Stop;
+  /**
+   * Exit the node queue for many markets at once — the bulk counterpart to
+   * {@link stop}. Takes the market addresses and returns one instruction each;
+   * pass them to {@link sendBatch}.
+   */
+  stopMany(markets: Address[]): Promise<Instructions.StopInstruction[]>;
+
+  /**
+   * Bulk-send many jobs instructions, automatically packing them into the fewest
+   * transactions that each stay within Solana's size and compute-unit limits.
+   *
+   * Each entry of `groups` is a single instruction or an atomic group of
+   * instructions that must stay in the same transaction. By default each
+   * transaction's compute-unit limit is estimated by simulation, because jobs
+   * instruction cost scales with the market queue size (a static estimate would
+   * under-provision large batches). Pass `estimateComputeUnits: false` to use the
+   * measured static table instead (no RPC, see `pnpm gen:cu`). All transactions are
+   * attempted regardless of individual failures; the result reports each outcome.
+   *
+   * Each result carries `confirmed`, the `accounts` it touched (grouped by role,
+   * e.g. `accounts.jobs`), the `decoded` instructions, and the `groupIndices` of
+   * the inputs it packed — so created accounts can be collected directly, or tied
+   * back to the exact input that produced them, without a bespoke `*Many` helper.
+   *
+   * @example
+   * ```typescript
+   * // Collect every created job from the confirmed transactions.
+   * const instructions = await client.jobs.listMany({ market, ipfsHash, timeout }, 7);
+   * const results = await client.jobs.sendBatch(instructions);
+   *
+   * const jobs = [];
+   * for (const tx of results) {
+   *   if (tx.confirmed) jobs.push(...tx.accounts.jobs);
+   * }
+   * ```
+   * @example
+   * ```typescript
+   * // Or tie each created job back to its input (groupIndices bridges tx -> input;
+   * // for single-instruction inputs decoded[k] lines up with groupIndices[k]).
+   * for (const tx of results) {
+   *   tx.groupIndices.forEach((inputIndex, k) => {
+   *     console.log(inputIndex, tx.confirmed, tx.decoded[k]?.accounts.job);
+   *   });
+   * }
+   * ```
+   *
+   * @param groups Atomic instruction groups to bulk together.
+   * @param options Optional configuration (fee payer, commitment, limits, simulation).
+   * @returns A per-transaction result array, in the order the buckets were packed.
+   */
+  sendBatch(
+    groups: Array<Instruction | Instruction[]>,
+    options?: {
+      feePayer?: TransactionSigner;
+      commitment?: 'processed' | 'confirmed' | 'finalized';
+      computeUnitMargin?: number;
+      maxComputeUnits?: number;
+      estimateComputeUnits?: boolean;
+      maxTransactionSize?: number;
+      sequential?: boolean;
+    }
+  ): Promise<JobsBatchTransactionResult[]>;
+
+  /**
+   * Bulk-pack and **sign** jobs instructions without sending them — the build-and
+   * -sign-only counterpart to {@link sendBatch}. Returns one signed, base64
+   * transaction per packed bucket for a separate process to persist and broadcast
+   * later (persist-before-send idempotency: a crash mid-send can replay the
+   * identical signed transaction, which the chain dedups by signature).
+   *
+   * Each bucket is signed with all of its embedded signers (the fresh job/run
+   * keypairs minted by each `list`/`assign` plus the fee payer), and the result
+   * carries the same `decoded`/`accounts` view as {@link sendBatch} so the
+   * per-bucket job/run addresses are available without decoding raw accounts.
+   *
+   * Compute-unit limits are set statically from the measured table (no simulation),
+   * since nothing is sent — then scaled by `computeUnitMargin` (default 3). The
+   * margin matters because jobs CU grows with market-queue depth (~131 CU/entry for
+   * `list`) and the table is a shallow measurement: a transaction signed now but
+   * broadcast later against a deeper queue could exceed a tight static limit and
+   * fail the whole bucket on landing. The protocol caps a queue at depth 250
+   * (worst-case `list` ≈51,900 CU), so the default 3 (budget ≈69,000, ~depth 380)
+   * covers the entire legal range with headroom. To size it explicitly, use
+   * `computeUnitMargin >= (≈19000 + 131·D_max) / 23000`. Over-provisioning only costs
+   * fee — `list` packing is size-bound, so a larger margin does not reduce density.
+   *
+   * Bucket atomicity applies: for operations whose instructions can already be
+   * settled (e.g. STOP/END on a finished job), a single failing instruction fails
+   * its whole bucket — pre-filter and/or use smaller buckets. LIST never hits this
+   * (every `list` mints fresh accounts).
+   *
+   * @example
+   * ```typescript
+   * const signed = await client.jobs.signBatch(await client.jobs.listMany(params, 7));
+   * for (const tx of signed) {
+   *   await persist({ blob: tx.blob, lastValidBlockHeight: tx.lastValidBlockHeight, jobs: tx.accounts.jobs });
+   *   // ...later, from a separate process: rpc.sendTransaction(tx.blob, { encoding: 'base64' })
+   * }
+   * ```
+   *
+   * @param groups Atomic instruction groups to bulk together.
+   * @param options Optional configuration (fee payer, limits). No `commitment`/`sequential` — nothing is sent.
+   * @param options.computeUnitMargin Multiplier on each instruction's static compute-unit estimate (default 3, covers the protocol's max queue depth of 250). Raise it only for deeper-than-protocol scenarios.
+   * @returns One signed, un-sent transaction per packed bucket, in packing order.
+   */
+  signBatch(
+    groups: Array<Instruction | Instruction[]>,
+    options?: {
+      feePayer?: TransactionSigner;
+      computeUnitMargin?: number;
+      maxComputeUnits?: number;
+      estimateComputeUnits?: boolean;
+      maxTransactionSize?: number;
+    }
+  ): Promise<SignedJobsBatchTransaction[]>;
 
   /**
    * Monitor program account updates using async iterators.
@@ -632,6 +896,54 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     async list(params) {
       return Instructions.list(params, createInstructionsHelper(this.get, this.runs));
     },
+    async listMany(
+      params: Instructions.ListParams | Instructions.ListParams[],
+      count?: number
+    ): Promise<Instructions.ListInstruction[]> {
+      const allParams = Array.isArray(params)
+        ? params
+        : Array.from({ length: count ?? 0 }, () => params);
+      return Promise.all(allParams.map((p) => this.list(p)));
+    },
+    async delistMany(jobs: Address[]): Promise<Instructions.DelistInstruction[]> {
+      return Promise.all(jobs.map((job) => this.delist({ job })));
+    },
+    async endMany(jobs: Address[]): Promise<Instructions.EndInstruction[]> {
+      return Promise.all(jobs.map((job) => this.end({ job })));
+    },
+    async quitMany(runs: Address[]): Promise<Instructions.QuitInstruction[]> {
+      return Promise.all(runs.map((run) => this.quit({ run })));
+    },
+    async closeMany(markets: Address[]): Promise<Instructions.CloseInstruction[]> {
+      return Promise.all(markets.map((market) => this.close({ market })));
+    },
+    async stopMany(markets: Address[]): Promise<Instructions.StopInstruction[]> {
+      return Promise.all(markets.map((market) => this.stop({ market })));
+    },
+    async assignMany(
+      params: Instructions.AssignParams | Instructions.AssignParams[],
+      count?: number
+    ): Promise<Instructions.AssignInstruction[]> {
+      const allParams = Array.isArray(params)
+        ? params
+        : Array.from({ length: count ?? 0 }, () => params);
+      return Promise.all(allParams.map((p) => this.assign(p)));
+    },
+    async extendMany(
+      params: Instructions.ExtendParams[]
+    ): Promise<Instructions.ExtendInstruction[]> {
+      return Promise.all(params.map((p) => this.extend(p)));
+    },
+    async finishMany(
+      params: Instructions.FinishParams[]
+    ): Promise<Instructions.FinishInstructions[]> {
+      return Promise.all(params.map((p) => this.finish(p)));
+    },
+    async completeMany(
+      params: Instructions.CompleteParams[]
+    ): Promise<Instructions.CompleteInstruction[]> {
+      return Promise.all(params.map((p) => this.complete(p)));
+    },
     /**
      * Post a new job to the marketplace (can list or assign based on params)
      */
@@ -682,6 +994,51 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     },
     async work(params) {
       return Instructions.work(params, createInstructionsHelper(this.get, this.runs));
+    },
+    async sendBatch(groups, options) {
+      const results = await deps.solana.buildSignAndSendBatch(groups, {
+        // Jobs instruction CU scales with the market queue size (e.g. delist scans
+        // the queue) AND the queue changes across the batch (list grows it, delist
+        // shrinks it). So estimate each transaction's limit by simulation, and send
+        // sequentially so every simulation reflects the state left by the prior
+        // transactions. Pass `estimateComputeUnits: false` for the static table
+        // (no RPC, but may under-provision on a large queue) or `sequential: false`
+        // to send concurrently.
+        estimateComputeUnits: true,
+        sequential: true,
+        ...options,
+        // Used for the packing ceiling and the static-table opt-out path.
+        computeUnits: getJobsInstructionComputeUnits,
+      });
+      // Decode each transaction's instructions so callers can recover the accounts
+      // they created or acted on (e.g. the job/run minted by a `list`), and group
+      // those accounts by role for the quick "give me the created jobs" view.
+      return results.map((result) => ({
+        ...result,
+        ...decodeBatchInstructions(result.instructions),
+      }));
+    },
+    async signBatch(groups, options) {
+      // Build + sign without sending, for persist-before-send idempotency. CU is set
+      // statically from the measured table (no simulation): signBatch never sends, so
+      // there is no chain state for a simulation to reflect at sign time. But jobs CU
+      // grows with market-queue depth (~131 CU/entry for list) and the table is a
+      // shallow measurement, so a transaction broadcast later against a deeper queue
+      // could exceed a tight static limit. The protocol caps a queue at depth 250,
+      // where a single list costs ~51,900 CU (19,131 + 131·250) vs. the 23,000 table
+      // value — so a 3x margin (budget ~69,000, ~depth 380) covers the entire legal
+      // range with headroom. Callers can override `computeUnitMargin`.
+      const signed = await deps.solana.buildAndSignBatch(groups, {
+        computeUnitMargin: 3,
+        ...options,
+        computeUnits: getJobsInstructionComputeUnits,
+      });
+      // Same decoded/accounts enrichment as sendBatch, so the per-bucket job/run
+      // addresses are available without decoding the raw instructions.
+      return signed.map((transaction) => ({
+        ...transaction,
+        ...decodeBatchInstructions(transaction.instructions),
+      }));
     },
     /**
      * Monitor program account updates using async iterators.

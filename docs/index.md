@@ -60,8 +60,7 @@ Explore our documentation organized by what you want to accomplish:
 ### Host GPUs
 
 - **[Host GPUs Guide](/hosts/grid)** - Join the network as a GPU provider
-- **[Ubuntu Setup](/hosts/grid-ubuntu)** - System setup instructions
-- **[Running the Host](/hosts/grid-run)** - Start hosting GPUs
+- **[Ubuntu Setup & Running](/hosts/grid-run)** - System setup and hosting instructions
 - **[Troubleshooting](/hosts/troubleshoot)** - Common issues and solutions
 
 </div>

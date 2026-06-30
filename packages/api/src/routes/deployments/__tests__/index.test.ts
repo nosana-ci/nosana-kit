@@ -104,7 +104,7 @@ describe('createDeploymentsApi', () => {
         expect(result.address).toBe(global.TEST_MOCK_VAULT.vault);
         expect(result.created_at).toBeInstanceOf(Date);
         expect(global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager.POST).toHaveBeenCalledWith(
-          '/api/deployments/vaults/create',
+          '/deployments/vaults/create',
           {},
         );
       });
@@ -167,7 +167,7 @@ describe('createDeploymentsApi', () => {
         });
 
         expect(global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager.GET).toHaveBeenCalledWith(
-          '/api/deployments/vaults',
+          '/deployments/vaults',
           {},
         );
       });

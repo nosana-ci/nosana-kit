@@ -18,7 +18,7 @@ export async function deploymentGetJobs(
   searchParams?: DeploymentJobsSearchParams,
 ): Promise<JobListResult> {
   const { data, error } = await client.GET(
-    '/api/deployments/{deployment}/jobs',
+    '/deployments/{deployment}/jobs',
     {
       params: {
         path: { deployment: state.id },

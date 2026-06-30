@@ -18,10 +18,9 @@ export function createIPFSFetchClient(config: IPFSConfig): FetchClient {
     try {
       const response = await fetch(request);
 
-      if (!response.ok && !response.body) {
+      if (!response.ok) {
         throw new Error(`Failed to fetch data from IPFS: ${response.status} ${response.statusText} ${await response.text()}`);
       }
-
 
       if (response.headers.get('content-type')?.includes('application/json')) {
         return [await response.json() as T, undefined] as [T, undefined];

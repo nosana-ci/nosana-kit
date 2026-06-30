@@ -22,7 +22,7 @@ describe('vaultWithdraw', () => {
       await vaultWithdraw(vaultAddress, mockOptions);
 
       expect(mockOptions.deploymentManager.POST).toHaveBeenCalledWith(
-        '/api/deployments/vaults/{vault}/withdraw',
+        '/deployments/vaults/{vault}/withdraw',
         {
           params: {
             path: {

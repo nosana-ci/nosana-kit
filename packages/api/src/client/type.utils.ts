@@ -3,14 +3,16 @@ import createClient from "openapi-fetch";
 export type EnumValues<T> = T[keyof T];
 
 /**
- * Utility type to remove header requirements from OpenAPI parameters
- * This preserves the original structure but removes headers and makes undefined params optional
- * We only modify the parameters, leaving responses and requestBody untouched
+ * Utility type that relaxes header *requirements* on OpenAPI parameters: auth
+ * headers (Authorization/x-user-id) are injected by the client middleware, so
+ * callers must never be forced to pass them. We make the whole `header` bag
+ * optional rather than removing it, so typed request headers the caller does
+ * supply (e.g. `Idempotency-Key`) still flow through. Responses and requestBody
+ * are left untouched.
  */
 type OmitHeaders<T> = T extends {
   parameters: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    header?: any;
+    header?: infer Header;
     path?: infer Path;
     query?: infer Query;
     cookie?: infer Cookie;
@@ -20,7 +22,7 @@ type OmitHeaders<T> = T extends {
 }
   ? {
     parameters: {
-      header?: never;
+      header?: Header;
     } & (Path extends undefined ? {} : { path: Path }) &
     (Query extends undefined ? {} : { query: Query }) &
     (Cookie extends undefined ? {} : { cookie: Cookie });

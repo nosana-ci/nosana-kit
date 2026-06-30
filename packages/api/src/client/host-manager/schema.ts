@@ -13,6 +13,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Submit error log (SDK) */
         post: operations["postErrorsReport"];
         delete?: never;
         options?: never;
@@ -70,22 +71,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/markets/gpu-types": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getMarketsGpu-types"];
-        put?: never;
-        post: operations["postMarketsGpu-types"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/markets/docker-images": {
         parameters: {
             query?: never;
@@ -113,22 +98,6 @@ export interface paths {
         put?: never;
         post: operations["postMarketsRemote-resources"];
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/markets/gpu-types/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getMarketsGpu-typesById"];
-        put: operations["putMarketsGpu-typesById"];
-        post?: never;
-        delete: operations["deleteMarketsGpu-typesById"];
         options?: never;
         head?: never;
         patch?: never;
@@ -231,30 +200,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/benchmarks/node-report": {
+    "/benchmarks/market-metric-aggregates": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getBenchmarksNode-report"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/benchmarks/node-template-performance/{nodeId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getBenchmarksNode-template-performanceByNodeId"];
+        get: operations["getBenchmarksMarket-metric-aggregates"];
         put?: never;
         post?: never;
         delete?: never;
@@ -279,15 +232,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/benchmarks/markets/benchmark-summary": {
+    "/benchmarks/metric-processors": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Returns per-market benchmark summary. total_nodes reflects all nodes mapped to each market */
-        get: operations["getBenchmarksMarketsBenchmark-summary"];
+        get: operations["getBenchmarksMetric-processors"];
         put?: never;
         post?: never;
         delete?: never;
@@ -296,32 +248,16 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/benchmarks/{id}/submit-results": {
+    "/benchmarks/operations": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getBenchmarksOperations"];
         put?: never;
-        post: operations["postBenchmarksByIdSubmit-results"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/benchmarks/submit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postBenchmarksSubmit"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -392,14 +328,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/benchmarks/benchmarks": {
+    "/benchmarks/metrics": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getBenchmarksBenchmarks"];
+        get: operations["getBenchmarksMetrics"];
         put?: never;
         post?: never;
         delete?: never;
@@ -408,7 +344,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/benchmarks/benchmarks/create": {
+    "/benchmarks/metrics/create": {
         parameters: {
             query?: never;
             header?: never;
@@ -417,14 +353,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["postBenchmarksBenchmarksCreate"];
+        post: operations["postBenchmarksMetricsCreate"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/benchmarks/benchmarks/{id}/update": {
+    "/benchmarks/metrics/{key}/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -433,14 +369,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["postBenchmarksBenchmarksByIdUpdate"];
+        post: operations["postBenchmarksMetricsByKeyUpdate"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/benchmarks/benchmarks/{id}/delete": {
+    "/benchmarks/metrics/{key}/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -450,30 +386,29 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["deleteBenchmarksBenchmarksByIdDelete"];
+        delete: operations["deleteBenchmarksMetricsByKeyDelete"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/benchmarks/admin-clear-benchmark-data": {
+    "/benchmarks/market-thresholds": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getBenchmarksMarket-thresholds"];
         put?: never;
-        /** Delete all research benchmark data for current benchmark version */
-        post: operations["postBenchmarksAdmin-clear-benchmark-data"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/benchmarks/selector": {
+    "/benchmarks/market-thresholds/create": {
         parameters: {
             query?: never;
             header?: never;
@@ -482,7 +417,167 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["postBenchmarksSelector"];
+        post: operations["postBenchmarksMarket-thresholdsCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/market-thresholds/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksMarket-thresholdsUpdate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/market-thresholds/describe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksMarket-thresholdsDescribe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/market-thresholds/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteBenchmarksMarket-thresholdsDelete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/operations/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksOperationsCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/operations/{id}/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksOperationsByIdUpdate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/operations/{id}/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteBenchmarksOperationsByIdDelete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/{id}/submit-results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksByIdSubmit-results"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/{id}/seed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksByIdSeed"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/{id}/prediction": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksByIdPrediction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/recent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getBenchmarksRecent"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -505,38 +600,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/nodes/metrics": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getNodesMetrics"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/nodes/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getNodes"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/nodes/available-gpus": {
         parameters: {
             query?: never;
@@ -545,22 +608,6 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getNodesAvailable-gpus"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/nodes/stats": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getNodesStats"];
         put?: never;
         post?: never;
         delete?: never;
@@ -633,86 +680,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/nodes/onboard": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postNodesOnboard"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/nodes/upgrade": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postNodesUpgrade"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/nodes/assign-node": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postNodesAssign-node"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/nodes/remove-market-assignment": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postNodesRemove-market-assignment"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/nodes/change-market": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postNodesChange-market"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/nodes/sync-node": {
         parameters: {
             query?: never;
@@ -723,6 +690,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["postNodesSync-node"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesByIdMetrics"];
+        put?: never;
+        post: operations["postNodesByIdMetrics"];
         delete?: never;
         options?: never;
         head?: never;
@@ -761,38 +744,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/nodes/join-test-grid": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postNodesJoin-test-grid"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/nodes/revoke": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postNodesRevoke"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/nodes/{id}": {
         parameters: {
             query?: never;
@@ -809,14 +760,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/nodes/{id}/full": {
+    "/nodes/{id}/address": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getNodesByIdFull"];
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patchNodesByIdAddress"];
+        trace?: never;
+    };
+    "/nodes/rewards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesRewards"];
         put?: never;
         post?: never;
         delete?: never;
@@ -825,14 +792,190 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/nodes/{id}/specs": {
+    "/nodes/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getNodesByIdSpecs"];
+        get: operations["getNodes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/promote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesPromote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/demote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesDemote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/move-market": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesMove-market"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/kick-from-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesKick-from-queue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/assign-node": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesAssign-node"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/remove-market-assignment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesRemove-market-assignment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/ban": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesBan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/unban": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesUnban"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/invalidate-metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesInvalidate-metrics"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}/contact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patchNodesByIdContact"];
+        trace?: never;
+    };
+    "/nodes/{id}/full": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesByIdFull"];
         put?: never;
         post?: never;
         delete?: never;
@@ -857,23 +1000,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/nodes/{id}/submit-system-specs": {
+    "/nodes/{id}/rewards": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getNodesByIdRewards"];
         put?: never;
-        post: operations["postNodesByIdSubmit-system-specs"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/nodes/{id}/address": {
+    "/nodes/{id}/recent-benchmarks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesByIdRecent-benchmarks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesByIdNotes"];
+        put?: never;
+        post: operations["postNodesByIdNotes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}/notes/{noteId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -883,26 +1058,10 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["deleteNodesByIdNotesByNoteId"];
         options?: never;
         head?: never;
-        patch: operations["patchNodesByIdAddress"];
-        trace?: never;
-    };
-    "/nodes/{id}/check-market": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postNodesByIdCheck-market"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
+        patch: operations["patchNodesByIdNotesByNoteId"];
         trace?: never;
     };
     "/stats/nodes-country": {
@@ -1017,14 +1176,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/templates/": {
+    "/benchmark-templates/config": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getTemplates"];
+        /** Current stored benchmark templates — operations + metrics + their thresholds. Read-only, no GitHub fetch; shown on the template page before a refresh. */
+        get: operations["getBenchmark-templatesConfig"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1033,14 +1193,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/templates/{id}": {
+    "/benchmark-templates/refresh": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getTemplatesById"];
+        /** Preview the benchmark template diff against stored github operations (added/updated/removed metrics + operations, supported markets, existing thresholds). Read-only — writes nothing. */
+        get: operations["getBenchmark-templatesRefresh"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1049,7 +1210,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/templates/admin-refresh": {
+    "/benchmark-templates/apply": {
         parameters: {
             query?: never;
             header?: never;
@@ -1058,23 +1219,26 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Manually trigger template refresh from GitHub */
-        post: operations["postTemplatesAdmin-refresh"];
+        /** Apply the operation/metric diff, the supplied human-reviewed thresholds, and the approved market-threshold reconciliations in one transaction. Metrics → thresholds → reconciliations, so each step's targets exist before the next. Omit all for a template-only sync. */
+        post: operations["postBenchmark-templatesApply"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/hosts/filters": {
+    "/node-under-maintenance": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Get filter options for GPUs with system specs. You can filter by market_type (premium, community, or all). */
-        get: operations["getHostsFilters"];
+        /**
+         * Public maintenance health-check (no auth)
+         * @description Polled by node clients before they're considered live. Returns 200 OK when the host manager is operating normally and 503 Service Unavailable when maintenance is active — clients branch on `response.ok` alone. `expectedEndAt` is a best-effort estimate; clients keep polling past it if the endpoint still returns 503. Network errors are treated as 'still in maintenance' from the client's perspective.
+         */
+        get: operations["getNode-under-maintenance"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1083,15 +1247,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/hosts/": {
+    "/config/export": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Get available hosts matching filter criteria. Use group=all to get hosts from all markets. */
-        get: operations["getHosts"];
+        /** Dump the full threshold-system configuration (groups, operations, metrics, markets, thresholds, market thresholds, anti-spoof seeds) for cloning into another environment. */
+        get: operations["getConfigExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMetrics"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1131,8 +1311,8 @@ export interface operations {
     postErrorsReport: {
         parameters: {
             query?: never;
-            header?: {
-                authorization?: string;
+            header: {
+                authorization: string;
             };
             path?: never;
             cookie?: never;
@@ -1167,7 +1347,33 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        success: boolean;
+                    };
+                    "multipart/form-data": {
+                        success: boolean;
+                    };
+                    "text/plain": {
+                        success: boolean;
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
             };
         };
     };
@@ -1238,57 +1444,6 @@ export interface operations {
             };
         };
     };
-    "getMarketsGpu-types": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "postMarketsGpu-types": {
-        parameters: {
-            query?: never;
-            header: {
-                authorization: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    vram?: number;
-                };
-                "multipart/form-data": {
-                    name: string;
-                    vram?: number;
-                };
-                "text/plain": {
-                    name: string;
-                    vram?: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     "getMarketsDocker-images": {
         parameters: {
             query?: never;
@@ -1340,7 +1495,9 @@ export interface operations {
     "getMarketsRemote-resources": {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1388,82 +1545,6 @@ export interface operations {
                 };
             };
         };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "getMarketsGpu-typesById": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "putMarketsGpu-typesById": {
-        parameters: {
-            query?: never;
-            header: {
-                authorization: string;
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    vram?: number;
-                };
-                "multipart/form-data": {
-                    name: string;
-                    vram?: number;
-                };
-                "text/plain": {
-                    name: string;
-                    vram?: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "deleteMarketsGpu-typesById": {
-        parameters: {
-            query?: never;
-            header: {
-                authorization: string;
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -1549,7 +1630,9 @@ export interface operations {
     "getMarketsRemote-resourcesById": {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
             path: {
                 id: string;
             };
@@ -1637,6 +1720,7 @@ export interface operations {
                 filterKey?: string;
                 filterValue?: string;
                 limit?: string;
+                type?: "PREMIUM" | "COMMUNITY";
             };
             header?: never;
             path?: never;
@@ -1692,14 +1776,13 @@ export interface operations {
                     type?: string;
                     sft?: (string | null) | null;
                     usd_reward_per_hour?: number;
+                    nos_reward_per_second?: number;
+                    utilization_target?: (number | null) | null;
                     job_price?: number;
                     job_timeout?: number;
                     job_expiration?: number;
                     node_access_key?: string;
                     minimum_stake?: number;
-                    gpu_types?: {
-                        id: number;
-                    }[];
                     required_images?: {
                         id: number;
                     }[];
@@ -1707,7 +1790,6 @@ export interface operations {
                         id: number;
                     }[];
                     client?: boolean;
-                    auto_kick_enabled?: boolean;
                 };
                 "multipart/form-data": {
                     slug?: string;
@@ -1715,14 +1797,13 @@ export interface operations {
                     type?: string;
                     sft?: (string | null) | null;
                     usd_reward_per_hour?: number;
+                    nos_reward_per_second?: number;
+                    utilization_target?: (number | null) | null;
                     job_price?: number;
                     job_timeout?: number;
                     job_expiration?: number;
                     node_access_key?: string;
                     minimum_stake?: number;
-                    gpu_types?: {
-                        id: number;
-                    }[];
                     required_images?: {
                         id: number;
                     }[];
@@ -1730,7 +1811,6 @@ export interface operations {
                         id: number;
                     }[];
                     client?: boolean;
-                    auto_kick_enabled?: boolean;
                 };
                 "text/plain": {
                     slug?: string;
@@ -1738,14 +1818,13 @@ export interface operations {
                     type?: string;
                     sft?: (string | null) | null;
                     usd_reward_per_hour?: number;
+                    nos_reward_per_second?: number;
+                    utilization_target?: (number | null) | null;
                     job_price?: number;
                     job_timeout?: number;
                     job_expiration?: number;
                     node_access_key?: string;
                     minimum_stake?: number;
-                    gpu_types?: {
-                        id: number;
-                    }[];
                     required_images?: {
                         id: number;
                     }[];
@@ -1753,7 +1832,6 @@ export interface operations {
                         id: number;
                     }[];
                     client?: boolean;
-                    auto_kick_enabled?: boolean;
                 };
             };
         };
@@ -1802,7 +1880,53 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        required_images: string[];
+                        required_remote_resources: ({
+                            /** @constant */
+                            type: "Ollama";
+                            model: string;
+                        } | {
+                            type: "S3" | "HF";
+                            url: string;
+                            IAM?: {
+                                access_key_id: string;
+                                secret_access_key: string;
+                            };
+                        })[];
+                    };
+                    "multipart/form-data": {
+                        required_images: string[];
+                        required_remote_resources: ({
+                            /** @constant */
+                            type: "Ollama";
+                            model: string;
+                        } | {
+                            type: "S3" | "HF";
+                            url: string;
+                            IAM?: {
+                                access_key_id: string;
+                                secret_access_key: string;
+                            };
+                        })[];
+                    };
+                    "text/plain": {
+                        required_images: string[];
+                        required_remote_resources: ({
+                            /** @constant */
+                            type: "Ollama";
+                            model: string;
+                        } | {
+                            type: "S3" | "HF";
+                            url: string;
+                            IAM?: {
+                                access_key_id: string;
+                                secret_access_key: string;
+                            };
+                        })[];
+                    };
+                };
             };
         };
     };
@@ -1867,12 +1991,13 @@ export interface operations {
             };
         };
     };
-    "getBenchmarksNode-report": {
+    "getBenchmarksMarket-metric-aggregates": {
         parameters: {
             query?: {
-                market?: string;
-                node?: string;
-                status?: string;
+                metrics?: string | string[];
+                marketAddress?: string;
+                nodeId?: string;
+                aggregate?: "average" | "min" | "max" | "median";
             };
             header?: never;
             path?: never;
@@ -1886,136 +2011,54 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        node: string;
-                        status: string;
-                        current_market: (string | null) | null;
-                        uptimePercentage: number;
-                        antiSpoofSuccessRate: number;
-                        uptimeTestCount: number;
-                        antiSpoofTestCount: number;
-                        reports: {
-                            marketAddress: (string | null) | null;
-                            requiredBandwidth: number;
-                            recommendedBandwidth: number;
-                            relativeWattage: number;
-                            relativeTemperature: number;
-                            relativePerformance: number;
-                            averageDownloadSpeed: number;
-                            averageUploadSpeed: number;
+                        aggregate: "average" | "min" | "max" | "median";
+                        markets: {
+                            marketAddress: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
                         }[];
-                    } | {
-                        node: string;
-                        status: string;
-                        current_market: (string | null) | null;
-                        uptimePercentage: number;
-                        antiSpoofSuccessRate: number;
-                        uptimeTestCount: number;
-                        antiSpoofTestCount: number;
-                        reports: {
-                            marketAddress: (string | null) | null;
-                            requiredBandwidth: number;
-                            recommendedBandwidth: number;
-                            relativeWattage: number;
-                            relativeTemperature: number;
-                            relativePerformance: number;
-                            averageDownloadSpeed: number;
-                            averageUploadSpeed: number;
-                        }[];
-                    }[];
+                        /** @description Aggregate across all individual benchmark runs for this node. */
+                        node?: {
+                            nodeId: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
+                        };
+                    };
                     "multipart/form-data": {
-                        node: string;
-                        status: string;
-                        current_market: (string | null) | null;
-                        uptimePercentage: number;
-                        antiSpoofSuccessRate: number;
-                        uptimeTestCount: number;
-                        antiSpoofTestCount: number;
-                        reports: {
-                            marketAddress: (string | null) | null;
-                            requiredBandwidth: number;
-                            recommendedBandwidth: number;
-                            relativeWattage: number;
-                            relativeTemperature: number;
-                            relativePerformance: number;
-                            averageDownloadSpeed: number;
-                            averageUploadSpeed: number;
+                        aggregate: "average" | "min" | "max" | "median";
+                        markets: {
+                            marketAddress: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
                         }[];
-                    } | {
-                        node: string;
-                        status: string;
-                        current_market: (string | null) | null;
-                        uptimePercentage: number;
-                        antiSpoofSuccessRate: number;
-                        uptimeTestCount: number;
-                        antiSpoofTestCount: number;
-                        reports: {
-                            marketAddress: (string | null) | null;
-                            requiredBandwidth: number;
-                            recommendedBandwidth: number;
-                            relativeWattage: number;
-                            relativeTemperature: number;
-                            relativePerformance: number;
-                            averageDownloadSpeed: number;
-                            averageUploadSpeed: number;
-                        }[];
-                    }[];
+                        /** @description Aggregate across all individual benchmark runs for this node. */
+                        node?: {
+                            nodeId: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
+                        };
+                    };
                     "text/plain": {
-                        node: string;
-                        status: string;
-                        current_market: (string | null) | null;
-                        uptimePercentage: number;
-                        antiSpoofSuccessRate: number;
-                        uptimeTestCount: number;
-                        antiSpoofTestCount: number;
-                        reports: {
-                            marketAddress: (string | null) | null;
-                            requiredBandwidth: number;
-                            recommendedBandwidth: number;
-                            relativeWattage: number;
-                            relativeTemperature: number;
-                            relativePerformance: number;
-                            averageDownloadSpeed: number;
-                            averageUploadSpeed: number;
+                        aggregate: "average" | "min" | "max" | "median";
+                        markets: {
+                            marketAddress: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
                         }[];
-                    } | {
-                        node: string;
-                        status: string;
-                        current_market: (string | null) | null;
-                        uptimePercentage: number;
-                        antiSpoofSuccessRate: number;
-                        uptimeTestCount: number;
-                        antiSpoofTestCount: number;
-                        reports: {
-                            marketAddress: (string | null) | null;
-                            requiredBandwidth: number;
-                            recommendedBandwidth: number;
-                            relativeWattage: number;
-                            relativeTemperature: number;
-                            relativePerformance: number;
-                            averageDownloadSpeed: number;
-                            averageUploadSpeed: number;
-                        }[];
-                    }[];
+                        /** @description Aggregate across all individual benchmark runs for this node. */
+                        node?: {
+                            nodeId: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
+                        };
+                    };
                 };
-            };
-        };
-    };
-    "getBenchmarksNode-template-performanceByNodeId": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                nodeId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -2067,12 +2110,9 @@ export interface operations {
             };
         };
     };
-    "getBenchmarksMarketsBenchmark-summary": {
+    "getBenchmarksMetric-processors": {
         parameters: {
-            query?: {
-                since?: string;
-                benchmark_version?: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -2083,78 +2123,18 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": {
-                        market_address: string;
-                        total_nodes: number;
-                        success_count: number;
-                        failure_count: number;
-                        success_rate_pct: number;
-                        failed_benchmark_ids: string[];
-                    }[];
-                    "multipart/form-data": {
-                        market_address: string;
-                        total_nodes: number;
-                        success_count: number;
-                        failure_count: number;
-                        success_rate_pct: number;
-                        failed_benchmark_ids: string[];
-                    }[];
-                    "text/plain": {
-                        market_address: string;
-                        total_nodes: number;
-                        success_count: number;
-                        failure_count: number;
-                        success_rate_pct: number;
-                        failed_benchmark_ids: string[];
-                    }[];
-                };
-            };
-        };
-    };
-    "postBenchmarksByIdSubmit-results": {
-        parameters: {
-            query?: never;
-            header: {
-                authorization: string;
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": unknown;
-                "multipart/form-data": unknown;
-                "text/plain": unknown;
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
                 content?: never;
             };
         };
     };
-    postBenchmarksSubmit: {
+    getBenchmarksOperations: {
         parameters: {
             query?: never;
-            header: {
-                authorization: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": unknown;
-                "multipart/form-data": unknown;
-                "text/plain": unknown;
-            };
-        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -2170,7 +2150,9 @@ export interface operations {
                 metric?: string;
                 marketAddress?: string;
             };
-            header?: never;
+            header: {
+                authorization: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2187,32 +2169,37 @@ export interface operations {
     postBenchmarksThresholdsCreate: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
             path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
                 "application/json": {
-                    metric: string;
-                    measurementDescription: string;
-                    thresholdValue?: string;
-                    feedbackMessage?: string;
-                    marketAddresses?: string[];
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
                 };
                 "multipart/form-data": {
-                    metric: string;
-                    measurementDescription: string;
-                    thresholdValue?: string;
-                    feedbackMessage?: string;
-                    marketAddresses?: string[];
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
                 };
                 "text/plain": {
-                    metric: string;
-                    measurementDescription: string;
-                    thresholdValue?: string;
-                    feedbackMessage?: string;
-                    marketAddresses?: string[];
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
                 };
             };
         };
@@ -2228,7 +2215,9 @@ export interface operations {
     postBenchmarksThresholdsByIdUpdate: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
             path: {
                 id: string;
             };
@@ -2237,25 +2226,28 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    metric: string;
-                    measurementDescription: string;
-                    thresholdValue?: string;
-                    feedbackMessage?: string;
-                    marketAddresses?: string[];
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
                 };
                 "multipart/form-data": {
-                    metric: string;
-                    measurementDescription: string;
-                    thresholdValue?: string;
-                    feedbackMessage?: string;
-                    marketAddresses?: string[];
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
                 };
                 "text/plain": {
-                    metric: string;
-                    measurementDescription: string;
-                    thresholdValue?: string;
-                    feedbackMessage?: string;
-                    marketAddresses?: string[];
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
                 };
             };
         };
@@ -2271,7 +2263,9 @@ export interface operations {
     deleteBenchmarksThresholdsByIdDelete: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
             path: {
                 id: string;
             };
@@ -2287,129 +2281,11 @@ export interface operations {
             };
         };
     };
-    getBenchmarksBenchmarks: {
+    getBenchmarksMetrics: {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
+            query?: {
+                operationId?: string | number;
             };
-        };
-    };
-    postBenchmarksBenchmarksCreate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    type?: string;
-                    name: string;
-                    description?: string;
-                    benchmarkOperation: unknown;
-                    expiryMinutes?: number;
-                };
-                "multipart/form-data": {
-                    type?: string;
-                    name: string;
-                    description?: string;
-                    benchmarkOperation: unknown;
-                    expiryMinutes?: number;
-                };
-                "text/plain": {
-                    type?: string;
-                    name: string;
-                    description?: string;
-                    benchmarkOperation: unknown;
-                    expiryMinutes?: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postBenchmarksBenchmarksByIdUpdate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    type?: string;
-                    name: string;
-                    description?: string;
-                    benchmarkOperation: unknown;
-                    expiryMinutes?: number;
-                };
-                "multipart/form-data": {
-                    type?: string;
-                    name: string;
-                    description?: string;
-                    benchmarkOperation: unknown;
-                    expiryMinutes?: number;
-                };
-                "text/plain": {
-                    type?: string;
-                    name: string;
-                    description?: string;
-                    benchmarkOperation: unknown;
-                    expiryMinutes?: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    deleteBenchmarksBenchmarksByIdDelete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "postBenchmarksAdmin-clear-benchmark-data": {
-        parameters: {
-            query?: never;
             header: {
                 authorization: string;
             };
@@ -2426,7 +2302,7 @@ export interface operations {
             };
         };
     };
-    postBenchmarksSelector: {
+    postBenchmarksMetricsCreate: {
         parameters: {
             query?: never;
             header: {
@@ -2438,16 +2314,49 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    nodeId: string;
-                    templateId?: string;
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
                 };
                 "multipart/form-data": {
-                    nodeId: string;
-                    templateId?: string;
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
                 };
                 "text/plain": {
-                    nodeId: string;
-                    templateId?: string;
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
                 };
             };
         };
@@ -2457,13 +2366,1955 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    postBenchmarksMetricsByKeyUpdate: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
+                };
+                "multipart/form-data": {
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
+                };
+                "text/plain": {
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteBenchmarksMetricsByKeyDelete: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getBenchmarksMarket-thresholds": {
+        parameters: {
+            query?: {
+                thresholdId?: string | number;
+                marketAddress?: string;
+            };
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postBenchmarksMarket-thresholdsCreate": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+                "multipart/form-data": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+                "text/plain": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postBenchmarksMarket-thresholdsUpdate": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+                "multipart/form-data": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+                "text/plain": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postBenchmarksMarket-thresholdsDescribe": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    subject?: string;
+                };
+                "multipart/form-data": {
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    subject?: string;
+                };
+                "text/plain": {
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    subject?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        description: string;
+                    };
+                    "multipart/form-data": {
+                        description: string;
+                    };
+                    "text/plain": {
+                        description: string;
+                    };
+                };
+            };
+        };
+    };
+    "deleteBenchmarksMarket-thresholdsDelete": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    thresholdId: number;
+                    marketAddress: string | null;
+                };
+                "multipart/form-data": {
+                    thresholdId: number;
+                    marketAddress: string | null;
+                };
+                "text/plain": {
+                    thresholdId: number;
+                    marketAddress: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBenchmarksOperationsCreate: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on: string[];
+                            stop_if_dependent_stops?: boolean;
+                        } | {
+                            group?: string;
+                            timeout?: number;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+                "multipart/form-data": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on: string[];
+                            stop_if_dependent_stops?: boolean;
+                        } | {
+                            group?: string;
+                            timeout?: number;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+                "text/plain": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on: string[];
+                            stop_if_dependent_stops?: boolean;
+                        } | {
+                            group?: string;
+                            timeout?: number;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBenchmarksOperationsByIdUpdate: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on: string[];
+                            stop_if_dependent_stops?: boolean;
+                        } | {
+                            group?: string;
+                            timeout?: number;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+                "multipart/form-data": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on: string[];
+                            stop_if_dependent_stops?: boolean;
+                        } | {
+                            group?: string;
+                            timeout?: number;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+                "text/plain": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on: string[];
+                            stop_if_dependent_stops?: boolean;
+                        } | {
+                            group?: string;
+                            timeout?: number;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteBenchmarksOperationsByIdDelete: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postBenchmarksByIdSubmit-results": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    status?: string;
+                    startTime?: number;
+                    endTime?: (number | null) | null;
+                    errors?: unknown[];
+                    opStates: {
+                        providerId?: (string | null) | null;
+                        operationId?: (string | null) | null;
+                        group?: (string | null) | null;
+                        status?: (string | null) | null;
+                        startTime?: (number | null) | null;
+                        endTime?: (number | null) | null;
+                        exitCode: (number | null) | null;
+                        logs?: {
+                            type: "stdin" | "stdout" | "stderr" | "nodeerr";
+                            log?: string;
+                            timestamp?: string;
+                        }[];
+                        results?: {
+                            [key: string]: string | string[];
+                        };
+                        error?: {
+                            event: string;
+                            message: string;
+                            code?: number;
+                        };
+                        diagnostics?: {
+                            reason: {
+                                hostShutDown: boolean;
+                                jobStopped: boolean;
+                                jobExpired: boolean;
+                                reason?: string;
+                            };
+                            state?: {
+                                Status: string;
+                                Running: boolean;
+                                Paused: boolean;
+                                Restarting: boolean;
+                                OOMKilled: boolean;
+                                Dead: boolean;
+                                Pid: number;
+                                ExitCode: number;
+                                Error: string;
+                                StartedAt: string;
+                                FinishedAt: string;
+                                RestartCount: number;
+                                Health?: {
+                                    Status: string;
+                                    FailingStreak: number;
+                                    Log: {
+                                        Start: string;
+                                        End: string;
+                                        ExitCode: number;
+                                        Output: string;
+                                    }[];
+                                };
+                            };
+                        };
+                        env?: {
+                            [key: string]: string;
+                        };
+                    }[];
+                    secrets?: {
+                        [key: string]: unknown;
+                    };
+                };
+                "multipart/form-data": {
+                    status?: string;
+                    startTime?: number;
+                    endTime?: (number | null) | null;
+                    errors?: unknown[];
+                    opStates: {
+                        providerId?: (string | null) | null;
+                        operationId?: (string | null) | null;
+                        group?: (string | null) | null;
+                        status?: (string | null) | null;
+                        startTime?: (number | null) | null;
+                        endTime?: (number | null) | null;
+                        exitCode: (number | null) | null;
+                        logs?: {
+                            type: "stdin" | "stdout" | "stderr" | "nodeerr";
+                            log?: string;
+                            timestamp?: string;
+                        }[];
+                        results?: {
+                            [key: string]: string | string[];
+                        };
+                        error?: {
+                            event: string;
+                            message: string;
+                            code?: number;
+                        };
+                        diagnostics?: {
+                            reason: {
+                                hostShutDown: boolean;
+                                jobStopped: boolean;
+                                jobExpired: boolean;
+                                reason?: string;
+                            };
+                            state?: {
+                                Status: string;
+                                Running: boolean;
+                                Paused: boolean;
+                                Restarting: boolean;
+                                OOMKilled: boolean;
+                                Dead: boolean;
+                                Pid: number;
+                                ExitCode: number;
+                                Error: string;
+                                StartedAt: string;
+                                FinishedAt: string;
+                                RestartCount: number;
+                                Health?: {
+                                    Status: string;
+                                    FailingStreak: number;
+                                    Log: {
+                                        Start: string;
+                                        End: string;
+                                        ExitCode: number;
+                                        Output: string;
+                                    }[];
+                                };
+                            };
+                        };
+                        env?: {
+                            [key: string]: string;
+                        };
+                    }[];
+                    secrets?: {
+                        [key: string]: unknown;
+                    };
+                };
+                "text/plain": {
+                    status?: string;
+                    startTime?: number;
+                    endTime?: (number | null) | null;
+                    errors?: unknown[];
+                    opStates: {
+                        providerId?: (string | null) | null;
+                        operationId?: (string | null) | null;
+                        group?: (string | null) | null;
+                        status?: (string | null) | null;
+                        startTime?: (number | null) | null;
+                        endTime?: (number | null) | null;
+                        exitCode: (number | null) | null;
+                        logs?: {
+                            type: "stdin" | "stdout" | "stderr" | "nodeerr";
+                            log?: string;
+                            timestamp?: string;
+                        }[];
+                        results?: {
+                            [key: string]: string | string[];
+                        };
+                        error?: {
+                            event: string;
+                            message: string;
+                            code?: number;
+                        };
+                        diagnostics?: {
+                            reason: {
+                                hostShutDown: boolean;
+                                jobStopped: boolean;
+                                jobExpired: boolean;
+                                reason?: string;
+                            };
+                            state?: {
+                                Status: string;
+                                Running: boolean;
+                                Paused: boolean;
+                                Restarting: boolean;
+                                OOMKilled: boolean;
+                                Dead: boolean;
+                                Pid: number;
+                                ExitCode: number;
+                                Error: string;
+                                StartedAt: string;
+                                FinishedAt: string;
+                                RestartCount: number;
+                                Health?: {
+                                    Status: string;
+                                    FailingStreak: number;
+                                    Log: {
+                                        Start: string;
+                                        End: string;
+                                        ExitCode: number;
+                                        Output: string;
+                                    }[];
+                                };
+                            };
+                        };
+                        env?: {
+                            [key: string]: string;
+                        };
+                    }[];
+                    secrets?: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        status: "success" | "failed";
+                        report?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                            }[];
+                        };
+                    };
+                    "multipart/form-data": {
+                        status: "success" | "failed";
+                        report?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                            }[];
+                        };
+                    };
+                    "text/plain": {
+                        status: "success" | "failed";
+                        report?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postBenchmarksByIdSeed: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    uuid: string;
+                    type: string;
+                }[];
+                "multipart/form-data": {
+                    uuid: string;
+                    type: string;
+                }[];
+                "text/plain": {
+                    uuid: string;
+                    type: string;
+                }[];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        seeds: {
+                            [key: string]: number;
+                        };
+                    };
+                    "multipart/form-data": {
+                        seeds: {
+                            [key: string]: number;
+                        };
+                    };
+                    "text/plain": {
+                        seeds: {
+                            [key: string]: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postBenchmarksByIdPrediction: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    uuid: string;
+                    prediction: number;
+                };
+                "multipart/form-data": {
+                    uuid: string;
+                    prediction: number;
+                };
+                "text/plain": {
+                    uuid: string;
+                    prediction: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBenchmarksRecent: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        feedbackReport: ({
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        } | null) | null;
+                        benchmarks: {
+                            id: string;
+                            status: string;
+                            createdAt: Record<string, never> | string | number;
+                            submittedAt: ((Record<string, never> | string | number) | null) | null;
+                            rawResults: (unknown | null) | null;
+                            operations: {
+                                operationId: number;
+                            }[];
+                            metrics: {
+                                metricKey: string;
+                                instance: string;
+                                value: unknown;
+                                isValid: boolean;
+                                createdAt: Record<string, never> | string | number;
+                            }[];
+                            antiSpoofs: {
+                                gpuType: string;
+                                gpuUUID: string;
+                                verified: boolean;
+                                seedAt: Record<string, never> | string | number;
+                                predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            }[];
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        feedbackReport: ({
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        } | null) | null;
+                        benchmarks: {
+                            id: string;
+                            status: string;
+                            createdAt: Record<string, never> | string | number;
+                            submittedAt: ((Record<string, never> | string | number) | null) | null;
+                            rawResults: (unknown | null) | null;
+                            operations: {
+                                operationId: number;
+                            }[];
+                            metrics: {
+                                metricKey: string;
+                                instance: string;
+                                value: unknown;
+                                isValid: boolean;
+                                createdAt: Record<string, never> | string | number;
+                            }[];
+                            antiSpoofs: {
+                                gpuType: string;
+                                gpuUUID: string;
+                                verified: boolean;
+                                seedAt: Record<string, never> | string | number;
+                                predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            }[];
+                        }[];
+                    };
+                    "text/plain": {
+                        feedbackReport: ({
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        } | null) | null;
+                        benchmarks: {
+                            id: string;
+                            status: string;
+                            createdAt: Record<string, never> | string | number;
+                            submittedAt: ((Record<string, never> | string | number) | null) | null;
+                            rawResults: (unknown | null) | null;
+                            operations: {
+                                operationId: number;
+                            }[];
+                            metrics: {
+                                metricKey: string;
+                                instance: string;
+                                value: unknown;
+                                isValid: boolean;
+                                createdAt: Record<string, never> | string | number;
+                            }[];
+                            antiSpoofs: {
+                                gpuType: string;
+                                gpuUUID: string;
+                                verified: boolean;
+                                seedAt: Record<string, never> | string | number;
+                                predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            }[];
+                        }[];
+                    };
+                };
             };
         };
     };
     getRpc: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2487,73 +4338,9 @@ export interface operations {
             };
         };
     };
-    getNodesMetrics: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getNodes: {
-        parameters: {
-            query?: {
-                limit?: string | number;
-                offset?: string | number;
-                state?: string | string[];
-                market?: string;
-                gpus?: string;
-                search?: string | string[];
-                orderBy?: string;
-                order?: "asc" | "desc";
-                csv_export?: boolean | string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     "getNodesAvailable-gpus": {
         parameters: {
             query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getNodesStats: {
-        parameters: {
-            query?: {
-                gpus?: string;
-                market?: string;
-            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2678,7 +4465,7 @@ export interface operations {
             };
         };
     };
-    postNodesOnboard: {
+    "postNodesSync-node": {
         parameters: {
             query?: never;
             header: {
@@ -2709,7 +4496,1271 @@ export interface operations {
             };
         };
     };
-    postNodesUpgrade: {
+    getNodesByIdMetrics: {
+        parameters: {
+            query?: {
+                metrics?: string | string[];
+            };
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
+                        gpus?: {
+                            nodeAddress: string;
+                            gpu: string;
+                            uuid: (string | null) | null;
+                            deviceId: (number | null) | null;
+                            vramMb: (number | null) | null;
+                            majorArchitecture: (number | null) | null;
+                            minorArchitecture: (number | null) | null;
+                        }[];
+                        metrics: {
+                            [key: string]: unknown;
+                        };
+                        lastUpdatedAt: ((Record<string, never> | string | number) | null) | null;
+                        email?: string;
+                        discord?: (string | null) | null;
+                        twitter?: (string | null) | null;
+                        createdAt?: ((Record<string, never> | string | number) | null) | null;
+                        notes?: {
+                            id: number;
+                            nodeAddress: string;
+                            content: string;
+                            source: "ADMIN" | "SYSTEM";
+                            createdAt: Record<string, never> | string | number;
+                            updatedAt: Record<string, never> | string | number;
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
+                        gpus?: {
+                            nodeAddress: string;
+                            gpu: string;
+                            uuid: (string | null) | null;
+                            deviceId: (number | null) | null;
+                            vramMb: (number | null) | null;
+                            majorArchitecture: (number | null) | null;
+                            minorArchitecture: (number | null) | null;
+                        }[];
+                        metrics: {
+                            [key: string]: unknown;
+                        };
+                        lastUpdatedAt: ((Record<string, never> | string | number) | null) | null;
+                        email?: string;
+                        discord?: (string | null) | null;
+                        twitter?: (string | null) | null;
+                        createdAt?: ((Record<string, never> | string | number) | null) | null;
+                        notes?: {
+                            id: number;
+                            nodeAddress: string;
+                            content: string;
+                            source: "ADMIN" | "SYSTEM";
+                            createdAt: Record<string, never> | string | number;
+                            updatedAt: Record<string, never> | string | number;
+                        }[];
+                    };
+                    "text/plain": {
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
+                        gpus?: {
+                            nodeAddress: string;
+                            gpu: string;
+                            uuid: (string | null) | null;
+                            deviceId: (number | null) | null;
+                            vramMb: (number | null) | null;
+                            majorArchitecture: (number | null) | null;
+                            minorArchitecture: (number | null) | null;
+                        }[];
+                        metrics: {
+                            [key: string]: unknown;
+                        };
+                        lastUpdatedAt: ((Record<string, never> | string | number) | null) | null;
+                        email?: string;
+                        discord?: (string | null) | null;
+                        twitter?: (string | null) | null;
+                        createdAt?: ((Record<string, never> | string | number) | null) | null;
+                        notes?: {
+                            id: number;
+                            nodeAddress: string;
+                            content: string;
+                            source: "ADMIN" | "SYSTEM";
+                            createdAt: Record<string, never> | string | number;
+                            updatedAt: Record<string, never> | string | number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    postNodesByIdMetrics: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    metricKey: string;
+                    value: unknown;
+                    instance?: string;
+                };
+                "multipart/form-data": {
+                    metricKey: string;
+                    value: unknown;
+                    instance?: string;
+                };
+                "text/plain": {
+                    metricKey: string;
+                    value: unknown;
+                    instance?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postNodesRegister: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    email: string;
+                    discord?: string;
+                    twitter?: string;
+                };
+                "multipart/form-data": {
+                    email: string;
+                    discord?: string;
+                    twitter?: string;
+                };
+                "text/plain": {
+                    email: string;
+                    discord?: string;
+                    twitter?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        status: "registered";
+                        nodeAddress: string;
+                    };
+                    "multipart/form-data": {
+                        /** @constant */
+                        status: "registered";
+                        nodeAddress: string;
+                    };
+                    "text/plain": {
+                        /** @constant */
+                        status: "registered";
+                        nodeAddress: string;
+                    };
+                };
+            };
+        };
+    };
+    "getNodesRequest-market": {
+        parameters: {
+            query?: {
+                market?: string;
+                session?: string;
+            };
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        benchmarkId?: string;
+                        jobDefinition?: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                } | {
+                                    group?: string;
+                                    timeout?: number;
+                                };
+                            }[];
+                        };
+                        market?: {
+                            address: string | null;
+                            sftTx?: string;
+                        };
+                        feedbackReport?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        };
+                        nextTestAt?: string;
+                        status?: string;
+                        session?: string;
+                    };
+                    "multipart/form-data": {
+                        benchmarkId?: string;
+                        jobDefinition?: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                } | {
+                                    group?: string;
+                                    timeout?: number;
+                                };
+                            }[];
+                        };
+                        market?: {
+                            address: string | null;
+                            sftTx?: string;
+                        };
+                        feedbackReport?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        };
+                        nextTestAt?: string;
+                        status?: string;
+                        session?: string;
+                    };
+                    "text/plain": {
+                        benchmarkId?: string;
+                        jobDefinition?: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                } | {
+                                    group?: string;
+                                    timeout?: number;
+                                };
+                            }[];
+                        };
+                        market?: {
+                            address: string | null;
+                            sftTx?: string;
+                        };
+                        feedbackReport?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        };
+                        nextTestAt?: string;
+                        status?: string;
+                        session?: string;
+                    };
+                };
+            };
+        };
+    };
+    getNodesById: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
+                    };
+                    "multipart/form-data": {
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
+                    };
+                    "text/plain": {
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
+                    };
+                };
+            };
+        };
+    };
+    patchNodesByIdAddress: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string;
+                };
+                "multipart/form-data": {
+                    address: string;
+                };
+                "text/plain": {
+                    address: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getNodesRewards: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                    "multipart/form-data": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                    "text/plain": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                };
+            };
+        };
+    };
+    getNodes: {
+        parameters: {
+            query?: {
+                state?: ("REJECTED" | "ONBOARDED" | "PREMIUM") | ("REJECTED" | "ONBOARDED" | "PREMIUM")[];
+                state_neq?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_notIn?: ("REJECTED" | "ONBOARDED" | "PREMIUM")[];
+                state_gt?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_lt?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_gte?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_lte?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_like?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_ilike?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                market?: string | string[];
+                market_neq?: string;
+                market_notIn?: string[];
+                market_gt?: string;
+                market_lt?: string;
+                market_gte?: string;
+                market_lte?: string;
+                market_like?: string;
+                market_ilike?: string;
+                orderBy?: "nodeAddress" | "status" | "marketAddress" | "createdAt";
+                order?: "asc" | "desc";
+                limit?: string | number;
+                offset?: string | number;
+                search?: string;
+                csv_export?: boolean | string;
+            };
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        nodes: {
+                            nodeAddress: string;
+                            email: string;
+                            status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                            accessKeyMint: (string | null) | null;
+                            marketAddress: (string | null) | null;
+                            assignedMarket: (string | null) | null;
+                            destinedMarket: (string | null) | null;
+                            recommendedMarket: (string | null) | null;
+                            discord: (string | null) | null;
+                            twitter: (string | null) | null;
+                            createdAt: ((Record<string, never> | string | number) | null) | null;
+                            updatedAt: ((Record<string, never> | string | number) | null) | null;
+                            outOfSync: ((Record<string, never> | string | number) | null) | null;
+                            metrics: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        total: number;
+                    } | string;
+                    "multipart/form-data": {
+                        nodes: {
+                            nodeAddress: string;
+                            email: string;
+                            status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                            accessKeyMint: (string | null) | null;
+                            marketAddress: (string | null) | null;
+                            assignedMarket: (string | null) | null;
+                            destinedMarket: (string | null) | null;
+                            recommendedMarket: (string | null) | null;
+                            discord: (string | null) | null;
+                            twitter: (string | null) | null;
+                            createdAt: ((Record<string, never> | string | number) | null) | null;
+                            updatedAt: ((Record<string, never> | string | number) | null) | null;
+                            outOfSync: ((Record<string, never> | string | number) | null) | null;
+                            metrics: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        total: number;
+                    } | string;
+                    "text/plain": {
+                        nodes: {
+                            nodeAddress: string;
+                            email: string;
+                            status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                            accessKeyMint: (string | null) | null;
+                            marketAddress: (string | null) | null;
+                            assignedMarket: (string | null) | null;
+                            destinedMarket: (string | null) | null;
+                            recommendedMarket: (string | null) | null;
+                            discord: (string | null) | null;
+                            twitter: (string | null) | null;
+                            createdAt: ((Record<string, never> | string | number) | null) | null;
+                            updatedAt: ((Record<string, never> | string | number) | null) | null;
+                            outOfSync: ((Record<string, never> | string | number) | null) | null;
+                            metrics: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        total: number;
+                    } | string;
+                };
+            };
+        };
+    };
+    postNodesPromote: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postNodesDemote: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postNodesMove-market": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postNodesKick-from-queue": {
         parameters: {
             query?: never;
             header: {
@@ -2805,7 +5856,7 @@ export interface operations {
             };
         };
     };
-    "postNodesChange-market": {
+    postNodesBan: {
         parameters: {
             query?: never;
             header: {
@@ -2814,7 +5865,19 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -2824,10 +5887,43 @@ export interface operations {
             };
         };
     };
-    "postNodesSync-node": {
+    postNodesUnban: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postNodesInvalidate-metrics": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2853,230 +5949,7 @@ export interface operations {
             };
         };
     };
-    postNodesRegister: {
-        parameters: {
-            query?: never;
-            header: {
-                authorization: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    nodeAddress: string;
-                    results: {
-                        providerId: (string | null) | null;
-                        operationId: (string | null) | null;
-                        status: (string | null) | null;
-                        startTime: (number | null) | null;
-                        endTime: (number | null) | null;
-                        exitCode: (number | null) | null;
-                        logs: {
-                            type: string;
-                            log?: string;
-                        }[];
-                        results?: {
-                            [key: string]: string | string[];
-                        };
-                    }[];
-                    email: string;
-                    discord?: string;
-                    twitter?: string;
-                };
-                "multipart/form-data": {
-                    nodeAddress: string;
-                    results: {
-                        providerId: (string | null) | null;
-                        operationId: (string | null) | null;
-                        status: (string | null) | null;
-                        startTime: (number | null) | null;
-                        endTime: (number | null) | null;
-                        exitCode: (number | null) | null;
-                        logs: {
-                            type: string;
-                            log?: string;
-                        }[];
-                        results?: {
-                            [key: string]: string | string[];
-                        };
-                    }[];
-                    email: string;
-                    discord?: string;
-                    twitter?: string;
-                };
-                "text/plain": {
-                    nodeAddress: string;
-                    results: {
-                        providerId: (string | null) | null;
-                        operationId: (string | null) | null;
-                        status: (string | null) | null;
-                        startTime: (number | null) | null;
-                        endTime: (number | null) | null;
-                        exitCode: (number | null) | null;
-                        logs: {
-                            type: string;
-                            log?: string;
-                        }[];
-                        results?: {
-                            [key: string]: string | string[];
-                        };
-                    }[];
-                    email: string;
-                    discord?: string;
-                    twitter?: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "getNodesRequest-market": {
-        parameters: {
-            query?: never;
-            header: {
-                authorization: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "postNodesJoin-test-grid": {
-        parameters: {
-            query?: never;
-            header: {
-                authorization: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    nodeAddress: string;
-                    results: {
-                        providerId: (string | null) | null;
-                        operationId: (string | null) | null;
-                        status: (string | null) | null;
-                        startTime: (number | null) | null;
-                        endTime: (number | null) | null;
-                        exitCode: (number | null) | null;
-                        logs: {
-                            type: string;
-                            log?: string;
-                        }[];
-                        results?: {
-                            [key: string]: string | string[];
-                        };
-                    }[];
-                    email: string;
-                    discord?: string;
-                    twitter?: string;
-                };
-                "multipart/form-data": {
-                    nodeAddress: string;
-                    results: {
-                        providerId: (string | null) | null;
-                        operationId: (string | null) | null;
-                        status: (string | null) | null;
-                        startTime: (number | null) | null;
-                        endTime: (number | null) | null;
-                        exitCode: (number | null) | null;
-                        logs: {
-                            type: string;
-                            log?: string;
-                        }[];
-                        results?: {
-                            [key: string]: string | string[];
-                        };
-                    }[];
-                    email: string;
-                    discord?: string;
-                    twitter?: string;
-                };
-                "text/plain": {
-                    nodeAddress: string;
-                    results: {
-                        providerId: (string | null) | null;
-                        operationId: (string | null) | null;
-                        status: (string | null) | null;
-                        startTime: (number | null) | null;
-                        endTime: (number | null) | null;
-                        exitCode: (number | null) | null;
-                        logs: {
-                            type: string;
-                            log?: string;
-                        }[];
-                        results?: {
-                            [key: string]: string | string[];
-                        };
-                    }[];
-                    email: string;
-                    discord?: string;
-                    twitter?: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postNodesRevoke: {
-        parameters: {
-            query?: never;
-            header: {
-                authorization: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    address: string;
-                    forceBan?: boolean;
-                };
-                "multipart/form-data": {
-                    address: string;
-                    forceBan?: boolean;
-                };
-                "text/plain": {
-                    address: string;
-                    forceBan?: boolean;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getNodesById: {
+    patchNodesByIdContact: {
         parameters: {
             query?: never;
             header: {
@@ -3087,7 +5960,25 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    email?: string;
+                    discord?: string | null;
+                    twitter?: string | null;
+                };
+                "multipart/form-data": {
+                    email?: string;
+                    discord?: string | null;
+                    twitter?: string | null;
+                };
+                "text/plain": {
+                    email?: string;
+                    discord?: string | null;
+                    twitter?: string | null;
+                };
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -3103,25 +5994,6 @@ export interface operations {
             header: {
                 authorization: string;
             };
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getNodesByIdSpecs: {
-        parameters: {
-            query?: never;
-            header?: never;
             path: {
                 id: string;
             };
@@ -3158,7 +6030,862 @@ export interface operations {
             };
         };
     };
-    "postNodesByIdSubmit-system-specs": {
+    getNodesByIdRewards: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                    "multipart/form-data": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                    "text/plain": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                };
+            };
+        };
+    };
+    "getNodesByIdRecent-benchmarks": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        nodeAddress: string;
+                        jobDefinition: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                } | {
+                                    group?: string;
+                                    timeout?: number;
+                                };
+                            }[];
+                        };
+                        rawResults: (unknown | null) | null;
+                        status: string;
+                        createdAt: Record<string, never> | string | number;
+                        submittedAt: ((Record<string, never> | string | number) | null) | null;
+                        operations: {
+                            benchmarkId: string;
+                            operationId: number;
+                        }[];
+                        antiSpoofs: {
+                            benchmarkId: string;
+                            seed: (number | null) | null;
+                            gpuType: string;
+                            gpuUUID: string;
+                            prediction: (number | null) | null;
+                            verified: boolean;
+                            seedAt: Record<string, never> | string | number;
+                            predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            seedRef: ({
+                                seed: number;
+                                gpuType: string;
+                                prediction: number;
+                                maximumDurationSeconds: (number | null) | null;
+                            } | null) | null;
+                        }[];
+                        nodeMetrics: {
+                            nodeAddress: string;
+                            benchmarkId: (string | null) | null;
+                            metricKey: string;
+                            instance: string;
+                            value: unknown;
+                            isValid: boolean;
+                            createdAt: Record<string, never> | string | number;
+                        }[];
+                    }[];
+                    "multipart/form-data": {
+                        id: string;
+                        nodeAddress: string;
+                        jobDefinition: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                } | {
+                                    group?: string;
+                                    timeout?: number;
+                                };
+                            }[];
+                        };
+                        rawResults: (unknown | null) | null;
+                        status: string;
+                        createdAt: Record<string, never> | string | number;
+                        submittedAt: ((Record<string, never> | string | number) | null) | null;
+                        operations: {
+                            benchmarkId: string;
+                            operationId: number;
+                        }[];
+                        antiSpoofs: {
+                            benchmarkId: string;
+                            seed: (number | null) | null;
+                            gpuType: string;
+                            gpuUUID: string;
+                            prediction: (number | null) | null;
+                            verified: boolean;
+                            seedAt: Record<string, never> | string | number;
+                            predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            seedRef: ({
+                                seed: number;
+                                gpuType: string;
+                                prediction: number;
+                                maximumDurationSeconds: (number | null) | null;
+                            } | null) | null;
+                        }[];
+                        nodeMetrics: {
+                            nodeAddress: string;
+                            benchmarkId: (string | null) | null;
+                            metricKey: string;
+                            instance: string;
+                            value: unknown;
+                            isValid: boolean;
+                            createdAt: Record<string, never> | string | number;
+                        }[];
+                    }[];
+                    "text/plain": {
+                        id: string;
+                        nodeAddress: string;
+                        jobDefinition: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                } | {
+                                    group?: string;
+                                    timeout?: number;
+                                };
+                            }[];
+                        };
+                        rawResults: (unknown | null) | null;
+                        status: string;
+                        createdAt: Record<string, never> | string | number;
+                        submittedAt: ((Record<string, never> | string | number) | null) | null;
+                        operations: {
+                            benchmarkId: string;
+                            operationId: number;
+                        }[];
+                        antiSpoofs: {
+                            benchmarkId: string;
+                            seed: (number | null) | null;
+                            gpuType: string;
+                            gpuUUID: string;
+                            prediction: (number | null) | null;
+                            verified: boolean;
+                            seedAt: Record<string, never> | string | number;
+                            predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            seedRef: ({
+                                seed: number;
+                                gpuType: string;
+                                prediction: number;
+                                maximumDurationSeconds: (number | null) | null;
+                            } | null) | null;
+                        }[];
+                        nodeMetrics: {
+                            nodeAddress: string;
+                            benchmarkId: (string | null) | null;
+                            metricKey: string;
+                            instance: string;
+                            value: unknown;
+                            isValid: boolean;
+                            createdAt: Record<string, never> | string | number;
+                        }[];
+                    }[];
+                };
+            };
+        };
+    };
+    getNodesByIdNotes: {
+        parameters: {
+            query?: {
+                source?: "ADMIN" | "SYSTEM";
+                limit?: string | number;
+                offset?: string | number;
+            };
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postNodesByIdNotes: {
         parameters: {
             query?: never;
             header: {
@@ -3172,115 +6899,13 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    gpus: {
-                        devices: {
-                            index: number;
-                            name: string;
-                            uuid: string;
-                            memory: {
-                                total_mb: number;
-                            };
-                            network_architecture: {
-                                major: number;
-                                minor: number;
-                            };
-                            results: number[];
-                        }[];
-                        runtime_version: number;
-                        cuda_driver_version: number;
-                        nvml_driver_version: string;
-                    };
-                    cpu: {
-                        model: string;
-                        logical_cores: number;
-                        physical_cores: number;
-                    };
-                    ram_mb: number;
-                    disk_gb: number;
-                    country: string;
-                    protocol: string;
-                    network: {
-                        ip: string;
-                        ping_ms: number;
-                        download_mbps: number;
-                        upload_mbps: number;
-                    };
-                    system_environment: string;
-                    version: string;
+                    content: string;
                 };
                 "multipart/form-data": {
-                    gpus: {
-                        devices: {
-                            index: number;
-                            name: string;
-                            uuid: string;
-                            memory: {
-                                total_mb: number;
-                            };
-                            network_architecture: {
-                                major: number;
-                                minor: number;
-                            };
-                            results: number[];
-                        }[];
-                        runtime_version: number;
-                        cuda_driver_version: number;
-                        nvml_driver_version: string;
-                    };
-                    cpu: {
-                        model: string;
-                        logical_cores: number;
-                        physical_cores: number;
-                    };
-                    ram_mb: number;
-                    disk_gb: number;
-                    country: string;
-                    protocol: string;
-                    network: {
-                        ip: string;
-                        ping_ms: number;
-                        download_mbps: number;
-                        upload_mbps: number;
-                    };
-                    system_environment: string;
-                    version: string;
+                    content: string;
                 };
                 "text/plain": {
-                    gpus: {
-                        devices: {
-                            index: number;
-                            name: string;
-                            uuid: string;
-                            memory: {
-                                total_mb: number;
-                            };
-                            network_architecture: {
-                                major: number;
-                                minor: number;
-                            };
-                            results: number[];
-                        }[];
-                        runtime_version: number;
-                        cuda_driver_version: number;
-                        nvml_driver_version: string;
-                    };
-                    cpu: {
-                        model: string;
-                        logical_cores: number;
-                        physical_cores: number;
-                    };
-                    ram_mb: number;
-                    disk_gb: number;
-                    country: string;
-                    protocol: string;
-                    network: {
-                        ip: string;
-                        ping_ms: number;
-                        download_mbps: number;
-                        upload_mbps: number;
-                    };
-                    system_environment: string;
-                    version: string;
+                    content: string;
                 };
             };
         };
@@ -3293,7 +6918,7 @@ export interface operations {
             };
         };
     };
-    patchNodesByIdAddress: {
+    deleteNodesByIdNotesByNoteId: {
         parameters: {
             query?: never;
             header: {
@@ -3301,22 +6926,11 @@ export interface operations {
             };
             path: {
                 id: string;
+                noteId: string;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": {
-                    address: string;
-                };
-                "multipart/form-data": {
-                    address: string;
-                };
-                "text/plain": {
-                    address: string;
-                };
-            };
-        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -3326,7 +6940,7 @@ export interface operations {
             };
         };
     };
-    "postNodesByIdCheck-market": {
+    patchNodesByIdNotesByNoteId: {
         parameters: {
             query?: never;
             header: {
@@ -3334,19 +6948,20 @@ export interface operations {
             };
             path: {
                 id: string;
+                noteId: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
                 "application/json": {
-                    gpus?: string;
+                    content: string;
                 };
                 "multipart/form-data": {
-                    gpus?: string;
+                    content: string;
                 };
                 "text/plain": {
-                    gpus?: string;
+                    content: string;
                 };
             };
         };
@@ -3904,43 +7519,7 @@ export interface operations {
             };
         };
     };
-    getTemplates: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getTemplatesById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "postTemplatesAdmin-refresh": {
+    "getBenchmark-templatesConfig": {
         parameters: {
             query?: never;
             header: {
@@ -3955,78 +7534,2195 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
+                content: {
+                    "application/json": {
+                        benchmarks: {
+                            slug: string;
+                            operationId: number;
+                            operation: {
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    } | {
+                                        group?: string;
+                                        timeout?: number;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            };
+                            thresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            marketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        benchmarks: {
+                            slug: string;
+                            operationId: number;
+                            operation: {
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    } | {
+                                        group?: string;
+                                        timeout?: number;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            };
+                            thresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            marketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                        }[];
+                    };
+                    "text/plain": {
+                        benchmarks: {
+                            slug: string;
+                            operationId: number;
+                            operation: {
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    } | {
+                                        group?: string;
+                                        timeout?: number;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            };
+                            thresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            marketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "getBenchmark-templatesRefresh": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    } | {
+                                        group?: string;
+                                        timeout?: number;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    } | {
+                                        group?: string;
+                                        timeout?: number;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
+                    };
+                    "text/plain": {
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    } | {
+                                        group?: string;
+                                        timeout?: number;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "postBenchmark-templatesApply": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    thresholds?: {
+                        name: string;
+                        description?: string;
+                        metric?: (string | null) | null;
+                        group?: (string | null) | null;
+                        isGating?: boolean;
+                        failureMessage?: string;
+                        marketThresholds: {
+                            marketAddresses: (string | null)[];
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                            interval?: (string | null) | null;
+                            isOptional?: boolean;
+                        }[];
+                    }[];
+                    reconciliations?: {
+                        slug: string;
+                        targetThresholdId: (number | null) | null;
+                        add: {
+                            marketAddress: string;
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        remove: {
+                            thresholdId: number;
+                            marketAddress: string;
+                        }[];
+                    }[];
+                };
+                "multipart/form-data": {
+                    thresholds?: {
+                        name: string;
+                        description?: string;
+                        metric?: (string | null) | null;
+                        group?: (string | null) | null;
+                        isGating?: boolean;
+                        failureMessage?: string;
+                        marketThresholds: {
+                            marketAddresses: (string | null)[];
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                            interval?: (string | null) | null;
+                            isOptional?: boolean;
+                        }[];
+                    }[];
+                    reconciliations?: {
+                        slug: string;
+                        targetThresholdId: (number | null) | null;
+                        add: {
+                            marketAddress: string;
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        remove: {
+                            thresholdId: number;
+                            marketAddress: string;
+                        }[];
+                    }[];
+                };
+                "text/plain": {
+                    thresholds?: {
+                        name: string;
+                        description?: string;
+                        metric?: (string | null) | null;
+                        group?: (string | null) | null;
+                        isGating?: boolean;
+                        failureMessage?: string;
+                        marketThresholds: {
+                            marketAddresses: (string | null)[];
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                            interval?: (string | null) | null;
+                            isOptional?: boolean;
+                        }[];
+                    }[];
+                    reconciliations?: {
+                        slug: string;
+                        targetThresholdId: (number | null) | null;
+                        add: {
+                            marketAddress: string;
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        remove: {
+                            thresholdId: number;
+                            marketAddress: string;
+                        }[];
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    } | {
+                                        group?: string;
+                                        timeout?: number;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    } | {
+                                        group?: string;
+                                        timeout?: number;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
+                    };
+                    "text/plain": {
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    } | {
+                                        group?: string;
+                                        timeout?: number;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "getNode-under-maintenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        maintenance: boolean;
+                        startsAt: string;
+                        expectedEndAt: string;
+                        reason: string;
+                    } | {
+                        /** @constant */
+                        maintenance: false;
+                    };
+                    "multipart/form-data": {
+                        maintenance: boolean;
+                        startsAt: string;
+                        expectedEndAt: string;
+                        reason: string;
+                    } | {
+                        /** @constant */
+                        maintenance: false;
+                    };
+                    "text/plain": {
+                        maintenance: boolean;
+                        startsAt: string;
+                        expectedEndAt: string;
+                        reason: string;
+                    } | {
+                        /** @constant */
+                        maintenance: false;
+                    };
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        maintenance: boolean;
+                        startsAt: string;
+                        expectedEndAt: string;
+                        reason: string;
+                    } | {
+                        /** @constant */
+                        maintenance: false;
+                    };
+                    "multipart/form-data": {
+                        maintenance: boolean;
+                        startsAt: string;
+                        expectedEndAt: string;
+                        reason: string;
+                    } | {
+                        /** @constant */
+                        maintenance: false;
+                    };
+                    "text/plain": {
+                        maintenance: boolean;
+                        startsAt: string;
+                        expectedEndAt: string;
+                        reason: string;
+                    } | {
+                        /** @constant */
+                        maintenance: false;
+                    };
+                };
+            };
+        };
+    };
+    getConfigExport: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        version: number;
+                        exportedAt: string;
+                        sourceEnv?: string | null;
+                        data: {
+                            groups: unknown[];
+                            operations: unknown[];
+                            metrics: unknown[];
+                            metricInvalidations: unknown[];
+                            markets: unknown[];
+                            thresholds: unknown[];
+                            marketThresholds: unknown[];
+                            antiSpoofSeeds: unknown[];
+                        };
+                    };
+                    "multipart/form-data": {
+                        version: number;
+                        exportedAt: string;
+                        sourceEnv?: string | null;
+                        data: {
+                            groups: unknown[];
+                            operations: unknown[];
+                            metrics: unknown[];
+                            metricInvalidations: unknown[];
+                            markets: unknown[];
+                            thresholds: unknown[];
+                            marketThresholds: unknown[];
+                            antiSpoofSeeds: unknown[];
+                        };
+                    };
+                    "text/plain": {
+                        version: number;
+                        exportedAt: string;
+                        sourceEnv?: string | null;
+                        data: {
+                            groups: unknown[];
+                            operations: unknown[];
+                            metrics: unknown[];
+                            metricInvalidations: unknown[];
+                            markets: unknown[];
+                            thresholds: unknown[];
+                            marketThresholds: unknown[];
+                            antiSpoofSeeds: unknown[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getMetrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
-            };
-        };
-    };
-    getHostsFilters: {
-        parameters: {
-            query?: {
-                market_type?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        groups: unknown[];
-                        "filter-options": unknown[];
-                    };
-                    "multipart/form-data": {
-                        groups: unknown[];
-                        "filter-options": unknown[];
-                    };
-                    "text/plain": {
-                        groups: unknown[];
-                        "filter-options": unknown[];
-                    };
-                };
-            };
-        };
-    };
-    getHosts: {
-        parameters: {
-            query?: {
-                group?: string;
-                market_type?: string;
-                platform_os?: string;
-                cuda_drivers?: string;
-                cpu_cores?: string | number;
-                ram_mb?: string | number;
-                disk_space_gb?: string | number;
-                download_speed_mb?: string | number;
-                upload_speed_mb?: string | number;
-                region?: string;
-                country?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        hosts: unknown[];
-                    };
-                    "multipart/form-data": {
-                        hosts: unknown[];
-                    };
-                    "text/plain": {
-                        hosts: unknown[];
-                    };
-                };
             };
         };
     };

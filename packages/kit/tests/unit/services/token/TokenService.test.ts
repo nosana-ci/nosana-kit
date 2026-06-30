@@ -7,16 +7,21 @@ import { createNosanaClient, type NosanaClient, TokenService } from '../../../..
 import { SignerFactory, AddressFactory } from '../../setup/index.js';
 
 vi.mock('../../../../src/logger/Logger.js', () => {
-  return {
-    Logger: {
-      getInstance: vi.fn().mockReturnValue({
-        debug: vi.fn(),
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-      }),
-    },
+  const mockLogger = {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   };
+  class Logger {
+    constructor() {
+      return mockLogger;
+    }
+    static getInstance() {
+      return mockLogger;
+    }
+  }
+  return { Logger };
 });
 // Mock @solana/kit module
 vi.mock('@solana/kit', async (importOriginal) => {
@@ -70,8 +75,8 @@ describe('TokenService (nos)', () => {
     it('should initialize TokenService', () => {
       expect(nosService).toBeDefined();
       expect(typeof nosService.getAllTokenHolders).toBe('function');
-      expect(typeof nosService.getTokenAccountForAddress).toBe('function');
       expect(typeof nosService.getBalance).toBe('function');
+      expect(typeof nosService.getBalanceInfo).toBe('function');
     });
 
     it('should have access to NosanaClient instance', () => {
@@ -392,106 +397,6 @@ describe('TokenService (nos)', () => {
     });
   });
 
-  describe('getTokenAccountForAddress', () => {
-    const ownerAddress = '9aKHLbxLbgKGz9vL3kZKz9XwPnxGKLWxjZHWzLHfbT1J';
-    const tokenAccountAddress = '7N4HggYEJAtCLJdnHGCtFqfxcB5rhQCsQTze3ftYstVj';
-
-    it('should fetch token account for a given address', async () => {
-      const mockResponse = {
-        value: [
-          {
-            pubkey: address(tokenAccountAddress),
-            account: {
-              data: {
-                parsed: {
-                  info: {
-                    owner: address(ownerAddress),
-                    mint: client.config.programs.nosTokenAddress,
-                    tokenAmount: {
-                      amount: '1500000000',
-                      decimals: 6,
-                      uiAmount: 1500,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        ],
-      };
-
-      (client.solana.rpc.getTokenAccountsByOwner as any).mockReturnValue({
-        send: vi.fn().mockResolvedValue(mockResponse),
-      });
-
-      const account = await nosService.getTokenAccountForAddress(ownerAddress);
-
-      expect(account).not.toBeNull();
-      expect(account).toMatchObject({
-        pubkey: address(tokenAccountAddress),
-        owner: address(ownerAddress),
-        mint: client.config.programs.nosTokenAddress,
-        amount: BigInt('1500000000'),
-        decimals: 6,
-        uiAmount: 1500,
-      });
-    });
-
-    it('should accept Address type as parameter', async () => {
-      const mockResponse = {
-        value: [
-          {
-            pubkey: address(tokenAccountAddress),
-            account: {
-              data: {
-                parsed: {
-                  info: {
-                    owner: address(ownerAddress),
-                    mint: client.config.programs.nosTokenAddress,
-                    tokenAmount: {
-                      amount: '1500000000',
-                      decimals: 6,
-                      uiAmount: 1500,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        ],
-      };
-
-      (client.solana.rpc.getTokenAccountsByOwner as any).mockReturnValue({
-        send: vi.fn().mockResolvedValue(mockResponse),
-      });
-
-      const account = await nosService.getTokenAccountForAddress(address(ownerAddress));
-
-      expect(account).not.toBeNull();
-      expect(account?.owner).toBe(address(ownerAddress));
-    });
-
-    it('should return null when no token account exists', async () => {
-      (client.solana.rpc.getTokenAccountsByOwner as any).mockReturnValue({
-        send: vi.fn().mockResolvedValue({ value: [] }),
-      });
-
-      const account = await nosService.getTokenAccountForAddress(ownerAddress);
-
-      expect(account).toBeNull();
-    });
-
-    it('should handle RPC errors', async () => {
-      (client.solana.rpc.getTokenAccountsByOwner as any).mockReturnValue({
-        send: vi.fn().mockRejectedValue(new Error('RPC Error')),
-      });
-
-      await expect(nosService.getTokenAccountForAddress(ownerAddress)).rejects.toThrow(
-        'Failed to fetch token account'
-      );
-    });
-  });
-
   describe('getBalance', () => {
     const ownerAddress = '9aKHLbxLbgKGz9vL3kZKz9XwPnxGKLWxjZHWzLHfbT1J';
 
@@ -525,7 +430,7 @@ describe('TokenService (nos)', () => {
 
       const balance = await nosService.getBalance(ownerAddress);
 
-      expect(balance).toBe(2000);
+      expect(balance).toBe(2000000000n);
     });
 
     it('should use wallet address when owner is not provided', async () => {
@@ -562,7 +467,82 @@ describe('TokenService (nos)', () => {
 
       const balance = await nosService.getBalance(ownerAddress);
 
-      expect(balance).toBe(0);
+      expect(balance).toBe(0n);
+    });
+
+    it('should return balance info when token account exists', async () => {
+      const tokenAccount = address('7N4HggYEJAtCLJdnHGCtFqfxcB5rhQCsQTze3ftYstVj');
+      const mockResponse = {
+        value: [
+          {
+            pubkey: tokenAccount,
+            account: {
+              data: {
+                parsed: {
+                  info: {
+                    owner: address(ownerAddress),
+                    mint: client.config.programs.nosTokenAddress,
+                    tokenAmount: {
+                      amount: '2000000000',
+                      decimals: 6,
+                      uiAmount: 2000,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        ],
+      };
+
+      (client.solana.rpc.getTokenAccountsByOwner as any).mockReturnValue({
+        send: vi.fn().mockResolvedValue(mockResponse),
+      });
+
+      const balance = await nosService.getBalanceInfo(ownerAddress);
+
+      expect(balance).toEqual({
+        owner: address(ownerAddress),
+        mint: client.config.programs.nosTokenAddress,
+        tokenAccount,
+        amount: 2000000000n,
+        decimals: 6,
+        uiAmount: 2000,
+      });
+    });
+
+    it('should return zero balance info when no token account exists', async () => {
+      (client.solana.rpc.getTokenAccountsByOwner as any).mockReturnValue({
+        send: vi.fn().mockResolvedValue({ value: [] }),
+      });
+
+      const balance = await nosService.getBalanceInfo(ownerAddress);
+
+      expect(balance).toEqual({
+        owner: address(ownerAddress),
+        mint: client.config.programs.nosTokenAddress,
+        tokenAccount: null,
+        amount: 0n,
+        decimals: 6,
+        uiAmount: 0,
+      });
+    });
+
+    it('should use wallet address for balance info when owner is not provided', async () => {
+      const mockSigner = await SignerFactory.createTestSigner();
+      client.wallet = mockSigner;
+
+      (client.solana.rpc.getTokenAccountsByOwner as any).mockReturnValue({
+        send: vi.fn().mockResolvedValue({ value: [] }),
+      });
+
+      await nosService.getBalanceInfo();
+
+      expect(client.solana.rpc.getTokenAccountsByOwner).toHaveBeenCalledWith(
+        mockSigner.address,
+        expect.any(Object),
+        expect.any(Object)
+      );
     });
 
     it('should handle RPC errors', async () => {
@@ -593,6 +573,37 @@ describe('TokenService (nos)', () => {
       expect(devnetClient.config.programs.nosTokenAddress).toBe(
         address('devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP')
       );
+    });
+  });
+
+  describe('getATA', () => {
+    it('should return the associated token account for a provided owner', async () => {
+      const owner = AddressFactory.createValid();
+
+      const ata = await nosService.getATA(owner);
+
+      expect(ata).toBeDefined();
+    });
+
+    it('should use wallet address when owner is not provided', async () => {
+      const mockSigner = await SignerFactory.createTestSigner();
+      client.wallet = mockSigner;
+
+      const [explicitAta, walletAta] = await Promise.all([
+        nosService.getATA(mockSigner.address),
+        nosService.getATA(),
+      ]);
+
+      expect(walletAta).toBe(explicitAta);
+    });
+
+    it('should throw error when neither owner nor wallet is provided', async () => {
+      const clientWithoutWallet = createNosanaClient(NosanaNetwork.DEVNET);
+      clientWithoutWallet.wallet = undefined;
+
+      await expect(clientWithoutWallet.nos.getATA()).rejects.toMatchObject({
+        code: 'NO_WALLET',
+      });
     });
   });
 
@@ -731,6 +742,99 @@ describe('TokenService (nos)', () => {
           amount,
         })
       ).rejects.toMatchObject({ code: 'NO_WALLET' });
+    });
+
+    it('should use custom payer for ATA creation when payerForATA is provided', async () => {
+      const recipient = AddressFactory.createValid();
+      const customPayer = AddressFactory.createValid();
+
+      // Mock getCreateATAInstructionIfNeeded to return an instruction
+      const mockCreateAtaIx = {
+        programAddress: 'TokenProgram',
+        accounts: [],
+        data: new Uint8Array(),
+      };
+      const spy = vi
+        .spyOn(client.solana, 'getCreateATAInstructionIfNeeded')
+        .mockResolvedValue(mockCreateAtaIx as any);
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+        payerForATA: customPayer,
+      });
+
+      expect(instructions).toBeDefined();
+      expect(instructions.length).toBe(2);
+      expect(instructions[0]).toBe(mockCreateAtaIx);
+      expect(spy).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        recipient,
+        customPayer
+      );
+    });
+
+    it('should use custom payer address string for ATA creation when payerForATA is provided as string', async () => {
+      const recipient = AddressFactory.createValid();
+      const customPayerString = AddressFactory.createValid();
+
+      // Mock getCreateATAInstructionIfNeeded to return an instruction
+      const mockCreateAtaIx = {
+        programAddress: 'TokenProgram',
+        accounts: [],
+        data: new Uint8Array(),
+      };
+      const spy = vi
+        .spyOn(client.solana, 'getCreateATAInstructionIfNeeded')
+        .mockResolvedValue(mockCreateAtaIx as any);
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+        payerForATA: customPayerString,
+      });
+
+      expect(instructions).toBeDefined();
+      expect(instructions.length).toBe(2);
+      expect(instructions[0]).toBe(mockCreateAtaIx);
+      expect(spy).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        recipient,
+        customPayerString
+      );
+    });
+
+    it('should use custom TransactionSigner as payer for ATA creation when payerForATA is a signer', async () => {
+      const recipient = AddressFactory.createValid();
+      const customPayerSigner = await SignerFactory.createRandomSigner();
+
+      // Mock getCreateATAInstructionIfNeeded to return an instruction
+      const mockCreateAtaIx = {
+        programAddress: 'TokenProgram',
+        accounts: [],
+        data: new Uint8Array(),
+      };
+      const spy = vi
+        .spyOn(client.solana, 'getCreateATAInstructionIfNeeded')
+        .mockResolvedValue(mockCreateAtaIx as any);
+
+      const instructions = await nosService.transfer({
+        to: recipient,
+        amount,
+        payerForATA: customPayerSigner,
+      });
+
+      expect(instructions).toBeDefined();
+      expect(instructions.length).toBe(2);
+      expect(instructions[0]).toBe(mockCreateAtaIx);
+      expect(spy).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        recipient,
+        customPayerSigner
+      );
     });
   });
 });

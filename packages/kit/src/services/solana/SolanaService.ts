@@ -54,7 +54,19 @@ import { Logger } from '../../logger/Logger.js';
 import { Wallet } from '../../types.js';
 import { SolanaConfig } from '../../config/types.js';
 import { convertHttpToWebSocketUrl } from '../../utils/convertHttpToWebSocketUrl.js';
+import { resolveAddressOrWallet } from '../../utils/resolveAddressOrWallet.js';
+import { packInstructions, MAX_COMPUTE_UNITS } from '../../utils/packInstructions.js';
 import { resolvePriorityFeeMicroLamports } from './priorityFees.js';
+
+const SOL_DECIMALS = 9;
+
+/**
+ * Compute units assumed for an instruction whose cost is unknown to the batch
+ * sender (no `computeUnits` estimate provided, or an estimator returned
+ * undefined). Matches Solana's own per-instruction default, so a transaction is
+ * never under-provisioned.
+ */
+const DEFAULT_INSTRUCTION_COMPUTE_UNITS = 200_000;
 
 /**
  * Factory function to create an estimateAndSetComputeUnitLimit function
@@ -84,6 +96,72 @@ export interface SolanaServiceDeps {
   getWallet: () => Wallet | undefined;
 }
 
+export interface BalanceInfo {
+  owner: Address;
+  mint: Address | 'SOL';
+  amount: bigint;
+  decimals: number;
+  uiAmount: number;
+}
+
+export interface SolBalanceInfo extends BalanceInfo {
+  mint: 'SOL';
+}
+
+/**
+ * Result of sending a single transaction within a batch.
+ * @group @nosana/kit
+ */
+export interface BatchTransactionResult {
+  /** Whether the transaction was sent and confirmed successfully. */
+  status: 'fulfilled' | 'rejected';
+  /** Convenience flag: `true` when `status` is `'fulfilled'`. */
+  confirmed: boolean;
+  /** The transaction signature, present when `status` is `'fulfilled'`. */
+  signature?: Signature;
+  /** The error that occurred, present when `status` is `'rejected'`. */
+  error?: unknown;
+  /** The instructions that made up this transaction (the packed bucket). */
+  instructions: Instruction[];
+  /**
+   * The indices of the original `groups` this transaction carried, in order — the
+   * bridge back from a per-transaction result to the per-group input you submitted.
+   * For example `groupIndices: [6, 7]` means this transaction packed `groups[6]`
+   * and `groups[7]`, so both share this transaction's `status`/`signature`/`error`.
+   * When every group is a single instruction, `groupIndices[k]` corresponds to
+   * `instructions[k]`.
+   */
+  groupIndices: number[];
+}
+
+/**
+ * One packed, signed, but **un-sent** transaction produced by
+ * {@link SolanaService.buildAndSignBatch}. The `blob` can be persisted and
+ * broadcast later by a separate process, which is what enables persist-before-send
+ * idempotency (a crash mid-send can replay the identical signed transaction, and
+ * the chain dedups it by signature).
+ * @group @nosana/kit
+ */
+export interface SignedBatchTransaction {
+  /**
+   * The fully-signed transaction, base64-encoded. Broadcast it as-is later via
+   * `rpc.sendTransaction(blob, { encoding: 'base64' })`.
+   */
+  blob: string;
+  /** The transaction signature (also the fee payer's signature). */
+  signature: Signature;
+  /**
+   * The `lastValidBlockHeight` of the blockhash this transaction was signed
+   * against — the expiry the consumer compares against to know when it is safe to
+   * rebuild (the transaction can no longer land once the chain passes this height).
+   */
+  lastValidBlockHeight: bigint;
+  /** The instructions that made up this transaction (the packed bucket). */
+  instructions: Instruction[];
+  /** The indices of the original `groups` this transaction carried (see {@link BatchTransactionResult.groupIndices}). */
+  groupIndices: number[];
+}
+
 /**
  * Solana service interface
  * @group @nosana/kit
@@ -105,10 +183,18 @@ export interface SolanaService {
    * Get the SOL balance for a specific address.
    *
    * @param addressStr - Optional address to query. If not provided, uses the wallet address.
-   * @returns The SOL balance in lamports as a number
+   * @returns The SOL balance in lamports
    * @throws {NosanaError} If neither address nor wallet is provided
    */
-  getBalance(addressStr?: string | Address): Promise<number>;
+  getBalance(addressStr?: string | Address): Promise<bigint>;
+  /**
+   * Get SOL balance metadata for a specific address.
+   *
+   * @param addressStr - Optional address to query. If not provided, uses the wallet address.
+   * @returns Exact lamports plus display-oriented SOL metadata
+   * @throws {NosanaError} If neither address nor wallet is provided
+   */
+  getBalanceInfo(addressStr?: string | Address): Promise<SolBalanceInfo>;
   /**
    * Build a transaction message from instructions.
    * This function creates a transaction message with fee payer, blockhash, and instructions.
@@ -144,6 +230,95 @@ export interface SolanaService {
       estimateComputeUnits?: boolean;
     }
   ): Promise<Signature>;
+  /**
+   * Pack instruction groups into the fewest transactions that each stay within the
+   * Solana transaction size limit, then build, sign, and send all of them.
+   *
+   * Each entry of `groups` is an *atomic group*: a single instruction, or an array
+   * of instructions that must stay together in the same transaction. Groups are
+   * never split across transactions; they are greedily packed into buckets sized by
+   * compiling each candidate transaction in-memory (no extra RPC calls).
+   *
+   * Unless `estimateComputeUnits` is set, each transaction gets an explicit
+   * `SetComputeUnitLimit` equal to the sum of its instructions' estimated compute
+   * units (from `computeUnits`), capped at the 1.4M per-transaction maximum. This
+   * keeps priority fees — which are charged against the compute-unit limit — tight
+   * instead of being billed against Solana's inflated per-instruction default.
+   *
+   * All transactions are attempted regardless of individual failures — the returned
+   * array reports the per-transaction outcome in input order.
+   *
+   * @param groups Atomic instruction groups to bulk together.
+   * @param options Optional configuration.
+   * @param options.feePayer Optional fee payer signer. Defaults to the service feePayer or wallet.
+   * @param options.commitment Commitment level for confirmation.
+   * @param options.computeUnits Per-instruction compute-unit estimate: a fixed number for
+   *        every instruction, or a function mapping an instruction to its units (return undefined
+   *        to fall back to the default). Used to set each transaction's compute-unit limit and to
+   *        bound packing. Defaults to Solana's per-instruction default.
+   * @param options.maxComputeUnits Per-transaction compute-unit cap. Defaults to 1,400,000.
+   * @param options.estimateComputeUnits If true, estimates the compute unit limit per transaction
+   *        via simulation instead of the static `computeUnits` estimate. Default: false.
+   * @param options.maxTransactionSize Override the maximum serialized transaction size in bytes.
+   * @param options.sequential If true, sends transactions one at a time, confirming each before the
+   *        next. Combined with `estimateComputeUnits`, this makes each simulation reflect the chain
+   *        state left by the prior transactions (e.g. a market queue that grows or shrinks across the
+   *        batch). Default: false (all transactions are sent concurrently).
+   * @returns A per-transaction result array, in the order the buckets were packed.
+   */
+  buildSignAndSendBatch(
+    groups: Array<Instruction | Instruction[]>,
+    options?: {
+      feePayer?: TransactionSigner;
+      commitment?: 'processed' | 'confirmed' | 'finalized';
+      computeUnits?: number | ((instruction: Instruction) => number | undefined);
+      computeUnitMargin?: number;
+      maxComputeUnits?: number;
+      estimateComputeUnits?: boolean;
+      maxTransactionSize?: number;
+      sequential?: boolean;
+    }
+  ): Promise<BatchTransactionResult[]>;
+
+  /**
+   * Pack instruction groups into the fewest transactions, then build and sign each
+   * — but **do not broadcast**. Returns one signed, base64-serialized transaction
+   * per bucket for a separate process to persist and send later. This is
+   * {@link buildSignAndSendBatch} minus the send: it exists so a consumer can
+   * persist-before-send for idempotency (a crash mid-send replays the identical
+   * signed transaction, which the chain dedups by signature).
+   *
+   * Packing and the per-transaction compute-unit limit work exactly as in
+   * {@link buildSignAndSendBatch}. Each bucket is signed with **all** of its
+   * embedded signers (e.g. the fresh job/run keypairs minted by a `list`
+   * instruction) plus the fee payer — this is inherent to signing with the message's
+   * embedded signers, so every required signature is present in the returned blob.
+   *
+   * Performs no network send. Each transaction is signed against its own freshly
+   * fetched blockhash, so `lastValidBlockHeight` may differ per bucket.
+   *
+   * Because the transaction is signed now but may be broadcast later — potentially
+   * against a deeper, costlier state than when it was signed — the static
+   * compute-unit estimate can under-budget at land time. Use `computeUnitMargin` to
+   * over-provision the baked-in limit (the cost of over-budgeting is only fee, and
+   * for size-bound batches it does not reduce packing density).
+   *
+   * @param groups Atomic instruction groups to bulk together.
+   * @param options Same packing options as {@link buildSignAndSendBatch} (no `commitment`/`sequential`, which only apply to sending).
+   * @param options.computeUnitMargin Multiplier on each instruction's compute-unit estimate (default 1). Raise it (>1) to over-provision the limit for transactions broadcast later against a costlier state.
+   * @returns One signed, un-sent transaction per packed bucket, in packing order.
+   */
+  buildAndSignBatch(
+    groups: Array<Instruction | Instruction[]>,
+    options?: {
+      feePayer?: TransactionSigner;
+      computeUnits?: number | ((instruction: Instruction) => number | undefined);
+      computeUnitMargin?: number;
+      maxComputeUnits?: number;
+      estimateComputeUnits?: boolean;
+      maxTransactionSize?: number;
+    }
+  ): Promise<SignedBatchTransaction[]>;
   /**
    * Partially sign a transaction message with the signers embedded in the transaction.
    * The transaction message must already have a fee payer address set (via buildTransaction with an address).
@@ -227,14 +402,16 @@ export interface SolanaService {
    * @param ata The associated token account address
    * @param mint The token mint address
    * @param owner The owner of the associated token account
-   * @param payer Optional payer for the account creation. If not provided, uses the wallet or service feePayer.
+   * @param payer Optional payer for the account creation. Can be a TransactionSigner (for full signing)
+   *              or an Address (for deferred signing scenarios where the payer signs later).
+   *              If not provided, uses the wallet or service feePayer.
    * @returns An instruction to create the ATA if it doesn't exist, or null if it already exists
    */
   getCreateATAInstructionIfNeeded(
     ata: Address,
     mint: Address,
     owner: Address,
-    payer?: TransactionSigner
+    payer?: TransactionSigner | Address
   ): Promise<Awaited<ReturnType<typeof getCreateAssociatedTokenIdempotentInstructionAsync>> | null>;
 }
 
@@ -262,6 +439,149 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
   // Store feePayer in a mutable variable, initialized from config
   let feePayer: TransactionSigner | undefined = config.feePayer;
+
+  const fetchBalance = async (addr: Address): Promise<bigint> => {
+    deps.logger.debug(`Getting balance for address: ${addr}`);
+    const balance = await rpc.getBalance(addr).send();
+    return balance.value;
+  };
+
+  const getBalance = async (addressStr?: string | Address): Promise<bigint> => {
+    try {
+      const addr = resolveAddressOrWallet({
+        value: addressStr,
+        getWallet: deps.getWallet,
+      });
+      return await fetchBalance(addr);
+    } catch (error) {
+      if (error instanceof NosanaError) {
+        throw error;
+      }
+      deps.logger.error(`Failed to get balance: ${error}`);
+      throw new NosanaError('Failed to get balance', ErrorCodes.RPC_ERROR, error);
+    }
+  };
+
+  const getBalanceInfo = async (addressStr?: string | Address): Promise<SolBalanceInfo> => {
+    try {
+      const owner = resolveAddressOrWallet({
+        value: addressStr,
+        getWallet: deps.getWallet,
+      });
+      const amount = await getBalance(owner);
+
+      return {
+        owner,
+        mint: 'SOL',
+        amount,
+        decimals: SOL_DECIMALS,
+        uiAmount: Number(amount) / 10 ** SOL_DECIMALS,
+      };
+    } catch (error) {
+      if (error instanceof NosanaError) {
+        throw error;
+      }
+      deps.logger.error(`Failed to get balance info: ${error}`);
+      throw new NosanaError('Failed to get balance info', ErrorCodes.RPC_ERROR, error);
+    }
+  };
+
+  // Shared setup for the batch methods (send and sign-only): resolve the fee payer,
+  // pack the groups into buckets, and expose how to map a bucket back to its input
+  // groups and how to prepend the per-bucket compute-unit limit. The send/sign step
+  // itself differs between the two callers and stays in each method.
+  const prepareBatch = (
+    groups: Array<Instruction | Instruction[]>,
+    options?: {
+      feePayer?: TransactionSigner;
+      computeUnits?: number | ((instruction: Instruction) => number | undefined);
+      computeUnitMargin?: number;
+      maxComputeUnits?: number;
+      estimateComputeUnits?: boolean;
+      maxTransactionSize?: number;
+    }
+  ) => {
+    // Resolve the fee payer so size measurement accounts for account dedup accurately.
+    const transactionFeePayer = options?.feePayer ?? feePayer ?? deps.getWallet();
+    if (!transactionFeePayer) {
+      throw new NosanaError('No wallet found and no feePayer provided', ErrorCodes.NO_WALLET);
+    }
+
+    // Per-instruction compute-unit estimate, with a safe fallback for unknown
+    // instructions, scaled by an optional safety margin. The margin raises both the
+    // baked-in compute-unit limit and the packing bound — used to over-provision when
+    // a static estimate may under-budget at land time (e.g. a transaction that is
+    // signed now but broadcast later against a deeper, costlier market queue).
+    const cuOption = options?.computeUnits;
+    const margin = Math.max(options?.computeUnitMargin ?? 1, 0);
+    const baseComputeUnits: (ix: Instruction) => number =
+      typeof cuOption === 'function'
+        ? (ix) => cuOption(ix) ?? DEFAULT_INSTRUCTION_COMPUTE_UNITS
+        : () => cuOption ?? DEFAULT_INSTRUCTION_COMPUTE_UNITS;
+    const resolveComputeUnits = (ix: Instruction): number =>
+      Math.ceil(baseComputeUnits(ix) * margin);
+    // Never exceed Solana's hard per-transaction cap, even if a larger value is passed.
+    const maxCU = Math.min(options?.maxComputeUnits ?? MAX_COMPUTE_UNITS, MAX_COMPUTE_UNITS);
+    // Set the compute-unit limit statically unless the caller opts into simulation.
+    const useStaticLimit = options?.estimateComputeUnits !== true;
+
+    // Reserve headroom for the compute-budget / priority-fee instructions that
+    // buildTransaction prepends to every transaction, so a packed bucket can never
+    // overflow once those are added. Values are placeholders — only their size matters.
+    const reservedInstructions: Instruction[] = [
+      getSetComputeUnitPriceInstruction({ microLamports: 0n }),
+      getSetComputeUnitLimitInstruction({ units: 0 }),
+    ];
+
+    const buckets = packInstructions(groups, {
+      feePayer: transactionFeePayer.address,
+      reservedInstructions,
+      maxTransactionSize: options?.maxTransactionSize,
+      // Bound packing by compute units only when we set the limit statically.
+      computeUnits: useStaticLimit ? resolveComputeUnits : undefined,
+      maxComputeUnits: maxCU,
+    });
+
+    // packInstructions preserves instruction object identity, so map each
+    // instruction reference back to the index of the group it came from. This lets
+    // every per-transaction result report which submitted groups it carried.
+    const groupIndexByInstruction = new Map<Instruction, number>();
+    groups.forEach((group, index) => {
+      for (const instruction of Array.isArray(group) ? group : [group]) {
+        if (!groupIndexByInstruction.has(instruction)) {
+          groupIndexByInstruction.set(instruction, index);
+        }
+      }
+    });
+    const groupIndicesOf = (bucket: Instruction[]): number[] => {
+      const indices: number[] = [];
+      const seen = new Set<number>();
+      for (const instruction of bucket) {
+        const index = groupIndexByInstruction.get(instruction);
+        if (index !== undefined && !seen.has(index)) {
+          seen.add(index);
+          indices.push(index);
+        }
+      }
+      return indices;
+    };
+
+    // Prepend an explicit, tight compute-unit limit so priority fees stay accurate.
+    const withComputeLimit = (bucket: Instruction[]): Instruction[] =>
+      useStaticLimit
+        ? [
+            getSetComputeUnitLimitInstruction({
+              units: Math.min(
+                bucket.reduce((sum, ix) => sum + resolveComputeUnits(ix), 0),
+                maxCU
+              ),
+            }),
+            ...bucket,
+          ]
+        : bucket;
+
+    return { buckets, groupIndicesOf, withComputeLimit };
+  };
 
   return {
     config,
@@ -324,31 +644,9 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       return pda;
     },
 
-    async getBalance(addressStr?: string | Address): Promise<number> {
-      try {
-        // Use wallet address if no address is provided
-        let addr: Address;
-        if (addressStr) {
-          addr = address(addressStr);
-        } else {
-          const wallet = deps.getWallet();
-          if (!wallet) {
-            throw new NosanaError('No wallet found and no address provided', ErrorCodes.NO_WALLET);
-          }
-          addr = wallet.address;
-        }
+    getBalance,
 
-        deps.logger.debug(`Getting balance for address: ${addr}`);
-        const balance = await rpc.getBalance(addr).send();
-        return Number(balance.value);
-      } catch (error) {
-        if (error instanceof NosanaError) {
-          throw error;
-        }
-        deps.logger.error(`Failed to get balance: ${error}`);
-        throw new NosanaError('Failed to get balance', ErrorCodes.RPC_ERROR, error);
-      }
-    },
+    getBalanceInfo,
 
     /**
      * Build a transaction message from instructions
@@ -466,12 +764,13 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       transaction: SendableTransaction & Transaction & TransactionWithBlockhashLifetime,
       options?: { commitment?: Commitment }
     ): Promise<Signature> {
+      let signature: Signature | undefined = undefined;
       try {
         // Ensure the transaction is sendable before attempting to send
         assertIsSendableTransaction(transaction);
 
         // Get the transaction signature for logging
-        const signature = getSignatureFromTransaction(transaction);
+        signature = getSignatureFromTransaction(transaction);
 
         deps.logger.info(`Sending transaction: ${signature}`);
 
@@ -484,9 +783,9 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
 
         return signature;
       } catch (error) {
-        const errorMessage = `Failed to send transaction: ${error instanceof Error ? error.message : String(error)}`;
+        const errorMessage = `Failed to send transaction ${signature ? `${signature}` : ''}: ${error instanceof Error ? error.message : String(error)}`;
         deps.logger.error(errorMessage);
-        throw new NosanaError(errorMessage, ErrorCodes.RPC_ERROR, error);
+        throw new NosanaError(errorMessage, ErrorCodes.RPC_ERROR, error, signature);
       }
     },
 
@@ -516,6 +815,113 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       });
       const signedTransaction = await this.signTransaction(transactionMessage);
       return await this.sendTransaction(signedTransaction, { commitment: options?.commitment });
+    },
+
+    /**
+     * Pack instruction groups into the fewest size-bounded transactions, then build,
+     * sign, and send all of them, reporting each transaction's outcome.
+     *
+     * See the interface documentation for details.
+     */
+    async buildSignAndSendBatch(
+      groups: Array<Instruction | Instruction[]>,
+      options?: {
+        feePayer?: TransactionSigner;
+        commitment?: Commitment;
+        computeUnits?: number | ((instruction: Instruction) => number | undefined);
+        computeUnitMargin?: number;
+        maxComputeUnits?: number;
+        estimateComputeUnits?: boolean;
+        maxTransactionSize?: number;
+        sequential?: boolean;
+      }
+    ): Promise<BatchTransactionResult[]> {
+      const { buckets, groupIndicesOf, withComputeLimit } = prepareBatch(groups, options);
+
+      // Build, sign, and send one packed bucket as a single transaction.
+      const sendBucket = async (bucket: Instruction[]): Promise<Signature> => {
+        const transactionMessage = await this.buildTransaction(withComputeLimit(bucket), {
+          feePayer: options?.feePayer,
+          estimateComputeUnits: options?.estimateComputeUnits,
+        });
+        const signedTransaction = await this.signTransaction(transactionMessage);
+        return this.sendTransaction(signedTransaction, { commitment: options?.commitment });
+      };
+
+      const toResult = (
+        bucket: Instruction[],
+        outcome: { signature?: Signature; error?: unknown }
+      ): BatchTransactionResult => ({
+        instructions: bucket,
+        status: outcome.error === undefined ? 'fulfilled' : 'rejected',
+        confirmed: outcome.error === undefined,
+        signature: outcome.signature,
+        error: outcome.error,
+        groupIndices: groupIndicesOf(bucket),
+      });
+
+      // Attempt every transaction; a failure in one does not stop the others.
+      if (options?.sequential) {
+        // Send one at a time, confirming each before the next. When compute units
+        // are estimated by simulation, this makes each estimate reflect the true
+        // chain state produced by the prior transactions (e.g. a queue that grows
+        // or shrinks across the batch), which concurrent sending cannot.
+        const results: BatchTransactionResult[] = [];
+        for (const bucket of buckets) {
+          try {
+            results.push(toResult(bucket, { signature: await sendBucket(bucket) }));
+          } catch (error) {
+            results.push(toResult(bucket, { error }));
+          }
+        }
+        return results;
+      }
+
+      const settled = await Promise.allSettled(buckets.map(sendBucket));
+      return settled.map((result, index) =>
+        result.status === 'fulfilled'
+          ? toResult(buckets[index], { signature: result.value })
+          : toResult(buckets[index], { error: result.reason })
+      );
+    },
+
+    /**
+     * Pack, build, and sign — but do not send. See the interface documentation.
+     */
+    async buildAndSignBatch(
+      groups: Array<Instruction | Instruction[]>,
+      options?: {
+        feePayer?: TransactionSigner;
+        computeUnits?: number | ((instruction: Instruction) => number | undefined);
+        computeUnitMargin?: number;
+        maxComputeUnits?: number;
+        estimateComputeUnits?: boolean;
+        maxTransactionSize?: number;
+      }
+    ): Promise<SignedBatchTransaction[]> {
+      const { buckets, groupIndicesOf, withComputeLimit } = prepareBatch(groups, options);
+
+      // Build + sign each bucket; never send. signTransaction signs with the
+      // message's embedded signers, so the fresh job/run keypairs minted by each
+      // instruction and the fee payer all sign here — the returned blob is fully
+      // signed and broadcastable as-is by a separate process.
+      const signBucket = async (bucket: Instruction[]): Promise<SignedBatchTransaction> => {
+        const transactionMessage = await this.buildTransaction(withComputeLimit(bucket), {
+          feePayer: options?.feePayer,
+          estimateComputeUnits: options?.estimateComputeUnits,
+        });
+        const signedTransaction = await this.signTransaction(transactionMessage);
+        return {
+          blob: this.serializeTransaction(signedTransaction),
+          signature: getSignatureFromTransaction(signedTransaction),
+          lastValidBlockHeight: transactionMessage.lifetimeConstraint.lastValidBlockHeight,
+          instructions: bucket,
+          groupIndices: groupIndicesOf(bucket),
+        };
+      };
+
+      // No send, so the buckets are independent — build + sign them concurrently.
+      return Promise.all(buckets.map(signBucket));
     },
 
     /**
@@ -589,7 +995,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
       ata: Address,
       mint: Address,
       owner: Address,
-      payer?: TransactionSigner
+      payer?: TransactionSigner | Address
     ): Promise<Awaited<
       ReturnType<typeof getCreateAssociatedTokenIdempotentInstructionAsync>
     > | null> {
@@ -612,8 +1018,15 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
           );
         }
 
+        // If payer is an Address (string), wrap it so the instruction builder accepts it.
+        // The signature will be collected later when the transaction is signed by the payer.
+        const payerSigner: TransactionSigner =
+          typeof instructionPayer === 'string'
+            ? ({ address: instructionPayer } as TransactionSigner)
+            : instructionPayer;
+
         const instruction = await getCreateAssociatedTokenIdempotentInstructionAsync({
-          payer: instructionPayer,
+          payer: payerSigner,
           ata,
           owner,
           mint,

@@ -2,7 +2,8 @@ export class NosanaError extends Error {
   constructor(
     message: string,
     public readonly code: string,
-    public readonly details?: unknown
+    public readonly details?: unknown,
+    public readonly txSignature?: string
   ) {
     super(message);
     this.name = 'NosanaError';

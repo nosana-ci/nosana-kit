@@ -4,26 +4,42 @@ import type { BlockchainIndexerClient } from '../../client/blockchain-indexer/in
 import type { ClientManagerClient } from '../../client/client-manager/index.js';
 import type {
   NosanaJobsApi,
+  NosanaJobActionOptions,
+  NosanaJobBatchOptions,
+  NosanaApiExtendJobRequest,
+  NosanaApiExtendJobResponse,
+  NosanaApiStopJobRequest,
+  NosanaApiStopJobResponse,
   NosanaApiGetJobByAddressRequest,
   NosanaApiGetJobByAddressResponse,
   NosanaApiGetAllJobsRequest,
   NosanaApiGetAllJobsResponse,
   NosanaApiListJobRequest,
   NosanaApiListJobResponse,
-  NosanaApiExtendJobRequest,
-  NosanaApiExtendJobResponse,
-  StopJobWithCreditsResponse,
+  NosanaApiListJobBatchRequest,
+  NosanaApiExtendJobBatchRequest,
+  NosanaApiStopJobBatchRequest,
+  NosanaApiJobsBatchResponse,
   Job,
   JobRunningNodesRequest,
   JobLongRunningRequest,
   JobStatsRequest,
   JobStatsTimestampsRequest,
+  JobStatsTimestampsHoursRequest,
   JobCountRequest,
   JobCountResponse,
   JobBatchRequest,
 } from './types.js';
 
 export * from './types.js';
+
+/**
+ * Builds the optional request init that carries the `Idempotency-Key` header.
+ * Returns an empty object when no key is supplied so the request is unchanged.
+ */
+function idempotencyInit({ idempotencyKey }: NosanaJobActionOptions = {}) {
+  return idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : {};
+}
 
 export function createNosanaJobsApi(clients: {
   blockchainIndexer: BlockchainIndexerClient;
@@ -34,7 +50,7 @@ export function createNosanaJobsApi(clients: {
     async get(
       address: NosanaApiGetJobByAddressRequest,
     ): Promise<NosanaApiGetJobByAddressResponse> {
-      const { data, error } = await blockchainIndexer.GET('/jobs/{address}', {
+      const { data, error, response } = await blockchainIndexer.GET('/jobs/{address}', {
         params: {
           path: {
             address,
@@ -43,7 +59,7 @@ export function createNosanaJobsApi(clients: {
       });
 
       if (error || !data) {
-        throw errorFormatter('Failed to get job', error);
+        throw errorFormatter('Failed to get job', error, response);
       }
 
       return data as unknown as NosanaApiGetJobByAddressResponse;
@@ -51,61 +67,103 @@ export function createNosanaJobsApi(clients: {
     async getAll(
       request?: NosanaApiGetAllJobsRequest,
     ): Promise<NosanaApiGetAllJobsResponse> {
-      const { data, error } = await blockchainIndexer.GET('/jobs/', {
+      const { data, error, response } = await blockchainIndexer.GET('/jobs/', {
         params: {
           query: request ?? {},
         },
       });
 
       if (error || !data) {
-        throw errorFormatter('Failed to get all jobs', error);
+        throw errorFormatter('Failed to get all jobs', error, response);
       }
 
       return data as unknown as NosanaApiGetAllJobsResponse;
     },
     async list(
       request: NosanaApiListJobRequest,
+      options?: NosanaJobActionOptions,
     ): Promise<NosanaApiListJobResponse> {
-      const { data, error } = await clientManager.POST('/jobs/list', {
+      const { data, error, response } = await clientManager.POST('/jobs/list', {
         body: request,
+        ...idempotencyInit(options),
       });
 
       if (error || !data) {
-        throw errorFormatter('Failed to list job', error);
+        throw errorFormatter('Failed to list job', error, response);
       }
 
       return data;
     },
-    async extend({
-      address,
-      ...request
-    }: NosanaApiExtendJobRequest): Promise<NosanaApiExtendJobResponse> {
-      const { data, error } = await clientManager.POST(
+    async extend(
+      { address, ...request }: NosanaApiExtendJobRequest,
+      options?: NosanaJobActionOptions,
+    ): Promise<NosanaApiExtendJobResponse> {
+      const { data, error, response } = await clientManager.POST(
         '/jobs/{address}/extend',
         {
           params: {
             path: { address },
           },
           body: request,
+          ...idempotencyInit(options),
         },
       );
 
       if (error || !data) {
-        throw errorFormatter('Failed to extend job', error);
+        throw errorFormatter('Failed to extend job', error, response);
       }
 
       return data;
     },
-    async stop(address: string): Promise<StopJobWithCreditsResponse> {
-      const { data, error } = await clientManager.POST('/jobs/{address}/stop', {
+    async stop(
+      address: NosanaApiStopJobRequest,
+      options?: NosanaJobActionOptions,
+    ): Promise<NosanaApiStopJobResponse> {
+      const { data, error, response } = await clientManager.POST('/jobs/{address}/stop', {
         params: {
           path: { address },
         },
-        body: undefined,
+        ...idempotencyInit(options),
       });
 
       if (error || !data) {
-        throw errorFormatter('Failed to stop job', error);
+        throw errorFormatter('Failed to stop job', error, response);
+      }
+
+      return data;
+    },
+    async listBatch(request: NosanaApiListJobBatchRequest, options: NosanaJobBatchOptions): Promise<NosanaApiJobsBatchResponse> {
+      const { data, error, response } = await clientManager.POST('/jobs/list/batch', {
+        params: { header: { 'Idempotency-Key': options.idempotencyKey } },
+        body: request,
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to list job batch', error, response);
+      }
+
+      return data;
+    },
+    async extendBatch(request: NosanaApiExtendJobBatchRequest, options: NosanaJobBatchOptions): Promise<NosanaApiJobsBatchResponse> {
+      const { data, error, response } = await clientManager.POST('/jobs/extend/batch', {
+        params: { header: { 'Idempotency-Key': options.idempotencyKey } },
+        body: request,
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to extend job batch', error, response);
+      }
+
+      return data;
+    },
+    async stopBatch(request: NosanaApiStopJobBatchRequest, options: NosanaJobBatchOptions): Promise<NosanaApiJobsBatchResponse> {
+      const { data, error, response } = await clientManager.POST('/jobs/stop/batch', {
+        params: { header: { 'Idempotency-Key': options.idempotencyKey } },
+        body: request,
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to stop job batch', error, response);
       }
 
       return data;
@@ -159,6 +217,22 @@ export function createNosanaJobsApi(clients: {
 
       if (error || !data) {
         throw errorFormatter('Failed to get job stats timestamps', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async getStatsTimestampsHours(
+      request?: JobStatsTimestampsHoursRequest,
+    ): Promise<Record<string, unknown>> {
+      const { data, error } = await blockchainIndexer.GET(
+        '/jobs/stats/timestamps-hours',
+        {
+          params: { query: request ?? {} },
+        },
+      );
+
+      if (error || !data) {
+        throw errorFormatter('Failed to get GPU compute hours', error);
       }
 
       return data as unknown as Record<string, unknown>;

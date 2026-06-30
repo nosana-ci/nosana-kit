@@ -18,7 +18,7 @@ export async function deploymentGetRevisions(
   searchParams?: DeploymentRevisionsSearchParams,
 ): Promise<RevisionListResult> {
   const { data, error } = await client.GET(
-    '/api/deployments/{deployment}/revisions',
+    '/deployments/{deployment}/revisions',
     {
       params: {
         path: { deployment: state.id },

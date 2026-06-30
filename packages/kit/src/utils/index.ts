@@ -2,4 +2,6 @@
 export * from './convertBigIntToNumber.js';
 export * from './convertHttpToWebSocketUrl.js';
 export * from './getStaticAccounts.js';
+export * from './packInstructions.js';
+export * from './resolveAddressOrWallet.js';
 export * from './walletToAuthorizationSigner.js';

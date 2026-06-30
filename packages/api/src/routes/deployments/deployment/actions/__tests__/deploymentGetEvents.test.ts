@@ -31,7 +31,7 @@ describe('deploymentGetEvents', () => {
 
       expect(result.events).toEqual([global.TEST_MOCK_EVENT]);
       expect(mockClient.GET).toHaveBeenCalledWith(
-        '/api/deployments/{deployment}/events',
+        '/deployments/{deployment}/events',
         {
           params: {
             path: { deployment: mockState.id },
@@ -45,7 +45,7 @@ describe('deploymentGetEvents', () => {
       await deploymentGetEvents(mockClient, mockState, { cursor: TEST_CURSOR, limit: TEST_LIMIT });
 
       expect(mockClient.GET).toHaveBeenCalledWith(
-        '/api/deployments/{deployment}/events',
+        '/deployments/{deployment}/events',
         {
           params: {
             path: { deployment: mockState.id },

@@ -51,10 +51,10 @@ export type PaginationParams = {
 };
 
 // Response types for the new endpoints
-export type DeploymentJobs = paths['/api/deployments/{deployment}/jobs']['get']['responses']['200']['content']['application/json'];
-export type DeploymentRevisions = paths['/api/deployments/{deployment}/revisions']['get']['responses']['200']['content']['application/json'];
-export type DeploymentEvents = paths['/api/deployments/{deployment}/events']['get']['responses']['200']['content']['application/json'];
-export type DeploymentTasks = paths['/api/deployments/{deployment}/tasks']['get']['responses']['200']['content']['application/json'];
+export type DeploymentJobs = paths['/deployments/{deployment}/jobs']['get']['responses']['200']['content']['application/json'];
+export type DeploymentRevisions = paths['/deployments/{deployment}/revisions']['get']['responses']['200']['content']['application/json'];
+export type DeploymentEvents = paths['/deployments/{deployment}/events']['get']['responses']['200']['content']['application/json'];
+export type DeploymentTasks = paths['/deployments/{deployment}/tasks']['get']['responses']['200']['content']['application/json'];
 
 export interface TopupVaultOptions {
   SOL?: number;
@@ -75,12 +75,12 @@ export interface Vault {
 }
 
 // Type for deployment job response
-export type DeploymentJob = paths['/api/deployments/{deployment}/jobs/{job}']['get']['responses']['200']['content']['application/json'];
+export type DeploymentJob = paths['/deployments/{deployment}/jobs/{job}']['get']['responses']['200']['content']['application/json'];
 
-export type DeploymentsSearchParams = paths['/api/deployments']['get']['parameters']['query'];
-export type DeploymentJobsSearchParams = paths['/api/deployments/{deployment}/jobs']['get']['parameters']['query'];
-export type DeploymentEventsSearchParams = paths['/api/deployments/{deployment}/events']['get']['parameters']['query'];
-export type DeploymentRevisionsSearchParams = paths['/api/deployments/{deployment}/revisions']['get']['parameters']['query'];
+export type DeploymentsSearchParams = paths['/deployments']['get']['parameters']['query'];
+export type DeploymentJobsSearchParams = paths['/deployments/{deployment}/jobs']['get']['parameters']['query'];
+export type DeploymentEventsSearchParams = paths['/deployments/{deployment}/events']['get']['parameters']['query'];
+export type DeploymentRevisionsSearchParams = paths['/deployments/{deployment}/revisions']['get']['parameters']['query'];
 
 // Item types extracted from paginated responses
 export type DeploymentJobItem = DeploymentJobs['jobs'][number];
@@ -105,6 +105,7 @@ export type ApiDeployment = DeploymentState & {
   updateReplicaCount: (replicas: number) => Promise<void>;
   updateTimeout: (timeout: number) => Promise<void>;
   updateSchedule: (schedule: string) => Promise<void>;
+  updateName: (name: string) => Promise<void>;
 };
 
 // Full deployment (with signer auth) - includes vault

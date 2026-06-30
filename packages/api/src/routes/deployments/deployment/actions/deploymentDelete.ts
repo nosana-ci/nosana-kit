@@ -23,7 +23,7 @@ export async function deploymentDelete(
     throw new Error('Deployment must be stopped before it can be deleted');
   }
 
-  const { error } = await client.DELETE('/api/deployments/{deployment}', {
+  const { error } = await client.DELETE('/deployments/{deployment}', {
     params: { path: { deployment: state.id } },
   });
 

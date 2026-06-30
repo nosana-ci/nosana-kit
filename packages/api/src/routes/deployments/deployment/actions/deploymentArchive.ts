@@ -21,7 +21,7 @@ export async function deploymentArchive(
   }
 
   const { data, error } = await client.POST(
-    '/api/deployments/{deployment}/archive',
+    '/deployments/{deployment}/archive',
     {
       params: { path: { deployment: state.id } },
     },

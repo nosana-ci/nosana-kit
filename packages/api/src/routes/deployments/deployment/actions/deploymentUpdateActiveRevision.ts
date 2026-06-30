@@ -9,7 +9,7 @@ export async function deploymentUpdateActiveRevision(
   state: DeploymentState,
 ): Promise<void> {
   const { data, error } = await client.PATCH(
-    `/api/deployments/{deployment}/update-active-revision`,
+    `/deployments/{deployment}/update-active-revision`,
     {
       params: { path: { deployment: state.id } },
       body: { active_revision },

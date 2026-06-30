@@ -31,7 +31,7 @@ describe('deploymentGetJobs', () => {
 
       expect(result.jobs).toEqual([global.TEST_MOCK_DEPLOYMENT_JOB]);
       expect(mockClient.GET).toHaveBeenCalledWith(
-        '/api/deployments/{deployment}/jobs',
+        '/deployments/{deployment}/jobs',
         {
           params: {
             path: { deployment: mockState.id },
@@ -45,7 +45,7 @@ describe('deploymentGetJobs', () => {
       await deploymentGetJobs(mockClient, mockState, { cursor: TEST_CURSOR, limit: TEST_LIMIT });
 
       expect(mockClient.GET).toHaveBeenCalledWith(
-        '/api/deployments/{deployment}/jobs',
+        '/deployments/{deployment}/jobs',
         {
           params: {
             path: { deployment: mockState.id },

@@ -49,7 +49,7 @@ scenario:npm test:scenario:
     - export DOCKER_TLS_VERIFY=
     - export DOCKER_CERT_PATH=
     - apk add --no-cache nodejs npm
-    - npm install -g pnpm@10.28.0
+    - npm install -g pnpm@10.28.1
     - pnpm install --frozen-lockfile
     - pnpm --filter @nosana/scenario... run build
     - pnpm --filter @nosana/scenario run test:scenario:localnet

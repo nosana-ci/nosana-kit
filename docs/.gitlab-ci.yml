@@ -8,7 +8,23 @@ include:
 
 docs:build:
   stage: build
+  # The docs site (vitepress + twoslash) is a heavy build (~3.6 GB, CPU-bound).
+  # It must never gate the release: allow_failure keeps a hung/failed docs build
+  # from blocking the dependent release pipeline, and a tight timeout makes it
+  # fail fast (minutes) instead of hanging until the 1h job deadline.
+  allow_failure: true
+  timeout: 20m
+  # Resource hints (only take effect if the runner permits resource overwrite;
+  # confirmed ignored on the current runner — left for when overwrite is enabled).
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
+    KUBERNETES_CPU_LIMIT: "4"
+    KUBERNETES_MEMORY_REQUEST: "8Gi"
+    KUBERNETES_MEMORY_LIMIT: "8Gi"
   script:
+    # Diagnostic: print the pod's real cgroup memory limit + CPU count via Node
+    # (the shell cgroup path read returned "unknown" on this image).
+    - "node -e \"console.log('=== pod: mem.constrainedGB=' + (process.constrainedMemory()/1073741824).toFixed(2) + ' availGB=' + (process.availableMemory()/1073741824).toFixed(2) + ' cpus=' + require('os').availableParallelism() + ' ===')\""
     - sed -i "s/0.0.0/${CI_COMMIT_TAG:1}/" packages/kit/package.json
     - pnpm install --frozen-lockfile
     - pnpm --filter @nosana/kit run build:with-deps
@@ -22,7 +38,7 @@ docs:build:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
 
-docs:pages:
+pages:
   stage: deploy
   needs:
     - job: docs:build

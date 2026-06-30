@@ -16,10 +16,10 @@ export type Complete = (params: CompleteParams) => Promise<CompleteInstruction>;
 
 export async function complete(
   { job, ipfsResultsHash }: CompleteParams,
-  { client, get, getRequiredWallet }: InstructionsHelperParams
+  { client, get, getRequiredWallet, getStaticAccounts }: InstructionsHelperParams
 ): Promise<CompleteInstruction> {
   const wallet = getRequiredWallet();
-  const jobAccount = await get(job);
+  const [jobAccount, { jobsProgram }] = await Promise.all([get(job), getStaticAccounts()]);
 
   if (jobAccount.state !== JobState.COMPLETED)
     throw new Error(
@@ -30,9 +30,12 @@ export async function complete(
     throw new Error('Job has already been completed.');
   }
 
-  return client.getCompleteInstruction({
-    job,
-    ipfsResult: new Uint8Array(ipfsHashToSolBytesArray(ipfsResultsHash)),
-    authority: wallet,
-  });
+  return client.getCompleteInstruction(
+    {
+      job,
+      ipfsResult: new Uint8Array(ipfsHashToSolBytesArray(ipfsResultsHash)),
+      authority: wallet,
+    },
+    { programAddress: jobsProgram }
+  );
 }

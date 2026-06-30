@@ -12,6 +12,7 @@ import {
   deploymentCreateNewRevision,
   deploymentUpdateActiveRevision,
   deploymentUpdateSchedule,
+  deploymentUpdateName,
   deploymentGenerateAuthHeader,
   deploymentDelete,
 } from './actions/index.js';
@@ -146,6 +147,16 @@ export function createDeployment(
   };
 
   /**
+   * @param name New name for the deployment
+   * @throws Error if there is an error updating the name
+   * @returns Promise<void>
+   * @description Updates the name of the deployment.
+   */
+  const updateName = async (name: string) => {
+    await deploymentUpdateName(name, client, state);
+  };
+
+  /**
    * @param active_revision
    * @throws Error if there is an error updating the active revision
    * @returns Promise<void>
@@ -258,5 +269,6 @@ export function createDeployment(
     updateActiveRevision,
     updateTimeout,
     updateSchedule,
+    updateName,
   });
 }

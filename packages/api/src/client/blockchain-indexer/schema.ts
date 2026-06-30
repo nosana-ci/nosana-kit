@@ -115,6 +115,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/jobs/stats/timestamps-hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get GPU compute hours over time
+         * @description Time series of GPU compute hours (sum of effective completed-job runtime) bucketed by period, mirroring /stats/timestamps but with hours instead of job counts.
+         */
+        get: operations["getJobsStatsTimestamps-hours"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/jobs/count": {
         parameters: {
             query?: never;
@@ -238,6 +258,22 @@ export interface paths {
         };
         /** @description Flexible endpoint to retrieve earning history of node with custom date ranges and grouping options. */
         get: operations["getStatsEarning-history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMetrics"];
         put?: never;
         post?: never;
         delete?: never;
@@ -411,12 +447,31 @@ export interface operations {
             };
         };
     };
+    "getJobsStatsTimestamps-hours": {
+        parameters: {
+            query?: {
+                period?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getJobsCount: {
         parameters: {
             query?: {
                 market?: string;
                 node?: string;
-                project?: string;
+                poster?: string;
                 payer?: string;
             };
             header?: never;
@@ -668,6 +723,23 @@ export interface operations {
                 end_date?: string;
                 group_by?: "day" | "month";
             };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getMetrics: {
+        parameters: {
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;

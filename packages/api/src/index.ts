@@ -24,6 +24,12 @@ import {
   type NosanaHostsApi,
   createNosanaStatsApi,
   type NosanaStatsApi,
+  createNosanaPaymentsApi,
+  type NosanaPaymentsApi,
+  createNosanaNewsletterApi,
+  type NosanaNewsletterApi,
+  createNosanaBenchmarksApi,
+  type NosanaBenchmarksApi,
 } from './routes/index.js';
 
 import { NosanaNetwork } from './types.js';
@@ -45,6 +51,16 @@ export interface NosanaApi {
   templates: NosanaTemplatesApi;
   hosts: NosanaHostsApi;
   stats: NosanaStatsApi;
+  payments: NosanaPaymentsApi;
+  newsletter: NosanaNewsletterApi;
+  benchmarks: NosanaBenchmarksApi;
+  /**
+   * The raw, fully-typed per-service OpenAPI clients. Use these to call any
+   * endpoint not covered by the curated groups above — every route of each
+   * service is available with path autocompletion and typed params/responses,
+   * e.g. `api.clients.hostManager.POST('/nodes/ban', { body })`.
+   */
+  clients: NosanaClients;
 }
 
 export interface NosanaApiWithApiKey {
@@ -57,6 +73,16 @@ export interface NosanaApiWithApiKey {
   templates: NosanaTemplatesApi;
   hosts: NosanaHostsApi;
   stats: NosanaStatsApi;
+  payments: NosanaPaymentsApi;
+  newsletter: NosanaNewsletterApi;
+  benchmarks: NosanaBenchmarksApi;
+  /**
+   * The raw, fully-typed per-service OpenAPI clients. Use these to call any
+   * endpoint not covered by the curated groups above — every route of each
+   * service is available with path autocompletion and typed params/responses,
+   * e.g. `api.clients.hostManager.POST('/nodes/ban', { body })`.
+   */
+  clients: NosanaClients;
 }
 
 export type NosanaApiClient = NosanaApi | NosanaApiWithApiKey;
@@ -140,8 +166,18 @@ export function createNosanaApi(
     stats: createNosanaStatsApi({
       blockchainIndexer: clients.blockchainIndexer,
     }),
+    payments: createNosanaPaymentsApi({ clientManager: clients.clientManager }),
+    newsletter: createNosanaNewsletterApi({
+      clientManager: clients.clientManager,
+    }),
+    benchmarks: createNosanaBenchmarksApi({ hostManager: clients.hostManager }),
+    clients,
   };
 }
+
+// Export helpers
+export { generateIdempotencyKey, IdempotencyCode } from './utils/idempotency.js';
+export { isNosanaApiError, isIdempotencyControlSignal } from './utils/errorFormatter.js';
 
 // Export types
 export * from './types.js';
@@ -149,6 +185,7 @@ export type {
   CreateNosanaApiOptions as ApiConfig,
   CreateNosanaApiOptions,
 } from './types.js';
+export type { NosanaApiError } from './utils/errorFormatter.js';
 
 // Export request/response types
 export type * from './routes/jobs/types.js';

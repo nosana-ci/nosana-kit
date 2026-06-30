@@ -15,6 +15,8 @@ export interface NosanaMarketsApi {
   getRequiredResources: (market: string) => Promise<MarketRequiredResources>;
   getPrices: () => Promise<Record<string, unknown>>;
   getPrice: () => Promise<MarketPriceResponse>;
-  getGpuTypes: () => Promise<Record<string, unknown>[]>;
   getDockerImages: () => Promise<Record<string, unknown>[]>;
+  getDockerImage: (id: string) => Promise<Record<string, unknown>>;
+  getRemoteResources: () => Promise<Record<string, unknown>[]>;
+  getRemoteResource: (id: string) => Promise<Record<string, unknown>>;
 }

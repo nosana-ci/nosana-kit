@@ -10,7 +10,7 @@ export async function deploymentCreateNewRevision(
   state: DeploymentState,
 ): Promise<void> {
   const { data, error } = await client.POST(
-    `/api/deployments/{deployment}/create-revision`,
+    `/deployments/{deployment}/create-revision`,
     {
       params: { path: { deployment: state.id } },
       body: jobDefinition as components['schemas']['JobDefinition'],

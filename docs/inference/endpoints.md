@@ -110,9 +110,9 @@ ipfs uploaded: https://nosana.mypinata.cloud/ipfs/QmTcNQ4dGq8veeg8v5cQyGoaJEPSYQ
 posting job to market 97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf for price 0.000115 NOS/s (total: 0.8280 NOS)
 job posted with tx 4UJ7Ad84PkaxDvx7VQWwNfNia7M7E4WJQeAomjEuA8xn5V4T9QWbQtusJgsQUV9Dj9o8bs1FL6hJhhAPUrYeLVpF!
 Service will be exposed at https://FhkRunC6dAtPaEWGJwRK16Vctzv1KmHBhpSyUmMsYyMS.node.k8s.prd.nos.ci
-Job:  https://dashboard.nosana.com/jobs/B3MmwHz7sovudYwMxZFwjS2E6eMRaEEqNgWao5RYUkLi
+Job:  https://explore.nosana.com/jobs/B3MmwHz7sovudYwMxZFwjS2E6eMRaEEqNgWao5RYUkLi
 JSON flow: https://nosana.mypinata.cloud/ipfs/QmTcNQ4dGq8veeg8v5cQyGoaJEPSYQnVTd1TvfckVFVzRu
-Market:  https://dashboard.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
+Market:  https://explore.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
 Price:  0.000115 NOS/s
 Status:  RUNNING
 run nosana job get B3MmwHz7sovudYwMxZFwjS2E6eMRaEEqNgWao5RYUkLi --network mainnet to retrieve job and result
@@ -260,8 +260,8 @@ Wallet:         CTYw7JqNeh92BLFCJ5pR9HbpZHCsQPxtV2mZdD7WY2bD
 SOL balance:    0.115372223 SOL
 NOS balance:    49.046325 NOS
 Service URL:    https://tzrYei3AxEa13vc1qY1VLoNniRKX7jF5dNJVq93HPPb5.node.k8s.prd.nos.ci
-Job:            https://dashboard.nosana.com/jobs/H3fhW6p9qQ2anKERK85LCVd3TJu2DVPdX2FhzWLMUyqg
-Market:         https://dashboard.nosana.com/markets/7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq
+Job:            https://explore.nosana.com/jobs/H3fhW6p9qQ2anKERK85LCVd3TJu2DVPdX2FhzWLMUyqg
+Market:         https://explore.nosana.com/markets/7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq
 Status:         RUNNING
 run nosana job get H3fhW6p9qQ2anKERK85LCVd3TJu2DVPdX2FhzWLMUyqg --network mainnet to retrieve job and result
 ```

@@ -1,7 +1,14 @@
 {
   "name": "@nosana/stake-program",
-  "version": "2.2.0",
+  "version": "2.3.1",
   "description": "Nosana Stake program generated client",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
+    "directory": "packages/generated_clients/stake"
+  },
+  "license": "MIT",
+  "author": "Nosana",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,10 +19,10 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
     "dev": "tsc --watch",
-    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "dev:with-deps": "pnpm --filter $npm_package_name... --parallel run dev",
     "test": "echo 'No tests' && exit 0",
     "lint": "echo 'No lint' && exit 0",
     "format": "echo 'No format' && exit 0",

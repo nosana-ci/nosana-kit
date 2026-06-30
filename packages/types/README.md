@@ -43,3 +43,5 @@ declare module '@nosana/types' {
   }
 }
 ```
+
+For more info go to [learn.nosana.com](https://learn.nosana.com)

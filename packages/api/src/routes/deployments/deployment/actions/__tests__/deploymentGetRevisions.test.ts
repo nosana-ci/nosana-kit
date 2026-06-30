@@ -31,7 +31,7 @@ describe('deploymentGetRevisions', () => {
 
       expect(result.revisions).toEqual([global.TEST_MOCK_REVISION]);
       expect(mockClient.GET).toHaveBeenCalledWith(
-        '/api/deployments/{deployment}/revisions',
+        '/deployments/{deployment}/revisions',
         {
           params: {
             path: { deployment: mockState.id },
@@ -45,7 +45,7 @@ describe('deploymentGetRevisions', () => {
       await deploymentGetRevisions(mockClient, mockState, { cursor: TEST_CURSOR, limit: TEST_LIMIT });
 
       expect(mockClient.GET).toHaveBeenCalledWith(
-        '/api/deployments/{deployment}/revisions',
+        '/deployments/{deployment}/revisions',
         {
           params: {
             path: { deployment: mockState.id },

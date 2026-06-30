@@ -21,7 +21,7 @@ export async function deploymentUpdateTimeout(
   }
 
   const { data, error } = await client.PATCH(
-    '/api/deployments/{deployment}/update-timeout',
+    '/deployments/{deployment}/update-timeout',
     {
       params: { path: { deployment: state.id } },
       body: { timeout },

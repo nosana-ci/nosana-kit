@@ -13,6 +13,7 @@ PROGRAMS=(
   nosJTmGQxvwXy23vng5UjkTbfv91Bzf9jEuro78dAGR
   nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE
   nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp
+  metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s  # Metaplex Token Metadata
 )
 
 # Accounts to clone (rewards reflection + vault)

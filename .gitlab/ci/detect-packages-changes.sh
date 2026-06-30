@@ -12,7 +12,7 @@ changed_json="$tmp_dir/changed.json"
 
 pnpm -r ls --json --depth=-1 > "$workspace_json"
 
-# Choose compare ref: tag pipeline -> previous tag; main branch -> previous commit; MR/other -> default branch
+# Choose compare ref: tag pipeline -> previous tag; main branch -> latest tag; MR/other -> default branch
 if [ -n "${CI_COMMIT_TAG:-}" ]; then
   # Compare with previous release tag (v*), so we see what changed in this release
   previous_tag=$(git tag -l 'v*' --sort=-version:refname 2>/dev/null | sed -n '2p')
@@ -21,8 +21,19 @@ if [ -n "${CI_COMMIT_TAG:-}" ]; then
   else
     compare_ref="origin/${CI_DEFAULT_BRANCH}"
   fi
-elif [ "${CI_COMMIT_BRANCH:-}" = "${CI_DEFAULT_BRANCH:-}" ] && [ -n "${CI_COMMIT_BEFORE_SHA:-}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
-  compare_ref="${CI_COMMIT_BEFORE_SHA}"
+elif [ "${CI_COMMIT_BRANCH:-}" = "${CI_DEFAULT_BRANCH:-}" ]; then
+  # Deploys from main are manual, so unreleased changes can span multiple
+  # commits. Compare with the latest release tag so every main pipeline
+  # validates everything the next deploy would publish.
+  latest_tag=$(git tag -l 'v*' --sort=-version:refname 2>/dev/null | sed -n '1p')
+  if [ -n "$latest_tag" ]; then
+    compare_ref="$latest_tag"
+  elif [ -n "${CI_COMMIT_BEFORE_SHA:-}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+    compare_ref="${CI_COMMIT_BEFORE_SHA}"
+  else
+    # No release tag yet: treat the whole history as unreleased
+    compare_ref=$(git rev-list --max-parents=0 HEAD | tail -1)
+  fi
 else
   compare_ref="origin/${CI_DEFAULT_BRANCH}"
 fi

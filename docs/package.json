@@ -1,6 +1,6 @@
 {
   "name": "@nosana/docs",
-  "version": "2.2.4",
+  "version": "2.6.1",
   "type": "module",
   "private": true,
   "scripts": {
@@ -48,5 +48,12 @@
     "vitepress-plugin-mermaid": {
       "vitepress": "^2.0.0-alpha.15"
     }
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
+    "directory": "docs"
+  },
+  "license": "MIT",
+  "author": "Nosana"
 }

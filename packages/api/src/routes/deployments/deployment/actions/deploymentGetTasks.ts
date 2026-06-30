@@ -18,7 +18,7 @@ export async function deploymentGetTasks(
   params?: PaginationParams,
 ): Promise<TaskListResult> {
   const { data, error } = await client.GET(
-    '/api/deployments/{deployment}/tasks',
+    '/deployments/{deployment}/tasks',
     {
       params: {
         path: { deployment: state.id },

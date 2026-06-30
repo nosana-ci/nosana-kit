@@ -9,12 +9,13 @@
   "scripts": {
     "build": "pnpm -r run build",
     "build:packages": "pnpm --filter \"./packages/**\" run build",
-    "dev": "pnpm -r run dev --parallel",
+    "dev": "pnpm -r --parallel run dev",
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format",
     "format:fix": "pnpm -r run format:fix",
     "generate-clients": "pnpm exec tsx scripts/generate-clients.ts",
+    "gen:cu": "pnpm --filter @nosana/scenario run gen:cu",
     "version": "true",
     "version:patch": "lerna version patch --yes",
     "version:force": "lerna version patch --yes --force-publish",
@@ -34,5 +35,11 @@
     "lerna": "^9.0.4",
     "tsx": "^4.19.0",
     "typescript": "^5.9.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git"
+  },
+  "license": "MIT",
+  "author": "Nosana"
 }

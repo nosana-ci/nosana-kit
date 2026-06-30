@@ -28,7 +28,7 @@ describe('deploymentGetTasks', () => {
 
       expect(result.tasks).toEqual(global.TEST_MOCK_TASKS_LIST);
       expect(mockClient.GET).toHaveBeenCalledWith(
-        '/api/deployments/{deployment}/tasks',
+        '/deployments/{deployment}/tasks',
         {
           params: {
             path: { deployment: mockState.id },

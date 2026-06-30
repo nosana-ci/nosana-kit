@@ -26,10 +26,18 @@ function convertEnumsToAsConst(content: string, filePath: string): string {
       .map((member: string) => member.trim())
       .filter((member: string) => member.length > 0)
       .map((member: string) => {
-        // Handle both: "MemberName" and "MemberName = value"
         const parts = member.split('=').map((p: string) => p.trim());
-        const memberName = parts[0];
-        return memberName;
+        if (parts.length > 1) {
+          // A "Member = value" discriminant would be silently replaced by the
+          // member name, changing the encoded value and corrupting instruction
+          // data. Refuse to convert rather than emit wrong code.
+          throw new Error(
+            `Enum ${enumName} in ${filePath} has an explicit discriminant (${member}); ` +
+              `converting it to an as-const object would change its encoded value. ` +
+              `Extend convert-typescript-enums-to-const.ts to preserve explicit values first.`
+          );
+        }
+        return parts[0];
       });
 
     // Build the as const object

@@ -16,8 +16,8 @@ describe('scenario: basic', () => {
     const client = await getScenarioClient();
     const solBalance = await client.solana.getBalance();
     const nosBalance = await client.nos.getBalance();
-    expect(solBalance).toBeGreaterThan(0);
-    expect(nosBalance).toBeGreaterThan(0);
+    expect(solBalance).toBeGreaterThan(0n);
+    expect(nosBalance).toBeGreaterThan(0n);
   });
 
   it('has jobs, stake, and rewards programs', async () => {

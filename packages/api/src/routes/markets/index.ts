@@ -76,15 +76,6 @@ export function createNosanaMarketsApi(clients: {
 
       return data;
     },
-    async getGpuTypes(): Promise<Record<string, unknown>[]> {
-      const { data, error } = await client.GET('/markets/gpu-types', {});
-
-      if (error || !data) {
-        throw errorFormatter('Failed to fetch GPU types', error);
-      }
-
-      return data as unknown as Record<string, unknown>[];
-    },
     async getDockerImages(): Promise<Record<string, unknown>[]> {
       const { data, error } = await client.GET('/markets/docker-images', {});
 
@@ -93,6 +84,40 @@ export function createNosanaMarketsApi(clients: {
       }
 
       return data as unknown as Record<string, unknown>[];
+    },
+    async getDockerImage(id: string): Promise<Record<string, unknown>> {
+      const { data, error } = await client.GET('/markets/docker-images/{id}', {
+        params: { path: { id } },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to fetch Docker image', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async getRemoteResources(): Promise<Record<string, unknown>[]> {
+      const { data, error } = await client.GET('/markets/remote-resources', {});
+
+      if (error || !data) {
+        throw errorFormatter('Failed to fetch remote resources', error);
+      }
+
+      return data as unknown as Record<string, unknown>[];
+    },
+    async getRemoteResource(id: string): Promise<Record<string, unknown>> {
+      const { data, error } = await client.GET(
+        '/markets/remote-resources/{id}',
+        {
+          params: { path: { id } },
+        },
+      );
+
+      if (error || !data) {
+        throw errorFormatter('Failed to fetch remote resource', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
     },
   };
 }

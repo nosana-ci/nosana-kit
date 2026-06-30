@@ -1,4 +1,4 @@
-import { OPERATION_ID_VALIDATE } from "../index.js";
+import { OPERATION_ID_VALIDATE } from "../rules.js";
 
 const validateOperationId = new Function(
   "$input",
@@ -21,6 +21,15 @@ describe("OperationId", () => {
     "trailing ",
     "two words here"
   ])("rejects IDs with spaces: %s", (id) => {
+    expect(validateOperationId(id)).toBe(false);
+  });
+
+  it.each([
+    "my.id",
+    ".leading",
+    "trailing.",
+    "a.b.c"
+  ])("rejects IDs with full stops: %s", (id) => {
     expect(validateOperationId(id)).toBe(false);
   });
 });

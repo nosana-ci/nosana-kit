@@ -4,7 +4,132 @@
  */
 
 export interface paths {
-    "/api/deployments": {
+    "/deployments/jobs/{job}/job-definition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Returns the job definition for a job. */
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                };
+                path: {
+                    job: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Job definition details. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["JobDefinition"];
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/jobs/{job}/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Post results for your running job. */
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                };
+                path: {
+                    job: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["JobResults"];
+                };
+            };
+            responses: {
+                /** @description Job results details. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            message: "Success";
+                        };
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments": {
         parameters: {
             query?: never;
             header?: never;
@@ -97,7 +222,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}": {
+    "/deployments/{deployment}": {
         parameters: {
             query?: never;
             header?: never;
@@ -223,7 +348,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/tasks": {
+    "/deployments/{deployment}/tasks": {
         parameters: {
             query?: never;
             header?: never;
@@ -317,7 +442,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/header": {
+    "/deployments/{deployment}/header": {
         parameters: {
             query?: never;
             header?: never;
@@ -390,7 +515,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/jobs/{job}": {
+    "/deployments/{deployment}/jobs/{job}": {
         parameters: {
             query?: never;
             header?: never;
@@ -474,7 +599,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/jobs": {
+    "/deployments/{deployment}/jobs": {
         parameters: {
             query?: never;
             header?: never;
@@ -572,7 +697,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/revisions": {
+    "/deployments/{deployment}/revisions": {
         parameters: {
             query?: never;
             header?: never;
@@ -666,7 +791,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/events": {
+    "/deployments/{deployment}/events": {
         parameters: {
             query?: never;
             header?: never;
@@ -762,7 +887,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/create": {
+    "/deployments/create": {
         parameters: {
             query?: never;
             header?: never;
@@ -835,7 +960,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/create-revision": {
+    "/deployments/{deployment}/create-revision": {
         parameters: {
             query?: never;
             header?: never;
@@ -927,7 +1052,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/start": {
+    "/deployments/{deployment}/start": {
         parameters: {
             query?: never;
             header?: never;
@@ -1003,7 +1128,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/stop": {
+    "/deployments/{deployment}/stop": {
         parameters: {
             query?: never;
             header?: never;
@@ -1079,7 +1204,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/archive": {
+    "/deployments/{deployment}/archive": {
         parameters: {
             query?: never;
             header?: never;
@@ -1155,7 +1280,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-active-revision": {
+    "/deployments/{deployment}/update-name": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Update the name of a deployment */
+        patch: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path: {
+                    deployment: components["schemas"]["PublicKey"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        name: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Deployment name updated successfully. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            name: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Deployment not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/deployments/{deployment}/update-active-revision": {
         parameters: {
             query?: never;
             header?: never;
@@ -1236,7 +1442,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-replica-count": {
+    "/deployments/{deployment}/update-replica-count": {
         parameters: {
             query?: never;
             header?: never;
@@ -1317,7 +1523,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-schedule": {
+    "/deployments/{deployment}/update-schedule": {
         parameters: {
             query?: never;
             header?: never;
@@ -1399,7 +1605,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-timeout": {
+    "/deployments/{deployment}/update-timeout": {
         parameters: {
             query?: never;
             header?: never;
@@ -1479,132 +1685,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/api/deployments/jobs/{job}/job-definition": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Returns the job definition for a job. */
-        get: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Signed authentication message, */
-                    authorization: string;
-                };
-                path: {
-                    job: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Job definition details. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["JobDefinition"];
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/jobs/{job}/results": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Post results for your running job. */
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Signed authentication message, */
-                    authorization: string;
-                };
-                path: {
-                    job: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["JobResults"];
-                };
-            };
-            responses: {
-                /** @description Job results details. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            message: "Success";
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/vaults": {
+    "/deployments/vaults": {
         parameters: {
             query?: never;
             header?: never;
@@ -1664,7 +1745,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/vaults/create": {
+    "/deployments/vaults/create": {
         parameters: {
             query?: never;
             header?: never;
@@ -1724,7 +1805,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/vaults/{vault}/withdraw": {
+    "/deployments/vaults/{vault}/withdraw": {
         parameters: {
             query?: never;
             header?: never;
@@ -2008,6 +2089,9 @@ export interface components {
                 };
             };
             deployment_id?: string;
+            ssh?: {
+                public_keys?: string[];
+            };
             meta?: {
                 trigger?: string;
                 /** @description Construct a type with a set of properties K of type T */
@@ -2183,10 +2267,12 @@ export interface components {
                 };
                 execution?: {
                     group?: string;
+                    timeout?: number;
                     depends_on: string[];
                     stop_if_dependent_stops?: boolean;
                 } | {
                     group?: string;
+                    timeout?: number;
                 };
             }[];
         };

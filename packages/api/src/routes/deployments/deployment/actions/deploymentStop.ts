@@ -23,7 +23,7 @@ export async function deploymentStop(
   }
 
   const { data, error } = await client.POST(
-    '/api/deployments/{deployment}/stop',
+    '/deployments/{deployment}/stop',
     {
       params: { path: { deployment: state.id } },
     },

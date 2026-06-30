@@ -9,7 +9,7 @@ export async function deploymentGetJob(
   job: string,
 ): Promise<DeploymentJob> {
   const { data, error } = await client.GET(
-    '/api/deployments/{deployment}/jobs/{job}',
+    '/deployments/{deployment}/jobs/{job}',
     {
       params: { path: { deployment, job } },
     },

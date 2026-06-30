@@ -1,7 +1,12 @@
 import { errorFormatter } from '../../utils/errorFormatter.js';
 
 import type { ClientManagerClient } from '../../client/client-manager/index.js';
-import type { Balance, NosanaCreditsApi } from './types.js';
+import type {
+  Balance,
+  NosanaCreditsApi,
+  CreditsSpendingHistoryRequest,
+  CreditsTransactionsRequest,
+} from './types.js';
 
 export * from './types.js';
 
@@ -49,6 +54,32 @@ export function createNosanaCreditsApi(clients: {
       }
 
       return data;
+    },
+    async getSpendingHistory(
+      request: CreditsSpendingHistoryRequest,
+    ): Promise<Record<string, unknown>> {
+      const { data, error } = await client.GET('/credits/spending-history', {
+        params: { query: request },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to fetch credit spending history', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async getTransactions(
+      request: CreditsTransactionsRequest,
+    ): Promise<Record<string, unknown>> {
+      const { data, error } = await client.GET('/credits/transactions', {
+        params: { query: request },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to list credit transactions', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
     },
     invitations: {
       async get(token: string): Promise<Record<string, unknown>> {

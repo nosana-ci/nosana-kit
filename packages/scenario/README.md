@@ -20,7 +20,7 @@ describe('scenario: basic', () => {
   it('works with the Nosana SDK', async () => {
     const client = await getScenarioClient();
     const balance = await client.solana.getBalance();
-    expect(balance).toBeGreaterThan(0);
+    expect(balance).toBeGreaterThan(0n);
   });
 
   it('creates a market and lists a job', async () => {
@@ -228,3 +228,5 @@ Returns a Vitest config object with the scenario setup file pre-configured.
 ### Re-exports from `@nosana/kit`
 
 - `NosanaNetwork`, `JobState`, `type NosanaClient`, `type Wallet`, `type Address`
+
+For more info go to [learn.nosana.com](https://learn.nosana.com)

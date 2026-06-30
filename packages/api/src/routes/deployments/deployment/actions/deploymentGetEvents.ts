@@ -18,7 +18,7 @@ export async function deploymentGetEvents(
   searchParams?: DeploymentEventsSearchParams,
 ): Promise<EventListResult> {
   const { data, error } = await client.GET(
-    '/api/deployments/{deployment}/events',
+    '/deployments/{deployment}/events',
     {
       params: {
         path: { deployment: state.id },

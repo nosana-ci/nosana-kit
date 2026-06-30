@@ -1,4 +1,4 @@
-import { errorFormatter } from '../errorFormatter.js';
+import { errorFormatter, isNosanaApiError, isIdempotencyControlSignal } from '../errorFormatter.js';
 
 describe('errorFormatter', () => {
   test('when called with only a message, it should return an error with that message', () => {
@@ -44,5 +44,95 @@ describe('errorFormatter', () => {
 
     expect(err.message).toBe('Failed');
     expect(err.details).toBe(123);
+  });
+
+  describe('with a response', () => {
+    it('takes statusCode from response.status when the body has none', () => {
+      const response = new Response(null, { status: 409 });
+      const err = errorFormatter('Failed', { code: 'IDEMPOTENCY_KEY_IN_PROGRESS' }, response);
+
+      expect(err.code).toBe('IDEMPOTENCY_KEY_IN_PROGRESS');
+      expect(err.statusCode).toBe(409);
+    });
+
+    it('prefers a body statusCode over response.status', () => {
+      const response = new Response(null, { status: 500 });
+      const err = errorFormatter('Failed', { error: 'Bad', statusCode: 400 }, response);
+
+      expect(err.statusCode).toBe(400);
+    });
+
+    it('parses the Retry-After header into seconds (number)', () => {
+      const response = new Response(null, { status: 409, headers: { 'Retry-After': '5' } });
+      const err = errorFormatter('Failed', { code: 'IDEMPOTENCY_KEY_IN_PROGRESS' }, response);
+
+      expect(err.retryAfter).toBe(5);
+    });
+
+    it('still records the status for a body-less proxy error', () => {
+      const response = new Response(null, { status: 502 });
+      const err = errorFormatter('Failed', undefined, response);
+
+      expect(err.message).toBe('Failed');
+      expect(err.statusCode).toBe(502);
+    });
+
+    it('leaves retryAfter undefined when the header is absent or unparseable', () => {
+      const noHeader = errorFormatter('Failed', { message: 'nope' }, new Response(null, { status: 409 }));
+      expect(noHeader.retryAfter).toBeUndefined();
+
+      const garbage = new Response(null, { status: 409, headers: { 'Retry-After': 'soon' } });
+      expect(errorFormatter('Failed', {}, garbage).retryAfter).toBeUndefined();
+    });
+  });
+});
+
+describe('isNosanaApiError', () => {
+  it('returns true for an error carrying a numeric statusCode', () => {
+    const err = errorFormatter('Failed', { code: 'X' }, new Response(null, { status: 409 }));
+
+    expect(isNosanaApiError(err)).toBe(true);
+    // narrows without casting
+    if (isNosanaApiError(err)) {
+      expect(err.statusCode).toBe(409);
+    }
+  });
+
+  it('returns false for a network-style error with no status', () => {
+    expect(isNosanaApiError(new TypeError('Failed to fetch'))).toBe(false);
+  });
+
+  it('returns false for non-error values', () => {
+    expect(isNosanaApiError(undefined)).toBe(false);
+    expect(isNosanaApiError({ statusCode: 409 })).toBe(false);
+  });
+});
+
+describe('isIdempotencyControlSignal', () => {
+  it('is true for a coded 409 control response', () => {
+    const err = errorFormatter(
+      'Failed',
+      { code: 'IDEMPOTENCY_KEY_IN_PROGRESS', message: 'in progress' },
+      new Response(null, { status: 409 }),
+    );
+
+    expect(isIdempotencyControlSignal(err)).toBe(true);
+  });
+
+  it('is false for a code-less error (ordinary rejection)', () => {
+    const err = errorFormatter('Failed', { message: 'not found' }, new Response(null, { status: 404 }));
+
+    expect(isIdempotencyControlSignal(err)).toBe(false);
+  });
+
+  it('is false for a present-but-unknown (non-idempotency) code', () => {
+    const err = errorFormatter('Failed', { code: 'SOME_OTHER_DOMAIN_CODE', message: 'x' }, new Response(null, { status: 409 }));
+
+    expect(isNosanaApiError(err)).toBe(true);
+    expect(isIdempotencyControlSignal(err)).toBe(false);
+  });
+
+  it('is false for a network error', () => {
+    expect(isIdempotencyControlSignal(new TypeError('Failed to fetch'))).toBe(false);
   });
 });

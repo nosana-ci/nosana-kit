@@ -98,9 +98,9 @@ ipfs uploaded:	https://nosana.mypinata.cloud/ipfs/QmRSLxBU9iemsmjmHMmmqkwEkqujuY
 posting job to market 97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf for price 0.000115 NOS/s (total: 0.8280 NOS)
 job posted with tx 4tc9Ys9bGQSUKugVsgXKTa2GqVQkjTk99JvsiRVpchxW9fupsTyCeUiHN3fXqq7y9g2CsJbSkx6gZjtDiPEY2gs2!
 Service will be exposed at https://FiYK3EKgFRbD1yfcPMUMhxNEPz3bkpYduCmWt7hJKRtp.node.k8s.prd.nos.ci
-Job:		https://dashboard.nosana.com/jobs/3YBLQ1LAQyjsUyBBN3G8oNRc7fBSGU3qDhWc9VtMTtDA
+Job:		https://explore.nosana.com/jobs/3YBLQ1LAQyjsUyBBN3G8oNRc7fBSGU3qDhWc9VtMTtDA
 JSON flow:	https://nosana.mypinata.cloud/ipfs/QmRSLxBU9iemsmjmHMmmqkwEkqujuYSrtPeNYqoNRGmmxT
-Market:		https://dashboard.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
+Market:		https://explore.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
 Price:		0.000115 NOS/s
 Status:		RUNNING
 
@@ -117,12 +117,12 @@ Let's run the `nosana job get` command to retrieve the results.
  |_| \_|\___/|___/\__,_|_| |_|\__,_|
 
 Network:	mainnet
-Job:		https://dashboard.nosana.com/jobs/3YBLQ1LAQyjsUyBBN3G8oNRc7fBSGU3qDhWc9VtMTtDA
+Job:		https://explore.nosana.com/jobs/3YBLQ1LAQyjsUyBBN3G8oNRc7fBSGU3qDhWc9VtMTtDA
 JSON flow:	https://nosana.mypinata.cloud/ipfs/QmRSLxBU9iemsmjmHMmmqkwEkqujuYSrtPeNYqoNRGmmxT
-Market:		https://dashboard.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
+Market:		https://explore.nosana.com/markets/97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf
 Price:		0.000115 NOS/s
 Status:		COMPLETED
-Node:		https://dashboard.nosana.com/nodes/DKUo8PCKcrfunRiCHWFNjeVLQieVYWr8izauPCFm8BVv
+Node:		https://explore.nosana.com/nodes/DKUo8PCKcrfunRiCHWFNjeVLQieVYWr8izauPCFm8BVv
 Start Time:	Tue Jul 30 2024 09:30:50 GMT-0400 (Atlantic Standard Time)
 Duration:	41 seconds
 Total Costs:	0.004715 NOS

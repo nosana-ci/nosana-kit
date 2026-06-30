@@ -29,6 +29,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Validate session */
         post: operations["postAuthValidate-session"];
         delete?: never;
         options?: never;
@@ -45,6 +46,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Validate API key */
         post: operations["postAuthValidate-api-key"];
         delete?: never;
         options?: never;
@@ -165,6 +167,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Claim a credit code */
         post: operations["postCreditsClaim"];
         delete?: never;
         options?: never;
@@ -181,6 +184,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Claim a credit invitation */
         post: operations["postCreditsInvitationsByTokenClaim"];
         delete?: never;
         options?: never;
@@ -197,6 +201,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Request free credits */
         post: operations["postCreditsRequest"];
         delete?: never;
         options?: never;
@@ -211,6 +216,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Check credit request eligibility */
         get: operations["getCreditsRequestEligibility"];
         put?: never;
         post?: never;
@@ -227,7 +233,48 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get credit balance */
         get: operations["getCreditsBalance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/spending-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get credit spending history
+         * @description Returns spending history for credit users using settled credit charges.
+         */
+        get: operations["getCreditsSpending-history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List credit transactions
+         * @description Returns credit transaction history for the authenticated user.
+         */
+        get: operations["getCreditsTransactions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -243,236 +290,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get invitation by token */
         get: operations["getCreditsInvitationsByToken"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/admin/request/config": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getCreditsAdminRequestConfig"];
-        put?: never;
-        post: operations["postCreditsAdminRequestConfig"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/admin/codes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getCreditsAdminCodes"];
-        put?: never;
-        post: operations["postCreditsAdminCodes"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/admin/accounts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getCreditsAdminAccounts"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/admin/accounts/{userId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getCreditsAdminAccountsByUserId"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/admin/codes/{code}/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postCreditsAdminCodesByCodeUpdate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/admin/codes/{code}/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postCreditsAdminCodesByCodeDelete"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/admin/invitations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postCreditsAdminInvitations"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/admin/invitations/bulk": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postCreditsAdminInvitationsBulk"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/admin/user-credit-alert-threshold-usd": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getCreditsAdminUser-credit-alert-threshold-usd"];
-        put?: never;
-        post: operations["postCreditsAdminUser-credit-alert-threshold-usd"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/request/amount": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get the free credit request amount */
-        get: operations["getCreditsRequestAmount"];
-        put?: never;
-        /** Set the free credit request amount */
-        post: operations["postCreditsRequestAmount"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/credits/accounts/{userId}/zero": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Zero out assigned credits for a user */
-        post: operations["postCreditsAccountsByUserIdZero"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/tracker/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getTracker"];
-        put?: never;
-        post: operations["postTracker"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/tracker/{name}/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postTrackerByNameUpdate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/tracker/{name}/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postTrackerByNameDelete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -486,6 +307,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List all templates */
         get: operations["getTemplates"];
         put?: never;
         post?: never;
@@ -502,6 +324,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get templates grouped by category */
         get: operations["getTemplatesGrouped"];
         put?: never;
         post?: never;
@@ -518,6 +341,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get template by ID */
         get: operations["getTemplatesById"];
         put?: never;
         post?: never;
@@ -534,6 +358,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get template variant */
         get: operations["getTemplatesByIdByVariantId"];
         put?: never;
         post?: never;
@@ -554,9 +379,29 @@ export interface paths {
         put?: never;
         /**
          * Create a job using credits
-         * @description Create a job using credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...)
+         * @description Create a job using credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...). Pass an `Idempotency-Key` header (e.g. the DM task's stable `taskId:unit:epoch`) to make the call safely retryable: the job is posted at most once per key. Replays return the original result; a key whose transaction is provably dead returns 409 `IDEMPOTENCY_KEY_EXPIRED` (bump the epoch and retry).
          */
         post: operations["postJobsList"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/list/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bulk-create jobs using credits
+         * @description Bulk-create jobs in the fewest packed transactions. Requires an `Idempotency-Key` header (one key per batch): the batch is posted at most once per key. The response reports each job's outcome by `index` — `confirmed` (with its `job`/`run` address) or `expired`. Re-post only the expired items under a fresh key. Still-confirming returns 409 `IDEMPOTENCY_KEY_IN_PROGRESS` (retry the same key).
+         */
+        post: operations["postJobsListBatch"];
         delete?: never;
         options?: never;
         head?: never;
@@ -574,7 +419,7 @@ export interface paths {
         put?: never;
         /**
          * Extend a job using credits
-         * @description Extend a job using credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...)
+         * @description Extend a job using credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...). Pass an `Idempotency-Key` header to make the call safely retryable (the extension is applied at most once per key). An already-terminal job is an idempotent no-op: 200 with a null `tx` and no `credits` (nothing is charged).
          */
         post: operations["postJobsByAddressExtend"];
         delete?: never;
@@ -594,9 +439,49 @@ export interface paths {
         put?: never;
         /**
          * Stop a job paid with credits
-         * @description Stop a job paid with credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...)
+         * @description Stop a job paid with credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...). Pass an `Idempotency-Key` header to make the call safely retryable: the stop is sent at most once per key and settlement runs exactly once. An already-terminal job returns 200 with `outcome: already_terminal` and a null `tx`.
          */
         post: operations["postJobsByAddressStop"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/extend/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bulk-extend jobs using credits
+         * @description Bulk-extend jobs in the fewest packed transactions. Requires an `Idempotency-Key` header (one key per batch). Per-item results report each extension by `index` — `confirmed` or `expired` (re-post the expired ones under a fresh key). An already-terminal job is a `confirmed` no-op (no `tx`); the rest still extend.
+         */
+        post: operations["postJobsExtendBatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/stop/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bulk-stop jobs using credits
+         * @description Bulk-stop jobs (delist queued / end running) in the fewest packed transactions. Requires an `Idempotency-Key` header (one key per batch). Already-terminal jobs are reported as `confirmed` with no transaction. Per-item results report each stop by `index`; re-post expired ones under a fresh key.
+         */
+        post: operations["postJobsStopBatch"];
         delete?: never;
         options?: never;
         head?: never;
@@ -623,6 +508,162 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payments/webhooks/stripe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stripe webhook
+         * @description Receives Stripe webhook events (signature verified)
+         */
+        post: operations["postPaymentsWebhooksStripe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/setup-intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add payment method
+         * @description Confirm card setup with Stripe and validate the payment method in one request
+         */
+        post: operations["postPaymentsSetup-intent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List payment methods
+         * @description List saved card payment methods for the authenticated user
+         */
+        get: operations["getPaymentsMethods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/methods/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete payment method
+         * @description Detach a payment method from the user
+         */
+        delete: operations["deletePaymentsMethodsById"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/methods/{id}/default": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set default payment method
+         * @description Set the default card used for credit purchases
+         */
+        put: operations["putPaymentsMethodsByIdDefault"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/payment-intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create PaymentIntent
+         * @description Create a Stripe PaymentIntent to purchase credits
+         */
+        post: operations["postPaymentsPayment-intent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/purchases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List credit purchases
+         * @description List completed credit purchases for the authenticated user
+         */
+        get: operations["getPaymentsPurchases"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -642,7 +683,60 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        /**
+         * @description Machine-readable idempotency control code. Branch on this, not the HTTP status alone. IN_PROGRESS → retry the SAME key; EXPIRED → mint a fresh key and re-post; PAYLOAD_MISMATCH → key reused with a different payload, do not retry.
+         * @enum {string}
+         */
+        IdempotencyCode: "IDEMPOTENCY_KEY_PAYLOAD_MISMATCH" | "IDEMPOTENCY_KEY_EXPIRED" | "IDEMPOTENCY_KEY_IN_PROGRESS";
+        /** @description Idempotency control response. Branch on `code`, never on the HTTP status. */
+        IdempotencyError: {
+            code?: components["schemas"]["IdempotencyCode"];
+            message: string;
+            /** @description Seconds to wait before retrying the SAME key. Present for IDEMPOTENCY_KEY_IN_PROGRESS; mirrors the Retry-After header. */
+            retryAfter?: number;
+        };
+        /** @description Ordinary business error. Has no `code` field (unlike IdempotencyError). */
+        JobError: {
+            message: string;
+        };
+        CreateJobWithCreditsResponse: {
+            tx: string;
+            job: string;
+            run: string;
+            credits: {
+                costUSD: number;
+                creditsUsed: number;
+                reservationId: string;
+                project: string;
+            };
+        };
+        ExtendJobWithCreditsResponse: {
+            tx: (string | null) | null;
+            job: string;
+            credits?: {
+                costUSD: number;
+                creditsUsed: number;
+                reservationId: string;
+            };
+        };
+        StopJobWithCreditsResponse: {
+            tx: (string | null) | null;
+            job: string;
+            delisted: boolean;
+            outcome?: "delisted" | "ended" | "already_terminal";
+        };
+        JobsBatchResponse: {
+            items: {
+                index: number;
+                status: "confirmed" | "expired";
+                job?: string;
+                run?: string;
+                /** @description On-chain transaction signature (base58). */
+                tx?: string;
+            }[];
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
@@ -1250,7 +1344,20 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        message: string;
+                        amount: number;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                        amount: number;
+                    };
+                    "text/plain": {
+                        message: string;
+                        amount: number;
+                    };
+                };
             };
         };
     };
@@ -1269,7 +1376,20 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        message: string;
+                        amount: number;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                        amount: number;
+                    };
+                    "text/plain": {
+                        message: string;
+                        amount: number;
+                    };
+                };
             };
         };
     };
@@ -1286,7 +1406,20 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        message: string;
+                        amount: number;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                        amount: number;
+                    };
+                    "text/plain": {
+                        message: string;
+                        amount: number;
+                    };
+                };
             };
         };
     };
@@ -1303,7 +1436,23 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        eligible: boolean;
+                        message?: string;
+                        amount?: number;
+                    };
+                    "multipart/form-data": {
+                        eligible: boolean;
+                        message?: string;
+                        amount?: number;
+                    };
+                    "text/plain": {
+                        eligible: boolean;
+                        message?: string;
+                        amount?: number;
+                    };
+                };
             };
         };
     };
@@ -1320,7 +1469,201 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        /** @description Credits assigned to the user in USD cents. */
+                        assignedCredits: number;
+                        /** @description Credits reserved for active jobs in USD cents. */
+                        reservedCredits: number;
+                        /** @description Credits that have been used/settled in USD cents. */
+                        settledCredits: number;
+                    };
+                    "multipart/form-data": {
+                        /** @description Credits assigned to the user in USD cents. */
+                        assignedCredits: number;
+                        /** @description Credits reserved for active jobs in USD cents. */
+                        reservedCredits: number;
+                        /** @description Credits that have been used/settled in USD cents. */
+                        settledCredits: number;
+                    };
+                    "text/plain": {
+                        /** @description Credits assigned to the user in USD cents. */
+                        assignedCredits: number;
+                        /** @description Credits reserved for active jobs in USD cents. */
+                        reservedCredits: number;
+                        /** @description Credits that have been used/settled in USD cents. */
+                        settledCredits: number;
+                    };
+                };
+            };
+        };
+    };
+    "getCreditsSpending-history": {
+        parameters: {
+            query: {
+                start_date: string;
+                end_date?: string;
+                group_by?: "day" | "month";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        userAddress: string;
+                        startDate: string;
+                        endDate: string;
+                        groupBy: string;
+                        results: {
+                            period: string;
+                            total_usd: number;
+                            breakdown: {
+                                market: string;
+                                totalSpent: number;
+                            }[];
+                            daily_breakdown?: {
+                                [key: string]: {
+                                    [key: string]: number;
+                                };
+                            };
+                        }[];
+                        forecast: number | null;
+                        comparison: {
+                            prevMonthTotal: number;
+                            pctChange: number | null;
+                        } | null;
+                        sameDayComparison: {
+                            sameDayLastMonthSpent: number;
+                            currentMonthSpent: number;
+                            pctChangeSoFar?: number | null;
+                        } | null;
+                        currentMonth: {
+                            currentMonthSpent: number;
+                        } | null;
+                    };
+                    "multipart/form-data": {
+                        userAddress: string;
+                        startDate: string;
+                        endDate: string;
+                        groupBy: string;
+                        results: {
+                            period: string;
+                            total_usd: number;
+                            breakdown: {
+                                market: string;
+                                totalSpent: number;
+                            }[];
+                            daily_breakdown?: {
+                                [key: string]: {
+                                    [key: string]: number;
+                                };
+                            };
+                        }[];
+                        forecast: number | null;
+                        comparison: {
+                            prevMonthTotal: number;
+                            pctChange: number | null;
+                        } | null;
+                        sameDayComparison: {
+                            sameDayLastMonthSpent: number;
+                            currentMonthSpent: number;
+                            pctChangeSoFar?: number | null;
+                        } | null;
+                        currentMonth: {
+                            currentMonthSpent: number;
+                        } | null;
+                    };
+                    "text/plain": {
+                        userAddress: string;
+                        startDate: string;
+                        endDate: string;
+                        groupBy: string;
+                        results: {
+                            period: string;
+                            total_usd: number;
+                            breakdown: {
+                                market: string;
+                                totalSpent: number;
+                            }[];
+                            daily_breakdown?: {
+                                [key: string]: {
+                                    [key: string]: number;
+                                };
+                            };
+                        }[];
+                        forecast: number | null;
+                        comparison: {
+                            prevMonthTotal: number;
+                            pctChange: number | null;
+                        } | null;
+                        sameDayComparison: {
+                            sameDayLastMonthSpent: number;
+                            currentMonthSpent: number;
+                            pctChangeSoFar?: number | null;
+                        } | null;
+                        currentMonth: {
+                            currentMonthSpent: number;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    getCreditsTransactions: {
+        parameters: {
+            query: {
+                limit: string | number;
+                offset: string | number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        transactions: {
+                            id: string;
+                            type: string;
+                            amountUsd: number;
+                            createdAt: string;
+                            method: string | null;
+                        }[];
+                        total: number;
+                    };
+                    "multipart/form-data": {
+                        transactions: {
+                            id: string;
+                            type: string;
+                            amountUsd: number;
+                            createdAt: string;
+                            method: string | null;
+                        }[];
+                        total: number;
+                    };
+                    "text/plain": {
+                        transactions: {
+                            id: string;
+                            type: string;
+                            amountUsd: number;
+                            createdAt: string;
+                            method: string | null;
+                        }[];
+                        total: number;
+                    };
+                };
             };
         };
     };
@@ -1339,501 +1682,32 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
-            };
-        };
-    };
-    getCreditsAdminRequestConfig: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
+                content: {
+                    "application/json": {
+                        creditsAmount: number;
+                        expirationDate: (((Record<string, never> | string | number) | string) | null) | null;
+                        restrictedEmail: (string | null) | null;
+                        restrictedAccountName: (string | null) | null;
+                        isClaimed: boolean;
+                        isExpired: boolean;
+                    };
+                    "multipart/form-data": {
+                        creditsAmount: number;
+                        expirationDate: (((Record<string, never> | string | number) | string) | null) | null;
+                        restrictedEmail: (string | null) | null;
+                        restrictedAccountName: (string | null) | null;
+                        isClaimed: boolean;
+                        isExpired: boolean;
+                    };
+                    "text/plain": {
+                        creditsAmount: number;
+                        expirationDate: (((Record<string, never> | string | number) | string) | null) | null;
+                        restrictedEmail: (string | null) | null;
+                        restrictedAccountName: (string | null) | null;
+                        isClaimed: boolean;
+                        isExpired: boolean;
+                    };
                 };
-                content?: never;
-            };
-        };
-    };
-    postCreditsAdminRequestConfig: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    enabled: boolean;
-                };
-                "multipart/form-data": {
-                    enabled: boolean;
-                };
-                "text/plain": {
-                    enabled: boolean;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getCreditsAdminCodes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postCreditsAdminCodes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    creditsAmount: number;
-                    expirationDate?: string;
-                    restrictedEmail?: string;
-                    restrictedAccountName?: string;
-                };
-                "multipart/form-data": {
-                    creditsAmount: number;
-                    expirationDate?: string;
-                    restrictedEmail?: string;
-                    restrictedAccountName?: string;
-                };
-                "text/plain": {
-                    creditsAmount: number;
-                    expirationDate?: string;
-                    restrictedEmail?: string;
-                    restrictedAccountName?: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getCreditsAdminAccounts: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getCreditsAdminAccountsByUserId: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postCreditsAdminCodesByCodeUpdate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    creditsAmount?: number;
-                    expirationDate?: string | null;
-                    restrictedEmail?: string | null;
-                    restrictedAccountName?: string | null;
-                };
-                "multipart/form-data": {
-                    creditsAmount?: number;
-                    expirationDate?: string | null;
-                    restrictedEmail?: string | null;
-                    restrictedAccountName?: string | null;
-                };
-                "text/plain": {
-                    creditsAmount?: number;
-                    expirationDate?: string | null;
-                    restrictedEmail?: string | null;
-                    restrictedAccountName?: string | null;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postCreditsAdminCodesByCodeDelete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postCreditsAdminInvitations: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    creditsAmount: number;
-                    expirationDate?: string;
-                    restrictedEmail?: string;
-                    restrictedAccountName?: string;
-                };
-                "multipart/form-data": {
-                    creditsAmount: number;
-                    expirationDate?: string;
-                    restrictedEmail?: string;
-                    restrictedAccountName?: string;
-                };
-                "text/plain": {
-                    creditsAmount: number;
-                    expirationDate?: string;
-                    restrictedEmail?: string;
-                    restrictedAccountName?: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postCreditsAdminInvitationsBulk: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    creditsAmount: number;
-                    count: number;
-                    expirationDate?: string | null;
-                };
-                "multipart/form-data": {
-                    creditsAmount: number;
-                    count: number;
-                    expirationDate?: string | null;
-                };
-                "text/plain": {
-                    creditsAmount: number;
-                    count: number;
-                    expirationDate?: string | null;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "getCreditsAdminUser-credit-alert-threshold-usd": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "postCreditsAdminUser-credit-alert-threshold-usd": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    value: string;
-                };
-                "multipart/form-data": {
-                    value: string;
-                };
-                "text/plain": {
-                    value: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getCreditsRequestAmount: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postCreditsRequestAmount: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @description Amount in millicents (e.g. 50000 = $50) */
-                    amount: number;
-                };
-                "multipart/form-data": {
-                    /** @description Amount in millicents (e.g. 50000 = $50) */
-                    amount: number;
-                };
-                "text/plain": {
-                    /** @description Amount in millicents (e.g. 50000 = $50) */
-                    amount: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postCreditsAccountsByUserIdZero: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getTracker: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postTracker: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    wallet: string;
-                    minimumUsd: number;
-                    minimumSol: number;
-                };
-                "multipart/form-data": {
-                    name: string;
-                    wallet: string;
-                    minimumUsd: number;
-                    minimumSol: number;
-                };
-                "text/plain": {
-                    name: string;
-                    wallet: string;
-                    minimumUsd: number;
-                    minimumSol: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postTrackerByNameUpdate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                name: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    wallet?: string;
-                    minimumUsd?: number;
-                    minimumSol?: number;
-                };
-                "multipart/form-data": {
-                    wallet?: string;
-                    minimumUsd?: number;
-                    minimumSol?: number;
-                };
-                "text/plain": {
-                    wallet?: string;
-                    minimumUsd?: number;
-                    minimumSol?: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    postTrackerByNameDelete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                name: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -1850,7 +1724,47 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    }[];
+                    "multipart/form-data": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    }[];
+                    "text/plain": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    }[];
+                };
             };
         };
     };
@@ -1867,7 +1781,53 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        [key: string]: {
+                            id: string;
+                            name: string;
+                            jobDefinition: unknown;
+                            icon: (string | null) | null;
+                            readme: (string | null) | null;
+                            category: (string | null) | null;
+                            vram_requirement: (number | null) | null;
+                            cuda_requirement: (number[] | null) | null;
+                            is_variant_template: (boolean | null) | null;
+                            parent_template_id: (string | null) | null;
+                            variants: unknown;
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        [key: string]: {
+                            id: string;
+                            name: string;
+                            jobDefinition: unknown;
+                            icon: (string | null) | null;
+                            readme: (string | null) | null;
+                            category: (string | null) | null;
+                            vram_requirement: (number | null) | null;
+                            cuda_requirement: (number[] | null) | null;
+                            is_variant_template: (boolean | null) | null;
+                            parent_template_id: (string | null) | null;
+                            variants: unknown;
+                        }[];
+                    };
+                    "text/plain": {
+                        [key: string]: {
+                            id: string;
+                            name: string;
+                            jobDefinition: unknown;
+                            icon: (string | null) | null;
+                            readme: (string | null) | null;
+                            category: (string | null) | null;
+                            vram_requirement: (number | null) | null;
+                            cuda_requirement: (number[] | null) | null;
+                            is_variant_template: (boolean | null) | null;
+                            parent_template_id: (string | null) | null;
+                            variants: unknown;
+                        }[];
+                    };
+                };
             };
         };
     };
@@ -1886,7 +1846,47 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    };
+                    "multipart/form-data": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    };
+                    "text/plain": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    };
+                };
             };
         };
     };
@@ -1906,14 +1906,21 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": unknown;
+                    "multipart/form-data": unknown;
+                    "text/plain": unknown;
+                };
             };
         };
     };
     postJobsList: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description De-duplicates retried requests sharing the same key, making the call safely retryable. Optional here; required on the batch endpoints. */
+                "Idempotency-Key"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1952,44 +1959,148 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Job listed on the market and charged to credits. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        tx: string;
-                        job: string;
-                        run: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
-                            project: string;
-                        };
-                    };
-                    "multipart/form-data": {
-                        tx: string;
-                        job: string;
-                        run: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
-                            project: string;
-                        };
-                    };
-                    "text/plain": {
-                        tx: string;
-                        job: string;
-                        run: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
-                            project: string;
-                        };
-                    };
+                    "application/json": components["schemas"]["CreateJobWithCreditsResponse"];
+                };
+            };
+            /** @description Invalid request (e.g. unknown market). Ordinary error: no `code` field. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Caller does not own the job, or the market is not credit-eligible. Ordinary error: no `code` field. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Job, credit-job, or user not found — or an Idempotency-Key minted by a different user. Ordinary error: no `code` field. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
+            409: {
+                headers: {
+                    /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdempotencyError"];
+                };
+            };
+        };
+    };
+    postJobsListBatch: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description De-duplicates retried requests sharing the same key (one key per batch). Required on batch endpoints — omitting it returns 400. */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Jobs to bulk-create */
+                    jobs: {
+                        /** @description IPFS hash of the job definition */
+                        ipfsHash: string;
+                        /** @description Market address */
+                        market: string;
+                        /** @description Job timeout in seconds (default: 3600) */
+                        timeout?: number;
+                    }[];
+                };
+                "multipart/form-data": {
+                    /** @description Jobs to bulk-create */
+                    jobs: {
+                        /** @description IPFS hash of the job definition */
+                        ipfsHash: string;
+                        /** @description Market address */
+                        market: string;
+                        /** @description Job timeout in seconds (default: 3600) */
+                        timeout?: number;
+                    }[];
+                };
+                "text/plain": {
+                    /** @description Jobs to bulk-create */
+                    jobs: {
+                        /** @description IPFS hash of the job definition */
+                        ipfsHash: string;
+                        /** @description Market address */
+                        market: string;
+                        /** @description Job timeout in seconds (default: 3600) */
+                        timeout?: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Per-item results by `index`: `confirmed` (with its job/run address and the packed tx's `tx` signature) or `expired` — re-post only the expired items under a fresh key. `tx` is absent on an already-terminal no-op (nothing was sent); items packed into the same on-chain tx share one `tx`. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobsBatchResponse"];
+                };
+            };
+            /** @description Missing `Idempotency-Key` header (required on batch endpoints) or an otherwise invalid request. Ordinary error: no `code` field. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Caller does not own the job, or the market is not credit-eligible. Ordinary error: no `code` field. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Job, credit-job, or user not found — or an Idempotency-Key minted by a different user. Ordinary error: no `code` field. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
+            409: {
+                headers: {
+                    /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdempotencyError"];
                 };
             };
         };
@@ -1997,7 +2108,10 @@ export interface operations {
     postJobsByAddressExtend: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description De-duplicates retried requests sharing the same key, making the call safely retryable. Optional here; required on the batch endpoints. */
+                "Idempotency-Key"?: string;
+            };
             path: {
                 /** @description Job address */
                 address: string;
@@ -2021,38 +2135,51 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Job extended and charged to credits. An already-terminal job is an idempotent no-op: `tx` is null and `credits` is omitted (nothing was charged). */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        tx: string;
-                        job: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
-                        };
-                    };
-                    "multipart/form-data": {
-                        tx: string;
-                        job: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
-                        };
-                    };
-                    "text/plain": {
-                        tx: string;
-                        job: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
-                        };
-                    };
+                    "application/json": components["schemas"]["ExtendJobWithCreditsResponse"];
+                };
+            };
+            /** @description Invalid request (e.g. unknown market). Ordinary error: no `code` field. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Caller does not own the job, or the market is not credit-eligible. Ordinary error: no `code` field. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Job, credit-job, or user not found — or an Idempotency-Key minted by a different user. Ordinary error: no `code` field. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
+            409: {
+                headers: {
+                    /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdempotencyError"];
                 };
             };
         };
@@ -2060,7 +2187,10 @@ export interface operations {
     postJobsByAddressStop: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description De-duplicates retried requests sharing the same key, making the call safely retryable. Optional here; required on the batch endpoints. */
+                "Idempotency-Key"?: string;
+            };
             path: {
                 /** @description Job address */
                 address: string;
@@ -2069,26 +2199,218 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Job stopped (or already terminal). `tx` is null and `outcome` is `already_terminal` when the job was already terminal and no transaction was minted. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        tx: string;
-                        job: string;
-                        delisted: boolean;
-                    };
-                    "multipart/form-data": {
-                        tx: string;
-                        job: string;
-                        delisted: boolean;
-                    };
-                    "text/plain": {
-                        tx: string;
-                        job: string;
-                        delisted: boolean;
-                    };
+                    "application/json": components["schemas"]["StopJobWithCreditsResponse"];
+                };
+            };
+            /** @description Caller does not own the job, or the market is not credit-eligible. Ordinary error: no `code` field. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Job, credit-job, or user not found — or an Idempotency-Key minted by a different user. Ordinary error: no `code` field. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
+            409: {
+                headers: {
+                    /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdempotencyError"];
+                };
+            };
+        };
+    };
+    postJobsExtendBatch: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description De-duplicates retried requests sharing the same key (one key per batch). Required on batch endpoints — omitting it returns 400. */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Jobs to bulk-extend */
+                    jobs: {
+                        /** @description Job address */
+                        jobAddress: string;
+                        /** @description Seconds to extend by */
+                        seconds: number;
+                    }[];
+                };
+                "multipart/form-data": {
+                    /** @description Jobs to bulk-extend */
+                    jobs: {
+                        /** @description Job address */
+                        jobAddress: string;
+                        /** @description Seconds to extend by */
+                        seconds: number;
+                    }[];
+                };
+                "text/plain": {
+                    /** @description Jobs to bulk-extend */
+                    jobs: {
+                        /** @description Job address */
+                        jobAddress: string;
+                        /** @description Seconds to extend by */
+                        seconds: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Per-item results by `index`: `confirmed` (with its job/run address and the packed tx's `tx` signature) or `expired` — re-post only the expired items under a fresh key. `tx` is absent on an already-terminal no-op (nothing was sent); items packed into the same on-chain tx share one `tx`. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobsBatchResponse"];
+                };
+            };
+            /** @description Missing `Idempotency-Key` header (required on batch endpoints) or an otherwise invalid request. Ordinary error: no `code` field. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Caller does not own the job, or the market is not credit-eligible. Ordinary error: no `code` field. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Job, credit-job, or user not found — or an Idempotency-Key minted by a different user. Ordinary error: no `code` field. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
+            409: {
+                headers: {
+                    /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdempotencyError"];
+                };
+            };
+        };
+    };
+    postJobsStopBatch: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description De-duplicates retried requests sharing the same key (one key per batch). Required on batch endpoints — omitting it returns 400. */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Jobs to bulk-stop */
+                    jobs: {
+                        /** @description Job address */
+                        jobAddress: string;
+                    }[];
+                };
+                "multipart/form-data": {
+                    /** @description Jobs to bulk-stop */
+                    jobs: {
+                        /** @description Job address */
+                        jobAddress: string;
+                    }[];
+                };
+                "text/plain": {
+                    /** @description Jobs to bulk-stop */
+                    jobs: {
+                        /** @description Job address */
+                        jobAddress: string;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Per-item results by `index`: `confirmed` (with its job/run address and the packed tx's `tx` signature) or `expired` — re-post only the expired items under a fresh key. `tx` is absent on an already-terminal no-op (nothing was sent); items packed into the same on-chain tx share one `tx`. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobsBatchResponse"];
+                };
+            };
+            /** @description Missing `Idempotency-Key` header (required on batch endpoints) or an otherwise invalid request. Ordinary error: no `code` field. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Caller does not own the job, or the market is not credit-eligible. Ordinary error: no `code` field. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Job, credit-job, or user not found — or an Idempotency-Key minted by a different user. Ordinary error: no `code` field. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
+            409: {
+                headers: {
+                    /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdempotencyError"];
                 };
             };
         };
@@ -2141,6 +2463,326 @@ export interface operations {
                         success: boolean;
                     };
                 };
+            };
+        };
+    };
+    postPaymentsWebhooksStripe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postPaymentsSetup-intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    paymentMethodId: string;
+                };
+                "multipart/form-data": {
+                    paymentMethodId: string;
+                };
+                "text/plain": {
+                    paymentMethodId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        accepted: boolean;
+                        verificationError: (string | null) | null;
+                        paymentVerified: boolean;
+                        requiresAction: boolean;
+                        clientSecret: (string | null) | null;
+                        setupIntentId: (string | null) | null;
+                    };
+                    "multipart/form-data": {
+                        accepted: boolean;
+                        verificationError: (string | null) | null;
+                        paymentVerified: boolean;
+                        requiresAction: boolean;
+                        clientSecret: (string | null) | null;
+                        setupIntentId: (string | null) | null;
+                    };
+                    "text/plain": {
+                        accepted: boolean;
+                        verificationError: (string | null) | null;
+                        paymentVerified: boolean;
+                        requiresAction: boolean;
+                        clientSecret: (string | null) | null;
+                        setupIntentId: (string | null) | null;
+                    };
+                };
+            };
+        };
+    };
+    getPaymentsMethods: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        methods: {
+                            id: string;
+                            brand: (string | null) | null;
+                            last4: (string | null) | null;
+                            expMonth: (number | null) | null;
+                            expYear: (number | null) | null;
+                            funding: (string | null) | null;
+                            isDefault: boolean;
+                        }[];
+                        paymentVerified: boolean;
+                    };
+                    "multipart/form-data": {
+                        methods: {
+                            id: string;
+                            brand: (string | null) | null;
+                            last4: (string | null) | null;
+                            expMonth: (number | null) | null;
+                            expYear: (number | null) | null;
+                            funding: (string | null) | null;
+                            isDefault: boolean;
+                        }[];
+                        paymentVerified: boolean;
+                    };
+                    "text/plain": {
+                        methods: {
+                            id: string;
+                            brand: (string | null) | null;
+                            last4: (string | null) | null;
+                            expMonth: (number | null) | null;
+                            expYear: (number | null) | null;
+                            funding: (string | null) | null;
+                            isDefault: boolean;
+                        }[];
+                        paymentVerified: boolean;
+                    };
+                };
+            };
+        };
+    };
+    deletePaymentsMethodsById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                    };
+                    "multipart/form-data": {
+                        success: boolean;
+                    };
+                    "text/plain": {
+                        success: boolean;
+                    };
+                };
+            };
+        };
+    };
+    putPaymentsMethodsByIdDefault: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        methods: {
+                            id: string;
+                            brand: (string | null) | null;
+                            last4: (string | null) | null;
+                            expMonth: (number | null) | null;
+                            expYear: (number | null) | null;
+                            funding: (string | null) | null;
+                            isDefault: boolean;
+                        }[];
+                        paymentVerified: boolean;
+                    };
+                    "multipart/form-data": {
+                        methods: {
+                            id: string;
+                            brand: (string | null) | null;
+                            last4: (string | null) | null;
+                            expMonth: (number | null) | null;
+                            expYear: (number | null) | null;
+                            funding: (string | null) | null;
+                            isDefault: boolean;
+                        }[];
+                        paymentVerified: boolean;
+                    };
+                    "text/plain": {
+                        methods: {
+                            id: string;
+                            brand: (string | null) | null;
+                            last4: (string | null) | null;
+                            expMonth: (number | null) | null;
+                            expYear: (number | null) | null;
+                            funding: (string | null) | null;
+                            isDefault: boolean;
+                        }[];
+                        paymentVerified: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "postPaymentsPayment-intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amountUsd: number;
+                    paymentMethodId?: string;
+                };
+                "multipart/form-data": {
+                    amountUsd: number;
+                    paymentMethodId?: string;
+                };
+                "text/plain": {
+                    amountUsd: number;
+                    paymentMethodId?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        clientSecret: (string | null) | null;
+                        paymentIntentId: string;
+                    };
+                    "multipart/form-data": {
+                        clientSecret: (string | null) | null;
+                        paymentIntentId: string;
+                    };
+                    "text/plain": {
+                        clientSecret: (string | null) | null;
+                        paymentIntentId: string;
+                    };
+                };
+            };
+        };
+    };
+    getPaymentsPurchases: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        purchases: {
+                            id: string;
+                            amountUsd: number;
+                            createdAt: string;
+                            referenceId: (string | null) | null;
+                            cardBrand: (string | null) | null;
+                            cardLast4: (string | null) | null;
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        purchases: {
+                            id: string;
+                            amountUsd: number;
+                            createdAt: string;
+                            referenceId: (string | null) | null;
+                            cardBrand: (string | null) | null;
+                            cardLast4: (string | null) | null;
+                        }[];
+                    };
+                    "text/plain": {
+                        purchases: {
+                            id: string;
+                            amountUsd: number;
+                            createdAt: string;
+                            referenceId: (string | null) | null;
+                            cardBrand: (string | null) | null;
+                            cardLast4: (string | null) | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    getMetrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

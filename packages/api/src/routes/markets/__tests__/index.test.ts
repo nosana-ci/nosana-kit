@@ -157,36 +157,6 @@ describe('createNosanaMarketsApi', () => {
     });
   });
 
-  describe('getGpuTypes', () => {
-    it('should return GPU types', async () => {
-      const mockResponse = [{ name: 'RTX 4090' }];
-      (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({
-        data: mockResponse,
-        error: null,
-      });
-
-      const api = createNosanaMarketsApi({
-        hostManager: global.TEST_MOCK_CLIENT,
-      });
-      const result = await api.getGpuTypes();
-
-      expect(result).toEqual(mockResponse);
-    });
-
-    test('when an error is returned, it should throw a formatted error', async () => {
-      (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({
-        data: null,
-        error: { message: 'Error' },
-      });
-
-      const api = createNosanaMarketsApi({
-        hostManager: global.TEST_MOCK_CLIENT,
-      });
-
-      await expect(api.getGpuTypes()).rejects.toThrow('Failed to fetch GPU types');
-    });
-  });
-
   describe('getDockerImages', () => {
     it('should return Docker images', async () => {
       const mockResponse = [{ image: 'tensorflow:latest' }];

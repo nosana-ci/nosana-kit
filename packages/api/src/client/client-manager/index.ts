@@ -3,7 +3,7 @@ import createClient, { type Middleware } from 'openapi-fetch';
 import { defaultConfig } from '../../defaults/index.js';
 
 import type { paths } from './schema.js';
-import type { AuthenticatedClient } from '../type.utils.js';
+import type { AuthenticatedClient, AuthenticatedPaths } from '../type.utils.js';
 import type {
   NosanaNetwork,
   ApiKeyAuth,
@@ -34,7 +34,7 @@ export function createNosanaClientManagerApiClient(
     },
   };
 
-  const client = createClient<paths>({
+  const client = createClient<AuthenticatedPaths<paths>>({
     baseUrl,
     ...(options?.include_credentials ? { credentials: 'include' } : {}),
   });

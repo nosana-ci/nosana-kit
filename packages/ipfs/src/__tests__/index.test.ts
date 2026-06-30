@@ -36,4 +36,12 @@ describe("createIpfsClient", () => {
     createIpfsClient(global.TEST_IPFS_CONFIG);
     expect(createIPFSFetchClient).toHaveBeenCalledWith(expect.objectContaining(global.TEST_IPFS_CONFIG));
   });
+
+  test("does not mutate the shared default config when created with custom config", () => {
+    const before = { ...defaultIPFSConfig };
+
+    createIpfsClient(global.TEST_IPFS_CONFIG);
+
+    expect(defaultIPFSConfig).toEqual(before);
+  });
 });

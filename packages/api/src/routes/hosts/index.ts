@@ -6,10 +6,16 @@ import type {
   NodeListRequest,
   NodeQueuedRequest,
   NodeUptimeRequest,
-  HostsFilterRequest,
-  HostsFiltersOptionsRequest,
-  BenchmarkReportRequest,
-  BenchmarkSummaryRequest,
+  NodeWithAccessRequest,
+  NodeRequestMarketRequest,
+  NodeMarketRelationRequest,
+  NodeMinimumVersionRequest,
+  NodeMetricsQuery,
+  NodeRegisterRequest,
+  NodeSyncRequest,
+  NodeMetricsBody,
+  NodeAddressRequest,
+  NodeContactRequest,
 } from './types.js';
 
 export * from './types.js';
@@ -43,35 +49,11 @@ export function createNosanaHostsApi(clients: {
 
       return data as unknown as Record<string, unknown>;
     },
-    async getSpecs(id: string): Promise<Record<string, unknown>> {
-      const { data, error } = await client.GET('/nodes/{id}/specs', {
-        params: {
-          path: { id },
-        },
-      });
-
-      if (error || !data) {
-        throw errorFormatter('Failed to get node specs', error);
-      }
-
-      return data as unknown as Record<string, unknown>;
-    },
     async getAvailableGpus(): Promise<Record<string, unknown>> {
       const { data, error } = await client.GET('/nodes/available-gpus', {});
 
       if (error || !data) {
         throw errorFormatter('Failed to get available GPUs', error);
-      }
-
-      return data as unknown as Record<string, unknown>;
-    },
-    async getStats(): Promise<Record<string, unknown>> {
-      const { data, error } = await client.GET('/nodes/stats', {
-        params: { query: {} },
-      });
-
-      if (error || !data) {
-        throw errorFormatter('Failed to get node stats', error);
       }
 
       return data as unknown as Record<string, unknown>;
@@ -118,75 +100,211 @@ export function createNosanaHostsApi(clients: {
 
       return data as unknown as Record<string, unknown>;
     },
-    async getAvailableHosts(
-      request?: HostsFilterRequest,
+    async getWithAccess(
+      request?: NodeWithAccessRequest,
     ): Promise<Record<string, unknown>> {
-      const { data, error } = await client.GET('/hosts/', {
+      const { data, error } = await client.GET('/nodes/with-access', {
         params: { query: request ?? {} },
       });
 
       if (error || !data) {
-        throw errorFormatter('Failed to get available hosts', error);
+        throw errorFormatter('Failed to get nodes with access', error);
       }
 
       return data as unknown as Record<string, unknown>;
     },
-    async getFilters(
-      request?: HostsFiltersOptionsRequest,
+    async getRewards(): Promise<Record<string, unknown>> {
+      const { data, error } = await client.GET('/nodes/rewards', {});
+
+      if (error || !data) {
+        throw errorFormatter('Failed to get node rewards', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async getRequestMarket(
+      request?: NodeRequestMarketRequest,
     ): Promise<Record<string, unknown>> {
-      const { data, error } = await client.GET('/hosts/filters', {
+      const { data, error } = await client.GET('/nodes/request-market', {
         params: { query: request ?? {} },
       });
 
       if (error || !data) {
-        throw errorFormatter('Failed to get host filters', error);
+        throw errorFormatter('Failed to request market', error);
       }
 
       return data as unknown as Record<string, unknown>;
     },
-    async getBenchmarkReport(
-      request?: BenchmarkReportRequest,
+    async getMarketRelation(
+      request?: NodeMarketRelationRequest,
     ): Promise<Record<string, unknown>> {
-      const { data, error } = await client.GET('/benchmarks/node-report', {
+      const { data, error } = await client.GET('/nodes/market-relation', {
         params: { query: request ?? {} },
       });
 
       if (error || !data) {
-        throw errorFormatter('Failed to get benchmark report', error);
+        throw errorFormatter('Failed to get market relation', error);
       }
 
       return data as unknown as Record<string, unknown>;
     },
-    async getTemplatePerformance(
-      nodeId: string,
+    async getMinimumRequiredVersion(
+      request?: NodeMinimumVersionRequest,
     ): Promise<Record<string, unknown>> {
       const { data, error } = await client.GET(
-        '/benchmarks/node-template-performance/{nodeId}',
-        {
-          params: {
-            path: { nodeId },
-          },
-        },
-      );
-
-      if (error || !data) {
-        throw errorFormatter('Failed to get template performance', error);
-      }
-
-      return data as unknown as Record<string, unknown>;
-    },
-    async getBenchmarkSummary(
-      request?: BenchmarkSummaryRequest,
-    ): Promise<Record<string, unknown>> {
-      const { data, error } = await client.GET(
-        '/benchmarks/markets/benchmark-summary',
+        '/nodes/minimum-required-version',
         {
           params: { query: request ?? {} },
         },
       );
 
       if (error || !data) {
-        throw errorFormatter('Failed to get benchmark summary', error);
+        throw errorFormatter('Failed to get minimum required version', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async getFull(id: string): Promise<Record<string, unknown>> {
+      const { data, error } = await client.GET('/nodes/{id}/full', {
+        params: { path: { id } },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to get full node', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async getInfo(id: string): Promise<Record<string, unknown>> {
+      const { data, error } = await client.GET('/nodes/{id}/info', {
+        params: { path: { id } },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to get node info', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async getMetrics(
+      id: string,
+      request?: NodeMetricsQuery,
+    ): Promise<Record<string, unknown>> {
+      const { data, error } = await client.GET('/nodes/{id}/metrics', {
+        params: { path: { id }, query: request ?? {} },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to get node metrics', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async getRewardsById(id: string): Promise<Record<string, unknown>> {
+      const { data, error } = await client.GET('/nodes/{id}/rewards', {
+        params: { path: { id } },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to get node rewards', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async getRecentBenchmarks(id: string): Promise<Record<string, unknown>> {
+      const { data, error } = await client.GET('/nodes/{id}/recent-benchmarks', {
+        params: { path: { id } },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to get recent benchmarks', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async register(
+      request: NodeRegisterRequest,
+    ): Promise<Record<string, unknown>> {
+      const { data, error } = await client.POST('/nodes/register', {
+        body: request,
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to register node', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async syncNode(request: NodeSyncRequest): Promise<Record<string, unknown>> {
+      const { data, error } = await client.POST('/nodes/sync-node', {
+        body: request,
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to sync node', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async heartbeat(): Promise<Record<string, unknown>> {
+      const { data, error } = await client.POST('/nodes/heartbeat', {});
+
+      if (error || !data) {
+        throw errorFormatter('Failed to send heartbeat', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async payment(): Promise<Record<string, unknown>> {
+      const { data, error } = await client.POST('/nodes/payment', {});
+
+      if (error || !data) {
+        throw errorFormatter('Failed to process node payment', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async postMetrics(
+      id: string,
+      request: NodeMetricsBody,
+    ): Promise<Record<string, unknown>> {
+      const { data, error } = await client.POST('/nodes/{id}/metrics', {
+        params: { path: { id } },
+        body: request,
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to post node metrics', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async updateAddress(
+      id: string,
+      request: NodeAddressRequest,
+    ): Promise<Record<string, unknown>> {
+      const { data, error } = await client.PATCH('/nodes/{id}/address', {
+        params: { path: { id } },
+        body: request,
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to update node address', error);
+      }
+
+      return data as unknown as Record<string, unknown>;
+    },
+    async updateContact(
+      id: string,
+      request: NodeContactRequest,
+    ): Promise<Record<string, unknown>> {
+      const { data, error } = await client.PATCH('/nodes/{id}/contact', {
+        params: { path: { id } },
+        body: request,
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to update node contact', error);
       }
 
       return data as unknown as Record<string, unknown>;

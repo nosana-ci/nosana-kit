@@ -5,7 +5,7 @@ import { type DeploymentState } from '../../types.js';
 
 /**
  * @param replicas Number of replicas to set for the deployment
- * @throws Error if replicas is less than 1
+ * @throws Error if replicas is less than 0
  * @throws Error if there is an error updating the replica count
  * @returns Promise<void>
  * @description Updates the number of replicas for the deployment.
@@ -16,12 +16,12 @@ export async function deploymentUpdateReplicaCount(
   client: DeploymentManagerClient,
   state: DeploymentState,
 ): Promise<void> {
-  if (replicas < 1) {
-    throw new Error('Replica count must be at least 1');
+  if (replicas < 0) {
+    throw new Error('Replica count must be at least 0');
   }
 
   const { data, error } = await client.PATCH(
-    '/api/deployments/{deployment}/update-replica-count',
+    '/deployments/{deployment}/update-replica-count',
     {
       params: { path: { deployment: state.id } },
       body: { replicas },

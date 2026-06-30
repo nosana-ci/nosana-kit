@@ -1,20 +1,25 @@
 {
   "name": "@nosana/authorization",
-  "version": "2.2.4",
+  "version": "2.3.1",
   "description": "Nosana authorization module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "author": "Nosana",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
+    "directory": "packages/authorisation"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
     "dev": "tsc --watch",
-    "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
+    "dev:with-deps": "pnpm --filter $npm_package_name... --parallel run dev",
     "clean": "rm -rf dist",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -25,7 +30,6 @@
     "format:fix": "echo 'No format:fix' && exit 0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
     "@types/node": "^24.0.14",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
@@ -33,11 +37,11 @@
     "eslint": "^9.31.0",
     "husky": "^9.1.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.3",
     "vitest": "^4.0.3"
   },
   "dependencies": {
-    "bs58": "^5.0.0",
+    "bs58": "^6.0.0",
     "buffer": "^6.0.3",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1"

@@ -195,3 +195,5 @@ npm install
 npm test
 npm run build
 ```
+
+For more info go to [learn.nosana.com](https://learn.nosana.com)
