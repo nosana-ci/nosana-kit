@@ -1,7 +1,7 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 import { withPagination } from '../../../../utils/withPagination.js';
 
-import type { QueryClient } from '../../../../client/index.js';
+import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type { DeploymentState, JobListResult, DeploymentJobsSearchParams } from '../../types.js';
 
 /**
@@ -13,12 +13,12 @@ import type { DeploymentState, JobListResult, DeploymentJobsSearchParams } from 
  * It is useful for monitoring the deployment's job status.
  */
 export async function deploymentGetJobs(
-  client: QueryClient,
+  client: DeploymentManagerClient,
   state: DeploymentState,
   searchParams?: DeploymentJobsSearchParams,
 ): Promise<JobListResult> {
   const { data, error } = await client.GET(
-    '/api/deployments/{deployment}/jobs',
+    '/deployments/{deployment}/jobs',
     {
       params: {
         path: { deployment: state.id },

@@ -1,15 +1,45 @@
-import { createNosanaClientManagerApiClient, createNosanaDashboardApiClient } from './client/index.js';
+import {
+  createNosanaClientManagerApiClient,
+  createBlockchainIndexerClient,
+  createHostManagerClient,
+  createDeploymentManagerClient,
+} from './client/index.js';
 import { NosanaAuthApi } from './routes/auth/types.js';
 import {
-  createNosanaJobsApi, type NosanaJobsApi,
-  createNosanaCreditsApi, type NosanaCreditsApi,
-  createNosanaMarketsApi, type NosanaMarketsApi,
-  createDeploymentsApi, type DeploymentsApi, type ApiDeploymentsApi,
-  createNosanaAuthApi
+  createNosanaJobsApi,
+  type NosanaJobsApi,
+  createNosanaCreditsApi,
+  type NosanaCreditsApi,
+  createNosanaMarketsApi,
+  type NosanaMarketsApi,
+  createDeploymentsApi,
+  type DeploymentsApi,
+  type ApiDeploymentsApi,
+  createNosanaAuthApi,
+  createNosanaUserApi,
+  type NosanaUserApi,
+  createNosanaTemplatesApi,
+  type NosanaTemplatesApi,
+  createNosanaHostsApi,
+  type NosanaHostsApi,
+  createNosanaStatsApi,
+  type NosanaStatsApi,
+  createNosanaPaymentsApi,
+  type NosanaPaymentsApi,
+  createNosanaNewsletterApi,
+  type NosanaNewsletterApi,
+  createNosanaBenchmarksApi,
+  type NosanaBenchmarksApi,
 } from './routes/index.js';
 
 import { NosanaNetwork } from './types.js';
-import type { ApiKeyAuth, CreateNosanaApiOptions, SignerAuth, NosanaNetwork as NosanaNetworkType } from './types.js';
+import type {
+  ApiKeyAuth,
+  CreateNosanaApiOptions,
+  SignerAuth,
+  NosanaNetwork as NosanaNetworkType,
+  NosanaClients,
+} from './types.js';
 
 export interface NosanaApi {
   auth: NosanaAuthApi;
@@ -17,6 +47,20 @@ export interface NosanaApi {
   credits: NosanaCreditsApi;
   markets: NosanaMarketsApi;
   deployments: DeploymentsApi;
+  user: NosanaUserApi;
+  templates: NosanaTemplatesApi;
+  hosts: NosanaHostsApi;
+  stats: NosanaStatsApi;
+  payments: NosanaPaymentsApi;
+  newsletter: NosanaNewsletterApi;
+  benchmarks: NosanaBenchmarksApi;
+  /**
+   * The raw, fully-typed per-service OpenAPI clients. Use these to call any
+   * endpoint not covered by the curated groups above — every route of each
+   * service is available with path autocompletion and typed params/responses,
+   * e.g. `api.clients.hostManager.POST('/nodes/ban', { body })`.
+   */
+  clients: NosanaClients;
 }
 
 export interface NosanaApiWithApiKey {
@@ -25,14 +69,65 @@ export interface NosanaApiWithApiKey {
   credits: NosanaCreditsApi;
   markets: NosanaMarketsApi;
   deployments: ApiDeploymentsApi;
+  user: NosanaUserApi;
+  templates: NosanaTemplatesApi;
+  hosts: NosanaHostsApi;
+  stats: NosanaStatsApi;
+  payments: NosanaPaymentsApi;
+  newsletter: NosanaNewsletterApi;
+  benchmarks: NosanaBenchmarksApi;
+  /**
+   * The raw, fully-typed per-service OpenAPI clients. Use these to call any
+   * endpoint not covered by the curated groups above — every route of each
+   * service is available with path autocompletion and typed params/responses,
+   * e.g. `api.clients.hostManager.POST('/nodes/ban', { body })`.
+   */
+  clients: NosanaClients;
 }
 
 export type NosanaApiClient = NosanaApi | NosanaApiWithApiKey;
 
+function createClients(
+  environment: NosanaNetworkType,
+  authParams: SignerAuth | ApiKeyAuth | undefined,
+  options?: CreateNosanaApiOptions,
+): NosanaClients {
+  return {
+    clientManager: createNosanaClientManagerApiClient(
+      environment,
+      authParams,
+      options,
+    ),
+    hostManager: createHostManagerClient(environment, authParams, options),
+    blockchainIndexer: createBlockchainIndexerClient(
+      environment,
+      authParams,
+      options,
+    ),
+    deploymentManager: createDeploymentManagerClient(
+      environment,
+      authParams,
+      options,
+    ),
+  };
+}
+
 // Overloads for different auth modes
-export function createNosanaApi(environment: NosanaNetworkType, noAuth: undefined, options?: CreateNosanaApiOptions): NosanaApi;
-export function createNosanaApi(environment: NosanaNetworkType, signerAuth: SignerAuth, options?: CreateNosanaApiOptions): NosanaApi;
-export function createNosanaApi(environment: NosanaNetworkType, apiKeyAuth: ApiKeyAuth, options?: CreateNosanaApiOptions): NosanaApiWithApiKey;
+export function createNosanaApi(
+  environment: NosanaNetworkType,
+  noAuth: undefined,
+  options?: CreateNosanaApiOptions,
+): NosanaApi;
+export function createNosanaApi(
+  environment: NosanaNetworkType,
+  signerAuth: SignerAuth,
+  options?: CreateNosanaApiOptions,
+): NosanaApi;
+export function createNosanaApi(
+  environment: NosanaNetworkType,
+  apiKeyAuth: ApiKeyAuth,
+  options?: CreateNosanaApiOptions,
+): NosanaApiWithApiKey;
 
 export function createNosanaApi(
   environment: NosanaNetworkType = NosanaNetwork.MAINNET,
@@ -40,18 +135,43 @@ export function createNosanaApi(
   options?: CreateNosanaApiOptions,
 ): NosanaApiClient {
   const hasApiKey = typeof signerOrApiKey === 'string';
-
-  const clientManagerClient = createNosanaClientManagerApiClient(environment, signerOrApiKey, options);
-  const dashboardClient = createNosanaDashboardApiClient(environment, signerOrApiKey, options);
+  const clients = createClients(environment, signerOrApiKey, options);
 
   return {
-    auth: createNosanaAuthApi(clientManagerClient),
-    jobs: createNosanaJobsApi(dashboardClient),
-    credits: createNosanaCreditsApi(dashboardClient),
-    markets: createNosanaMarketsApi(dashboardClient),
-    deployments: !hasApiKey && signerOrApiKey
-      ? createDeploymentsApi({ client: dashboardClient, solana: signerOrApiKey.solana }, false)
-      : createDeploymentsApi({ client: dashboardClient }, true)
+    auth: createNosanaAuthApi(clients.clientManager),
+    jobs: createNosanaJobsApi({
+      blockchainIndexer: clients.blockchainIndexer,
+      clientManager: clients.clientManager,
+    }),
+    credits: createNosanaCreditsApi({ clientManager: clients.clientManager }),
+    markets: createNosanaMarketsApi({ hostManager: clients.hostManager }),
+    deployments:
+      !hasApiKey && signerOrApiKey
+        ? createDeploymentsApi(
+            {
+              deploymentManager: clients.deploymentManager,
+              solana: signerOrApiKey.solana,
+            },
+            false,
+          )
+        : createDeploymentsApi(
+            { deploymentManager: clients.deploymentManager },
+            true,
+          ),
+    user: createNosanaUserApi({ clientManager: clients.clientManager }),
+    templates: createNosanaTemplatesApi({
+      clientManager: clients.clientManager,
+    }),
+    hosts: createNosanaHostsApi({ hostManager: clients.hostManager }),
+    stats: createNosanaStatsApi({
+      blockchainIndexer: clients.blockchainIndexer,
+    }),
+    payments: createNosanaPaymentsApi({ clientManager: clients.clientManager }),
+    newsletter: createNosanaNewsletterApi({
+      clientManager: clients.clientManager,
+    }),
+    benchmarks: createNosanaBenchmarksApi({ hostManager: clients.hostManager }),
+    clients,
   };
 }
 
@@ -61,7 +181,10 @@ export { isNosanaApiError, isIdempotencyControlSignal } from './utils/errorForma
 
 // Export types
 export * from './types.js';
-export type { CreateNosanaApiOptions as ApiConfig, CreateNosanaApiOptions } from './types.js';
+export type {
+  CreateNosanaApiOptions as ApiConfig,
+  CreateNosanaApiOptions,
+} from './types.js';
 export type { NosanaApiError } from './utils/errorFormatter.js';
 
 // Export request/response types

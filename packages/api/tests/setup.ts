@@ -4,7 +4,7 @@
  */
 
 import { vi, beforeEach, afterEach } from 'vitest';
-import { createMockQueryClient, createMockSolanaFunctions } from './mockFactory.js';
+import { createMockClient, createMockSolanaFunctions } from './mockFactory.js';
 
 // Mock openapi-fetch globally
 vi.mock('openapi-fetch', () => ({
@@ -21,18 +21,16 @@ afterEach(() => {
 });
 
 // Global mock client for API tests
-global.TEST_MOCK_CLIENT = createMockQueryClient();
+global.TEST_MOCK_CLIENT = createMockClient();
 
-global.TEST_ROUTE_OPTIONS_WITH_SIGNER = {
-  client: createMockQueryClient(),
+global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER = {
+  deploymentManager: createMockClient(),
   solana: createMockSolanaFunctions(),
-}
+};
 
 // Auth fixtures
 global.TEST_API_KEY = 'test-api-key';
-global.TEST_NOSANA_API_OPTIONS = {
-  backend_url: 'https://api.test.com',
-};
+global.TEST_NOSANA_API_OPTIONS = {};
 
 // Request fixtures
 global.TEST_CREATE_JOB_REQUEST = {
@@ -61,7 +59,14 @@ global.TEST_MOCK_JOB = {
       {
         id: 'Pytorch',
         args: {
-          cmd: ['jupyter', 'lab', '--ip=0.0.0.0', '--port=8888', '--no-browser', '--allow-root'],
+          cmd: [
+            'jupyter',
+            'lab',
+            '--ip=0.0.0.0',
+            '--port=8888',
+            '--no-browser',
+            '--allow-root',
+          ],
           gpu: true,
           image: 'docker.io/nosana/pytorch-jupyter:2.0.0',
           expose: 8888,
@@ -105,7 +110,7 @@ global.TEST_MOCK_EXTEND_JOB_RESPONSE = {
     costUSD: 0.39,
     creditsUsed: 390,
     reservationId: 'd2be6d73-4d5a-495a-8294-861a9a9287f4',
-  }
+  },
 };
 
 global.TEST_MOCK_STOP_JOB_RESPONSE = {
@@ -140,7 +145,9 @@ global.TEST_MOCK_MARKET = {
     'docker.io/vllm/vllm-openai:v0.9.2',
     'docker.io/ollama/ollama:0.11.3',
   ],
-  required_remote_resources: [{ type: 'S3', url: 'https://models.nosana.io/foldingAtHome' }],
+  required_remote_resources: [
+    { type: 'S3', url: 'https://models.nosana.io/foldingAtHome' },
+  ],
   client: false,
   max_usd_uptime_reward_per_day: 0,
   lowest_vram: 24,
@@ -175,7 +182,16 @@ global.TEST_MOCK_DEPLOYMENT = {
             id: 'Pytorch',
             args: {
               image: 'docker.io/nosana/pytorch-jupyter:2.0.0',
-              cmd: ['jupyter', 'lab', '--ip=0.0.0.0', '--port=8888', '--no-browser', '--allow-root', "--ServerApp.token=''", "--ServerApp.password=''"],
+              cmd: [
+                'jupyter',
+                'lab',
+                '--ip=0.0.0.0',
+                '--port=8888',
+                '--no-browser',
+                '--allow-root',
+                "--ServerApp.token=''",
+                "--ServerApp.password=''",
+              ],
               expose: 8888,
               gpu: true,
             },
@@ -232,7 +248,16 @@ global.TEST_CREATE_DEPLOYMENT_REQUEST = {
       {
         id: 'Pytorch',
         args: {
-          cmd: ['jupyter', 'lab', '--ip=0.0.0.0', '--port=8888', '--no-browser', '--allow-root', "--ServerApp.token=''", "--ServerApp.password=''"],
+          cmd: [
+            'jupyter',
+            'lab',
+            '--ip=0.0.0.0',
+            '--port=8888',
+            '--no-browser',
+            '--allow-root',
+            "--ServerApp.token=''",
+            "--ServerApp.password=''",
+          ],
           gpu: true,
           image: 'docker.io/nosana/pytorch-jupyter:2.0.0',
           expose: 8888,
@@ -250,7 +275,7 @@ global.TEST_CREATE_DEPLOYMENT_REQUEST = {
 };
 
 global.TEST_MOCK_TASK = {
-  task: "LIST",
+  task: 'LIST',
   deploymentId: '8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH',
   due_at: new Date('2025-12-04T12:30:14.294Z').toString(),
   created_at: new Date('2025-12-04T12:20:14.294Z').toString(),
@@ -280,8 +305,54 @@ global.TEST_MOCK_VAULTS_LIST = [
     vault: 'AnotherVaultAddress123456789',
     owner: 'AnotherVaultAddress123456789',
     created_at: '2025-12-04T12:21:13.591Z',
-  }
+  },
 ];
+
+// Events/Jobs/Revisions pagination fixtures
+global.TEST_MOCK_EVENT = {
+  type: 'DEPLOYMENT_STARTED',
+  deployment: '8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH',
+  created_at: '2025-12-04T12:20:14.294Z',
+};
+
+global.TEST_MOCK_EVENTS_RESPONSE = {
+  events: [global.TEST_MOCK_EVENT],
+  pagination: {
+    cursor_next: null,
+    cursor_prev: null,
+    total_items: 1,
+  },
+};
+
+global.TEST_MOCK_DEPLOYMENT_JOB = {
+  job: '8TjrkaZmW2UFjpm2Va5LECJc7zoFrbUJETk6fPimGi9a',
+  status: 'RUNNING',
+  deployment: '8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH',
+};
+
+global.TEST_MOCK_DEPLOYMENT_JOBS_RESPONSE = {
+  jobs: [global.TEST_MOCK_DEPLOYMENT_JOB],
+  pagination: {
+    cursor_next: null,
+    cursor_prev: null,
+    total_items: 1,
+  },
+};
+
+global.TEST_MOCK_REVISION = {
+  revision: 1,
+  deployment: '8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH',
+  created_at: '2025-12-04T12:20:14.294Z',
+};
+
+global.TEST_MOCK_REVISIONS_RESPONSE = {
+  revisions: [global.TEST_MOCK_REVISION],
+  pagination: {
+    cursor_next: null,
+    cursor_prev: null,
+    total_items: 1,
+  },
+};
 
 // Mock Api responses
 global.TEST_MOCK_TRANSACTION_SIGNATURE = 'base64-encoded-transaction';

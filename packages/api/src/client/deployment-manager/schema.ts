@@ -4,34 +4,35 @@
  */
 
 export interface paths {
-    "/api/deployments": {
+    "/deployments/jobs/{job}/job-definition": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description List all user deployments. */
+        /** @description Returns the job definition for a job. */
         get: {
             parameters: {
                 query?: never;
                 header: {
-                    "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
                 };
-                path?: never;
+                path: {
+                    job: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description List of deployments. */
+                /** @description Job definition details. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Deployments"];
+                        "application/json": components["schemas"]["JobDefinition"];
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -62,7 +63,166 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}": {
+    "/deployments/jobs/{job}/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Post results for your running job. */
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                };
+                path: {
+                    job: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["JobResults"];
+                };
+            };
+            responses: {
+                /** @description Job results details. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            message: "Success";
+                        };
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List all user deployments. */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Base64-encoded cursor for keyset pagination */
+                    cursor?: string;
+                    /** @description Number of items per page (10, 20, 50, or 100) */
+                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                    sort_order?: "asc" | "desc";
+                    /** @description Search for partial matches in deployment ID or name (case-insensitive) */
+                    search?: string;
+                    /** @description Filter by exact deployment ID */
+                    id?: string;
+                    /** @description Filter by exact deployment name */
+                    name?: string;
+                    /** @description Filter by deployment status. Can be single value or comma-separated list */
+                    status?: ("DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED") | string;
+                    /** @description Filter by deployment strategy. Can be single value or comma-separated list */
+                    strategy?: ("SIMPLE" | "SIMPLE-EXTEND" | "SCHEDULED" | "INFINITE") | string;
+                    /** @description Filter by vault public key */
+                    vault?: string;
+                    /** @description Filter deployments created after this date (ISO 8601 format) */
+                    created_after?: string;
+                    /** @description Filter deployments created before this date (ISO 8601 format) */
+                    created_before?: string;
+                };
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of deployments with pagination. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            deployments: components["schemas"]["Deployment"][];
+                            pagination: {
+                                /** @description Cursor for next page, null if no more pages */
+                                cursor_next: string | null;
+                                /** @description Cursor for previous page, null if on first page */
+                                cursor_prev: string | null;
+                                /** @description Total number of items in collection */
+                                total_items: number;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}": {
         parameters: {
             query?: never;
             header?: never;
@@ -77,6 +237,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -133,6 +295,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -184,7 +348,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/tasks": {
+    "/deployments/{deployment}/tasks": {
         parameters: {
             query?: never;
             header?: never;
@@ -194,11 +358,26 @@ export interface paths {
         /** @description Get scheduled tasks for a specific deployment. */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Base64-encoded cursor for keyset pagination */
+                    cursor?: string;
+                    /** @description Number of items per page (10, 20, 50, or 100) */
+                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                    sort_order?: "asc" | "desc";
+                    /** @description Filter by task type. Can be single value or comma-separated list */
+                    task?: ("LIST" | "EXTEND" | "STOP") | string;
+                    /** @description Filter tasks due after this date (ISO 8601 format) */
+                    due_after?: string;
+                    /** @description Filter tasks due before this date (ISO 8601 format) */
+                    due_before?: string;
+                };
                 header: {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -207,13 +386,23 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of scheduled tasks for the deployment. */
+                /** @description List of scheduled tasks for the deployment with pagination. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Task"][];
+                        "application/json": {
+                            tasks: components["schemas"]["Task"][];
+                            pagination: {
+                                /** @description Cursor for next page, null if no more pages */
+                                cursor_next: string | null;
+                                /** @description Cursor for previous page, null if on first page */
+                                cursor_prev: string | null;
+                                /** @description Total number of items in collection */
+                                total_items: number;
+                            };
+                        };
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -253,7 +442,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/header": {
+    "/deployments/{deployment}/header": {
         parameters: {
             query?: never;
             header?: never;
@@ -268,6 +457,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -324,7 +515,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/jobs/{job}": {
+    "/deployments/{deployment}/jobs/{job}": {
         parameters: {
             query?: never;
             header?: never;
@@ -339,6 +530,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -406,7 +599,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/jobs": {
+    "/deployments/{deployment}/jobs": {
         parameters: {
             query?: never;
             header?: never;
@@ -416,11 +609,30 @@ export interface paths {
         /** @description Get jobs for a specific deployment. */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Base64-encoded cursor for keyset pagination */
+                    cursor?: string;
+                    /** @description Number of items per page (10, 20, 50, or 100) */
+                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                    sort_order?: "asc" | "desc";
+                    /** @description Filter by job state. Can be single value or comma-separated list (e.g., 'RUNNING,COMPLETED') */
+                    state?: ("QUEUED" | "RUNNING" | "COMPLETED" | "STOPPED") | string;
+                    /** @description Filter by exact job ID */
+                    job?: string;
+                    /** @description Filter by deployment revision number */
+                    revision?: number;
+                    /** @description Filter jobs created after this date (ISO 8601 format) */
+                    created_after?: string;
+                    /** @description Filter jobs created before this date (ISO 8601 format) */
+                    created_before?: string;
+                };
                 header: {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -429,13 +641,23 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of jobs for the deployment. */
+                /** @description List of jobs for the deployment with pagination. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Job"][];
+                        "application/json": {
+                            jobs: components["schemas"]["Job"][];
+                            pagination: {
+                                /** @description Cursor for next page, null if no more pages */
+                                cursor_next: string | null;
+                                /** @description Cursor for previous page, null if on first page */
+                                cursor_prev: string | null;
+                                /** @description Total number of items in collection */
+                                total_items: number;
+                            };
+                        };
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -475,7 +697,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/revisions": {
+    "/deployments/{deployment}/revisions": {
         parameters: {
             query?: never;
             header?: never;
@@ -485,11 +707,26 @@ export interface paths {
         /** @description Get revisions for a specific deployment. */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Base64-encoded cursor for keyset pagination */
+                    cursor?: string;
+                    /** @description Number of items per page (10, 20, 50, or 100) */
+                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                    sort_order?: "asc" | "desc";
+                    /** @description Filter by exact revision number */
+                    revision?: number;
+                    /** @description Filter revisions created after this date (ISO 8601 format) */
+                    created_after?: string;
+                    /** @description Filter revisions created before this date (ISO 8601 format) */
+                    created_before?: string;
+                };
                 header: {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -498,13 +735,23 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of revisions for the deployment. */
+                /** @description List of revisions for the deployment with pagination. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Revision"][];
+                        "application/json": {
+                            revisions: components["schemas"]["Revision"][];
+                            pagination: {
+                                /** @description Cursor for next page, null if no more pages */
+                                cursor_next: string | null;
+                                /** @description Cursor for previous page, null if on first page */
+                                cursor_prev: string | null;
+                                /** @description Total number of items in collection */
+                                total_items: number;
+                            };
+                        };
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -544,7 +791,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/events": {
+    "/deployments/{deployment}/events": {
         parameters: {
             query?: never;
             header?: never;
@@ -554,11 +801,28 @@ export interface paths {
         /** @description Get events for a specific deployment. */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Base64-encoded cursor for keyset pagination */
+                    cursor?: string;
+                    /** @description Number of items per page (10, 20, 50, or 100) */
+                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                    sort_order?: "asc" | "desc";
+                    /** @description Filter by event category: 'Deployment' or 'Event'. Can be comma-separated list */
+                    category?: ("Deployment" | "Event") | string;
+                    /** @description Filter by event type. Can be single value or comma-separated list */
+                    type?: string;
+                    /** @description Filter events created after this date (ISO 8601 format) */
+                    created_after?: string;
+                    /** @description Filter events created before this date (ISO 8601 format) */
+                    created_before?: string;
+                };
                 header: {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -567,13 +831,23 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of events for the deployment. */
+                /** @description List of events for the deployment with pagination. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Event"][];
+                        "application/json": {
+                            events: components["schemas"]["Event"][];
+                            pagination: {
+                                /** @description Cursor for next page, null if no more pages */
+                                cursor_next: string | null;
+                                /** @description Cursor for previous page, null if on first page */
+                                cursor_prev: string | null;
+                                /** @description Total number of items in collection */
+                                total_items: number;
+                            };
+                        };
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -613,7 +887,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/create": {
+    "/deployments/create": {
         parameters: {
             query?: never;
             header?: never;
@@ -630,6 +904,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path?: never;
                 cookie?: never;
@@ -684,7 +960,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/create-revision": {
+    "/deployments/{deployment}/create-revision": {
         parameters: {
             query?: never;
             header?: never;
@@ -701,6 +977,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -774,7 +1052,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/start": {
+    "/deployments/{deployment}/start": {
         parameters: {
             query?: never;
             header?: never;
@@ -791,6 +1069,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -848,7 +1128,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/stop": {
+    "/deployments/{deployment}/stop": {
         parameters: {
             query?: never;
             header?: never;
@@ -865,6 +1145,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -922,7 +1204,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/archive": {
+    "/deployments/{deployment}/archive": {
         parameters: {
             query?: never;
             header?: never;
@@ -939,6 +1221,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -996,7 +1280,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-active-revision": {
+    "/deployments/{deployment}/update-name": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Update the name of a deployment */
+        patch: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path: {
+                    deployment: components["schemas"]["PublicKey"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        name: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Deployment name updated successfully. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            name: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Deployment not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/deployments/{deployment}/update-active-revision": {
         parameters: {
             query?: never;
             header?: never;
@@ -1017,6 +1382,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -1075,7 +1442,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-replica-count": {
+    "/deployments/{deployment}/update-replica-count": {
         parameters: {
             query?: never;
             header?: never;
@@ -1096,6 +1463,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -1154,7 +1523,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-schedule": {
+    "/deployments/{deployment}/update-schedule": {
         parameters: {
             query?: never;
             header?: never;
@@ -1175,6 +1544,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -1234,7 +1605,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-timeout": {
+    "/deployments/{deployment}/update-timeout": {
         parameters: {
             query?: never;
             header?: never;
@@ -1255,6 +1626,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     deployment: components["schemas"]["PublicKey"];
@@ -1312,132 +1685,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/api/deployments/jobs/{job}/job-definition": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Returns the job definition for a job. */
-        get: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Signed authentication message, */
-                    authorization: string;
-                };
-                path: {
-                    job: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Job definition details. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["JobDefinition"];
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/jobs/{job}/results": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Post results for your running job. */
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Signed authentication message, */
-                    authorization: string;
-                };
-                path: {
-                    job: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["JobResults"];
-                };
-            };
-            responses: {
-                /** @description Job results details. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            message: "Success";
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/vaults": {
+    "/deployments/vaults": {
         parameters: {
             query?: never;
             header?: never;
@@ -1452,6 +1700,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path?: never;
                 cookie?: never;
@@ -1495,7 +1745,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/vaults/create": {
+    "/deployments/vaults/create": {
         parameters: {
             query?: never;
             header?: never;
@@ -1512,6 +1762,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path?: never;
                 cookie?: never;
@@ -1553,7 +1805,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/vaults/{vault}/withdraw": {
+    "/deployments/vaults/{vault}/withdraw": {
         parameters: {
             query?: never;
             header?: never;
@@ -1570,6 +1822,8 @@ export interface paths {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
                     authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
                 };
                 path: {
                     vault: components["schemas"]["PublicKey"];
@@ -1652,6 +1906,8 @@ export interface components {
             "x-user-id": string;
             /** @description Signed authentication message, */
             authorization: string;
+            /** @description Nosana API key */
+            "x-nosana-api"?: string;
         };
         /**
          * HostHeaders
@@ -1750,9 +2006,10 @@ export interface components {
         /** Job */
         Job: {
             tx: string;
-            job: string;
             deployment: string;
+            job: string;
             market: string;
+            node: string | null;
             revision: number;
             state: "QUEUED" | "RUNNING" | "COMPLETED" | "STOPPED";
             time_start: number;
@@ -1832,6 +2089,9 @@ export interface components {
                 };
             };
             deployment_id?: string;
+            ssh?: {
+                public_keys?: string[];
+            };
             meta?: {
                 trigger?: string;
                 /** @description Construct a type with a set of properties K of type T */
@@ -2007,10 +2267,12 @@ export interface components {
                 };
                 execution?: {
                     group?: string;
+                    timeout?: number;
                     depends_on: string[];
                     stop_if_dependent_stops?: boolean;
                 } | {
                     group?: string;
+                    timeout?: number;
                 };
             }[];
         };

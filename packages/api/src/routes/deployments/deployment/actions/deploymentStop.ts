@@ -1,6 +1,6 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
-import type { QueryClient } from '../../../../client/index.js';
+import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type { DeploymentState } from '../../types.js';
 import { DeploymentStatus } from '@nosana/types';
 
@@ -13,15 +13,17 @@ import { DeploymentStatus } from '@nosana/types';
  * It is useful for pausing deployments without archiving them.
  */
 export async function deploymentStop(
-  client: QueryClient,
+  client: DeploymentManagerClient,
   state: DeploymentState,
 ): Promise<void> {
-  if ([DeploymentStatus.STOPPING, DeploymentStatus.STOPPED].includes(state.status)) {
+  if (
+    [DeploymentStatus.STOPPING, DeploymentStatus.STOPPED].includes(state.status)
+  ) {
     throw new Error('Deployment is already stopped');
   }
 
   const { data, error } = await client.POST(
-    '/api/deployments/{deployment}/stop',
+    '/deployments/{deployment}/stop',
     {
       params: { path: { deployment: state.id } },
     },

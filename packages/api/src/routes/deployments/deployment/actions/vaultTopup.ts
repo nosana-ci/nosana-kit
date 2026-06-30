@@ -1,7 +1,7 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
 import type { TopupVaultOptions } from '../../types.js';
-import type { RouteOptionsWithSigner } from '../../../../types.js';
+import type { DeploymentRouteClientsWithSigner } from '../../../../types.js';
 
 /**
  * Tops up a vault with SOL and/or NOS.
@@ -16,7 +16,7 @@ import type { RouteOptionsWithSigner } from '../../../../types.js';
 export async function vaultTopup(
   vaultAddress: string,
   options: TopupVaultOptions,
-  { solana: { transferTokensToRecipient } }: RouteOptionsWithSigner
+  { solana: { transferTokensToRecipient } }: DeploymentRouteClientsWithSigner
 ): Promise<void> {
   try {
     await transferTokensToRecipient(vaultAddress, options);

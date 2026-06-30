@@ -1,16 +1,23 @@
-import { errorFormatter } from "../../../../utils/errorFormatter.js";
+import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
-import type { QueryClient } from '../../../../client/index.js';
-import { DeploymentState } from "../../types.js";
+import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
+import { DeploymentState } from '../../types.js';
 
-export async function deploymentUpdateActiveRevision(active_revision: number, client: QueryClient, state: DeploymentState): Promise<void> {
-  const { data, error } = await client.PATCH(`/api/deployments/{deployment}/update-active-revision`, {
-    params: { path: { deployment: state.id } },
-    body: { active_revision },
-  });
+export async function deploymentUpdateActiveRevision(
+  active_revision: number,
+  client: DeploymentManagerClient,
+  state: DeploymentState,
+): Promise<void> {
+  const { data, error } = await client.PATCH(
+    `/deployments/{deployment}/update-active-revision`,
+    {
+      params: { path: { deployment: state.id } },
+      body: { active_revision },
+    },
+  );
 
   if (error || !data) {
-    throw errorFormatter("Error updating active revision", error);
+    throw errorFormatter('Error updating active revision', error);
   }
 
   Object.assign(state, {

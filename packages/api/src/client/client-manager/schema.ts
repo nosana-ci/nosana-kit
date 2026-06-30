@@ -1639,6 +1639,7 @@ export interface operations {
                             type: string;
                             amountUsd: number;
                             createdAt: string;
+                            method: string | null;
                         }[];
                         total: number;
                     };
@@ -1648,6 +1649,7 @@ export interface operations {
                             type: string;
                             amountUsd: number;
                             createdAt: string;
+                            method: string | null;
                         }[];
                         total: number;
                     };
@@ -1657,6 +1659,7 @@ export interface operations {
                             type: string;
                             amountUsd: number;
                             createdAt: string;
+                            method: string | null;
                         }[];
                         total: number;
                     };

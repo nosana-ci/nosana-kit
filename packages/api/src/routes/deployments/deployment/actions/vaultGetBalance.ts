@@ -1,6 +1,6 @@
 import { errorFormatter } from "../../../../utils/errorFormatter.js";
 
-import type { RouteOptionsWithSigner } from "../../../../types.js";
+import type { DeploymentRouteClientsWithSigner } from "../../../../types.js";
 
 /**
  * Gets the balance of a vault.
@@ -13,7 +13,7 @@ import type { RouteOptionsWithSigner } from "../../../../types.js";
  */
 export async function vaultGetBalance(
   vaultAddress: string,
-  { solana: { getBalance } }: RouteOptionsWithSigner
+  { solana: { getBalance } }: DeploymentRouteClientsWithSigner
 ): Promise<{ SOL: number; NOS: number }> {
   try {
     return await getBalance(vaultAddress);

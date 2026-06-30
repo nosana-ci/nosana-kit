@@ -1,11 +1,12 @@
 import type {
   JobDefinition,
-  components,
-  paths,
 } from '@nosana/types';
+import type { components, paths } from '../../client/deployment-manager/schema.js';
 
 // Re-export types from @nosana/types for reuse
 export type { JobDefinition } from '@nosana/types';
+
+export type JobResults = components['schemas']['JobResults'];
 
 // Deployment state with Date objects instead of strings
 export type DeploymentState = Omit<components['schemas']['Deployment'], "updated_at" | "created_at"> & {
@@ -50,10 +51,10 @@ export type PaginationParams = {
 };
 
 // Response types for the new endpoints
-export type DeploymentJobs = paths['/api/deployments/{deployment}/jobs']['get']['responses']['200']['content']['application/json'];
-export type DeploymentRevisions = paths['/api/deployments/{deployment}/revisions']['get']['responses']['200']['content']['application/json'];
-export type DeploymentEvents = paths['/api/deployments/{deployment}/events']['get']['responses']['200']['content']['application/json'];
-export type DeploymentTasks = paths['/api/deployments/{deployment}/tasks']['get']['responses']['200']['content']['application/json'];
+export type DeploymentJobs = paths['/deployments/{deployment}/jobs']['get']['responses']['200']['content']['application/json'];
+export type DeploymentRevisions = paths['/deployments/{deployment}/revisions']['get']['responses']['200']['content']['application/json'];
+export type DeploymentEvents = paths['/deployments/{deployment}/events']['get']['responses']['200']['content']['application/json'];
+export type DeploymentTasks = paths['/deployments/{deployment}/tasks']['get']['responses']['200']['content']['application/json'];
 
 export interface TopupVaultOptions {
   SOL?: number;
@@ -74,12 +75,12 @@ export interface Vault {
 }
 
 // Type for deployment job response
-export type DeploymentJob = paths['/api/deployments/{deployment}/jobs/{job}']['get']['responses']['200']['content']['application/json'];
+export type DeploymentJob = paths['/deployments/{deployment}/jobs/{job}']['get']['responses']['200']['content']['application/json'];
 
-export type DeploymentsSearchParams = paths['/api/deployments']['get']['parameters']['query'];
-export type DeploymentJobsSearchParams = paths['/api/deployments/{deployment}/jobs']['get']['parameters']['query'];
-export type DeploymentEventsSearchParams = paths['/api/deployments/{deployment}/events']['get']['parameters']['query'];
-export type DeploymentRevisionsSearchParams = paths['/api/deployments/{deployment}/revisions']['get']['parameters']['query'];
+export type DeploymentsSearchParams = paths['/deployments']['get']['parameters']['query'];
+export type DeploymentJobsSearchParams = paths['/deployments/{deployment}/jobs']['get']['parameters']['query'];
+export type DeploymentEventsSearchParams = paths['/deployments/{deployment}/events']['get']['parameters']['query'];
+export type DeploymentRevisionsSearchParams = paths['/deployments/{deployment}/revisions']['get']['parameters']['query'];
 
 // Item types extracted from paginated responses
 export type DeploymentJobItem = DeploymentJobs['jobs'][number];
@@ -104,6 +105,7 @@ export type ApiDeployment = DeploymentState & {
   updateReplicaCount: (replicas: number) => Promise<void>;
   updateTimeout: (timeout: number) => Promise<void>;
   updateSchedule: (schedule: string) => Promise<void>;
+  updateName: (name: string) => Promise<void>;
 };
 
 // Full deployment (with signer auth) - includes vault
@@ -120,6 +122,8 @@ export interface DeploymentsApi {
     deploymentIDorCreateObject: string | CreateDeployment,
     ...actions: Array<(deployment: Deployment) => Promise<void> | void>
   ) => Promise<Deployment>;
+  getJobDefinition: (job: string) => Promise<JobDefinition>;
+  submitJobResults: (job: string, results: JobResults) => Promise<void>;
   vaults: {
     create: () => Promise<Vault>;
     list: () => Promise<Vault[]>;
@@ -135,4 +139,6 @@ export interface ApiDeploymentsApi {
     deploymentIDorCreateObject: string | CreateDeployment,
     ...actions: Array<(deployment: ApiDeployment) => Promise<void> | void>
   ) => Promise<ApiDeployment>;
+  getJobDefinition: (job: string) => Promise<JobDefinition>;
+  submitJobResults: (job: string, results: JobResults) => Promise<void>;
 }

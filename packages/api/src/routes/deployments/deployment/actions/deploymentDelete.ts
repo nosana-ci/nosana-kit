@@ -1,6 +1,6 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
-import type { QueryClient } from '../../../../client/index.js';
+import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type { DeploymentState } from '../../types.js';
 import { DeploymentStatus } from '@nosana/types';
 
@@ -15,7 +15,7 @@ import { DeploymentStatus } from '@nosana/types';
  * After successful deletion, the clearState callback is invoked to prevent further interaction.
  */
 export async function deploymentDelete(
-  client: QueryClient,
+  client: DeploymentManagerClient,
   state: DeploymentState,
   clearState: () => void,
 ): Promise<void> {
@@ -23,12 +23,9 @@ export async function deploymentDelete(
     throw new Error('Deployment must be stopped before it can be deleted');
   }
 
-  const { error } = await client.DELETE(
-    '/api/deployments/{deployment}',
-    {
-      params: { path: { deployment: state.id } },
-    },
-  );
+  const { error } = await client.DELETE('/deployments/{deployment}', {
+    params: { path: { deployment: state.id } },
+  });
 
   if (error) {
     throw errorFormatter('Error deleting deployment', error);

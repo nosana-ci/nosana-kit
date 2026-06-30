@@ -12,8 +12,9 @@ import {
   deploymentCreateNewRevision,
   deploymentUpdateActiveRevision,
   deploymentUpdateSchedule,
+  deploymentUpdateName,
   deploymentGenerateAuthHeader,
-  deploymentDelete
+  deploymentDelete,
 } from './actions/index.js';
 import { createVault } from './createVault.js';
 
@@ -23,27 +24,39 @@ import type {
   DeploymentState,
   ApiDeployment,
   PaginationParams,
+  TaskListResult,
   JobListResult,
   RevisionListResult,
   EventListResult,
-  TaskListResult,
   DeploymentJobsSearchParams,
   DeploymentRevisionsSearchParams,
-  DeploymentEventsSearchParams
+  DeploymentEventsSearchParams,
 } from '../types.js';
-import type { RouteOptions, RouteOptionsWithSigner } from '../../../types.js';
-import type { components } from '@nosana/types';
+import type {
+  DeploymentRouteClients,
+  DeploymentRouteClientsWithSigner,
+} from '../../../types.js';
+import type { components } from '../../../client/deployment-manager/schema.js';
 
 type DeploymentSchema = components['schemas']['Deployment'];
 
-export function createDeployment(deployment: DeploymentSchema, options: RouteOptions, hasApiKey: true): ApiDeployment;
-export function createDeployment(deployment: DeploymentSchema, options: RouteOptionsWithSigner, hasApiKey: false): Deployment;
+export function createDeployment(
+  deployment: DeploymentSchema,
+  clients: DeploymentRouteClients,
+  hasApiKey: true,
+): ApiDeployment;
+export function createDeployment(
+  deployment: DeploymentSchema,
+  clients: DeploymentRouteClientsWithSigner,
+  hasApiKey: false,
+): Deployment;
 
 export function createDeployment(
   deployment: DeploymentSchema,
-  options: RouteOptions | RouteOptionsWithSigner,
+  clients: DeploymentRouteClients | DeploymentRouteClientsWithSigner,
   hasApiKey: true | false,
 ): Deployment | ApiDeployment {
+  const client = clients.deploymentManager;
   let state: DeploymentState = {
     ...deployment,
     updated_at: new Date(deployment.updated_at),
@@ -57,7 +70,7 @@ export function createDeployment(
    * @description Starts the deployment.
    */
   const start = async (): Promise<void> => {
-    await deploymentStart(options.client, state);
+    await deploymentStart(client, state);
   };
 
   /**
@@ -69,7 +82,7 @@ export function createDeployment(
    * It is useful for pausing deployments without archiving them.
    */
   const stop = async (): Promise<void> => {
-    await deploymentStop(options.client, state);
+    await deploymentStop(client, state);
   };
 
   /**
@@ -81,7 +94,7 @@ export function createDeployment(
    * It is useful for cleaning up deployments that are no longer needed.
    */
   const archive = async () => {
-    await deploymentArchive(options.client, state);
+    await deploymentArchive(client, state);
   };
 
   /**
@@ -94,7 +107,7 @@ export function createDeployment(
    * It is useful for monitoring the deployment's progress and status.
    */
   const getTasks = async (params?: PaginationParams): Promise<TaskListResult> => {
-    return await deploymentGetTasks(options.client, state, params);
+    return await deploymentGetTasks(client, state, params);
   };
 
   /**
@@ -106,7 +119,7 @@ export function createDeployment(
    * It is useful for updating the deployment with new configurations or code.
    */
   const createRevision = async (jobDefinition: JobDefinition) => {
-    await deploymentCreateNewRevision(jobDefinition, options.client, state);
+    await deploymentCreateNewRevision(jobDefinition, client, state);
   };
 
   /**
@@ -118,7 +131,7 @@ export function createDeployment(
    * This will change the number of instances running for the deployment.
    */
   const updateReplicaCount = async (replicas: number) => {
-    await deploymentUpdateReplicaCount(replicas, options.client, state);
+    await deploymentUpdateReplicaCount(replicas, client, state);
   };
 
   /**
@@ -130,18 +143,28 @@ export function createDeployment(
    * This will change the maximum time the deployment can run before it is stopped.
    */
   const updateTimeout = async (timeout: number) => {
-    await deploymentUpdateTimeout(timeout, options.client, state);
+    await deploymentUpdateTimeout(timeout, client, state);
   };
 
   /**
-   * @param active_revision 
+   * @param name New name for the deployment
+   * @throws Error if there is an error updating the name
+   * @returns Promise<void>
+   * @description Updates the name of the deployment.
+   */
+  const updateName = async (name: string) => {
+    await deploymentUpdateName(name, client, state);
+  };
+
+  /**
+   * @param active_revision
    * @throws Error if there is an error updating the active revision
    * @returns Promise<void>
    * @description Updates the active revision for the deployment.
    * This will change which revision of the deployment is currently active and serving traffic.
    */
   const updateActiveRevision = async (active_revision: number) => {
-    await deploymentUpdateActiveRevision(active_revision, options.client, state);
+    await deploymentUpdateActiveRevision(active_revision, client, state);
   };
 
   /**
@@ -152,7 +175,7 @@ export function createDeployment(
    * This will change when the deployment runs based on the provided schedule.
    */
   const updateSchedule = async (schedule: string) => {
-    await deploymentUpdateSchedule(schedule, options.client, state);
+    await deploymentUpdateSchedule(schedule, client, state);
   };
 
   /**
@@ -162,11 +185,11 @@ export function createDeployment(
    * This is used for securing access to the deployment's resources.
    */
   const generateAuthHeader = async () => {
-    return await deploymentGenerateAuthHeader(options.client, state);
+    return await deploymentGenerateAuthHeader(client, state);
   };
 
   const getJob = async (job: string) => {
-    return await deploymentGetJob(options.client, state.id, job);
+    return await deploymentGetJob(client, state.id, job);
   };
 
   /**
@@ -179,7 +202,7 @@ export function createDeployment(
    * It is useful for monitoring the deployment's job status.
    */
   const getJobs = async (searchParams?: DeploymentJobsSearchParams): Promise<JobListResult> => {
-    return await deploymentGetJobs(options.client, state, searchParams);
+    return await deploymentGetJobs(client, state, searchParams);
   };
 
   /**
@@ -192,7 +215,7 @@ export function createDeployment(
    * It is useful for viewing the deployment history.
    */
   const getRevisions = async (searchParams?: DeploymentRevisionsSearchParams): Promise<RevisionListResult> => {
-    return await deploymentGetRevisions(options.client, state, searchParams);
+    return await deploymentGetRevisions(client, state, searchParams);
   };
 
   /**
@@ -205,30 +228,32 @@ export function createDeployment(
    * It is useful for monitoring deployment activity and debugging.
    */
   const getEvents = async (searchParams?: DeploymentEventsSearchParams): Promise<EventListResult> => {
-    return await deploymentGetEvents(options.client, state, searchParams);
+    return await deploymentGetEvents(client, state, searchParams);
   };
 
   /**
-    * @throws Error if the deployment is not stopped
-    * @throws Error if there is an error deleting the deployment
-    * @returns Promise<void>
-    * @description Deletes the deployment permanently.
-    * This will remove the deployment and all associated data (jobs, results, revisions, events).
-    * The deployment must be in STOPPED state before it can be deleted.
-    * The vault associated with the deployment is NOT deleted.
-    * After successful deletion, the deployment object becomes unusable.
-    */
+   * @throws Error if the deployment is not stopped
+   * @throws Error if there is an error deleting the deployment
+   * @returns Promise<void>
+   * @description Deletes the deployment permanently.
+   * This will remove the deployment and all associated data (jobs, results, revisions, events).
+   * The deployment must be in STOPPED state before it can be deleted.
+   * The vault associated with the deployment is NOT deleted.
+   * After successful deletion, the deployment object becomes unusable.
+   */
   const deleteDeployment = async () => {
-    return await deploymentDelete(options.client, state, () => {
+    return await deploymentDelete(client, state, () => {
       // @ts-expect-error Clear the state to prevent further interaction
       state = undefined;
     });
   };
 
   return Object.assign(state, {
-    ...(!hasApiKey && "solana" in options ? {
-      vault: createVault(state.vault, options, state.created_at)
-    } : {}),
+    ...(!hasApiKey && 'solana' in clients
+      ? {
+          vault: createVault(state.vault, clients, state.created_at),
+        }
+      : {}),
     start,
     stop,
     archive,
@@ -244,5 +269,6 @@ export function createDeployment(
     updateActiveRevision,
     updateTimeout,
     updateSchedule,
+    updateName,
   });
 }

@@ -1,6 +1,6 @@
 import createClient from 'openapi-fetch';
 
-import { createNosanaDashboardApiClient } from '../index.js';
+import { createBlockchainIndexerClient } from '../blockchain-indexer/index.js';
 import { defaultConfig } from '../../defaults/index.js';
 import { NosanaNetwork } from '../../types.js';
 
@@ -10,9 +10,9 @@ const testSignerAuth = {
   generate: async (message: string) => `${message}:test-signature`,
 };
 
-describe('createNosanaClient', () => {
-  test('when called with custom backend_url option, it should use the custom URL', () => {
-    createNosanaDashboardApiClient(NosanaNetwork.MAINNET, global.TEST_API_KEY, { backend_url: 'https://custom.api.com' });
+describe('createBlockchainIndexerClient', () => {
+  test('when called with custom blockchain_indexer_url option, it should use the custom URL', () => {
+    createBlockchainIndexerClient(NosanaNetwork.MAINNET, global.TEST_API_KEY, { blockchain_indexer_url: 'https://custom.api.com' });
 
     expect(createClient).toHaveBeenCalledWith({
       baseUrl: 'https://custom.api.com',
@@ -20,11 +20,11 @@ describe('createNosanaClient', () => {
   });
 
   test('when called with "include" credentials option, it should pass it to the client and auth middleware to be skipped', () => {
-    createNosanaDashboardApiClient(NosanaNetwork.MAINNET, undefined, { include_credentials: true });
+    createBlockchainIndexerClient(NosanaNetwork.MAINNET, undefined, { include_credentials: true });
 
     expect(createClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        baseUrl: defaultConfig[NosanaNetwork.MAINNET].backend_url,
+        baseUrl: defaultConfig[NosanaNetwork.MAINNET].blockchain_indexer_url,
         credentials: 'include',
       })
     );
@@ -33,23 +33,23 @@ describe('createNosanaClient', () => {
   });
 
   test('when called without options, it should use the default mainnet URL', () => {
-    createNosanaDashboardApiClient(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
+    createBlockchainIndexerClient(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
 
     expect(createClient).toHaveBeenCalledWith({
-      baseUrl: defaultConfig[NosanaNetwork.MAINNET].backend_url,
+      baseUrl: defaultConfig[NosanaNetwork.MAINNET].blockchain_indexer_url,
     });
   });
 
   test('when called with devnet environment, it should use the devnet URL', () => {
-    createNosanaDashboardApiClient(NosanaNetwork.DEVNET, global.TEST_API_KEY, undefined);
+    createBlockchainIndexerClient(NosanaNetwork.DEVNET, global.TEST_API_KEY, undefined);
 
     expect(createClient).toHaveBeenCalledWith({
-      baseUrl: defaultConfig[NosanaNetwork.DEVNET].backend_url,
+      baseUrl: defaultConfig[NosanaNetwork.DEVNET].blockchain_indexer_url,
     });
   });
 
   it('should register the auth middleware', () => {
-    createNosanaDashboardApiClient(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
+    createBlockchainIndexerClient(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
 
     expect(global.TEST_MOCK_CLIENT.use).toHaveBeenCalledWith(
       expect.objectContaining({ onRequest: expect.any(Function) })
@@ -57,7 +57,7 @@ describe('createNosanaClient', () => {
   });
 
   test('when using API key auth, it should set Bearer token header', async () => {
-    createNosanaDashboardApiClient(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
+    createBlockchainIndexerClient(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
 
     const middleware = global.TEST_MOCK_CLIENT.use.mock.calls[0][0];
     const mockRequest = { headers: new Headers() };
@@ -68,7 +68,7 @@ describe('createNosanaClient', () => {
   });
 
   test('when using SignerAuth, it should set x-user-id and Authorization headers', async () => {
-    createNosanaDashboardApiClient(NosanaNetwork.MAINNET, testSignerAuth, undefined);
+    createBlockchainIndexerClient(NosanaNetwork.MAINNET, testSignerAuth, undefined);
 
     const middleware = global.TEST_MOCK_CLIENT.use.mock.calls[0][0];
     const mockRequest = { headers: new Headers() };

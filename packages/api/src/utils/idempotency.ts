@@ -6,11 +6,8 @@
  * fresh-key is the caller's policy. Removing or renaming a member is a breaking
  * change, so consumers branching on these get a compile signal if they drift.
  *
- * These constants are kept in lockstep with the client-manager OpenAPI spec by a
- * compile-time assertion in `../client/clientManagerSchema.lockstep.ts` (which
- * is intentionally *not* part of the public import graph, so the large generated
- * schema stays out of consumers' type graph). Regenerate the schema with
- * `pnpm generate:types:client-manager:dev`.
+ * These constants mirror the `IdempotencyCode` enum in the client-manager
+ * OpenAPI spec; keep them in sync when the spec changes.
  *
  * - `IN_PROGRESS` — a matching request is still in flight; retry the same key
  *   later (honouring `retryAfter`).

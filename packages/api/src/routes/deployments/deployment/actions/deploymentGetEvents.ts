@@ -1,7 +1,7 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 import { withPagination } from '../../../../utils/withPagination.js';
 
-import type { QueryClient } from '../../../../client/index.js';
+import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type { DeploymentState, DeploymentEventsSearchParams, EventListResult } from '../../types.js';
 
 /**
@@ -13,12 +13,12 @@ import type { DeploymentState, DeploymentEventsSearchParams, EventListResult } f
  * It is useful for monitoring deployment activity and debugging.
  */
 export async function deploymentGetEvents(
-  client: QueryClient,
+  client: DeploymentManagerClient,
   state: DeploymentState,
   searchParams?: DeploymentEventsSearchParams,
 ): Promise<EventListResult> {
   const { data, error } = await client.GET(
-    '/api/deployments/{deployment}/events',
+    '/deployments/{deployment}/events',
     {
       params: {
         path: { deployment: state.id },

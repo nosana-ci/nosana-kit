@@ -33,7 +33,7 @@ describe('deploymentDelete', () => {
       await deploymentDelete(mockClient, mockState, clearStateMock);
 
       expect(mockClient.DELETE).toHaveBeenCalledWith(
-        '/api/deployments/{deployment}',
+        '/deployments/{deployment}',
         {
           params: { path: { deployment: deploymentId } },
         }

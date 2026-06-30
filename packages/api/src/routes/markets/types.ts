@@ -1,11 +1,22 @@
-import { operations } from "../../client/schema.js";
+import type { operations } from '../../client/host-manager/schema.js';
 
-export type Market = operations['getApiMarkets']['responses'][200]['content']['application/json'][number];
-export type MarketRequiredResources = operations['getApiMarketsByIdRequired-resources']['responses'][200]['content']['application/json'];
+// Market types — host-manager Elysia swagger doesn't provide response schemas,
+// so these are defined manually to match the actual API responses.
+export type Market = Record<string, unknown>;
+export type MarketRequiredResources = Record<string, unknown>;
+
+// getMarketsPrice is one of the few host-manager endpoints with a typed response
+export type MarketPriceResponse =
+  operations['getMarketsPrice']['responses']['200']['content']['application/json'];
 
 export interface NosanaMarketsApi {
   list: () => Promise<Market[]>;
   get: (market: string) => Promise<Market>;
   getRequiredResources: (market: string) => Promise<MarketRequiredResources>;
+  getPrices: () => Promise<Record<string, unknown>>;
+  getPrice: () => Promise<MarketPriceResponse>;
+  getDockerImages: () => Promise<Record<string, unknown>[]>;
+  getDockerImage: (id: string) => Promise<Record<string, unknown>>;
+  getRemoteResources: () => Promise<Record<string, unknown>[]>;
+  getRemoteResource: (id: string) => Promise<Record<string, unknown>>;
 }
-

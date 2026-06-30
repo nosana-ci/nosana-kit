@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 import { vaultGetBalance } from '../vaultGetBalance.js';
 
 describe('vaultGetBalance', () => {
-  const mockOptions = global.TEST_ROUTE_OPTIONS_WITH_SIGNER;
+  const mockOptions = global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER;
   const vaultAddress = global.TEST_MOCK_DEPLOYMENT.vault;
 
   beforeEach(() => {

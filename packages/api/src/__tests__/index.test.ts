@@ -1,12 +1,14 @@
 import { vi } from 'vitest';
 
 import { createNosanaApi, NosanaNetwork } from '../index.js';
-import { createNosanaDashboardApiClient } from '../client/index.js';
+import { createBlockchainIndexerClient } from '../client/index.js';
 import { createDeploymentsApi } from '../routes/deployments/index.js';
 
 vi.mock('../client/index.js', () => ({
-  createNosanaDashboardApiClient: vi.fn(() => global.TEST_MOCK_CLIENT),
   createNosanaClientManagerApiClient: vi.fn(() => global.TEST_MOCK_CLIENT),
+  createBlockchainIndexerClient: vi.fn(() => global.TEST_MOCK_CLIENT),
+  createHostManagerClient: vi.fn(() => global.TEST_MOCK_CLIENT),
+  createDeploymentManagerClient: vi.fn(() => global.TEST_MOCK_CLIENT),
 }));
 
 vi.mock('../routes/deployments/index.js', () => ({
@@ -25,40 +27,40 @@ const testSignerAuth = {
 };
 
 describe('createNosanaApi', () => {
-  test('when called with SignerAuth, it should pass it to the client', () => {
+  test('when called with SignerAuth, it should create the blockchain indexer client', () => {
     createNosanaApi(NosanaNetwork.MAINNET, testSignerAuth, undefined);
 
-    expect(createNosanaDashboardApiClient).toHaveBeenCalledWith(
+    expect(createBlockchainIndexerClient).toHaveBeenCalledWith(
       NosanaNetwork.MAINNET,
       testSignerAuth,
       undefined
     );
   });
 
-  test('when called with ApiKey, it should pass it to the client', () => {
+  test('when called with ApiKey, it should create the blockchain indexer client', () => {
     createNosanaApi(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
 
-    expect(createNosanaDashboardApiClient).toHaveBeenCalledWith(
+    expect(createBlockchainIndexerClient).toHaveBeenCalledWith(
       NosanaNetwork.MAINNET,
       global.TEST_API_KEY,
       undefined
     );
   });
 
-  test('when called without auth, it should pass undefined to the client', () => {
+  test('when called without auth, it should create the blockchain indexer client with undefined', () => {
     createNosanaApi(NosanaNetwork.MAINNET, undefined, undefined);
 
-    expect(createNosanaDashboardApiClient).toHaveBeenCalledWith(
+    expect(createBlockchainIndexerClient).toHaveBeenCalledWith(
       NosanaNetwork.MAINNET,
       undefined,
       undefined
     );
   });
 
-  test('when called with options, it should pass them to the client', () => {
+  test('when called with options, it should pass them to the clients', () => {
     createNosanaApi(NosanaNetwork.MAINNET, testSignerAuth, global.TEST_NOSANA_API_OPTIONS);
 
-    expect(createNosanaDashboardApiClient).toHaveBeenCalledWith(
+    expect(createBlockchainIndexerClient).toHaveBeenCalledWith(
       NosanaNetwork.MAINNET,
       testSignerAuth,
       global.TEST_NOSANA_API_OPTIONS
@@ -69,7 +71,7 @@ describe('createNosanaApi', () => {
     createNosanaApi(NosanaNetwork.MAINNET, testSignerAuth, undefined);
 
     expect(createDeploymentsApi).toHaveBeenCalledWith(
-      { client: global.TEST_MOCK_CLIENT, solana: testSignerAuth.solana },
+      { deploymentManager: global.TEST_MOCK_CLIENT, solana: testSignerAuth.solana },
       false
     );
   });
@@ -77,6 +79,6 @@ describe('createNosanaApi', () => {
   test('it should create deployments API with hasApiKey=true for ApiKey', () => {
     createNosanaApi(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
 
-    expect(createDeploymentsApi).toHaveBeenCalledWith({ client: global.TEST_MOCK_CLIENT }, true);
+    expect(createDeploymentsApi).toHaveBeenCalledWith({ deploymentManager: global.TEST_MOCK_CLIENT }, true);
   });
 });
