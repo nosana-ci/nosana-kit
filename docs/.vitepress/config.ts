@@ -108,6 +108,7 @@ export default withMermaid(
               { text: 'Jobs', link: '/api/jobs' },
               { text: 'Markets', link: '/api/markets' },
               { text: 'Credits', link: '/api/credits' },
+              { text: 'SDK Route Groups', link: '/api/sdk-route-groups' },
             ],
           },
         ],

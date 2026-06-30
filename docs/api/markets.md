@@ -134,6 +134,31 @@ curl -X GET https://dashboard.k8s.prd.nos.ci/api/markets/{id}/required-resources
 
 :::
 
+## Pricing, Docker Images & Remote Resources
+
+```ts
+// Pricing
+const prices = await client.api.markets.getPrices(); // all market prices
+const nosPrice = await client.api.markets.getPrice(); // current NOS price (USD)
+
+// Docker images
+const images = await client.api.markets.getDockerImages();
+const image = await client.api.markets.getDockerImage(id);
+
+// Remote resources
+const resources = await client.api.markets.getRemoteResources();
+const resource = await client.api.markets.getRemoteResource(id);
+```
+
+| Method | HTTP | Path | Description |
+|---|---|---|---|
+| `markets.getPrices()` | GET | `/api/markets/prices` | All market prices |
+| `markets.getPrice()` | GET | `/api/markets/price` | Current NOS token price (USD) |
+| `markets.getDockerImages()` | GET | `/api/markets/docker-images` | List Docker images |
+| `markets.getDockerImage(id)` | GET | `/api/markets/docker-images/{id}` | Get a Docker image |
+| `markets.getRemoteResources()` | GET | `/api/markets/remote-resources` | List remote resources |
+| `markets.getRemoteResource(id)` | GET | `/api/markets/remote-resources/{id}` | Get a remote resource |
+
 ## Market Types
 
 Markets can be categorized into different types:

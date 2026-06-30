@@ -65,8 +65,9 @@ The Nosana API is organized into several modules:
 - **[Deployments](/api/create-deployments)** - Create and manage deployments
 - **[Jobs](/api/jobs)** - Manage individual jobs, extend execution time, stop jobs
 - **[Markets](/api/markets)** - Discover GPU markets and check resource requirements
-- **[Credits](/api/credits)** - Check your account credit balance
+- **[Credits](/api/credits)** - Check balance, claim/request credits, spending history
 - **[Vault Management](/api/vault-management)** - Manage vaults for wallet-based deployments
+- **[SDK Route Groups](/api/sdk-route-groups)** - Full reference of every SDK route group (auth, user, jobs, credits, markets, deployments, templates, hosts, stats, payments, benchmarks, newsletter) and the raw `api.clients`
 
 ## TypeScript SDK
 
@@ -101,3 +102,14 @@ const client = createNosanaClient({
   },
 });
 ```
+
+### Route groups & raw clients
+
+The SDK exposes the API as typed route groups under `client.api` — `auth`,
+`user`, `jobs`, `credits`, `markets`, `deployments`, `templates`, `hosts`,
+`stats`, `payments`, `benchmarks`, and `newsletter`. See the
+[SDK Route Groups reference](/api/sdk-route-groups) for every method.
+
+For any endpoint without a curated method, use the raw, fully-typed per-service
+clients at `client.api.clients.{clientManager,hostManager,blockchainIndexer,deploymentManager}`
+— authentication is applied automatically.
