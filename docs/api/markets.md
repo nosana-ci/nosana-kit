@@ -28,10 +28,12 @@ Get a list of all available markets:
 
 == @nosana/kit
 
-```ts
-import { createNosanaClient } from '@nosana/kit';
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
-const client = createNosanaClient({
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: process.env.NOSANA_API_KEY,
   },
@@ -78,7 +80,13 @@ Get detailed information about a specific market:
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // Get market by address
 const market = await client.api.markets.get('CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ');
 
@@ -105,7 +113,13 @@ Check the resource requirements for a specific market:
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // Get required resources for a market
 const resources = await client.api.markets.getRequiredResources(
   'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ'
@@ -136,7 +150,14 @@ curl -X GET https://dashboard.k8s.prd.nos.ci/api/markets/{id}/required-resources
 
 ## Pricing, Docker Images & Remote Resources
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+declare const id: string;
+// ---cut---
 // Pricing
 const prices = await client.api.markets.getPrices(); // all market prices
 const nosPrice = await client.api.markets.getPrice(); // current NOS price (USD)
@@ -177,23 +198,29 @@ When creating a deployment, you need to specify a market. Consider:
 
 ## Example: Finding the Right Market
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // List all markets
 const markets = await client.api.markets.list();
 
 // Filter for markets with sufficient VRAM
-const suitableMarkets = markets.filter(market => 
-  market.vram >= 24 // Need at least 24GB VRAM
+const suitableMarkets = markets.filter(
+  (market) => Number(market.vram) >= 24, // Need at least 24GB VRAM
 );
 
 // Get detailed requirements for each
 for (const market of suitableMarkets) {
-  const resources = await client.api.markets.getRequiredResources(market.address);
+  const resources = await client.api.markets.getRequiredResources(String(market.address));
   console.log(`${market.name}: ${resources.required_vram}GB VRAM required`);
 }
 
 // Select the most cost-effective option
 const selectedMarket = suitableMarkets.sort(
-  (a, b) => a.price_per_hour_usd - b.price_per_hour_usd
+  (a, b) => Number(a.price_per_hour_usd) - Number(b.price_per_hour_usd),
 )[0];
 ```

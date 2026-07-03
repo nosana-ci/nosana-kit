@@ -38,7 +38,13 @@ Node and the browser) so you don't have to reach for `crypto` yourself.
 
 Pass an `idempotencyKey` in the options object (the last argument):
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 import { generateIdempotencyKey } from '@nosana/kit';
 
 const key = generateIdempotencyKey();
@@ -89,7 +95,16 @@ error **without** a `code` is an ordinary rejection. Use `isIdempotencyControlSi
 to make that split, then branch on the exported `IdempotencyCode` constants —
 *what* each code means for your retry policy is up to you.
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, generateIdempotencyKey } from '@nosana/kit';
+import type { NosanaApiListJobRequest } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+declare const request: NosanaApiListJobRequest;
+const key = generateIdempotencyKey();
+// ---cut---
 import { IdempotencyCode, isIdempotencyControlSignal } from '@nosana/kit';
 
 try {
@@ -120,10 +135,12 @@ Retrieve information about a specific job:
 
 == @nosana/kit
 
-```ts
-import { createNosanaClient } from '@nosana/kit';
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
-const client = createNosanaClient({
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: process.env.NOSANA_API_KEY,
   },
@@ -133,7 +150,8 @@ const client = createNosanaClient({
 const job = await client.api.jobs.get('job-address-here');
 
 console.log('Job State:', job.state);
-console.log('Job Definition:', job.job_definition);
+console.log('Node:', job.node);
+console.log('Job Definition IPFS hash:', job.ipfsJob);
 ```
 
 == HTTP API
@@ -153,13 +171,19 @@ Post a job to the Nosana Network using credits. The job definition must be uploa
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, generateIdempotencyKey } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // Post a job using credits
 const job = await client.api.jobs.list(
   {
     ipfsHash: 'QmYourJobDefinitionIPFSHash',
     market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ',
-    timeout: 60, // Optional: timeout in minutes
+    timeout: 600, // Optional: max runtime in seconds (default: 3600)
     node: 'node-address', // Optional: specific node to run on
   },
   // Optional: see the "Idempotency" section above.
@@ -180,7 +204,7 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
   -d '{
     "ipfsHash": "QmYourJobDefinitionIPFSHash",
     "market": "CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ",
-    "timeout": 60
+    "timeout": 600
   }'
 ```
 
@@ -203,19 +227,23 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
 
 ### Job Definition on IPFS
 
-Before posting a job, you need to upload your job definition to IPFS. You can use the Nosana IPFS service:
+Before posting a job, you need to upload your job definition to IPFS. You can use the Nosana IPFS service. It's a good idea to [validate the job definition](/deployments/jobs/job-definition/validation) first — it catches schema mistakes before you upload or spend credits:
 
-```ts
-import { createNosanaClient } from '@nosana/kit';
+```ts twoslash
+import type { JobDefinition } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+declare const jobDefinitionJson: JobDefinition;
+// ---cut---
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
-const client = createNosanaClient({
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: process.env.NOSANA_API_KEY,
   },
 });
 
-// Upload job definition to IPFS
-const ipfsHash = await client.ipfs.add(jobDefinitionJson);
+// Upload (pin) the job definition to IPFS
+const ipfsHash = await client.ipfs.pin(jobDefinitionJson);
 
 // Then post the job using the IPFS hash
 const result = await client.api.jobs.list({
@@ -237,7 +265,13 @@ Extend the execution time of a running job:
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, generateIdempotencyKey } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // Extend job execution time
 const result = await client.api.jobs.extend(
   {
@@ -278,7 +312,13 @@ Stop a running job:
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, generateIdempotencyKey } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // Stop a running job
 const result = await client.api.jobs.stop('job-address-here');
 
@@ -333,7 +373,13 @@ retry with the **same** batch key; items that already landed stay landed. See
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 import { generateIdempotencyKey } from '@nosana/kit';
 
 const result = await client.api.jobs.listBatch(
@@ -374,7 +420,13 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list/batch \
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, generateIdempotencyKey } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 const result = await client.api.jobs.extendBatch(
   {
     jobs: [
@@ -409,7 +461,13 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/extend/batch \
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, generateIdempotencyKey } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 const result = await client.api.jobs.stopBatch(
   { jobs: [{ jobAddress: 'job-address-1' }, { jobAddress: 'job-address-2' }] },
   { idempotencyKey: generateIdempotencyKey() }, // required

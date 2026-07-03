@@ -56,6 +56,7 @@ export default withMermaid(
                 items: [
                   { text: 'Intro', link: '/deployments/jobs/job-definition/intro' },
                   { text: 'Schema', link: '/deployments/jobs/job-definition/schema' },
+                  { text: 'Validation', link: '/deployments/jobs/job-definition/validation' },
                   { text: 'Health Checks', link: '/deployments/jobs/job-definition/health-checks' },
                   {
                     text: 'Literals (Pipeline)',
@@ -96,28 +97,32 @@ export default withMermaid(
             text: 'Guides',
             items: [
               { text: 'Get API Key', link: '/api/get-api-key' },
+              { text: 'Your First Job', link: '/api/first-job' },
               { text: 'Wallet Authentication', link: '/api/wallet-authentication' },
             ],
           },
           {
-            text: 'Reference',
+            text: 'Deployments',
             items: [
               { text: 'Create Deployments', link: '/api/create-deployments' },
               { text: 'Manage Deployments', link: '/api/manage-deployments' },
               { text: 'Vault Management', link: '/api/vault-management' },
+            ],
+          },
+          {
+            text: 'API Reference',
+            items: [
+              { text: 'Overview', link: '/api/reference' },
+              { text: 'Authentication & API Keys', link: '/api/auth' },
               { text: 'Jobs', link: '/api/jobs' },
               { text: 'Markets', link: '/api/markets' },
               { text: 'Credits', link: '/api/credits' },
-              { text: 'SDK Route Groups', link: '/api/sdk-route-groups' },
-            ],
-          },
-        ],
-        '/guides/': [
-          {
-            text: 'Guides',
-            items: [
-              { text: 'My First Deployment', link: '/guides/my-first-deployment' },
-              { text: 'Deploy DeepSeek Model', link: '/guides/deploy-deepseek-model' },
+              { text: 'Templates', link: '/api/templates' },
+              { text: 'Hosts', link: '/api/hosts' },
+              { text: 'Stats', link: '/api/stats' },
+              { text: 'Payments', link: '/api/payments' },
+              { text: 'Benchmarks', link: '/api/benchmarks' },
+              { text: 'Raw Clients', link: '/api/raw-clients' },
             ],
           },
         ],
@@ -128,6 +133,7 @@ export default withMermaid(
               { text: 'Introduction', link: '/about/introduction' },
               { text: 'Getting Started', link: '/about/getting-started' },
               { text: 'Key Concepts', link: '/about/key-concepts' },
+              { text: 'Solana Wallets', link: '/about/wallet' },
               { text: 'Glossary', link: '/about/glossary' },
             ],
           },
@@ -236,12 +242,6 @@ export default withMermaid(
               { text: 'Nodes', link: '/programs/nodes' },
               { text: 'Token', link: '/programs/token' },
             ],
-          },
-        ],
-        '/wallet/': [
-          {
-            text: 'Wallet',
-            items: [{ text: 'Wallet', link: '/wallet' }],
           },
         ],
       },

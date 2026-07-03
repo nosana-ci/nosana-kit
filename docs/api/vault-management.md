@@ -14,28 +14,50 @@ Vaults are Solana accounts that hold SOL and NOS tokens used to pay for deployme
 
 To use vault management, you need to authenticate with a wallet. See the [Wallet Authentication](/api/wallet-authentication) guide for setup instructions.
 
+With a wallet (and no API key) configured, `client.api` is the signer variant of the API (`NosanaApi`), whose deployments include a `vault`:
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, loadWalletFromFile } from '@nosana/kit';
+import type { NosanaApi } from '@nosana/kit';
+
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = await loadWalletFromFile();
+
+const api = client.api as NosanaApi; // signer variant: deployments include a vault
+```
+
 ## Deployment Vaults
 
 When you create a deployment with wallet authentication, it automatically includes a vault:
 
-```ts
-import { createNosanaClient } from '@nosana/kit';
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, loadWalletFromFile } from '@nosana/kit';
+import type { NosanaApi } from '@nosana/kit';
 
-const client = createNosanaClient({
-  wallet: {
-    // Your wallet configuration
-  },
-});
-
-// Create a deployment with wallet authentication
-const deployment = await client.deployments.create({
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = await loadWalletFromFile();
+const api = client.api as NosanaApi;
+// ---cut---
+const deployment = await api.deployments.create({
   name: 'My Deployment',
   market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ',
   replicas: 1,
   timeout: 60,
   strategy: 'SIMPLE',
   job_definition: {
-    // ... your job definition
+    version: '0.1',
+    type: 'container',
+    meta: { trigger: 'api' },
+    ops: [
+      {
+        type: 'container/run',
+        id: 'hello-world',
+        args: {
+          cmd: 'echo hello world',
+          image: 'ubuntu',
+        },
+      },
+    ],
   },
 });
 
@@ -49,16 +71,18 @@ console.log('Vault address:', deployment.vault.address);
 
 Check the current balance of SOL and NOS in your vault:
 
-:::tabs
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, loadWalletFromFile } from '@nosana/kit';
+import type { NosanaApi } from '@nosana/kit';
 
-== @nosana/kit
-
-```ts
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = await loadWalletFromFile();
+const api = client.api as NosanaApi;
+const deployment = await api.deployments.get('your-deployment-id');
+// ---cut---
 const balance = await deployment.vault.getBalance();
 console.log(`SOL: ${balance.SOL}, NOS: ${balance.NOS}`);
 ```
-
-:::
 
 The balance is returned as an object with `SOL` and `NOS` properties, representing the amounts in each token.
 
@@ -68,11 +92,15 @@ The balance is returned as an object with `SOL` and `NOS` properties, representi
 
 Add funds to your vault to pay for deployment execution. You can top up with SOL, NOS, or both:
 
-:::tabs
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, loadWalletFromFile } from '@nosana/kit';
+import type { NosanaApi } from '@nosana/kit';
 
-== @nosana/kit
-
-```ts
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = await loadWalletFromFile();
+const api = client.api as NosanaApi;
+const deployment = await api.deployments.get('your-deployment-id');
+// ---cut---
 // Top up with NOS tokens
 await deployment.vault.topup({
   NOS: 100, // Amount in NOS
@@ -90,8 +118,6 @@ await deployment.vault.topup({
 });
 ```
 
-:::
-
 The `topup` method transfers tokens from your wallet to the vault address. Make sure your wallet has sufficient balance before attempting to top up.
 
 **Note:** Topping up a vault is handled client-side using Solana token transfers, not through a direct API endpoint.
@@ -104,7 +130,15 @@ Withdraw all funds from a vault back to your wallet:
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, loadWalletFromFile } from '@nosana/kit';
+import type { NosanaApi } from '@nosana/kit';
+
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = await loadWalletFromFile();
+const api = client.api as NosanaApi;
+const deployment = await api.deployments.get('your-deployment-id');
+// ---cut---
 await deployment.vault.withdraw();
 ```
 
@@ -144,9 +178,16 @@ You can create and manage vaults independently of deployments:
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, loadWalletFromFile } from '@nosana/kit';
+import type { NosanaApi } from '@nosana/kit';
+
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = await loadWalletFromFile();
+const api = client.api as NosanaApi;
+// ---cut---
 // Create a new vault
-const vault = await client.deployments.vaults.create();
+const vault = await api.deployments.vaults.create();
 
 console.log('Vault address:', vault.address);
 console.log('Created at:', vault.created_at);
@@ -176,11 +217,18 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/deployments/vaults/create \
 
 == @nosana/kit
 
-```ts
-// List all your vaults
-const vaults = await client.deployments.vaults.list();
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, loadWalletFromFile } from '@nosana/kit';
+import type { NosanaApi } from '@nosana/kit';
 
-vaults.forEach(vault => {
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = await loadWalletFromFile();
+const api = client.api as NosanaApi;
+// ---cut---
+// List all your vaults
+const vaults = await api.deployments.vaults.list();
+
+vaults.forEach((vault) => {
   console.log(`Vault: ${vault.address}, Created: ${vault.created_at}`);
 });
 ```
@@ -213,8 +261,15 @@ curl -X GET https://dashboard.k8s.prd.nos.ci/api/deployments/vaults \
 
 Once you have a vault object, you can use all the same methods:
 
-```ts
-const vault = await client.deployments.vaults.create();
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, loadWalletFromFile } from '@nosana/kit';
+import type { NosanaApi } from '@nosana/kit';
+
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = await loadWalletFromFile();
+const api = client.api as NosanaApi;
+// ---cut---
+const vault = await api.deployments.vaults.create();
 
 // Check balance
 const balance = await vault.getBalance();
@@ -246,4 +301,3 @@ When using wallet authentication, you have access to these vault management endp
 2. **Top Up Before Running**: Add funds to your vault before starting deployments to avoid interruptions
 3. **Withdraw Unused Funds**: Periodically withdraw unused funds from vaults back to your wallet
 4. **Use Separate Vaults**: Consider creating separate vaults for different projects or environments
-  

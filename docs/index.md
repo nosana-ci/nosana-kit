@@ -84,7 +84,7 @@ Explore our documentation organized by what you want to accomplish:
 - **[Key Concepts](/about/key-concepts)** - Core concepts explained
 - **[Glossary](/about/glossary)** - Terminology reference
 - **[GPU Markets](/deployments/gpu-markets)** - Available compute resources
-- **[Solana Wallet](/wallet)** - Wallet setup and configuration
+- **[Solana Wallet](/about/wallet)** - Wallet setup and configuration
 - **[Discord Community](https://discord.gg/nosana-ai)** - Get help and join the community
 
 </div>

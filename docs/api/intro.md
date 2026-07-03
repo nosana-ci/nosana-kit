@@ -6,6 +6,8 @@ title: Nosana API
 
 Nosana exposes both a REST HTTP API and a typed TypeScript SDK so you can create and manage deployments from whatever environment fits your workflow.
 
+New here? Follow the [Your First Job guide](/api/first-job) for an end-to-end walkthrough: pick a market, validate a job definition, post it with credits, and fetch the results.
+
 ## HTTP API
 
 Use the Nosana HTTP API to create and manage deployments from any language or environment that can make HTTPS requests.
@@ -60,14 +62,20 @@ Use this reference to:
 
 ## API Modules
 
-The Nosana API is organized into several modules:
+The Nosana API is organized into several modules — see the
+[API Reference overview](/api/reference) for the full list:
 
-- **[Deployments](/api/create-deployments)** - Create and manage deployments
+- **[Deployments](/api/create-deployments)** - Create and manage deployments, including [vaults](/api/vault-management)
 - **[Jobs](/api/jobs)** - Manage individual jobs, extend execution time, stop jobs
 - **[Markets](/api/markets)** - Discover GPU markets and check resource requirements
 - **[Credits](/api/credits)** - Check balance, claim/request credits, spending history
-- **[Vault Management](/api/vault-management)** - Manage vaults for wallet-based deployments
-- **[SDK Route Groups](/api/sdk-route-groups)** - Full reference of every SDK route group (auth, user, jobs, credits, markets, deployments, templates, hosts, stats, payments, benchmarks, newsletter) and the raw `api.clients`
+- **[Authentication & API Keys](/api/auth)** - Validate credentials, manage API keys
+- **[Templates](/api/templates)** - Ready-made deployment templates
+- **[Hosts](/api/hosts)** - Nodes & GPU hosts: discovery, metrics, rewards
+- **[Stats](/api/stats)** - Network statistics, NOS price, earning/spending history
+- **[Payments](/api/payments)** - Payment methods and credit purchases
+- **[Benchmarks](/api/benchmarks)** - Benchmark data and thresholds
+- **[Raw Clients](/api/raw-clients)** - Typed clients for every other endpoint
 
 ## TypeScript SDK
 
@@ -93,12 +101,14 @@ For more installation options and details, see the [Kit Installation Guide](/kit
 
 ### Initializing the Client
 
-```ts
-import { createNosanaClient } from '@nosana/kit';
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
-const client = createNosanaClient({
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
-    apiKey: process.env.NOSANA_API_KEY as string,
+    apiKey: process.env.NOSANA_API_KEY,
   },
 });
 ```
@@ -107,9 +117,9 @@ const client = createNosanaClient({
 
 The SDK exposes the API as typed route groups under `client.api` — `auth`,
 `user`, `jobs`, `credits`, `markets`, `deployments`, `templates`, `hosts`,
-`stats`, `payments`, `benchmarks`, and `newsletter`. See the
-[SDK Route Groups reference](/api/sdk-route-groups) for every method.
+`stats`, `payments`, and `benchmarks`. See the
+[API Reference overview](/api/reference) for every group and its methods.
 
 For any endpoint without a curated method, use the raw, fully-typed per-service
 clients at `client.api.clients.{clientManager,hostManager,blockchainIndexer,deploymentManager}`
-— authentication is applied automatically.
+— authentication is applied automatically. See [Raw Clients](/api/raw-clients).

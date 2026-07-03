@@ -12,7 +12,7 @@ Before creating deployments, ensure you have:
 
 - **API Key**: A valid Nosana API key. See the [API key guide](/api/get-api-key).
 - **Credit Balance**: Sufficient credit balance on your Nosana account to run deployments.
-- **Job Definition**: A valid [job definition](/deployments/jobs/job-definition/intro) describing the container workload.
+- **Job Definition**: A valid [job definition](/deployments/jobs/job-definition/intro) describing the container workload. You can [validate it locally](/deployments/jobs/job-definition/validation) with the SDK before creating the deployment.
 
 ## What you configure
 
@@ -31,10 +31,12 @@ For all available fields, see **[Deployment Options](/deployments/options)**. Yo
 
 == TypeScript SDK
 
-```ts
-import { createNosanaClient } from '@nosana/kit';
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
-const client = createNosanaClient('mainnet', {
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: process.env.NOSANA_API_KEY,
   },
@@ -114,9 +116,15 @@ New deployments are created in a **draft** state and must be explicitly started:
 
 == TypeScript SDK
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 async function startDeployment(id: string) {
-  const deployment = await client.deployments.get(id);
+  const deployment = await client.api.deployments.get(id);
   await deployment.start();
 }
 ```

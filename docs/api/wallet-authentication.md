@@ -23,7 +23,7 @@ Wallet authentication is required for:
 
 The easiest way to use wallet authentication is with the `@nosana/kit` SDK, which automatically handles wallet signing and authentication.
 
-For detailed information on configuring wallets, see the [Wallet Configuration](/kit/wallet) guide.
+For all the ways to create and configure a wallet (keypair files, base58 keys, browser wallets), see the [Wallet Configuration](/kit/wallet) guide.
 
 ### Installation
 
@@ -33,16 +33,15 @@ npm install @nosana/kit
 
 ### Initialization
 
-```ts
-import { createNosanaClient } from '@nosana/kit';
+Create the client **without** an API key and assign a wallet:
 
-// Initialize with wallet instead of API key
-const client = createNosanaClient({
-  wallet: {
-    // Your wallet configuration
-    // This can be a Keypair, Wallet, or other wallet adapter
-  },
-});
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, loadWalletFromFile } from '@nosana/kit';
+
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+
+// Load a Solana CLI keypair (defaults to ~/.config/solana/id.json)
+client.wallet = await loadWalletFromFile();
 ```
 
 When you use `@nosana/kit` with a wallet, it automatically:
@@ -52,16 +51,38 @@ When you use `@nosana/kit` with a wallet, it automatically:
 
 ### Creating Deployments with Vault
 
-```ts
-// Create a deployment with wallet authentication
-const deployment = await client.deployments.create({
+With a wallet (and no API key) configured, `client.api` is the signer variant
+of the API (`NosanaApi`), whose deployments include a `vault`:
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork, loadWalletFromFile } from '@nosana/kit';
+import type { NosanaApi } from '@nosana/kit';
+
+const client = createNosanaClient(NosanaNetwork.MAINNET);
+client.wallet = await loadWalletFromFile();
+// ---cut---
+const api = client.api as NosanaApi; // signer variant: deployments include a vault
+
+const deployment = await api.deployments.create({
   name: 'My Deployment',
   market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ',
   replicas: 1,
   timeout: 60,
   strategy: 'SIMPLE',
   job_definition: {
-    // ... your job definition
+    version: '0.1',
+    type: 'container',
+    meta: { trigger: 'api' },
+    ops: [
+      {
+        type: 'container/run',
+        id: 'hello-world',
+        args: {
+          cmd: 'echo hello world',
+          image: 'ubuntu',
+        },
+      },
+    ],
   },
 });
 
@@ -73,36 +94,43 @@ For detailed information on managing vaults, see the [Vault Management](/api/vau
 
 ## Using @nosana/api Directly
 
-If you're using `@nosana/api` directly (without `@nosana/kit`), you need to provide `SignerAuth` manually:
+If you're using `@nosana/api` directly (without `@nosana/kit`), you need to provide `SignerAuth` yourself — an identifier (your wallet's public key), a message-signing function, and the Solana functions used for vault operations:
 
-```ts
-import { createNosanaApi, NosanaNetwork } from '@nosana/api';
-import type { SignerAuth } from '@nosana/api';
+```ts twoslash
+import { createNosanaApi, NosanaNetwork } from '@nosana/kit';
+import type { SignerAuth } from '@nosana/kit';
 
+declare const wallet: {
+  address: string;
+  signMessage(message: Uint8Array): Promise<Uint8Array>;
+};
+// ---cut---
 const signerAuth: SignerAuth = {
-  identifier: wallet.publicKey.toBase58(), // Your wallet's public key
+  identifier: wallet.address, // your wallet's public key
   generate: async (message: string) => {
-    // Sign the message with your wallet
+    // Sign the message with your wallet and return it base64-encoded
     const signature = await wallet.signMessage(new TextEncoder().encode(message));
-    return signature.toString('base64');
+    return btoa(String.fromCharCode(...signature));
   },
   solana: {
-    getBalance: async (address: string) => {
-      // Implement balance fetching
+    getBalance: async (address) => {
+      // Fetch the SOL and NOS balances for the address
       return { SOL: 0, NOS: 0 };
     },
-    transferTokensToRecipient: async (recipient: string, tokens: { SOL?: number; NOS?: number }) => {
-      // Implement token transfer
+    transferTokensToRecipient: async (recipient, tokens) => {
+      // Transfer the tokens from your wallet to the recipient
     },
-    deserializeSignSendAndConfirmTransaction: async (transaction: string) => {
-      // Implement transaction signing and sending
-      return 'signature';
+    deserializeSignSendAndConfirmTransaction: async (transaction) => {
+      // Sign, send, and confirm the serialized transaction
+      return 'tx-signature';
     },
   },
 };
 
 const api = createNosanaApi(NosanaNetwork.MAINNET, signerAuth);
 ```
+
+`createNosanaApi` and the `SignerAuth` type are also exported from the standalone `@nosana/api` package. `@nosana/kit` implements these functions for you from the configured wallet — that's the recommended path.
 
 ## HTTP API with Wallet Authentication
 
@@ -141,5 +169,3 @@ For vault management endpoints and operations, see the [Vault Management](/api/v
 | Funding | Uses account credits | Uses vault (SOL/NOS) |
 | Vault Management | ❌ Not available | ✅ Full vault operations |
 | Setup Complexity | Simple | Requires wallet setup |
-
-

@@ -209,3 +209,7 @@ Here is a simple example Job Definition of an Pytorch Jupyter Notebook:
 }
 ```
 
+
+## Validating a Job Definition
+
+The SDK exports a strict validator (`validateJobDefinition`) plus JSON Schemas (`jobSchemas`) so you can check a job definition against this schema before posting it. See [Validation](./validation.md).
