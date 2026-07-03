@@ -99,12 +99,14 @@ For more installation options and details, see the [Kit Installation Guide](/kit
 
 ### Initializing the Client
 
-```ts
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
-    apiKey: process.env.NOSANA_API_KEY as string,
+    apiKey: process.env.NOSANA_API_KEY,
   },
 });
 ```
@@ -113,7 +115,7 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 
 The SDK exposes the API as typed route groups under `client.api` — `auth`,
 `user`, `jobs`, `credits`, `markets`, `deployments`, `templates`, `hosts`,
-`stats`, `payments`, `benchmarks`, and `newsletter`. See the
+`stats`, `payments`, and `benchmarks`. See the
 [API Reference overview](/api/reference) for every group and its methods.
 
 For any endpoint without a curated method, use the raw, fully-typed per-service

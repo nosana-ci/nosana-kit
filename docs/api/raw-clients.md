@@ -11,7 +11,10 @@ is still reachable through the underlying, fully-typed
 `client.api.clients`. Authentication is applied automatically — you don't add
 headers yourself.
 
-```ts
+```ts twoslash
+declare const process: { env: Record<string, string> };
+declare const nodeAddress: string;
+// ---cut---
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {

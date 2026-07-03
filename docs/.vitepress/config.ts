@@ -124,15 +124,6 @@ export default withMermaid(
             ],
           },
         ],
-        '/guides/': [
-          {
-            text: 'Guides',
-            items: [
-              { text: 'My First Deployment', link: '/guides/my-first-deployment' },
-              { text: 'Deploy DeepSeek Model', link: '/guides/deploy-deepseek-model' },
-            ],
-          },
-        ],
         '/about/': [
           {
             text: 'About',
@@ -140,6 +131,7 @@ export default withMermaid(
               { text: 'Introduction', link: '/about/introduction' },
               { text: 'Getting Started', link: '/about/getting-started' },
               { text: 'Key Concepts', link: '/about/key-concepts' },
+              { text: 'Solana Wallets', link: '/about/wallet' },
               { text: 'Glossary', link: '/about/glossary' },
             ],
           },
@@ -248,12 +240,6 @@ export default withMermaid(
               { text: 'Nodes', link: '/programs/nodes' },
               { text: 'Token', link: '/programs/token' },
             ],
-          },
-        ],
-        '/wallet/': [
-          {
-            text: 'Wallet',
-            items: [{ text: 'Wallet', link: '/wallet' }],
           },
         ],
       },

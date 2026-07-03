@@ -13,12 +13,14 @@ Use the Nosana REST API or TypeScript SDK to list, inspect, stop, and archive de
 
 All examples assume you have your API key set up. For the SDK, initialize the client:
 
-```ts
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
-    apiKey: process.env.NOSANA_API_KEY as string,
+    apiKey: process.env.NOSANA_API_KEY,
   },
 });
 ```
@@ -35,8 +37,14 @@ export NOSANA_API_KEY="nos_xxx_your_api_key"
 
 == TypeScript SDK
 
-```ts
-const deployments = await client.deployments.list();
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const { deployments } = await client.api.deployments.list();
 ```
 
 == HTTP API
@@ -55,8 +63,14 @@ curl -s \
 
 == TypeScript SDK
 
-```ts
-const deployment = await client.deployments.get('YOUR_DEPLOYMENT_ID');
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
 ```
 
 == HTTP API
@@ -77,13 +91,29 @@ Create a new revision of the job definition for an existing deployment:
 
 == TypeScript SDK
 
-```ts
-const deployment = await client.deployments.get('YOUR_DEPLOYMENT_ID');
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
 
-const revision = await deployment.createRevision({
-  job_definition: {
-    // New job definition fields go here
-  },
+await deployment.createRevision({
+  version: '0.1',
+  type: 'container',
+  meta: { trigger: 'api' },
+  ops: [
+    {
+      type: 'container/run',
+      id: 'hello-world',
+      args: {
+        cmd: 'echo hello world v2',
+        image: 'ubuntu',
+      },
+    },
+  ],
 });
 ```
 
@@ -95,7 +125,7 @@ curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d @job-definition.json \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/revisions | jq .
+  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/create-revision | jq .
 ```
 
 :::
@@ -108,9 +138,15 @@ The body should contain a `job_definition` matching the structure described in t
 
 == TypeScript SDK
 
-```ts
-const deployment = await client.deployments.get('YOUR_DEPLOYMENT_ID');
-await deployment.updateReplicas(3);
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
+await deployment.updateReplicaCount(3);
 ```
 
 == HTTP API
@@ -121,7 +157,7 @@ curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"replicas": 3}' \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/update-replicas | jq .
+  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/update-replica-count | jq .
 ```
 
 :::
@@ -132,8 +168,14 @@ curl -s \
 
 == TypeScript SDK
 
-```ts
-const deployment = await client.deployments.get('YOUR_DEPLOYMENT_ID');
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
 await deployment.updateSchedule('0 0 * * *'); // daily at midnight
 ```
 
@@ -159,8 +201,14 @@ curl -s \
 
 == TypeScript SDK
 
-```ts
-const deployment = await client.deployments.get('YOUR_DEPLOYMENT_ID');
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
 await deployment.updateTimeout(120); // minutes
 ```
 
@@ -185,8 +233,14 @@ Start an existing deployment that is in a draft or stopped state:
 
 == TypeScript SDK
 
-```ts
-const deployment = await client.deployments.get('YOUR_DEPLOYMENT_ID');
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
 await deployment.start();
 ```
 
@@ -209,8 +263,14 @@ Stop a running deployment:
 
 == TypeScript SDK
 
-```ts
-const deployment = await client.deployments.get('YOUR_DEPLOYMENT_ID');
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
 await deployment.stop();
 ```
 
@@ -235,8 +295,14 @@ Archive a deployment to remove it from your active list while keeping history:
 
 == TypeScript SDK
 
-```ts
-const deployment = await client.deployments.get('YOUR_DEPLOYMENT_ID');
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
 await deployment.archive();
 ```
 
@@ -257,16 +323,36 @@ The response will include `status: "ARCHIVED"` when successful.
 
 The pipe function allows you to chain multiple actions on a deployment in a functional programming style. It can either create a new deployment or operate on an existing one.
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // Create and execute multiple actions in sequence
-const deployment = await client.deployments.pipe(
+const deployment = await client.api.deployments.pipe(
   {
     name: 'My Application',
     market: '7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq',
     replicas: 3,
     timeout: 300,
     strategy: 'SIMPLE',
-    job_definition: {},
+    job_definition: {
+      version: '0.1',
+      type: 'container',
+      meta: { trigger: 'api' },
+      ops: [
+        {
+          type: 'container/run',
+          id: 'my-application',
+          args: {
+            cmd: 'echo hello world',
+            image: 'ubuntu',
+          },
+        },
+      ],
+    },
   },
   async (deployment) => {
     console.log('Starting deployment');
@@ -274,19 +360,19 @@ const deployment = await client.deployments.pipe(
   },
   async (deployment) => {
     console.log('Updating replicas');
-    await deployment.updateReplicas(5);
+    await deployment.updateReplicaCount(5);
   },
 );
 
 // Or operate on an existing deployment
-const deployment = await client.deployments.pipe(
+const existing = await client.api.deployments.pipe(
   'existing-deployment-id',
   async (deployment) => {
     await deployment.start();
   },
   async (deployment) => {
     await deployment.stop();
-  }
+  },
 );
 ```
 

@@ -11,7 +11,9 @@ node in sync.
 
 ## Discovering hosts
 
-```ts
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
@@ -46,7 +48,13 @@ const byCountry = await client.api.hosts.getByCountry();
 
 ## Metrics, uptime & rewards
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // Node metrics and uptime
 const metrics = await client.api.hosts.getMetrics('node-address');
 const uptime = await client.api.hosts.getUptime('node-address');

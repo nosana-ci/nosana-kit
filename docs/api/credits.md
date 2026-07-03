@@ -18,7 +18,9 @@ Check your current credit balance:
 
 == @nosana/kit
 
-```ts
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
@@ -79,7 +81,14 @@ If you don't have enough available credits, deployments will fail with an `INSUF
 
 ## Claiming & Requesting Credits
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+declare const token: string;
+// ---cut---
 // Claim a credit code
 await client.api.credits.claim('CREDIT-CODE-123');
 
@@ -104,7 +113,13 @@ await client.api.credits.invitations.claim(token);
 
 ## Spending History & Transactions
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // Spending history (start_date required; optional end_date, group_by)
 const spending = await client.api.credits.getSpendingHistory({
   start_date: '2025-01-01',

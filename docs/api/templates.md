@@ -12,7 +12,9 @@ sizes).
 
 ## Usage
 
-```ts
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
@@ -43,13 +45,21 @@ const variant = await client.api.templates.getVariant('template-id', 'variant-id
 
 A template's job definition can be passed straight into a deployment:
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+import type { JobDefinition } from '@nosana/kit';
+
 const template = await client.api.templates.get('template-id');
 
 const deployment = await client.api.deployments.create({
   name: 'my-deployment',
   market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ',
-  job_definition: template.job_definition,
+  job_definition: template.jobDefinition as JobDefinition,
   timeout: 3600,
   replicas: 1,
   strategy: 'SIMPLE',

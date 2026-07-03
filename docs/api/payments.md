@@ -12,15 +12,19 @@ Purchased credits land on your [credit balance](/api/credits).
 
 ## Payment methods
 
-```ts
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: { apiKey: process.env.NOSANA_API_KEY },
 });
 
-// Add a payment method: creates a Stripe SetupIntent to confirm client-side
-const setupIntent = await client.api.payments.addMethod({});
+// Attach a payment method (id from Stripe.js) via a Stripe SetupIntent
+const setupIntent = await client.api.payments.addMethod({
+  paymentMethodId: 'pm_xxx',
+});
 
 // List saved payment methods
 const methods = await client.api.payments.listMethods();
@@ -32,10 +36,16 @@ await client.api.payments.deleteMethod('payment-method-id');
 
 ## Purchasing credits
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // Create a PaymentIntent for a credit purchase
 const intent = await client.api.payments.createPaymentIntent({
-  amount: 50, // USD
+  amountUsd: 50,
 });
 
 // List past credit purchases

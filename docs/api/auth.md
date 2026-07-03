@@ -14,7 +14,9 @@ For how to obtain an API key in the dashboard, see the
 
 ## `auth`
 
-```ts
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 const client = createNosanaClient(NosanaNetwork.MAINNET, {
@@ -43,7 +45,13 @@ const signature = await client.api.auth.signMessage('message-to-sign', {
 
 Create, list, update, and delete API keys:
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 // Create a key — the plaintext key is only returned once, store it safely
 const created = await client.api.user.apiKeys.create({
   name: 'ci-pipeline',

@@ -31,10 +31,12 @@ For all available fields, see **[Deployment Options](/deployments/options)**. Yo
 
 == TypeScript SDK
 
-```ts
-import { createNosanaClient } from '@nosana/kit';
+```ts twoslash
+declare const process: { env: Record<string, string> };
+// ---cut---
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
-const client = createNosanaClient('mainnet', {
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: process.env.NOSANA_API_KEY,
   },
@@ -114,9 +116,15 @@ New deployments are created in a **draft** state and must be explicitly started:
 
 == TypeScript SDK
 
-```ts
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
 async function startDeployment(id: string) {
-  const deployment = await client.deployments.get(id);
+  const deployment = await client.api.deployments.get(id);
   await deployment.start();
 }
 ```
