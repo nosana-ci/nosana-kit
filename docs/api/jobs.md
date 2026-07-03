@@ -183,7 +183,7 @@ const job = await client.api.jobs.list(
   {
     ipfsHash: 'QmYourJobDefinitionIPFSHash',
     market: 'CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ',
-    timeout: 60, // Optional: timeout in minutes
+    timeout: 600, // Optional: max runtime in seconds (default: 3600)
     node: 'node-address', // Optional: specific node to run on
   },
   // Optional: see the "Idempotency" section above.
@@ -204,7 +204,7 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
   -d '{
     "ipfsHash": "QmYourJobDefinitionIPFSHash",
     "market": "CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ",
-    "timeout": 60
+    "timeout": 600
   }'
 ```
 

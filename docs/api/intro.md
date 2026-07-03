@@ -6,6 +6,8 @@ title: Nosana API
 
 Nosana exposes both a REST HTTP API and a typed TypeScript SDK so you can create and manage deployments from whatever environment fits your workflow.
 
+New here? Follow the [Your First Job guide](/api/first-job) for an end-to-end walkthrough: pick a market, validate a job definition, post it with credits, and fetch the results.
+
 ## HTTP API
 
 Use the Nosana HTTP API to create and manage deployments from any language or environment that can make HTTPS requests.

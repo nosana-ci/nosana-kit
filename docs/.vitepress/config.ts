@@ -97,6 +97,7 @@ export default withMermaid(
             text: 'Guides',
             items: [
               { text: 'Get API Key', link: '/api/get-api-key' },
+              { text: 'Your First Job', link: '/api/first-job' },
               { text: 'Wallet Authentication', link: '/api/wallet-authentication' },
             ],
           },
