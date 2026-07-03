@@ -121,9 +121,9 @@ Retrieve information about a specific job:
 == @nosana/kit
 
 ```ts
-import { createNosanaClient } from '@nosana/kit';
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
-const client = createNosanaClient({
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: process.env.NOSANA_API_KEY,
   },
@@ -206,9 +206,9 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
 Before posting a job, you need to upload your job definition to IPFS. You can use the Nosana IPFS service:
 
 ```ts
-import { createNosanaClient } from '@nosana/kit';
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
-const client = createNosanaClient({
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: process.env.NOSANA_API_KEY,
   },

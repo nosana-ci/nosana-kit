@@ -29,9 +29,9 @@ Get a list of all available markets:
 == @nosana/kit
 
 ```ts
-import { createNosanaClient } from '@nosana/kit';
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
-const client = createNosanaClient({
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: process.env.NOSANA_API_KEY,
   },

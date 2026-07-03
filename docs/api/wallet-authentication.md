@@ -34,7 +34,7 @@ npm install @nosana/kit
 ### Initialization
 
 ```ts
-import { createNosanaClient } from '@nosana/kit';
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
 // Initialize with wallet instead of API key
 const client = createNosanaClient({

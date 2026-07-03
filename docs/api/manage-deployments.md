@@ -14,9 +14,9 @@ Use the Nosana REST API or TypeScript SDK to list, inspect, stop, and archive de
 All examples assume you have your API key set up. For the SDK, initialize the client:
 
 ```ts
-import { createNosanaClient } from '@nosana/kit';
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 
-const client = createNosanaClient({
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
   api: {
     apiKey: process.env.NOSANA_API_KEY as string,
   },
