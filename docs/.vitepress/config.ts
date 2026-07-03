@@ -56,6 +56,7 @@ export default withMermaid(
                 items: [
                   { text: 'Intro', link: '/deployments/jobs/job-definition/intro' },
                   { text: 'Schema', link: '/deployments/jobs/job-definition/schema' },
+                  { text: 'Validation', link: '/deployments/jobs/job-definition/validation' },
                   { text: 'Health Checks', link: '/deployments/jobs/job-definition/health-checks' },
                   {
                     text: 'Literals (Pipeline)',

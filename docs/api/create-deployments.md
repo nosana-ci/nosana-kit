@@ -12,7 +12,7 @@ Before creating deployments, ensure you have:
 
 - **API Key**: A valid Nosana API key. See the [API key guide](/api/get-api-key).
 - **Credit Balance**: Sufficient credit balance on your Nosana account to run deployments.
-- **Job Definition**: A valid [job definition](/deployments/jobs/job-definition/intro) describing the container workload.
+- **Job Definition**: A valid [job definition](/deployments/jobs/job-definition/intro) describing the container workload. You can [validate it locally](/deployments/jobs/job-definition/validation) with the SDK before creating the deployment.
 
 ## What you configure
 

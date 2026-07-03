@@ -227,7 +227,7 @@ curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
 
 ### Job Definition on IPFS
 
-Before posting a job, you need to upload your job definition to IPFS. You can use the Nosana IPFS service:
+Before posting a job, you need to upload your job definition to IPFS. You can use the Nosana IPFS service. It's a good idea to [validate the job definition](/deployments/jobs/job-definition/validation) first — it catches schema mistakes before you upload or spend credits:
 
 ```ts twoslash
 import type { JobDefinition } from '@nosana/kit';
