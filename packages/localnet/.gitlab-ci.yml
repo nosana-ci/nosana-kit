@@ -89,6 +89,10 @@ localnet:docker:build:
 localnet:docker:tag:
   stage: deploy
   extends: .localnet-docker
+  # The image being re-tagged is only built when this package changes, so a
+  # release that touches nothing here has none to re-tag. That must not hold up
+  # the npm publish, which shares this stage and needs nothing from here.
+  allow_failure: true
   before_script:
     - apk add --no-cache git
     - export DOCKER_TLS_CERTDIR=
