@@ -1,6 +1,6 @@
 {
   "name": "@nosana/authorization",
-  "version": "2.3.1",
+  "version": "2.7.2",
   "description": "Nosana authorization module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

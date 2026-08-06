@@ -1,6 +1,6 @@
 {
   "name": "@nosana/merkle-distributor-program",
-  "version": "2.3.1",
+  "version": "2.7.2",
   "description": "Nosana Merkle Distributor program generated client",
   "repository": {
     "type": "git",
