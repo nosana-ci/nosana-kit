@@ -1,6 +1,6 @@
 {
   "name": "@nosana/stake-program",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "Nosana Stake program generated client",
   "repository": {
     "type": "git",
