@@ -13,6 +13,7 @@ export function createAuthenticatedClient<Paths extends Record<string, any>>(
   baseUrl: string,
   authParams: ApiKeyAuth | SignerAuth | undefined,
   options?: Pick<CreateNosanaApiOptions, 'include_credentials'>,
+  defaultHeaders?: Record<string, string>,
 ): AuthenticatedClient<Paths> {
   const authMiddleware: Middleware = {
     async onRequest({ request }) {
@@ -31,6 +32,7 @@ export function createAuthenticatedClient<Paths extends Record<string, any>>(
   const client = createClient<AuthenticatedPaths<Paths>>({
     baseUrl,
     ...(options?.include_credentials ? { credentials: 'include' } : {}),
+    ...(defaultHeaders ? { headers: defaultHeaders } : {}),
   });
 
   if (!options?.include_credentials) {

@@ -39,6 +39,7 @@ export type CreateNosanaApiOptions = Partial<{
   client_manager_url: string;
   host_manager_url: string;
   blockchain_indexer_url: string;
+  /** Under API key auth this becomes the client manager proxy's forwarding target. */
   deployment_manager_url: string;
   include_credentials: boolean;
 }>
