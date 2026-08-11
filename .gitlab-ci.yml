@@ -22,6 +22,7 @@ stages:
 variables:
   GIT_STRATEGY: fetch
   GIT_DEPTH: "0"
+  GITHUB_REPO: nosana-kit # enables the github-release job on vX.Y.Z tags
 
 .pnpm_setup: &pnpm_setup
   - corepack enable
@@ -37,6 +38,8 @@ before_script: *pnpm_setup
 
 include:
   - local: .gitlab/ci/generated-clients.yml
+  - project: nosana-ci/tools/cicd/gitlab-ci
+    file: templates/github-release.yml
 
 detect-packages-changes:
   stage: trigger
@@ -116,3 +119,14 @@ lerna-publish:
     - pnpm run publish
   rules:
     - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
+
+# Create release on GitHub, but only once the packages are actually live on npm.
+github-release:
+  extends: .github-release
+  stage: deploy
+  needs:
+    - job: lerna-publish
+
+mr-title-lint:
+  extends: .mr-title-lint
+  stage: test
