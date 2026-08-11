@@ -120,7 +120,7 @@ lerna-publish:
   rules:
     - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
 
-# Announce on GitHub, but only once the packages are actually live on npm.
+# Create release on GitHub, but only once the packages are actually live on npm.
 github-release:
   extends: .github-release
   stage: deploy
