@@ -117,6 +117,10 @@ lerna-publish:
     - pnpm run build:packages
     - pnpm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
     - pnpm run publish
+  artifacts:
+    paths:
+      - lerna-publish-summary.json
+    expire_in: 1 day
   rules:
     - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG != "latest"
 
@@ -126,6 +130,11 @@ github-release:
   stage: deploy
   needs:
     - job: lerna-publish
+      artifacts: true
+  variables:
+    RELEASE_NPM_PACKAGES: file:lerna-publish-summary.json
+    RELEASE_NPM_REQUIRED: "true"
+    RELEASE_NOTES_FOOTER: ":books: Documentation: https://learn.nosana.com"
 
 mr-title-lint:
   extends: .mr-title-lint

@@ -43,4 +43,7 @@ docs/.vitepress/cache/
 # Generated API docs
 docs/kit/reference/
 
+# Written by `lerna publish --summary-file`, consumed by the github-release job
+lerna-publish-summary.json
+
 CLAUDE.md
