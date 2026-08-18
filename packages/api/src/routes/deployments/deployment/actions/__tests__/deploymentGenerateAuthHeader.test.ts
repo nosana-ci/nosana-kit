@@ -32,7 +32,10 @@ describe('deploymentGenerateAuthHeader', () => {
       expect(mockClient.GET).toHaveBeenCalledWith(
         '/deployments/{deployment}/header',
         {
-          params: { path: { deployment: mockState.id } },
+          params: {
+            path: { deployment: mockState.id },
+            query: {},
+          },
         },
       );
     });
