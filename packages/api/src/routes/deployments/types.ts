@@ -81,6 +81,7 @@ export type DeploymentsSearchParams = paths['/deployments']['get']['parameters']
 export type DeploymentJobsSearchParams = paths['/deployments/{deployment}/jobs']['get']['parameters']['query'];
 export type DeploymentEventsSearchParams = paths['/deployments/{deployment}/events']['get']['parameters']['query'];
 export type DeploymentRevisionsSearchParams = paths['/deployments/{deployment}/revisions']['get']['parameters']['query'];
+export type DeploymentAuthHeaderParams = paths['/deployments/{deployment}/header']['get']['parameters']['query'];
 
 // Item types extracted from paginated responses
 export type DeploymentJobItem = DeploymentJobs['jobs'][number];
@@ -99,7 +100,7 @@ export type ApiDeployment = DeploymentState & {
   getJobs: (searchParams?: DeploymentJobsSearchParams) => Promise<JobListResult>;
   getRevisions: (searchParams?: DeploymentRevisionsSearchParams) => Promise<RevisionListResult>;
   getEvents: (searchParams?: DeploymentEventsSearchParams) => Promise<EventListResult>;
-  generateAuthHeader: () => Promise<string>;
+  generateAuthHeader: (query?: DeploymentAuthHeaderParams) => Promise<string>;
   createRevision: (jobDefinition: JobDefinition) => Promise<void>;
   updateActiveRevision: (revision: number) => Promise<void>;
   updateReplicaCount: (replicas: number) => Promise<void>;

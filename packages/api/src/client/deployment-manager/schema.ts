@@ -452,7 +452,12 @@ export interface paths {
         /** @description Get header for a specific deployment. */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Include a timestamp in the signed message. */
+                    includeTime?: "true" | "false";
+                    /** @description Custom message to sign. Defaults to "DEPLOYMENT_HEADER". */
+                    message?: string;
+                };
                 header: {
                     "x-user-id": string;
                     /** @description Signed authentication message, */
@@ -1754,7 +1759,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Create a shared vault. */
+        /** @description Get or create the caller's shared vault: returns their existing (oldest) vault, creating one only if they have none. */
         post: {
             parameters: {
                 query?: never;
@@ -1770,7 +1775,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Vault created successfully. */
+                /** @description The caller's shared vault (existing, or newly created). */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -1965,10 +1970,18 @@ export interface components {
             replicas: number;
             /** @description Timeout in minutes, must be at least 1 minute. */
             timeout: number;
-            vault?: string;
             confidential?: boolean;
+            /** @description If true, the deployment is started immediately after creation instead of being left as a DRAFT. */
+            autostart?: boolean;
             job_definition: components["schemas"]["JobDefinition"];
         } & ({
+            vault?: string;
+            new_vault?: unknown;
+        } | {
+            /** @description If true, a brand-new vault is created for this deployment instead of reusing the owner's shared (oldest) vault. */
+            new_vault?: boolean;
+            vault?: unknown;
+        }) & ({
             strategy: "SIMPLE" | "SIMPLE-EXTEND";
         } | {
             /** @enum {string} */

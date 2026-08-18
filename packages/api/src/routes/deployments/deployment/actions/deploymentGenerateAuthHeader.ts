@@ -1,16 +1,20 @@
 import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
 import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
-import { type DeploymentState } from '../../types.js';
+import type { DeploymentAuthHeaderParams, DeploymentState } from '../../types.js';
 
 export async function deploymentGenerateAuthHeader(
   client: DeploymentManagerClient,
   state: DeploymentState,
+  query?: DeploymentAuthHeaderParams,
 ): Promise<string> {
   const { data, error } = await client.GET(
     '/deployments/{deployment}/header',
     {
-      params: { path: { deployment: state.id } },
+      params: {
+        path: { deployment: state.id },
+        query: { ...query },
+      },
     },
   );
 

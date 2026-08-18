@@ -31,6 +31,7 @@ import type {
   DeploymentJobsSearchParams,
   DeploymentRevisionsSearchParams,
   DeploymentEventsSearchParams,
+  DeploymentAuthHeaderParams,
 } from '../types.js';
 import type {
   DeploymentRouteClients,
@@ -184,8 +185,8 @@ export function createDeployment(
    * @description Generates a new authentication header for the deployment.
    * This is used for securing access to the deployment's resources.
    */
-  const generateAuthHeader = async () => {
-    return await deploymentGenerateAuthHeader(client, state);
+  const generateAuthHeader = async (query?: DeploymentAuthHeaderParams) => {
+    return await deploymentGenerateAuthHeader(client, state, query);
   };
 
   const getJob = async (job: string) => {
@@ -251,8 +252,8 @@ export function createDeployment(
   return Object.assign(state, {
     ...(!hasApiKey && 'solana' in clients
       ? {
-          vault: createVault(state.vault, clients, state.created_at),
-        }
+        vault: createVault(state.vault, clients, state.created_at),
+      }
       : {}),
     start,
     stop,
