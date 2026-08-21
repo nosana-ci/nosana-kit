@@ -37,6 +37,8 @@ describe('NosanaClient', () => {
       expect(client.nos).toBeDefined();
       expect(client.logger).toBeDefined();
       expect(client.ipfs).toBeDefined();
+      expect(client.ssh).toBeDefined();
+      expect(client.terminal).toBeDefined();
     });
 
     it('uses MAINNET as default when no network is specified', () => {
