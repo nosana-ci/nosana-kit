@@ -13,6 +13,8 @@ import {
 } from './services/programs/merkleDistributor/index.js';
 import { createSolanaService, type SolanaService } from './services/solana/index.js';
 import { createTokenService, type TokenService } from './services/token/index.js';
+import { createSshService, type SshService } from './services/ssh/index.js';
+import { createTerminalService, type TerminalService } from './services/terminal/index.js';
 import { createApiInstance, NosanaApiDeps } from './utils/createApiInstance.js';
 import { walletToAuthorizationSigner } from './utils/walletToAuthorizationSigner.js';
 
@@ -34,6 +36,8 @@ export interface NosanaClient {
   readonly ipfs: NosanaIpfsClient;
   readonly authorization: NosanaAuthorization;
   readonly logger: Logger;
+  readonly ssh: SshService;
+  readonly terminal: TerminalService;
   /**
    * The wallet. Must be a Wallet (supports both message and transaction signing).
    * Set this property directly to configure the wallet.
@@ -105,6 +109,8 @@ const createClientFromConfig = (config: ClientConfig, network: NosanaNetwork): N
   const jobs = createJobsProgram(programDeps, config.programs);
   const stake = createStakeProgram(programDeps, config.programs);
   const merkleDistributor = createMerkleDistributorProgram(programDeps, config.programs);
+  const ssh = createSshService({ getWallet });
+  const terminal = createTerminalService({ getWallet });
 
   // Initialize Nosana Modules
   const ipfs = createIpfsClient(config.ipfs);
@@ -146,6 +152,8 @@ const createClientFromConfig = (config: ClientConfig, network: NosanaNetwork): N
     stake,
     merkleDistributor,
     ipfs,
+    ssh,
+    terminal,
     get authorization() {
       return reactiveNosanaModules.authorization;
     },

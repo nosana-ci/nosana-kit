@@ -244,6 +244,16 @@ export type {
   SignedBatchTransaction,
 } from './services/solana/SolanaService.js';
 
+/**
+ * @group @nosana/kit
+ */
+export * from './services/ssh/index.js';
+
+/**
+ * @group @nosana/kit
+ */
+export * from './services/terminal/index.js';
+
 // ============================================================================
 // @nosana/kit - Configuration
 // ============================================================================
