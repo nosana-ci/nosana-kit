@@ -120,6 +120,9 @@ importers:
       '@nosana/types':
         specifier: workspace:*
         version: link:../types
+      eventsource:
+        specifier: ^4.1.0
+        version: 4.1.1
       openapi-fetch:
         specifier: ^0.14.0
         version: 0.14.1
@@ -3411,6 +3414,10 @@ packages:
   eventsource-parser@3.0.6:
     resolution: {integrity: sha512-Vo1ab+QXPzZ4tCa8SwIHJFaSzy4R6SHf7BY79rFBDf0idraZWAkYrDjDj8uWaSm3S2TK+hJ7/t1CEmZ7jXw+pg==}
     engines: {node: '>=18.0.0'}
+
+  eventsource@4.1.1:
+    resolution: {integrity: sha512-D6bTRWh6KahHTK/m4WnjPQyEinNPf9eFLEZSEoj7d6fTibspnAVYfzHvirL7u/aoX5d9YYfIkBVAhmigUELk9w==}
+    engines: {node: '>=20.0.0'}
 
   execa@5.0.0:
     resolution: {integrity: sha512-ov6w/2LCiuyO4RLYGdpFGjkcs0wMTgGE8PrkTHikeUy5iJekXyPIKUjifk5CsE0pt7sMCrMZ3YNqoCj6idQOnQ==}
@@ -9454,6 +9461,10 @@ snapshots:
   eventemitter3@4.0.7: {}
 
   eventsource-parser@3.0.6: {}
+
+  eventsource@4.1.1:
+    dependencies:
+      eventsource-parser: 3.0.6
 
   execa@5.0.0:
     dependencies:

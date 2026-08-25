@@ -14,6 +14,7 @@ export * from './deploymentUpdateReplicaCount.js';
 export * from './deploymentUpdateSchedule.js';
 export * from './deploymentUpdateTimeout.js';
 export * from './deploymentUpdateName.js';
+export * from './deploymentStream.js';
 export * from './vaultGetBalance.js';
 export * from './vaultTopup.js';
 export * from './vaultWithdraw.js';

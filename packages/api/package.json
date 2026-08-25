@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@nosana/types": "workspace:*",
+    "eventsource": "^4.1.0",
     "openapi-fetch": "^0.14.0"
   },
   "packageManager": "pnpm@10.28.1",
