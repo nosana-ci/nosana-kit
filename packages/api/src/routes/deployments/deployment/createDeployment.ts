@@ -2,6 +2,7 @@ import {
   deploymentStop,
   deploymentStart,
   deploymentGetEvents,
+  deploymentStream,
   deploymentGetJob,
   deploymentGetJobs,
   deploymentGetRevisions,
@@ -32,6 +33,8 @@ import type {
   DeploymentRevisionsSearchParams,
   DeploymentEventsSearchParams,
   DeploymentAuthHeaderParams,
+  DeploymentStreamHandlers,
+  DeploymentStreamSubscription,
 } from '../types.js';
 import type {
   DeploymentRouteClients,
@@ -233,6 +236,19 @@ export function createDeployment(
   };
 
   /**
+   * @returns A function that closes the stream.
+   * @description Streams the deployment's changes over server-sent events.
+   * The stream opens with the deployment, its active jobs and its outstanding
+   * tasks, then emits changes as they happen. It reopens itself if the
+   * connection drops, so `onOpen` may fire more than once.
+   */
+  const stream = (
+    handlers: DeploymentStreamHandlers,
+  ): DeploymentStreamSubscription => {
+    return deploymentStream(client, state, handlers);
+  };
+
+  /**
    * @throws Error if the deployment is not stopped
    * @throws Error if there is an error deleting the deployment
    * @returns Promise<void>
@@ -264,6 +280,7 @@ export function createDeployment(
     getJobs,
     getRevisions,
     getEvents,
+    stream,
     generateAuthHeader,
     createRevision,
     updateReplicaCount,

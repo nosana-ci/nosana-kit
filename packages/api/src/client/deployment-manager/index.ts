@@ -2,7 +2,7 @@ import { createAuthenticatedClient } from '../createClient.js';
 import { defaultConfig } from '../../defaults/index.js';
 
 import type { paths } from './schema.js';
-import type { AuthenticatedClient } from '../type.utils.js';
+import type { AuthenticatedClient, ClientConnection } from '../type.utils.js';
 import type {
   NosanaNetwork,
   ApiKeyAuth,
@@ -10,7 +10,16 @@ import type {
   CreateNosanaApiOptions,
 } from '../../types.js';
 
-export type DeploymentManagerClient = AuthenticatedClient<paths>;
+/**
+ * Alone among the services, this one is also streamed from: `connection` is
+ * what opening a server-sent event stream needs, which openapi-fetch cannot
+ * model. The base factory builds it alongside every client, so a stream is
+ * addressed and authenticated exactly as an ordinary request is; this type
+ * surfaces it where the other services leave it unexposed.
+ */
+export type DeploymentManagerClient = AuthenticatedClient<paths> & {
+  connection: ClientConnection;
+};
 
 /**
  * API keys can be revoked and regenerated, so the deployment manager never sees them.
@@ -39,10 +48,5 @@ export function createDeploymentManagerClient(
     ? { 'x-deployment-manager-url': options.deployment_manager_url }
     : undefined;
 
-  return createAuthenticatedClient<paths>(
-    baseUrl,
-    authParams,
-    options,
-    targetOverride,
-  );
+  return createAuthenticatedClient<paths>(baseUrl, authParams, options, targetOverride);
 }

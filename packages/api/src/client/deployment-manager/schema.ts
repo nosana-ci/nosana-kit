@@ -892,6 +892,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/deployments/{deployment}/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Server-sent stream of a deployment's changes. Each message is one `DeploymentStreamEvent`, discriminated by `type`. The stream starts with the current deployment, its active jobs and its outstanding tasks, then emits live changes. Historical jobs and events remain available through their paginated endpoints. */
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path: {
+                    deployment: components["schemas"]["PublicKey"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/event-stream": components["schemas"]["DeploymentStreamEvent"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/deployments/create": {
         parameters: {
             query?: never;
@@ -1961,6 +2005,48 @@ export interface components {
         Deployments: components["schemas"]["Deployment"][];
         /** DeploymentStatus */
         DeploymentStatus: "DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED";
+        /** DeploymentStreamEvent */
+        DeploymentStreamEvent: {
+            /** @enum {string} */
+            type: "deployment";
+            status: "DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED";
+            replicas: number;
+            active_revision: number;
+        } | {
+            /** @enum {string} */
+            type: "job";
+            job: string;
+            state: "QUEUED" | "RUNNING" | "COMPLETED" | "STOPPED";
+            node: string | null;
+            timeStart: number;
+            timeEnd: number;
+        } | {
+            /** @enum {string} */
+            type: "event";
+            category: "Deployment" | "Event";
+            event: string;
+            message: string;
+            tx: string | null;
+            /** Format: date-time */
+            created_at: string;
+        } | {
+            /** @enum {string} */
+            type: "task";
+            id: string;
+            task: "LIST" | "EXTEND" | "STOP";
+            status: "PENDING" | "PROCESSING";
+            attempts: number;
+            /** Format: date-time */
+            due_at: string;
+            job: string | null;
+        } | {
+            /** @enum {string} */
+            type: "task";
+            id: string;
+            task: "LIST" | "EXTEND" | "STOP";
+            /** @enum {string} */
+            status: "DONE";
+        };
         /** DeploymentStrategy */
         DeploymentStrategy: "SIMPLE" | "SIMPLE-EXTEND" | "SCHEDULED" | "INFINITE";
         /** DeploymentCreateBody */
