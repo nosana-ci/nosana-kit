@@ -69,6 +69,9 @@ export function createAuthenticatedClient<Paths extends Record<string, any>>(
         // Cookie auth is carried by the browser, so nothing is added by hand.
         ...(options?.include_credentials ? {} : await authHeaders(authParams)),
       }),
+      ...(options?.include_credentials
+        ? { credentials: 'include' as const }
+        : {}),
     },
   });
 }

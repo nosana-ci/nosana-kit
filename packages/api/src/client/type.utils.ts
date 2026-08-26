@@ -49,6 +49,12 @@ export type AuthenticatedPaths<Paths extends Record<string, any>> = {
 export type ClientConnection = {
   baseUrl: string;
   headers: () => Promise<Record<string, string>>;
+  /**
+   * Set when the caller authenticates by cookie. There are no auth headers to
+   * copy in that mode, so a connection that ignored this would send nothing at
+   * all and be rejected.
+   */
+  credentials?: 'include' | 'omit' | 'same-origin';
 };
 
 /**
