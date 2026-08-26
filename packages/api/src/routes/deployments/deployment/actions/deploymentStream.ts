@@ -73,13 +73,16 @@ export function deploymentStream(
   state: DeploymentState,
   handlers: DeploymentStreamHandlers,
 ): DeploymentStreamSubscription {
-  const { baseUrl, headers } = client.connection;
+  const { baseUrl, headers, credentials } = client.connection;
   const url = `${baseUrl}/deployments/${encodeURIComponent(state.id)}/stream`;
 
   const source = new EventSource(url, {
     fetch: async (input, init) =>
       fetch(input, {
         ...init,
+        // Under cookie auth there are no headers to copy, so the stream has to
+        // opt into sending the cookie or it authenticates as nobody.
+        ...(credentials ? { credentials } : {}),
         headers: { ...init.headers, ...(await headers()) },
       }),
   });
