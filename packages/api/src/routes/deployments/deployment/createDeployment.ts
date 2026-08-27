@@ -6,6 +6,7 @@ import {
   deploymentGetJob,
   deploymentGetJobs,
   deploymentGetRevisions,
+  deploymentGetSshKeys,
   deploymentArchive,
   deploymentUpdateReplicaCount,
   deploymentGetTasks,
@@ -13,6 +14,7 @@ import {
   deploymentCreateNewRevision,
   deploymentUpdateActiveRevision,
   deploymentUpdateSchedule,
+  deploymentUpdateSshKeys,
   deploymentUpdateName,
   deploymentGenerateAuthHeader,
   deploymentDelete,
@@ -35,6 +37,8 @@ import type {
   DeploymentAuthHeaderParams,
   DeploymentStreamHandlers,
   DeploymentStreamSubscription,
+  DeploymentSshKeys,
+  DeploymentUpdateSshKeysResult,
 } from '../types.js';
 import type {
   DeploymentRouteClients,
@@ -192,6 +196,22 @@ export function createDeployment(
     return await deploymentGenerateAuthHeader(client, state, query);
   };
 
+  /**
+   * Gets the SSH public keys configured for this deployment.
+   */
+  const getSshKeys = async (): Promise<DeploymentSshKeys> => {
+    return await deploymentGetSshKeys(client, state);
+  };
+
+  /**
+   * Replaces the SSH public keys configured for this deployment.
+   */
+  const updateSshKeys = async (
+    publicKeys: string[],
+  ): Promise<DeploymentUpdateSshKeysResult> => {
+    return await deploymentUpdateSshKeys(publicKeys, client, state);
+  };
+
   const getJob = async (job: string) => {
     return await deploymentGetJob(client, state.id, job);
   };
@@ -282,6 +302,8 @@ export function createDeployment(
     getEvents,
     stream,
     generateAuthHeader,
+    getSshKeys,
+    updateSshKeys,
     createRevision,
     updateReplicaCount,
     updateActiveRevision,
