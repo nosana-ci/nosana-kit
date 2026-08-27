@@ -1,6 +1,6 @@
 {
   "name": "@nosana/api",
-  "version": "2.7.5",
+  "version": "2.9.0",
   "description": "Nosana API module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@nosana/types": "workspace:*",
+    "eventsource": "^4.1.0",
     "openapi-fetch": "^0.14.0"
   },
   "packageManager": "pnpm@10.28.1",

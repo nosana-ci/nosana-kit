@@ -42,6 +42,22 @@ export type AuthenticatedPaths<Paths extends Record<string, any>> = {
 };
 
 /**
+ * What opening a connection openapi-fetch cannot model — a server-sent event
+ * stream — needs in order to be addressed and authenticated the same way every
+ * ordinary request is.
+ */
+export type ClientConnection = {
+  baseUrl: string;
+  headers: () => Promise<Record<string, string>>;
+  /**
+   * Set when the caller authenticates by cookie. There are no auth headers to
+   * copy in that mode, so a connection that ignored this would send nothing at
+   * all and be rejected.
+   */
+  credentials?: 'include' | 'omit' | 'same-origin';
+};
+
+/**
  * Explicit client type that should preserve all response typing
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

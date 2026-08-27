@@ -89,6 +89,34 @@ export type DeploymentRevisionItem = DeploymentRevisions['revisions'][number];
 export type DeploymentEventItem = DeploymentEvents['events'][number];
 export type DeploymentTaskItem = DeploymentTasks['tasks'][number];
 
+/**
+ * One frame of `GET /deployments/{deployment}/stream`, discriminated by `type`.
+ *
+ * The stream opens with the deployment, its active jobs and its outstanding
+ * tasks, then emits changes as they happen.
+ */
+export type DeploymentStreamEvent =
+  components['schemas']['DeploymentStreamEvent'];
+
+/** One kind of frame, selected from the union by its `type`. */
+export type DeploymentStreamEventOf<T extends DeploymentStreamEvent['type']> =
+  Extract<DeploymentStreamEvent, { type: T }>;
+
+/** An open stream, for as long as the caller wants it. */
+export type DeploymentStreamSubscription = { close: () => void };
+
+/** What a caller wants to hear about while streaming a deployment. */
+export type DeploymentStreamHandlers = {
+  onDeployment?: (event: DeploymentStreamEventOf<'deployment'>) => void;
+  onJob?: (event: DeploymentStreamEventOf<'job'>) => void;
+  /** A new entry in the deployment's event log. */
+  onEvent?: (event: DeploymentStreamEventOf<'event'>) => void;
+  onTask?: (event: DeploymentStreamEventOf<'task'>) => void;
+  /** The stream opened, or reopened after dropping: resynchronise from here. */
+  onOpen?: () => void;
+  onError?: (error: unknown) => void;
+};
+
 // API deployment (with API key auth) - no vault
 export type ApiDeployment = DeploymentState & {
   start: () => Promise<void>;
@@ -100,6 +128,8 @@ export type ApiDeployment = DeploymentState & {
   getJobs: (searchParams?: DeploymentJobsSearchParams) => Promise<JobListResult>;
   getRevisions: (searchParams?: DeploymentRevisionsSearchParams) => Promise<RevisionListResult>;
   getEvents: (searchParams?: DeploymentEventsSearchParams) => Promise<EventListResult>;
+  /** Stream changes over server-sent events; close it to stop. */
+  stream: (handlers: DeploymentStreamHandlers) => DeploymentStreamSubscription;
   generateAuthHeader: (query?: DeploymentAuthHeaderParams) => Promise<string>;
   createRevision: (jobDefinition: JobDefinition) => Promise<void>;
   updateActiveRevision: (revision: number) => Promise<void>;
