@@ -82,6 +82,9 @@ export type DeploymentJobsSearchParams = paths['/deployments/{deployment}/jobs']
 export type DeploymentEventsSearchParams = paths['/deployments/{deployment}/events']['get']['parameters']['query'];
 export type DeploymentRevisionsSearchParams = paths['/deployments/{deployment}/revisions']['get']['parameters']['query'];
 export type DeploymentAuthHeaderParams = paths['/deployments/{deployment}/header']['get']['parameters']['query'];
+export type DeploymentSshKeys = paths['/deployments/{deployment}/ssh-keys']['get']['responses']['200']['content']['application/json'];
+export type DeploymentUpdateSshKeysBody = paths['/deployments/{deployment}/update-ssh-keys']['patch']['requestBody']['content']['application/json'];
+export type DeploymentUpdateSshKeysResult = paths['/deployments/{deployment}/update-ssh-keys']['patch']['responses']['200']['content']['application/json'];
 
 // Item types extracted from paginated responses
 export type DeploymentJobItem = DeploymentJobs['jobs'][number];
@@ -131,6 +134,8 @@ export type ApiDeployment = DeploymentState & {
   /** Stream changes over server-sent events; close it to stop. */
   stream: (handlers: DeploymentStreamHandlers) => DeploymentStreamSubscription;
   generateAuthHeader: (query?: DeploymentAuthHeaderParams) => Promise<string>;
+  getSshKeys: () => Promise<DeploymentSshKeys>;
+  updateSshKeys: (publicKeys: string[]) => Promise<DeploymentUpdateSshKeysResult>;
   createRevision: (jobDefinition: JobDefinition) => Promise<void>;
   updateActiveRevision: (revision: number) => Promise<void>;
   updateReplicaCount: (replicas: number) => Promise<void>;
