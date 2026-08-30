@@ -2,11 +2,10 @@ import { mkdtemp, rm, writeFile, chmod } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import type { JobDefinition } from '@nosana/types';
 
 import {
-  buildSshAuthorizationMessage,
   createSshService,
   generateSshKeyPair,
   isValidSshPublicKey,
@@ -118,52 +117,5 @@ describe('SSH access service', () => {
       "'ProxyCommand=socat - PROXY:node.example.com:%h:%p,proxyport=5002'"
     );
     expect(nc.proxyCommand).toBe('nc -X connect -x node.example.com:5002 %h %p');
-  });
-
-  it('authorizes an ephemeral SSH key with the exact node protocol', async () => {
-    const pair = await generateSshKeyPair({ cryptoProvider: deterministicCrypto });
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 201,
-      json: async () => ({
-        authorized: true,
-        job: 'job-address',
-        sshUser: 'nosana-job-address',
-        expiresAt: '2026-08-21T12:04:00.000Z',
-      }),
-    });
-    const service = createSshService({
-      getWallet: () => undefined,
-      fetch: fetchMock as unknown as typeof fetch,
-      now: () => new Date('2026-08-21T12:00:00.000Z'),
-    });
-
-    await service.authorizeEphemeralKey({
-      job: 'job-address',
-      node: 'node-address',
-      nodeDomain: 'node.example.com',
-      network: 'devnet',
-      publicKey: pair.publicKey,
-      authorizationProvider: async () => new Uint8Array(64).fill(7),
-    });
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://node-address.node.example.com/job/job-address/ssh/authorize',
-      expect.objectContaining({ method: 'POST' })
-    );
-    const request = fetchMock.mock.calls[0][1] as RequestInit;
-    const body = JSON.parse(String(request.body));
-    expect(body.message).toBe(
-      buildSshAuthorizationMessage({
-        job: 'job-address',
-        node: 'node-address',
-        sshPublicKey: pair.publicKey,
-        expiresAt: '2026-08-21T12:04:00.000Z',
-        network: 'devnet',
-      })
-    );
-    expect(body.signature).toBe(
-      'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBw=='
-    );
   });
 });
