@@ -583,6 +583,11 @@ export type {
   TopupVaultOptions,
   DeploymentsApi,
   ApiDeploymentsApi,
+  // Deployment SSE stream
+  DeploymentStreamEvent,
+  DeploymentStreamEventOf,
+  DeploymentStreamHandlers,
+  DeploymentStreamSubscription,
 } from '@nosana/api';
 
 // ============================================================================

@@ -112,6 +112,12 @@ export type DeploymentStreamHandlers = {
   /** A new entry in the deployment's event log. */
   onEvent?: (event: DeploymentStreamEventOf<'event'>) => void;
   onTask?: (event: DeploymentStreamEventOf<'task'>) => void;
+  /**
+   * One of the deployment's endpoints and whether it currently answers. Sent for
+   * every endpoint on open, then whenever reachability changes — several ports of
+   * one op share a tunnel and so are restated together.
+   */
+  onEndpoint?: (event: DeploymentStreamEventOf<'endpoint'>) => void;
   /** The stream opened, or reopened after dropping: resynchronise from here. */
   onOpen?: () => void;
   onError?: (error: unknown) => void;

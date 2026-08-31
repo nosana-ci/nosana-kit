@@ -27,6 +27,7 @@ const DISPATCH: {
   job: (handlers, event) => handlers.onJob?.(event),
   event: (handlers, event) => handlers.onEvent?.(event),
   task: (handlers, event) => handlers.onTask?.(event),
+  endpoint: (handlers, event) => handlers.onEndpoint?.(event),
 };
 
 /**

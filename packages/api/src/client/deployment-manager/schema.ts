@@ -936,6 +936,79 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/deployments/{deployment}/ssh-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get the SSH public keys currently granted access to the deployment's jobs. */
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path: {
+                    deployment: components["schemas"]["PublicKey"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The deployment's SSH public keys (empty when SSH access is not configured). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            public_keys: string[];
+                        };
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Deployment not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/deployments/create": {
         parameters: {
             query?: never;
@@ -1052,6 +1125,8 @@ export interface paths {
                                 opId: string;
                                 port: number | string;
                                 url: string;
+                                /** @description Whether the deployment currently answers here. Per opId: a node opens one load-balanced proxy per op, so every port that op exposes reports the same value. */
+                                online: boolean;
                             }[];
                             revisions: {
                                 revision: number;
@@ -1654,6 +1729,104 @@ export interface paths {
         };
         trace?: never;
     };
+    "/deployments/{deployment}/update-ssh-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Replace the deployment's SSH public keys. The new set is stored on the deployment (not on a revision — no new revision or restart) and injected into every job posted from now on. New keys are also authorized on the node of every job currently running; removed keys stop working only when a job restarts. */
+        patch: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path: {
+                    deployment: components["schemas"]["PublicKey"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description The complete set of SSH public keys allowed to reach this deployment's jobs (at most 10). Replaces the current set; an empty array revokes SSH access. */
+                        public_keys: string[];
+                    };
+                };
+            };
+            responses: {
+                /** @description SSH keys updated. Check `jobs` for nodes that rejected or did not receive the new keys. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            public_keys: string[];
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** @description Per running job: whether its node authorized the new keys. Empty when the new set is empty — a revocation cannot reach running jobs. */
+                            jobs: {
+                                job: string;
+                                node: string;
+                                status: "authorized" | "failed";
+                                error?: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Bad Request. A key is not a valid OpenSSH public key, or the set exceeds the limits. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Deployment not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
     "/deployments/{deployment}/update-timeout": {
         parameters: {
             query?: never;
@@ -1701,6 +1874,96 @@ export interface paths {
                             timeout: number;
                             updated_at: string;
                         };
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Deployment not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/deployments/{deployment}/update-startup-timeout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Update the startup timeout of an INFINITE deployment. */
+        patch: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path: {
+                    deployment: components["schemas"]["PublicKey"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description Minutes a job has, from the moment a node starts running it, to open its network tunnel. A job that does not come online in time is stopped and replaced on another node. The new value applies to jobs started after the update. INFINITE deployments only, and the job definition must expose at least one port. */
+                        startup_timeout: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Deployment startup timeout updated successfully. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            startup_timeout: number;
+                            updated_at: string;
+                        };
+                    };
+                };
+                /** @description Bad Request. The deployment is not INFINITE, or its job definition exposes no ports. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
                     };
                 };
                 /** @description Unauthorized. Invalid or missing authentication. */
@@ -1980,6 +2243,8 @@ export interface components {
                 opId: string;
                 port: number | string;
                 url: string;
+                /** @description Whether the deployment currently answers here. Per opId: a node opens one load-balanced proxy per op, so every port that op exposes reports the same value. */
+                online: boolean;
             }[];
             confidential: boolean;
             active_revision: number;
@@ -2000,6 +2265,7 @@ export interface components {
             /** @enum {string} */
             strategy: "INFINITE";
             rotation_time: number;
+            startup_timeout?: number;
         });
         /** Deployments */
         Deployments: components["schemas"]["Deployment"][];
@@ -2041,6 +2307,14 @@ export interface components {
             job: string | null;
         } | {
             /** @enum {string} */
+            type: "endpoint";
+            opId: string;
+            port: number | string;
+            url: string;
+            /** @description Whether the deployment currently answers here. Per opId: a node opens one load-balanced proxy per op, so every port that op exposes reports the same value. */
+            online: boolean;
+        } | {
+            /** @enum {string} */
             type: "task";
             id: string;
             task: "LIST" | "EXTEND" | "STOP";
@@ -2059,6 +2333,8 @@ export interface components {
             confidential?: boolean;
             /** @description If true, the deployment is started immediately after creation instead of being left as a DRAFT. */
             autostart?: boolean;
+            /** @description The complete set of SSH public keys allowed to reach this deployment's jobs (at most 10). Replaces the current set; an empty array revokes SSH access. */
+            ssh_public_keys?: string[];
             job_definition: components["schemas"]["JobDefinition"];
         } & ({
             vault?: string;
@@ -2081,12 +2357,16 @@ export interface components {
             strategy: "INFINITE";
             /** @description Rotation time in seconds. Must be at least 10 minutes less than timeout to allow for proper rotation. */
             rotation_time?: number;
+            /** @description Minutes a job has, from the moment a node starts running it, to open its network tunnel. A job that does not come online in time is stopped and replaced on another node. Must cover the image pull and any operations that run before the exposed one. Requires the job definition to expose at least one port. */
+            startup_timeout?: number;
         });
         /** Endpoint */
         Endpoint: {
             opId: string;
             port: number | string;
             url: string;
+            /** @description Whether the deployment currently answers here. Per opId: a node opens one load-balanced proxy per op, so every port that op exposes reports the same value. */
+            online: boolean;
         };
         /** Error */
         Error: {
