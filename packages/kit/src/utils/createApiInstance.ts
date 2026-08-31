@@ -96,7 +96,13 @@ export function createApiInstance(
   wallet: Wallet | undefined,
   deps: { authorization: NosanaAuthorization; solana: SolanaService; nos: TokenService }
 ): NosanaApi | NosanaApiWithApiKey {
-  const { apiKey, ...apiConfig } = config || {};
+  const { apiKey, getToken, ...apiConfig } = config || {};
+
+  // A dynamic bearer provider (e.g. an OAuth session) takes precedence: it is
+  // resolved per request so the token can refresh without rebuilding the client.
+  if (getToken) {
+    return createNosanaApi(network, getToken, apiConfig);
+  }
 
   if (apiKey) {
     return createNosanaApi(network, apiKey, apiConfig);

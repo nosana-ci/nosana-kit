@@ -147,7 +147,6 @@ export function createNosanaApi(
   signerOrApiKey: SignerAuth | ApiKeyAuth | undefined,
   options?: CreateNosanaApiOptions,
 ): NosanaApiClient {
-  const hasApiKey = typeof signerOrApiKey === 'string';
   const clients = createClients(environment, signerOrApiKey, options);
   const auth = createNosanaAuthApi(clients.clientManager);
   // A node verifies a signed header against the job owner, so a caller without a
@@ -169,8 +168,10 @@ export function createNosanaApi(
     }),
     credits: createNosanaCreditsApi({ clientManager: clients.clientManager }),
     markets: createNosanaMarketsApi({ hostManager: clients.hostManager }),
+    // Only a wallet-backed SignerAuth (an object) can sign deployment
+    // transactions locally; string / token-provider (bearer) auth uses the proxy.
     deployments:
-      !hasApiKey && signerOrApiKey
+      typeof signerOrApiKey === 'object' && signerOrApiKey !== null
         ? createDeploymentsApi(
             {
               deploymentManager: clients.deploymentManager,

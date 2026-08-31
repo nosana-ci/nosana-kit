@@ -10,6 +10,7 @@ Monorepo for the [Nosana](https://nosana.com) developer toolkit: TypeScript pack
 | [@nosana/types](./packages/types) | Shared types and schemas. |
 | [@nosana/api](./packages/api) | Nosana API client. |
 | [@nosana/authorization](./packages/authorisation) | Message signing and validation for API auth. |
+| [@nosana/connect](./packages/connect) | "Connect with Nosana" OAuth 2.1 / OIDC client for third-party apps. |
 | [@nosana/endpoints](./packages/endpoints) | Endpoint and environment configuration. |
 | [@nosana/ipfs](./packages/ipfs) | IPFS pinning and retrieval. |
 | [@nosana/ssh](./packages/ssh) | SSH key pairs, key validation and node access for jobs. |

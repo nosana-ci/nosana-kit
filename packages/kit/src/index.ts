@@ -552,6 +552,7 @@ export type {
   CreateNosanaApiOptions,
   ApiKeyAuth,
   SignerAuth,
+  TokenProvider,
   ApiConfig,
   // Job API types
   NosanaJobsApi,
@@ -613,3 +614,34 @@ export { createIpfsClient, solBytesArrayToIpfsHash, ipfsHashToSolBytesArray } fr
  * @group @nosana/ipfs
  */
 export type { IPFSConfig, GetOverride, PostOverride, FetchClient } from '@nosana/ipfs';
+
+// ============================================================================
+// @nosana/connect - "Connect with Nosana" OAuth
+// ============================================================================
+
+/**
+ * Browser SPA "Connect with Nosana" flow. Pair with `getToken` on the kit's
+ * `api` config: `api: { getToken: () => connect.getAccessToken() }`.
+ * @group @nosana/connect
+ */
+export { createBrowserConnect, sessionStorageStore } from '@nosana/connect/browser';
+
+/**
+ * @group @nosana/connect
+ */
+export type { BrowserConnect, LoginRedirectOptions, CallbackResult } from '@nosana/connect/browser';
+
+/**
+ * @group @nosana/connect
+ */
+export { NosanaConnectClient, DEFAULT_ISSUER, memoryStore } from '@nosana/connect';
+
+/**
+ * @group @nosana/connect
+ */
+export type {
+  ConnectConfig,
+  ConnectStore,
+  AuthorizationRequest,
+  TokenResponse as ConnectTokenResponse,
+} from '@nosana/connect';
