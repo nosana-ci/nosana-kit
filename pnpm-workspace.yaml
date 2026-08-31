@@ -7,6 +7,7 @@ packages:
   - 'packages/endpoints'
   - 'packages/ipfs'
   - 'packages/types'
+  - 'packages/skills'
   - 'docs'
   - 'packages/generated_clients/jobs'
   - 'packages/generated_clients/stake'
