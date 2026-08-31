@@ -1,0 +1,27 @@
+{
+  "name": "@nosana/skills",
+  "version": "2.9.0",
+  "description": "Claude Code plugin teaching AI coding agents to deploy and monitor Nosana workloads",
+  "type": "module",
+  "private": true,
+  "author": "Nosana",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
+    "directory": "packages/skills"
+  },
+  "scripts": {
+    "build": "echo 'No build' && exit 0",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "echo 'No dev' && exit 0",
+    "dev:with-deps": "echo 'No dev' && exit 0",
+    "test": "node ../../.gitlab/ci/validate-skill.mjs",
+    "lint": "echo 'No lint' && exit 0",
+    "format": "echo 'No format' && exit 0",
+    "format:fix": "echo 'No format:fix' && exit 0"
+  },
+  "dependencies": {
+    "@nosana/kit": "workspace:*"
+  }
+}

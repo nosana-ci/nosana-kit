@@ -21,6 +21,18 @@ Monorepo for the [Nosana](https://nosana.com) developer toolkit: TypeScript pack
 
 For detailed SDK usage, see the [**Nosana Kit** README](./packages/kit/README.md).
 
+## Agent Skill
+
+[`packages/skills`](./packages/skills) is a Claude Code plugin that teaches AI
+coding agents to deploy and monitor Nosana workloads. It is not published to npm.
+
+Install it by typing these at the Claude Code prompt (not in your shell):
+
+```
+/plugin marketplace add nosana-ci/nosana-kit
+/plugin install nosana@nosana
+```
+
 ## Requirements
 
 - **Node.js** >= 20.18.0  

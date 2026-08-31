@@ -1,0 +1,19 @@
+stages:
+  - test
+
+include:
+  - local: .gitlab/ci/common.yml
+
+# The plugin ships no code of its own, so this is the only thing standing between
+# a snippet that stopped compiling against @nosana/kit and the people installing
+# it. The orchestrator triggers this pipeline whenever the workspace dependency
+# on kit — and so transitively types, api, endpoints and ipfs — changes.
+skills:validate:
+  stage: test
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm --filter @nosana/kit run build:with-deps
+    - pnpm --filter @nosana/skills run test
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

@@ -1,0 +1,9 @@
+{
+  "name": "nosana",
+  "description": "Deploy and monitor GPU workloads on the Nosana Network with @nosana/kit. Covers deployment lifecycle, job definitions, GPU market selection, service endpoints, container logs, credits and vaults.",
+  "author": { "name": "Nosana", "url": "https://nosana.com" },
+  "homepage": "https://learn.nosana.com",
+  "repository": "https://github.com/nosana-ci/nosana-kit",
+  "license": "MIT",
+  "keywords": ["nosana", "gpu", "solana", "deployment", "inference", "ai"]
+}

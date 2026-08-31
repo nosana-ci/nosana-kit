@@ -1,0 +1,21 @@
+{
+  "name": "nosana",
+  "owner": {
+    "name": "Nosana",
+    "url": "https://nosana.com"
+  },
+  "plugins": [
+    {
+      "name": "nosana",
+      "source": "./packages/skills",
+      "description": "Deploy and monitor GPU workloads on the Nosana Network with @nosana/kit",
+      "category": "deployment",
+      "homepage": "https://learn.nosana.com",
+      "author": {
+        "name": "Nosana",
+        "url": "https://nosana.com"
+      }
+    }
+  ],
+  "description": "Claude Code plugins for the Nosana Network"
+}
