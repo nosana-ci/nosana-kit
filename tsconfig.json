@@ -3,6 +3,7 @@
   "references": [
     { "path": "./packages/types" },
     { "path": "./packages/authorisation" },
+    { "path": "./packages/connect" },
     { "path": "./packages/ipfs" },
     { "path": "./packages/endpoints" },
     { "path": "./packages/api" },

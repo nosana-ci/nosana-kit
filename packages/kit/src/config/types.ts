@@ -1,4 +1,5 @@
 import { ApiConfig } from '@nosana/api';
+import type { TokenProvider } from '@nosana/api';
 import type { IPFSConfig } from '@nosana/ipfs';
 import type { AuthorizationStore } from '@nosana/authorization';
 import type { Address, TransactionSigner } from '@solana/kit';
@@ -78,6 +79,13 @@ export interface ProgramConfig {
 
 export interface APIConfig extends ApiConfig {
   apiKey?: string;
+  /**
+   * A dynamic bearer token resolved on every request — e.g.
+   * `() => connect.getAccessToken()` from `@nosana/connect`. Because it is
+   * called per request it can transparently refresh, unlike a static `apiKey`.
+   * Takes precedence over `apiKey` and wallet auth when set.
+   */
+  getToken?: TokenProvider;
 }
 
 export interface AuthorizationConfig {

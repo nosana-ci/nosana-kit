@@ -201,6 +201,36 @@ importers:
         specifier: ^4.0.3
         version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.13)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2)
 
+  packages/connect:
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.14
+        version: 24.10.13
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.38.0
+        version: 8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.38.0
+        version: 8.53.1(eslint@9.39.2)(typescript@5.9.3)
+      '@vitest/coverage-v8':
+        specifier: ^4.0.3
+        version: 4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.13)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2))
+      eslint:
+        specifier: ^9.31.0
+        version: 9.39.2
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@24.10.13)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.3
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.13)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2)
+
   packages/endpoints:
     dependencies:
       '@nosana/types':
@@ -316,6 +346,9 @@ importers:
       '@nosana/authorization':
         specifier: workspace:*
         version: link:../authorisation
+      '@nosana/connect':
+        specifier: workspace:*
+        version: link:../connect
       '@nosana/endpoints':
         specifier: workspace:*
         version: link:../endpoints
@@ -6848,6 +6881,7 @@ snapshots:
     dependencies:
       '@nosana/api': link:packages/api
       '@nosana/authorization': link:packages/authorisation
+      '@nosana/connect': link:packages/connect
       '@nosana/endpoints': link:packages/endpoints
       '@nosana/ipfs': link:packages/ipfs
       '@nosana/jobs-program': link:packages/generated_clients/jobs

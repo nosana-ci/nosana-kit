@@ -36,6 +36,7 @@
   "dependencies": {
     "@nosana/api": "workspace:*",
     "@nosana/authorization": "workspace:*",
+    "@nosana/connect": "workspace:*",
     "@nosana/endpoints": "workspace:*",
     "@nosana/ipfs": "workspace:*",
     "@nosana/jobs-program": "workspace:*",

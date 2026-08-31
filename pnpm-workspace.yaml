@@ -4,6 +4,7 @@ packages:
   - 'packages/scenario'
   - 'packages/api'
   - 'packages/authorisation'
+  - 'packages/connect'
   - 'packages/endpoints'
   - 'packages/ipfs'
   - 'packages/types'
