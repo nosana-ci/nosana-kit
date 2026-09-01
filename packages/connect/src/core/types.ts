@@ -74,3 +74,34 @@ export interface ConnectStore {
   set(key: string, value: string): void | Promise<void>;
   remove(key: string): void | Promise<void>;
 }
+
+/** A Connect config plus an optional store — the input to a session factory. */
+export type ConnectSessionConfig = ConnectConfig & { store?: ConnectStore };
+
+/** Options for starting a login. */
+export interface LoginOptions {
+  /** Override the configured redirect URI for this request. */
+  redirectUri?: string;
+  /** Override scopes for this request. */
+  scopes?: string[];
+  /** Arbitrary state restored on the callback (e.g. the path to return to). */
+  appState?: unknown;
+  /** Extra authorize params (e.g. prompt, login_hint). */
+  extraParams?: Record<string, string>;
+}
+
+/** The result of completing a login callback. */
+export interface CallbackResult {
+  appState?: unknown;
+  tokens: TokenResponse;
+}
+
+/**
+ * The minimal contract the SDK needs from a Connect session: a source of the
+ * current access token. The browser session (`createBrowserConnect`) satisfies
+ * it, as does any token source you provide, so either can drive an
+ * `@nosana/kit` client's API auth.
+ */
+export interface ConnectSession {
+  getAccessToken(): string | Promise<string>;
+}

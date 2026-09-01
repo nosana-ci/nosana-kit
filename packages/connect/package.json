@@ -20,6 +20,10 @@
     "./browser": {
       "types": "./dist/browser/index.d.ts",
       "import": "./dist/browser/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js"
     }
   },
   "files": [

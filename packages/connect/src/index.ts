@@ -1,4 +1,4 @@
-// Isomorphic core. Environment-specific helpers live at:
-//   @nosana/connect/browser  — SPA redirect flow (public + PKCE)
-//   @nosana/connect/server    — confidential web app handlers (coming next)
+// Isomorphic core. Environment-specific flows live at @nosana/connect/browser
+// and @nosana/connect/server; `createConnect` picks between them from your config.
 export * from './core/index.js';
+export { createConnect, type ConnectFactoryConfig } from './factory.js';
