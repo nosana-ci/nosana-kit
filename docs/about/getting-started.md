@@ -37,7 +37,7 @@ Direct HTTP API access works with any programming language.
 - **Get started**: [API Documentation](/api/intro)
 
 ```bash
-curl -X POST "https://dashboard.k8s.prd.nos.ci/api/deployments/create" \
+curl -X POST "https://api.nosana.com/deployments/create" \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

@@ -21,7 +21,7 @@ Before calling the API, ensure you have:
 - **Base URL**: The current production API base URL:
 
 ```bash
-https://dashboard.k8s.prd.nos.ci/api
+https://api.nosana.com
 ```
 
 ### Authentication
@@ -52,7 +52,7 @@ For wallet-based authentication with vault management capabilities, see the [Wal
 
 You can explore all available endpoints and schemas in the interactive Swagger UI:
 
-- **Swagger UI**: https://dashboard.k8s.prd.nos.ci/api/swagger
+- **Swagger UI**: https://api.nosana.com/api/docs
 
 Use this reference to:
 

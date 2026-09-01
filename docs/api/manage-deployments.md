@@ -52,7 +52,7 @@ const { deployments } = await client.api.deployments.list();
 ```bash
 curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments | jq .
+  https://api.nosana.com/deployments | jq .
 ```
 
 :::
@@ -78,7 +78,7 @@ const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
 ```bash
 curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID | jq .
 ```
 
 :::
@@ -125,7 +125,7 @@ curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d @job-definition.json \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/create-revision | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/create-revision | jq .
 ```
 
 :::
@@ -157,7 +157,7 @@ curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"replicas": 3}' \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/update-replica-count | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-replica-count | jq .
 ```
 
 :::
@@ -187,7 +187,7 @@ curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"schedule": "0 0 * * *"}' \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/update-schedule | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-schedule | jq .
 ```
 
 :::
@@ -220,7 +220,7 @@ curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"timeout": 120}' \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/update-timeout | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-timeout | jq .
 ```
 
 :::
@@ -250,7 +250,7 @@ await deployment.start();
 curl -s \
   -X POST \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/start | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/start | jq .
 ```
 
 :::
@@ -280,7 +280,7 @@ await deployment.stop();
 curl -s \
   -X POST \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/<deployment_id>/stop | jq .
+  https://api.nosana.com/deployments/<deployment_id>/stop | jq .
 ```
 
 :::
@@ -312,7 +312,7 @@ await deployment.archive();
 curl -s \
   -X POST \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/<deployment_id>/archive | jq .
+  https://api.nosana.com/deployments/<deployment_id>/archive | jq .
 ```
 
 :::
@@ -380,4 +380,4 @@ This example gets a deployment, updates its replica count and timeout, and then 
 
 ## Full API Reference
 
-For all deployment endpoints and fields, consult the **[API Swagger reference](https://dashboard.k8s.prd.nos.ci/api/swagger)**.
+For all deployment endpoints and fields, consult the **[API Swagger reference](https://api.nosana.com/api/docs)**.
