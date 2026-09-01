@@ -64,6 +64,21 @@ const balance = await client.api.credits.balance();
 The SDK attaches the user's login to each request and refreshes it automatically, so it
 keeps working without you managing tokens.
 
+### Know whether someone's signed in
+
+On page load, use `isAuthenticated()` to decide what to show — your signed-in UI, or the
+"Connect with Nosana" button. The sign-in persists across reloads, so returning visitors
+stay logged in:
+
+```ts
+if (await client.connect.isAuthenticated()) {
+  const user = await client.connect.getUser(); // their profile (name, email, …)
+  // show the app
+} else {
+  // show the "Connect with Nosana" button
+}
+```
+
 To sign out:
 
 ```ts
@@ -145,7 +160,7 @@ function connectFor(session) {
 }
 
 // Then use it per request, exactly as before:
-app.get('/login', (req, res) => res.redirect(await connectFor(req.session).getLoginUrl()));
+app.get('/login', async (req, res) => res.redirect(await connectFor(req.session).getLoginUrl()));
 app.get('/callback', async (req, res) => {
   await connectFor(req.session).handleCallback(req.url);
   res.redirect('/');
@@ -156,6 +171,9 @@ Everything else stays the same — each user's sign-in is kept in their own sess
 
 ## Good to know
 
+- **Which network?** The network you pass to `createNosanaClient` (`NosanaNetwork.MAINNET`
+  or `NosanaNetwork.DEVNET`) picks the matching sign-in and API endpoints for you — no URLs
+  to configure.
 - **Already using the Nosana dashboard's own login?** If your app runs on a `nosana.com`
   address, you don't need this — the SDK already recognises the signed-in user.
 - Want the finer details — every option and method? They're in the
