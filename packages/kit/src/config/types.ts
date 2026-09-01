@@ -1,5 +1,6 @@
 import { ApiConfig } from '@nosana/api';
 import type { TokenProvider } from '@nosana/api';
+import type { ConnectFactoryConfig, ConnectSession } from '@nosana/connect';
 import type { IPFSConfig } from '@nosana/ipfs';
 import type { AuthorizationStore } from '@nosana/authorization';
 import type { Address, TransactionSigner } from '@solana/kit';
@@ -92,6 +93,16 @@ export interface AuthorizationConfig {
   store?: AuthorizationStore['actions'];
 }
 
+/**
+ * The client's `connect` input: either an already-created Connect session
+ * (anything exposing `getAccessToken` — e.g. a `createConnect(...)` result) or
+ * config to build one. When it's config, the client builds the session for you
+ * with `createConnect` — a `clientSecret` selects the server flow, otherwise
+ * browser. Either way its access token is wired into the API client, so you
+ * never pass `api.getToken` yourself.
+ */
+export type ConnectInput = ConnectSession | ConnectFactoryConfig;
+
 export interface ClientConfig {
   solana: SolanaConfig;
   wallet?: Wallet;
@@ -100,6 +111,7 @@ export interface ClientConfig {
   programs: ProgramConfig;
   api?: APIConfig;
   authorization?: AuthorizationConfig;
+  connect?: ConnectInput;
 }
 
 export interface PartialClientConfig {
@@ -110,4 +122,5 @@ export interface PartialClientConfig {
   programs?: Partial<ProgramConfig>;
   api?: Partial<APIConfig>;
   authorization?: Partial<AuthorizationConfig>;
+  connect?: ConnectInput;
 }

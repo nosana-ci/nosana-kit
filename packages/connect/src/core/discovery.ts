@@ -18,6 +18,13 @@ export function defaultEndpoints(issuer: string): AuthorizationServerMetadata {
   };
 }
 
+// A resolved discovery document is stable for an issuer, so cache it for the
+// process lifetime — otherwise the per-request server session pattern re-fetches
+// it on every sign-in and refresh. Only successful discoveries with the default
+// fetch are cached: a custom fetch (tests) bypasses it, and a fallback from a
+// transient failure is never cached so it can be retried.
+const discoveryCache = new Map<string, AuthorizationServerMetadata>();
+
 /** Fetch the OIDC discovery document for an issuer, falling back to constructed
  *  endpoints when it is missing or malformed. */
 export async function discover(
@@ -25,12 +32,17 @@ export async function discover(
   fetchImpl: typeof fetch = fetch,
 ): Promise<AuthorizationServerMetadata> {
   const base = issuer.replace(/\/+$/, '');
+  const cacheable = fetchImpl === fetch;
+  if (cacheable) {
+    const cached = discoveryCache.get(base);
+    if (cached) return cached;
+  }
   try {
     const res = await fetchImpl(`${base}/.well-known/openid-configuration`);
     if (!res.ok) return defaultEndpoints(base);
     const doc = (await res.json()) as Partial<AuthorizationServerMetadata>;
     if (!doc.authorization_endpoint || !doc.token_endpoint) return defaultEndpoints(base);
-    return {
+    const metadata: AuthorizationServerMetadata = {
       issuer: doc.issuer ?? base,
       authorization_endpoint: doc.authorization_endpoint,
       token_endpoint: doc.token_endpoint,
@@ -38,6 +50,8 @@ export async function discover(
       jwks_uri: doc.jwks_uri,
       end_session_endpoint: doc.end_session_endpoint,
     };
+    if (cacheable) discoveryCache.set(base, metadata);
+    return metadata;
   } catch {
     return defaultEndpoints(base);
   }

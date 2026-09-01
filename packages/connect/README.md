@@ -11,7 +11,6 @@ security guarantee holds and your app never touches a `code_challenge`.
 
 - **Isomorphic core** — works in browsers and Node 20+ (uses Web Crypto + `fetch`).
 - **`@nosana/connect/browser`** — drop-in SPA redirect flow with token management.
-- **`@nosana/connect/server`** — confidential web-app handlers *(coming next)*.
 
 ## Install
 
@@ -62,28 +61,28 @@ refreshing via the refresh token when it's near expiry.
 
 ## Use with `@nosana/kit`
 
-`@nosana/kit` re-exports this package and accepts a Connect session as its API auth, so
-`kit.api.*` calls carry the (auto-refreshed) Connect token — no manual header handling:
+`@nosana/kit` re-exports this package and can build the Connect session for you: pass a
+`connect` config and `kit.api.*` calls carry the (auto-refreshed) token — no manual header
+handling:
 
 ```ts
-import { createNosanaClient, createBrowserConnect } from "@nosana/kit";
+import { createNosanaClient, createBrowserConnect, NosanaNetwork } from "@nosana/kit";
 
-const connect = createBrowserConnect({
-  clientId: "stcl_…",
-  redirectUri: location.origin + "/callback",
-});
-// …loginWithRedirect / handleRedirectCallback as above…
+// Build the session (keep the ref for login), pass it to the client.
+const connect = createBrowserConnect({ clientId: "stcl_…", redirectUri: location.origin + "/callback" });
+const client = createNosanaClient(NosanaNetwork.MAINNET, { connect });
 
-const kit = createNosanaClient({
-  network: "mainnet",
-  api: { getToken: () => connect.getAccessToken() }, // dynamic bearer, refreshed per request
-});
-
-await kit.api.credits.balance(); // Authorization: Bearer <fresh token>
+// …connect.loginWithRedirect() / connect.handleRedirectCallback() as above…
+await client.api.credits.balance(); // Authorization: Bearer <fresh token>
 ```
 
-`getToken` is resolved on every request, so the token stays fresh; a static `api.apiKey`
-would go stale after expiry.
+`connect` also accepts browser config to build for you (`{ connect: { clientId, redirectUri } }`),
+or any session exposing `getAccessToken()`. The token is resolved on every request, so it
+stays fresh — a static `api.apiKey` would go stale.
+
+**Server-side web apps** (acting on behalf of a logged-in user) don't build a session here:
+exchange the code with your client secret, then pass that user's token to the client with
+`api: { getToken: () => usersAccessToken }`.
 
 > This is the cross-origin path. A **first-party** app on a `*.nosana.com` domain can
 > instead ride the existing session cookie with `api: { include_credentials: true }` and

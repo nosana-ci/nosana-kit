@@ -14,7 +14,7 @@ const DEFAULT_SCOPES = ['openid', 'offline_access'];
 /**
  * Stateless OAuth 2.1 / OIDC client. Environment-agnostic: it constructs
  * authorize URLs and performs token requests, but owns no storage and triggers
- * no redirects — the browser/server wrappers layer those on top.
+ * no redirects — the browser wrapper (`createBrowserConnect`) layers those on top.
  */
 export class NosanaConnectClient {
   private readonly config: ConnectConfig;

@@ -186,6 +186,7 @@ export default withMermaid(
               { text: 'Token Service', link: '/kit/token-service' },
               { text: 'API Service', link: '/kit/api-service' },
               { text: 'Authorization Service', link: '/kit/authorization-service' },
+              { text: 'Connect with Nosana', link: '/kit/connect' },
             ],
           },
           {
