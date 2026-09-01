@@ -1,5 +1,11 @@
 export { NosanaConnectClient } from './client.js';
-export { DEFAULT_ISSUER, defaultEndpoints, discover } from './discovery.js';
+export {
+  DEFAULT_ISSUER,
+  NOSANA_ISSUERS,
+  issuerForNetwork,
+  defaultEndpoints,
+  discover,
+} from './discovery.js';
 export { memoryStore } from './store.js';
 export { createConnectSession, type ConnectSessionCore, type StoredTokens } from './session.js';
 export {

@@ -1,10 +1,15 @@
 import { createBrowserConnect, type BrowserConnect } from './browser/index.js';
 import { createServerConnect, type ServerConnect } from './server/index.js';
-import type { ConnectSessionConfig } from './core/index.js';
+import type { ConnectSession, ConnectSessionConfig } from './core/index.js';
 
 /** Config accepted by {@link createConnect}: a Connect config plus an optional
  *  store. A `clientSecret` selects the server flow; omitting it selects browser. */
 export type ConnectFactoryConfig = ConnectSessionConfig;
+
+/** True when a value is already a Connect session (vs. config to build one). */
+export const isConnectSession = (
+  value: ConnectSession | ConnectSessionConfig,
+): value is ConnectSession => typeof (value as ConnectSession).getAccessToken === 'function';
 
 /**
  * Create a "Connect with Nosana" session, picking the flow from your config:

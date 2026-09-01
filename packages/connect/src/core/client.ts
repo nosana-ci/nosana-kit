@@ -24,7 +24,9 @@ export class NosanaConnectClient {
   constructor(config: ConnectConfig) {
     if (!config.clientId) throw new Error('NosanaConnect: clientId is required');
     this.config = config;
-    this.fetchImpl = config.fetch ?? fetch;
+    // Bind to globalThis: the browser `fetch` throws "Illegal invocation" when
+    // called as a method (`this.fetchImpl(...)`) with a non-global `this`.
+    this.fetchImpl = config.fetch ?? fetch.bind(globalThis);
   }
 
   /** Resolve (and cache) the authorization-server metadata. */
