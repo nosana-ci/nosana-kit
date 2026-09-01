@@ -75,7 +75,7 @@ async function createDeployment() {
 ```bash
 export NOSANA_API_KEY="nos_xxx_your_api_key"
 
-curl -X POST "https://dashboard.k8s.prd.nos.ci/api/deployments/create" \
+curl -X POST "https://api.nosana.com/deployments/create" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -d '{
@@ -135,7 +135,7 @@ async function startDeployment(id: string) {
 curl -s \
   -X POST \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/<deployment_id>/start | jq .
+  https://api.nosana.com/deployments/<deployment_id>/start | jq .
 ```
 
 :::

@@ -145,7 +145,7 @@ await deployment.vault.withdraw();
 == HTTP API
 
 ```bash
-curl -X POST https://dashboard.k8s.prd.nos.ci/api/deployments/vaults/{vault}/withdraw \
+curl -X POST https://api.nosana.com/deployments/vaults/{vault}/withdraw \
   -H "Authorization: NosanaApiAuthentication:<signed-message>" \
   -H "x-user-id: <your-public-key>" \
   -H "Content-Type: application/json"
@@ -196,7 +196,7 @@ console.log('Created at:', vault.created_at);
 == HTTP API
 
 ```bash
-curl -X POST https://dashboard.k8s.prd.nos.ci/api/deployments/vaults/create \
+curl -X POST https://api.nosana.com/deployments/vaults/create \
   -H "Authorization: NosanaApiAuthentication:<signed-message>" \
   -H "x-user-id: <your-public-key>" \
   -H "Content-Type: application/json"
@@ -236,7 +236,7 @@ vaults.forEach((vault) => {
 == HTTP API
 
 ```bash
-curl -X GET https://dashboard.k8s.prd.nos.ci/api/deployments/vaults \
+curl -X GET https://api.nosana.com/deployments/vaults \
   -H "Authorization: NosanaApiAuthentication:<signed-message>" \
   -H "x-user-id: <your-public-key>"
 ```
