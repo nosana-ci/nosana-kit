@@ -2,7 +2,7 @@ import { NosanaNetwork } from '@nosana/types';
 import { NosanaApiClient } from '@nosana/api';
 import { createIpfsClient, NosanaIpfsClient } from '@nosana/ipfs';
 import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/authorization';
-import { createConnect } from '@nosana/connect';
+import { createConnect, defaultEndpoints, isConnectSession, issuerForNetwork } from '@nosana/connect';
 import type { ConnectFactoryConfig, ConnectSession } from '@nosana/connect';
 import type { BrowserConnect } from '@nosana/connect/browser';
 import type { ServerConnect } from '@nosana/connect/server';
@@ -82,13 +82,23 @@ export interface NosanaClient {
  * client.wallet = myWallet;
  * ```
  */
-/** True when a `connect` input is already a session (vs. browser config to build). */
-const isConnectSession = (input: ConnectInput): input is ConnectSession =>
-  typeof (input as ConnectSession).getAccessToken === 'function';
-
-/** Resolve a `connect` input to a session: pass a session through, build from config. */
-const resolveConnect = (input: ConnectInput): ConnectSession =>
-  isConnectSession(input) ? input : createConnect(input);
+/**
+ * Resolve a `connect` input to a session: pass a session through, or build from
+ * config. With no caller `issuer`, default it from the network and pin the
+ * endpoints to that host with `defaultEndpoints` (Nosana's fixed SuperTokens
+ * layout). This keeps the whole OAuth flow — and its CSRF cookie — on the
+ * dashboard API host (the same host the dashboard's SuperTokens uses), rather
+ * than the internal host the provider's discovery advertises, which would split
+ * the cookie across hosts and fail at consent. A caller-supplied `issuer` still
+ * uses normal discovery.
+ */
+const resolveConnect = (input: ConnectInput, network: NosanaNetwork): ConnectSession => {
+  if (isConnectSession(input)) return input;
+  if (input.issuer) return createConnect(input);
+  const issuer = issuerForNetwork(network);
+  if (!issuer) return createConnect(input);
+  return createConnect({ ...input, issuer, metadata: input.metadata ?? defaultEndpoints(issuer) });
+};
 
 const createClientFromConfig = (config: ClientConfig, network: NosanaNetwork): NosanaClient => {
   const logger = new Logger({ level: config.logLevel });
@@ -138,7 +148,7 @@ const createClientFromConfig = (config: ClientConfig, network: NosanaNetwork): N
   // "Connect with Nosana": use the passed-in session, or build one from config
   // (see the `connect` docs on ClientConfig). Its token is wired into the API
   // client below, so callers never pass api.getToken.
-  const connect = config.connect ? resolveConnect(config.connect) : undefined;
+  const connect = config.connect ? resolveConnect(config.connect, network) : undefined;
   const apiConfig: APIConfig | undefined = connect
     ? { ...config.api, getToken: config.api?.getToken ?? (() => connect.getAccessToken()) }
     : config.api;

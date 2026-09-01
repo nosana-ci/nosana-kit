@@ -1,0 +1,19 @@
+{
+  "name": "@nosana/connect-browser-demo",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Tiny browser demo: Connect with Nosana + a couple of API calls, via @nosana/kit",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@nosana/kit": "link:../../../kit"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^5.4.11"
+  }
+}

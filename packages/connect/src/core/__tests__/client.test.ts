@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NosanaConnectClient } from '../client.js';
 import type { AuthorizationServerMetadata } from '../types.js';
 
@@ -112,5 +112,37 @@ describe('NosanaConnectClient', () => {
       fetch: fetchMock as unknown as typeof fetch,
     });
     await expect(client.exchangeCode({ code: 'bad' })).rejects.toThrow(/400/);
+  });
+});
+
+describe('default fetch binding (browser "Illegal invocation" regression)', () => {
+  const original = globalThis.fetch;
+  afterEach(() => {
+    globalThis.fetch = original;
+  });
+
+  it('invokes the default fetch bound to the global, not the client instance', async () => {
+    // Emulate a browser: `fetch` throws when called with a non-global `this`
+    // (Node's fetch does not, which is why the original bug slipped through).
+    const seenThis: unknown[] = [];
+    globalThis.fetch = function (this: unknown) {
+      seenThis.push(this);
+      if (this !== undefined && this !== globalThis) {
+        throw new TypeError("Failed to execute 'fetch' on 'Window': Illegal invocation");
+      }
+      return Promise.resolve(jsonResponse({ access_token: 'at', token_type: 'bearer' }));
+    } as unknown as typeof fetch;
+
+    // No custom fetch → the client must bind the global default.
+    const client = new NosanaConnectClient({
+      clientId: 'id',
+      clientSecret: 'sec',
+      redirectUri: 'https://app.test/cb',
+      metadata, // avoids a discovery fetch
+    });
+
+    const tokens = await client.exchangeCode({ code: 'abc' });
+    expect(tokens.access_token).toBe('at');
+    expect(seenThis).toContain(globalThis);
   });
 });

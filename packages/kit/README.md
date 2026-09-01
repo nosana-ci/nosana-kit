@@ -1124,6 +1124,10 @@ Prefer a one-liner? Let the client build the session from config —
 
 - The token is resolved on **every** request, so it stays fresh — a static `api.apiKey`
   would go stale. See the [`@nosana/connect` README](../connect/README.md) for the full API.
+- **Environment follows the network.** When the kit builds the session from a `connect`
+  config, the OAuth issuer defaults from the network you pass — `NosanaNetwork.MAINNET` →
+  `deploy.nosana.com`, `NosanaNetwork.DEVNET` → `devnet.nosana.com`. Override with
+  `connect.issuer`. (A session you build yourself and pass in keeps its own issuer.)
 - **Server-side web apps** (acting for a logged-in user) run the confidential redirect flow
   on your backend, then pass that user's token to the client via
   `api: { getToken: () => usersAccessToken }` — `connect` is the browser convenience.
