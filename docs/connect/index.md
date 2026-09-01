@@ -67,7 +67,7 @@ keeps working without you managing tokens.
 To sign out:
 
 ```ts
-await connect.logout();
+await client.connect.logout();
 ```
 
 ## Server apps
@@ -159,4 +159,4 @@ Everything else stays the same — each user's sign-in is kept in their own sess
 - **Already using the Nosana dashboard's own login?** If your app runs on a `nosana.com`
   address, you don't need this — the SDK already recognises the signed-in user.
 - Want the finer details — every option and method? They're in the
-  [SDK Reference](./reference/).
+  [SDK Reference](/kit/reference/).
