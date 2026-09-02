@@ -118,6 +118,13 @@ export type DeploymentStreamHandlers = {
    * one op share a tunnel and so are restated together.
    */
   onEndpoint?: (event: DeploymentStreamEventOf<'endpoint'>) => void;
+  /**
+   * The authoritative set of the deployment's active jobs, by id, sent once when
+   * the stream opens (ahead of the per-job frames). Prune any active job still
+   * shown whose id is absent here: a completion missed while disconnected is not
+   * replayed as a `job` frame, so this is the only signal that it is gone.
+   */
+  onJobs?: (event: DeploymentStreamEventOf<'jobs'>) => void;
   /** The stream opened, or reopened after dropping: resynchronise from here. */
   onOpen?: () => void;
   onError?: (error: unknown) => void;

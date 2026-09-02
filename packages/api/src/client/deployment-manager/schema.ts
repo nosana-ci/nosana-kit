@@ -2286,6 +2286,13 @@ export interface components {
             node: string | null;
             timeStart: number;
             timeEnd: number;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+        } | {
+            /** @enum {string} */
+            type: "jobs";
+            jobs: string[];
         } | {
             /** @enum {string} */
             type: "event";

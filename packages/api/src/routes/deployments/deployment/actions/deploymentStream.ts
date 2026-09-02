@@ -25,6 +25,7 @@ const DISPATCH: {
 } = {
   deployment: (handlers, event) => handlers.onDeployment?.(event),
   job: (handlers, event) => handlers.onJob?.(event),
+  jobs: (handlers, event) => handlers.onJobs?.(event),
   event: (handlers, event) => handlers.onEvent?.(event),
   task: (handlers, event) => handlers.onTask?.(event),
   endpoint: (handlers, event) => handlers.onEndpoint?.(event),
