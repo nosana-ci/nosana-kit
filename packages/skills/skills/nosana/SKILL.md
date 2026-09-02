@@ -289,7 +289,7 @@ where they do, these were checked against the shipped types and the live API.
    stream returns the string union. `deployment.getJob()` is typed
    `string | number`. Normalise on read.
 3. **Two ways in over HTTP.** Calling directly, use the gateway at
-   `https://dashboard.k8s.prd.nos.ci/api` — one host, every route, and a merged
+   `https://api.nosana.com` — one host, every route, and a merged
    OpenAPI spec (see below). The SDK instead calls the four services behind it
    directly — `client-manager` (auth, credits, templates, job writes),
    `blockchain-indexer` (job reads, stats), `deployment-manager` (deployments,
@@ -335,8 +335,13 @@ spec, so you don't need to know which service owns what:
 
 | | |
 |---|---|
-| Spec | `https://dashboard.k8s.prd.nos.ci/api/openapi.json` |
-| Browsable | `https://dashboard.k8s.prd.nos.ci/api/docs` |
+| Spec | `https://api.nosana.com/api/openapi.json` |
+| Browsable | `https://api.nosana.com/api/docs` |
+
+Routes answer both with and without the `/api` prefix
+(`/markets/` and `/api/markets/` are the same route); the spec and its docs UI
+are only under `/api`. The older `dashboard.k8s.prd.nos.ci/api` host still
+answers, but `api.nosana.com` is what the docs now use.
 
 Read the spec when you need a route this skill doesn't cover, an exact request
 or response shape, or a query parameter — it is generated from the running
