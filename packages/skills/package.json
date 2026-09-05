@@ -1,6 +1,6 @@
 {
   "name": "@nosana/skills",
-  "version": "2.11.2",
+  "version": "2.12.0",
   "description": "Claude Code plugin teaching AI coding agents to deploy and monitor Nosana workloads",
   "type": "module",
   "private": true,
