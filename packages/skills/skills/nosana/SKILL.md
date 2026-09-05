@@ -335,13 +335,8 @@ spec, so you don't need to know which service owns what:
 
 | | |
 |---|---|
-| Spec | `https://api.nosana.com/api/openapi.json` |
-| Browsable | `https://api.nosana.com/api/docs` |
-
-Routes answer both with and without the `/api` prefix
-(`/markets/` and `/api/markets/` are the same route); the spec and its docs UI
-are only under `/api`. The older `dashboard.k8s.prd.nos.ci/api` host still
-answers, but `api.nosana.com` is what the docs now use.
+| Spec | `https://api.nosana.com/openapi.json` |
+| Browsable | `https://api.nosana.com/docs` |
 
 Read the spec when you need a route this skill doesn't cover, an exact request
 or response shape, or a query parameter — it is generated from the running
