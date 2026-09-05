@@ -1,0 +1,34 @@
+User-agent: *
+Allow: /
+
+# Answer and search crawlers: allowed. They cite sources, so indexing sends
+# developers back here.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Bulk training-corpus crawlers: disallowed. They neither cite nor refer.
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+Sitemap: https://docs.nosana.com/sitemap.xml
