@@ -8,6 +8,12 @@ vi.mock('../actions/index.js', () => ({
   deploymentArchive: vi.fn(),
   deploymentUpdateReplicaCount: vi.fn(),
   deploymentGetTasks: vi.fn().mockResolvedValue([]),
+  deploymentGetSshKeys: vi.fn().mockResolvedValue({ public_keys: [] }),
+  deploymentUpdateSshKeys: vi.fn().mockResolvedValue({
+    public_keys: [],
+    updated_at: '2026-08-26T12:00:00.000Z',
+    jobs: [],
+  }),
   deploymentUpdateTimeout: vi.fn(),
   deploymentCreateNewRevision: vi.fn(),
   deploymentUpdateActiveRevision: vi.fn(),
@@ -39,6 +45,8 @@ describe('createDeployment', () => {
     expect(deployment.getTasks).toBeTypeOf('function');
     expect(deployment.getJob).toBeTypeOf('function');
     expect(deployment.generateAuthHeader).toBeTypeOf('function');
+    expect(deployment.getSshKeys).toBeTypeOf('function');
+    expect(deployment.updateSshKeys).toBeTypeOf('function');
     expect(deployment.createRevision).toBeTypeOf('function');
     expect(deployment.updateReplicaCount).toBeTypeOf('function');
     expect(deployment.updateActiveRevision).toBeTypeOf('function');
@@ -94,6 +102,31 @@ describe('createDeployment', () => {
         'job-123',
       );
       expect(result).toEqual({ id: 'job-id' });
+    });
+
+    test('when getSshKeys is invoked, it should call getSshKeys action', async () => {
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+
+      const result = await deployment.getSshKeys();
+
+      expect(actions.deploymentGetSshKeys).toHaveBeenCalledWith(
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
+        expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
+      );
+      expect(result).toEqual({ public_keys: [] });
+    });
+
+    test('when updateSshKeys is invoked, it should call updateSshKeys action', async () => {
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+      const publicKeys = ['ssh-ed25519 AAAA test@example.com'];
+
+      await deployment.updateSshKeys(publicKeys);
+
+      expect(actions.deploymentUpdateSshKeys).toHaveBeenCalledWith(
+        publicKeys,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
+        expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
+      );
     });
 
     test('when updateSchedule method is invoked, it should call updateSchedule action', async () => {
@@ -261,4 +294,3 @@ describe('createDeployment', () => {
     });
   });
 });
-

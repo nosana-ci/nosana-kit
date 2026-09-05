@@ -1709,3 +1709,9 @@ MIT
 - [Nosana Network](https://nosana.com)
 - [GitHub Repository](https://github.com/nosana-ci/nosana-kit)
 - [NPM Package](https://www.npmjs.com/package/@nosana/kit)
+
+## SSH access
+
+`client.ssh` supports temporary and permanent keys, listing, replacement, and
+revocation on running jobs. See the [SSH access guide](../../docs/kit/ssh-access.md)
+for the node contract and deployment-manager integration.
