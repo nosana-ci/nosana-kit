@@ -8,8 +8,15 @@ vi.mock('../actions/index.js', () => ({
   deploymentArchive: vi.fn(),
   deploymentUpdateReplicaCount: vi.fn(),
   deploymentGetTasks: vi.fn().mockResolvedValue([]),
-  deploymentGetSshKeys: vi.fn().mockResolvedValue({ public_keys: [] }),
-  deploymentUpdateSshKeys: vi.fn().mockResolvedValue({
+  deploymentGetSshKeys: vi.fn().mockResolvedValue({
+    public_keys: ['ssh-ed25519 AAAA test@example.com'],
+  }),
+  deploymentAddSshKeys: vi.fn().mockResolvedValue({
+    public_keys: ['ssh-ed25519 AAAA test@example.com'],
+    updated_at: '2026-08-26T12:00:00.000Z',
+    jobs: [],
+  }),
+  deploymentRemoveSshKeys: vi.fn().mockResolvedValue({
     public_keys: [],
     updated_at: '2026-08-26T12:00:00.000Z',
     jobs: [],
@@ -45,8 +52,9 @@ describe('createDeployment', () => {
     expect(deployment.getTasks).toBeTypeOf('function');
     expect(deployment.getJob).toBeTypeOf('function');
     expect(deployment.generateAuthHeader).toBeTypeOf('function');
-    expect(deployment.getSshKeys).toBeTypeOf('function');
-    expect(deployment.updateSshKeys).toBeTypeOf('function');
+    expect(deployment.ssh.keys).toBeTypeOf('function');
+    expect(deployment.ssh.add).toBeTypeOf('function');
+    expect(deployment.ssh.remove).toBeTypeOf('function');
     expect(deployment.createRevision).toBeTypeOf('function');
     expect(deployment.updateReplicaCount).toBeTypeOf('function');
     expect(deployment.updateActiveRevision).toBeTypeOf('function');
@@ -104,29 +112,43 @@ describe('createDeployment', () => {
       expect(result).toEqual({ id: 'job-id' });
     });
 
-    test('when getSshKeys is invoked, it should call getSshKeys action', async () => {
+    test('when ssh.keys is invoked, it should call getSshKeys action and return the keys', async () => {
       const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
 
-      const result = await deployment.getSshKeys();
+      const result = await deployment.ssh.keys();
 
       expect(actions.deploymentGetSshKeys).toHaveBeenCalledWith(
         global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
-      expect(result).toEqual({ public_keys: [] });
+      expect(result).toEqual(['ssh-ed25519 AAAA test@example.com']);
     });
 
-    test('when updateSshKeys is invoked, it should call updateSshKeys action', async () => {
+    test('when ssh.add is invoked, it should call addSshKeys action', async () => {
       const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
       const publicKeys = ['ssh-ed25519 AAAA test@example.com'];
 
-      await deployment.updateSshKeys(publicKeys);
+      const result = await deployment.ssh.add(publicKeys);
 
-      expect(actions.deploymentUpdateSshKeys).toHaveBeenCalledWith(
+      expect(actions.deploymentAddSshKeys).toHaveBeenCalledWith(
         publicKeys,
         global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
+      expect(result.public_keys).toEqual(publicKeys);
+    });
+
+    test('when ssh.remove is invoked, it should call removeSshKeys action', async () => {
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+
+      const result = await deployment.ssh.remove('ssh-ed25519 AAAA test@example.com');
+
+      expect(actions.deploymentRemoveSshKeys).toHaveBeenCalledWith(
+        'ssh-ed25519 AAAA test@example.com',
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
+        expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
+      );
+      expect(result.public_keys).toEqual([]);
     });
 
     test('when updateSchedule method is invoked, it should call updateSchedule action', async () => {

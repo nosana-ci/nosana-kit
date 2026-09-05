@@ -590,6 +590,7 @@ export type {
   DeploymentState,
   DeploymentJob,
   DeploymentDuplicateOptions,
+  DeploymentSsh,
   DeploymentSshKeys,
   DeploymentUpdateSshKeysBody,
   DeploymentUpdateSshKeysResult,

@@ -151,6 +151,9 @@ await vault.topup({ NOS: 100 });
 | `updateMarket` | `market: string` | `Promise<void>` |
 | `duplicate` | `options: DeploymentDuplicateOptions` | `Promise<Deployment>` |
 | `generateAuthHeader` | — | `Promise<unknown>` |
+| `ssh.keys` | — | `Promise<string[]>` |
+| `ssh.add` | `publicKeys: string \| string[]` | `Promise<DeploymentUpdateSshKeysResult>` |
+| `ssh.remove` | `publicKeys: string \| string[]` | `Promise<DeploymentUpdateSshKeysResult>` |
 
 ### `api.templates` — Deployment Templates
 

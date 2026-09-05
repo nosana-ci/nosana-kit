@@ -33,10 +33,16 @@ until disconnected or the job ends.
 
 ## Deployment manager integration
 
-The existing deployment API still accepts `{ public_keys: string[] }`:
+Deployment-level keys are managed on the deployment object under `deployment.ssh`.
+They are stored on the deployment (no new revision or restart) and injected into
+every job posted from then on. `add` and `remove` accept one key or a list, and
+identify a key by its type and material, so a differing comment neither adds a
+duplicate nor misses a removal:
 
 ```ts
-const result = await deployment.updateSshKeys(publicKeys);
+const keys = await deployment.ssh.keys();
+const result = await deployment.ssh.add(publicKey);
+await deployment.ssh.remove(publicKey);
 // Saving can succeed while node updates fail. Inspect result.jobs.
 ```
 

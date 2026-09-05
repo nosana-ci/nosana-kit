@@ -1,3 +1,4 @@
+export * from './deploymentAddSshKeys.js';
 export * from './deploymentArchive.js';
 export * from './deploymentCreateNewRevision.js';
 export * from './deploymentDelete.js';
@@ -8,6 +9,7 @@ export * from './deploymentGetJobs.js';
 export * from './deploymentGetRevisions.js';
 export * from './deploymentGetSshKeys.js';
 export * from './deploymentGetTasks.js';
+export * from './deploymentRemoveSshKeys.js';
 export * from './deploymentStart.js';
 export * from './deploymentStop.js';
 export * from './deploymentGenerateAuthHeader.js';

@@ -134,6 +134,23 @@ export type DeploymentStreamHandlers = {
   onError?: (error: unknown) => void;
 };
 
+/** SSH key management for a deployment's jobs, under `deployment.ssh`. */
+export type DeploymentSsh = {
+  /** The SSH public keys currently granted access to the deployment's jobs. */
+  keys: () => Promise<string[]>;
+  /**
+   * Grant one or more OpenSSH public keys access. Keys already present are left
+   * as they are: a key is identified by its type and material, so a differing
+   * comment does not add it twice.
+   */
+  add: (publicKeys: string | string[]) => Promise<DeploymentUpdateSshKeysResult>;
+  /**
+   * Revoke one or more OpenSSH public keys. A removed key stops working on a
+   * running job only when that job restarts.
+   */
+  remove: (publicKeys: string | string[]) => Promise<DeploymentUpdateSshKeysResult>;
+};
+
 // API deployment (with API key auth) - no vault
 export type ApiDeployment = DeploymentState & {
   start: () => Promise<void>;
@@ -148,8 +165,7 @@ export type ApiDeployment = DeploymentState & {
   /** Stream changes over server-sent events; close it to stop. */
   stream: (handlers: DeploymentStreamHandlers) => DeploymentStreamSubscription;
   generateAuthHeader: (query?: DeploymentAuthHeaderParams) => Promise<string>;
-  getSshKeys: () => Promise<DeploymentSshKeys>;
-  updateSshKeys: (publicKeys: string[]) => Promise<DeploymentUpdateSshKeysResult>;
+  ssh: DeploymentSsh;
   createRevision: (jobDefinition: JobDefinition) => Promise<void>;
   updateActiveRevision: (revision: number) => Promise<void>;
   updateReplicaCount: (replicas: number) => Promise<void>;

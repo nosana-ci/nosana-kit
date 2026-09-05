@@ -14,7 +14,8 @@ import {
   deploymentCreateNewRevision,
   deploymentUpdateActiveRevision,
   deploymentUpdateSchedule,
-  deploymentUpdateSshKeys,
+  deploymentAddSshKeys,
+  deploymentRemoveSshKeys,
   deploymentUpdateName,
   deploymentGenerateAuthHeader,
   deploymentDelete,
@@ -40,7 +41,6 @@ import type {
   DeploymentDuplicateOptions,
   DeploymentStreamHandlers,
   DeploymentStreamSubscription,
-  DeploymentSshKeys,
   DeploymentUpdateSshKeysResult,
 } from '../types.js';
 import type {
@@ -228,19 +228,40 @@ export function createDeployment(
   };
 
   /**
-   * Gets the SSH public keys configured for this deployment.
+   * @description SSH key management for the deployment's jobs.
+   * Keys are stored on the deployment (no new revision or restart) and injected
+   * into every job posted from then on. Running jobs are updated in place where
+   * their node allows it; check the returned `jobs` for nodes that did not.
    */
-  const getSshKeys = async (): Promise<DeploymentSshKeys> => {
-    return await deploymentGetSshKeys(client, state);
-  };
+  const ssh = {
+    /**
+     * @throws Error if there is an error fetching the keys
+     * @returns Promise<string[]> The SSH public keys currently granted access
+     */
+    keys: async (): Promise<string[]> => {
+      const { public_keys } = await deploymentGetSshKeys(client, state);
+      return public_keys;
+    },
 
-  /**
-   * Replaces the SSH public keys configured for this deployment.
-   */
-  const updateSshKeys = async (
-    publicKeys: string[],
-  ): Promise<DeploymentUpdateSshKeysResult> => {
-    return await deploymentUpdateSshKeys(publicKeys, client, state);
+    /**
+     * @param publicKeys One or more OpenSSH public keys to grant access
+     * @throws Error if there is an error updating the keys
+     * @returns Promise<DeploymentUpdateSshKeysResult> The stored set and per-job node results
+     * @description Grants the keys access. Keys already present are left as they are.
+     */
+    add: async (publicKeys: string | string[]): Promise<DeploymentUpdateSshKeysResult> => {
+      return await deploymentAddSshKeys(publicKeys, client, state);
+    },
+
+    /**
+     * @param publicKeys One or more OpenSSH public keys to revoke
+     * @throws Error if there is an error updating the keys
+     * @returns Promise<DeploymentUpdateSshKeysResult> The stored set and per-job node results
+     * @description Revokes the keys. A removed key stops working on a running job only when that job restarts.
+     */
+    remove: async (publicKeys: string | string[]): Promise<DeploymentUpdateSshKeysResult> => {
+      return await deploymentRemoveSshKeys(publicKeys, client, state);
+    },
   };
 
   const getJob = async (job: string) => {
@@ -333,8 +354,7 @@ export function createDeployment(
     getEvents,
     stream,
     generateAuthHeader,
-    getSshKeys,
-    updateSshKeys,
+    ssh,
     createRevision,
     updateReplicaCount,
     updateActiveRevision,

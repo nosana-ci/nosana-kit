@@ -386,6 +386,50 @@ curl -s \
 
 The response is the new deployment. In the SDK, `duplicate()` returns a full deployment object with the same methods as `get()`, so you can call `start()`, `updateReplicaCount()`, `stream()` and so on directly on the copy. Pass `autostart: true` to have the API start it for you instead.
 
+## Manage SSH Keys
+
+Grant or revoke SSH access to a deployment's jobs. Keys are stored on the deployment (no new revision or restart) and injected into every job posted from then on. Running jobs are updated in place where their node allows it; a removed key stops working on a running job only when that job restarts.
+
+:::tabs
+
+== TypeScript SDK
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
+const publicKey = 'ssh-ed25519 AAAA... you@example.com';
+
+const { jobs } = await deployment.ssh.add(publicKey); // per running job: did its node accept the key?
+const keys = await deployment.ssh.keys(); // now includes publicKey
+await deployment.ssh.remove(publicKey);
+```
+
+== HTTP API
+
+```bash
+# List the keys
+curl -s \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/ssh-keys | jq .
+
+# Replace the complete set (an empty array revokes access)
+curl -s \
+  -X PATCH \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"public_keys": ["ssh-ed25519 AAAA... you@example.com"]}' \
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-ssh-keys | jq .
+```
+
+:::
+
+`add` and `remove` accept one key or a list, and identify a key by its type and material, so a differing comment neither adds a duplicate nor misses a removal. Both return the stored set plus `jobs`, one entry per running job, saying whether its node accepted the change. The HTTP API replaces the whole set in one call.
+
 ## Pipe Multiple Deployment Operations (SDK Only)
 
 The pipe function allows you to chain multiple actions on a deployment in a functional programming style. It can either create a new deployment or operate on an existing one.
