@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 import { createDeployment } from '../createDeployment.js';
 import * as actions from '../actions/index.js';
 
@@ -14,6 +14,8 @@ vi.mock('../actions/index.js', () => ({
   deploymentUpdateSchedule: vi.fn(),
   deploymentGenerateAuthHeader: vi.fn().mockResolvedValue('auth-header'),
   deploymentGetJob: vi.fn().mockResolvedValue({ id: 'job-id' }),
+  deploymentUpdateMarket: vi.fn(),
+  deploymentDuplicate: vi.fn(),
 }));
 
 
@@ -42,6 +44,8 @@ describe('createDeployment', () => {
     expect(deployment.updateActiveRevision).toBeTypeOf('function');
     expect(deployment.updateTimeout).toBeTypeOf('function');
     expect(deployment.updateSchedule).toBeTypeOf('function');
+    expect(deployment.updateMarket).toBeTypeOf('function');
+    expect(deployment.duplicate).toBeTypeOf('function');
   });
 
   it('should convert date strings to Date objects', () => {
@@ -202,6 +206,58 @@ describe('createDeployment', () => {
         global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
       );
+    });
+
+    test('when updateMarket method is invoked, it should call updateMarket action', async () => {
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+
+      await deployment.updateMarket('rdRYm53F9nj7VWenCvuJw4Zf85KEo5op9kAiQk52kFh');
+
+      expect(actions.deploymentUpdateMarket).toHaveBeenCalledWith(
+        'rdRYm53F9nj7VWenCvuJw4Zf85KEo5op9kAiQk52kFh',
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
+        expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
+      );
+    });
+
+    describe('duplicate', () => {
+      const copy = {
+        ...global.TEST_MOCK_DEPLOYMENT,
+        id: 'CopyDeploymentId111111111111111111111111111',
+        name: 'copied-deployment',
+      };
+
+      beforeEach(() => {
+        (actions.deploymentDuplicate as Mock).mockResolvedValue(copy);
+      });
+
+      test('when invoked, it should call duplicate action and wrap the copy', async () => {
+        const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+
+        const result = await deployment.duplicate({ name: 'copied-deployment', autostart: true });
+
+        expect(actions.deploymentDuplicate).toHaveBeenCalledWith(
+          { name: 'copied-deployment', autostart: true },
+          global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
+          expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
+        );
+        expect(result.id).toBe(copy.id);
+        expect(result.name).toBe('copied-deployment');
+        expect(result.created_at).toBeInstanceOf(Date);
+        expect(result.start).toBeTypeOf('function');
+        expect(result.duplicate).toBeTypeOf('function');
+        expect(typeof result.vault).toBe('string');
+        expect(deployment.id).toBe(global.TEST_MOCK_DEPLOYMENT.id);
+      });
+
+      test('when hasApiKey is false, the copy should include a vault', async () => {
+        const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, false);
+
+        const result = await deployment.duplicate({ name: 'copied-deployment' });
+
+        expect(result.vault).toBeDefined();
+        expect(result.vault.address).toBe('vault-address');
+      });
     });
   });
 });

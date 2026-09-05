@@ -225,6 +225,38 @@ curl -s \
 
 :::
 
+## Update Market
+
+Move a deployment to a different market. If the deployment is `RUNNING`, its current jobs are stopped and relisted on the new market: `SIMPLE` and `SIMPLE-EXTEND` relist the stopped count immediately, `INFINITE` refills each stopped replica, and `SCHEDULED` lists on its next scheduled run.
+
+:::tabs
+
+== TypeScript SDK
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
+await deployment.updateMarket('NEW_MARKET_ADDRESS');
+```
+
+== HTTP API
+
+```bash
+curl -s \
+  -X PATCH \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"market": "NEW_MARKET_ADDRESS"}' \
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-market | jq .
+```
+
+:::
+
 ## Start a Deployment
 
 Start an existing deployment that is in a draft or stopped state:
@@ -318,6 +350,41 @@ curl -s \
 :::
 
 The response will include `status: "ARCHIVED"` when successful.
+
+## Duplicate a Deployment
+
+Create a copy of an existing deployment. The copy shares the source's vault, market, replicas, timeout, strategy, confidentiality and SSH keys, and starts from the source's active revision as its first revision. It is created as a `DRAFT` unless `autostart` is set. The source deployment is left untouched.
+
+:::tabs
+
+== TypeScript SDK
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
+const copy = await deployment.duplicate({ name: 'my-copy' }); // new DRAFT deployment
+await copy.start(); // the copy is a full deployment object
+```
+
+== HTTP API
+
+```bash
+curl -s \
+  -X POST \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-copy", "autostart": true}' \
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/duplicate | jq .
+```
+
+:::
+
+The response is the new deployment. In the SDK, `duplicate()` returns a full deployment object with the same methods as `get()`, so you can call `start()`, `updateReplicaCount()`, `stream()` and so on directly on the copy. Pass `autostart: true` to have the API start it for you instead.
 
 ## Pipe Multiple Deployment Operations (SDK Only)
 

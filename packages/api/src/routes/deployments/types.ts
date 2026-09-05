@@ -82,6 +82,7 @@ export type DeploymentJobsSearchParams = paths['/deployments/{deployment}/jobs']
 export type DeploymentEventsSearchParams = paths['/deployments/{deployment}/events']['get']['parameters']['query'];
 export type DeploymentRevisionsSearchParams = paths['/deployments/{deployment}/revisions']['get']['parameters']['query'];
 export type DeploymentAuthHeaderParams = paths['/deployments/{deployment}/header']['get']['parameters']['query'];
+export type DeploymentDuplicateOptions = paths['/deployments/{deployment}/duplicate']['post']['requestBody']['content']['application/json'];
 
 // Item types extracted from paginated responses
 export type DeploymentJobItem = DeploymentJobs['jobs'][number];
@@ -150,11 +151,16 @@ export type ApiDeployment = DeploymentState & {
   updateTimeout: (timeout: number) => Promise<void>;
   updateSchedule: (schedule: string) => Promise<void>;
   updateName: (name: string) => Promise<void>;
+  updateMarket: (market: string) => Promise<void>;
+  /** Copy this deployment into a new one; the source is left untouched. */
+  duplicate: (options: DeploymentDuplicateOptions) => Promise<ApiDeployment>;
 };
 
 // Full deployment (with signer auth) - includes vault
-export type Deployment = ApiDeployment & {
+export type Deployment = Omit<ApiDeployment, 'duplicate'> & {
   vault: Vault;
+  /** Copy this deployment into a new one; the source is left untouched. */
+  duplicate: (options: DeploymentDuplicateOptions) => Promise<Deployment>;
 };
 
 // Deployments API interface (with signer auth - includes vault)

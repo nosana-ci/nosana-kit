@@ -148,6 +148,8 @@ await vault.topup({ NOS: 100 });
 | `updateTimeout` | `timeout: number` | `Promise<void>` |
 | `updateActiveRevision` | `active_revision: number` | `Promise<void>` |
 | `updateSchedule` | `schedule: string` | `Promise<void>` |
+| `updateMarket` | `market: string` | `Promise<void>` |
+| `duplicate` | `options: DeploymentDuplicateOptions` | `Promise<Deployment>` |
 | `generateAuthHeader` | — | `Promise<unknown>` |
 
 ### `api.templates` — Deployment Templates

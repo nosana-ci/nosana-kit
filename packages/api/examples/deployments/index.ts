@@ -84,6 +84,16 @@ async function command() {
       deployment = await client.deployments.get(args[1]);
       await deployment.updateSchedule(args[2]);
       return deployment;
+    case 'updateMarket':
+      deployment = await client.deployments.get(args[1]);
+      await deployment.updateMarket(args[2]);
+      return deployment;
+    case 'duplicate':
+      deployment = await client.deployments.get(args[1]);
+      return await deployment.duplicate({
+        name: args[2],
+        autostart: args[3] === 'true',
+      });
     case 'createAndDeploy':
       return await client.deployments.pipe(
         {

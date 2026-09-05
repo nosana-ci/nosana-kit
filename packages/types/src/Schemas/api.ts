@@ -4,7 +4,51 @@
  */
 
 export interface paths {
-    "/api/jobs/list": {
+    "/api-keys/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get API Keys
+         * @description Get all API keys for the authenticated user
+         */
+        get: operations["getApi-keys"];
+        put?: never;
+        /**
+         * Create API Key
+         * @description Create a new API key for the authenticated user
+         */
+        post: operations["postApi-keys"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api-keys/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get API Key
+         * @description Get a specific API key by ID
+         */
+        get: operations["getApi-keysById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api-keys/{id}/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -14,17 +58,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create a job using credits
-         * @description Create a job using credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...)
+         * Delete API Key
+         * @description Delete an API key
          */
-        post: operations["postApiJobsList"];
+        post: operations["postApi-keysByIdDelete"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/jobs/{address}/extend": {
+    "/api-keys/{id}/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -34,17 +78,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Extend a job using credits
-         * @description Extend a job using credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...)
+         * Update API Key
+         * @description Update an API key (name or status)
          */
-        post: operations["postApiJobsByAddressExtend"];
+        post: operations["postApi-keysByIdUpdate"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/jobs/{address}/stop": {
+    "/auth/sign-message/external": {
         parameters: {
             query?: never;
             header?: never;
@@ -54,24 +98,76 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Stop a job paid with credits
-         * @description Stop a job paid with credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...)
+         * Sign message for external service authentication
+         * @description Sign message for external service authentication
          */
-        post: operations["postApiJobsByAddressStop"];
+        post: operations["postAuthSign-messageExternal"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/jobs/{address}": {
+    "/auth/validate-api-key": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getApiJobsByAddress"];
+        get?: never;
+        put?: never;
+        /** Validate API key */
+        post: operations["postAuthValidate-api-key"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/validate-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate session */
+        post: operations["postAuthValidate-session"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmark-templates/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply the operation/metric diff, the supplied human-reviewed thresholds, and the approved market-threshold reconciliations in one transaction. Metrics → thresholds → reconciliations, so each step's targets exist before the next. Omit all for a template-only sync. */
+        post: operations["postBenchmark-templatesApply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmark-templates/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Current stored benchmark templates — operations + metrics + their thresholds. Read-only, no GitHub fetch; shown on the template page before a refresh. */
+        get: operations["getBenchmark-templatesConfig"];
         put?: never;
         post?: never;
         delete?: never;
@@ -80,14 +176,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/markets/": {
+    "/benchmark-templates/refresh": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getApiMarkets"];
+        /** Preview the benchmark template diff against stored github operations (added/updated/removed metrics + operations, supported markets, existing thresholds). Read-only — writes nothing. */
+        get: operations["getBenchmark-templatesRefresh"];
         put?: never;
         post?: never;
         delete?: never;
@@ -96,14 +193,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/markets/{id}/": {
+    "/benchmarks/{id}/prediction": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getApiMarketsById"];
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksByIdPrediction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/{id}/seed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksByIdSeed"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/{id}/submit-results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksByIdSubmit-results"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/benchmark-version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getBenchmarksBenchmark-version"];
+        put?: never;
+        post: operations["postBenchmarksBenchmark-version"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/market-metric-aggregates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getBenchmarksMarket-metric-aggregates"];
         put?: never;
         post?: never;
         delete?: never;
@@ -112,14 +273,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/markets/{id}/required-resources": {
+    "/benchmarks/market-thresholds": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getApiMarketsByIdRequired-resources"];
+        get: operations["getBenchmarksMarket-thresholds"];
         put?: never;
         post?: never;
         delete?: never;
@@ -128,7 +289,397 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/credits/balance": {
+    "/benchmarks/market-thresholds/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksMarket-thresholdsCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/market-thresholds/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteBenchmarksMarket-thresholdsDelete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/market-thresholds/describe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksMarket-thresholdsDescribe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/market-thresholds/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksMarket-thresholdsUpdate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/metric-processors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getBenchmarksMetric-processors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getBenchmarksMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/metrics/{key}/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteBenchmarksMetricsByKeyDelete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/metrics/{key}/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksMetricsByKeyUpdate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/metrics/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksMetricsCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/operations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getBenchmarksOperations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/operations/{id}/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteBenchmarksOperationsByIdDelete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/operations/{id}/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksOperationsByIdUpdate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/operations/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksOperationsCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/recent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getBenchmarksRecent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/thresholds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getBenchmarksThresholds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/thresholds/{id}/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteBenchmarksThresholdsByIdDelete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/thresholds/{id}/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksThresholdsByIdUpdate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/benchmarks/thresholds/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksThresholdsCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get credit balance */
+        get: operations["getCreditsBalance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Claim a credit code */
+        post: operations["postCreditsClaim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/invitations/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get invitation by token */
+        get: operations["getCreditsInvitationsByToken"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/invitations/{token}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Claim a credit invitation */
+        post: operations["postCreditsInvitationsByTokenClaim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Request free credits */
+        post: operations["postCreditsRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/request/eligibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Check credit request eligibility */
+        get: operations["getCreditsRequestEligibility"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/spending-history": {
         parameters: {
             query?: never;
             header?: never;
@@ -136,10 +687,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get the current user's credit balance
-         * @description Authentication required via Authorization header. Supports either JWT (Bearer <jwt>) or API key (Bearer <key>). Available balance is assignedCredits - reservedCredits - settledCredits.
+         * Get credit spending history
+         * @description Returns spending history for credit users using settled credit charges.
          */
-        get: operations["getApiCreditsBalance"];
+        get: operations["getCreditsSpending-history"];
         put?: never;
         post?: never;
         delete?: never;
@@ -148,7 +699,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments": {
+    "/credits/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List credit transactions
+         * @description Returns credit transaction history for the authenticated user.
+         */
+        get: operations["getCreditsTransactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments": {
         parameters: {
             query?: never;
             header?: never;
@@ -156,81 +727,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description List all user deployments. */
-        get: {
-            parameters: {
-                query?: {
-                    /** @description Base64-encoded cursor for keyset pagination */
-                    cursor?: string;
-                    /** @description Number of items per page (10, 20, 50, or 100) */
-                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
-                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
-                    sort_order?: "asc" | "desc";
-                    /** @description Filter by deployment status. Can be single value or comma-separated list */
-                    status?: ("DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED") | string;
-                    /** @description Filter by deployment strategy. Can be single value or comma-separated list */
-                    strategy?: ("SIMPLE" | "SIMPLE-EXTEND" | "SCHEDULED" | "INFINITE") | string;
-                    /** @description Filter by exact deployment ID */
-                    id?: string;
-                    /** @description Filter by vault public key */
-                    vault?: string;
-                    /** @description Filter deployments created after this date (ISO 8601 format) */
-                    created_after?: string;
-                    /** @description Filter deployments created before this date (ISO 8601 format) */
-                    created_before?: string;
-                };
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of deployments with pagination. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            deployments: components["schemas"]["Deployment"][];
-                            pagination: {
-                                /** @description Cursor for next page, null if no more pages */
-                                cursor_next: string | null;
-                                /** @description Cursor for previous page, null if on first page */
-                                cursor_prev: string | null;
-                                /** @description Total number of items in collection */
-                                total_items: number;
-                            };
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        get: operations["getDeployments"];
         put?: never;
         post?: never;
         delete?: never;
@@ -239,7 +736,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}": {
+    "/deployments/{deployment}": {
         parameters: {
             query?: never;
             header?: never;
@@ -247,1005 +744,17 @@ export interface paths {
             cookie?: never;
         };
         /** @description Get a specific deployment by ID. */
-        get: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Gets a deployment by ID. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Deployment"];
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        get: operations["getDeploymentsByDeployment"];
         put?: never;
         post?: never;
         /** @description Delete a deployment permanently */
-        delete: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Deployment deleted successfully. */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": unknown;
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        delete: operations["deleteDeploymentsByDeployment"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/tasks": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get scheduled tasks for a specific deployment. */
-        get: {
-            parameters: {
-                query?: {
-                    /** @description Base64-encoded cursor for keyset pagination */
-                    cursor?: string;
-                    /** @description Number of items per page (10, 20, 50, or 100) */
-                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
-                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
-                    sort_order?: "asc" | "desc";
-                    /** @description Filter by task type. Can be single value or comma-separated list */
-                    task?: ("LIST" | "EXTEND" | "STOP") | string;
-                    /** @description Filter tasks due after this date (ISO 8601 format) */
-                    due_after?: string;
-                    /** @description Filter tasks due before this date (ISO 8601 format) */
-                    due_before?: string;
-                };
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of scheduled tasks for the deployment with pagination. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            tasks: components["schemas"]["Task"][];
-                            pagination: {
-                                /** @description Cursor for next page, null if no more pages */
-                                cursor_next: string | null;
-                                /** @description Cursor for previous page, null if on first page */
-                                cursor_prev: string | null;
-                                /** @description Total number of items in collection */
-                                total_items: number;
-                            };
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/{deployment}/header": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get header for a specific deployment. */
-        get: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Returns authorization header to interact with the vaults jobs. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            header: string;
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/{deployment}/jobs/{job}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get a specific deployment job by ID. */
-        get: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                    job: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Gets a deployment job by ID. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            confidential: boolean;
-                            revision: number;
-                            market: string;
-                            node: string;
-                            state: string | number;
-                            jobStatus: string | null;
-                            jobDefinition: components["schemas"]["JobDefinition"];
-                            jobResult: components["schemas"]["JobResults"] | null;
-                            timeStart: number;
-                            timeEnd: number;
-                            listedAt: number;
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/{deployment}/jobs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get jobs for a specific deployment. */
-        get: {
-            parameters: {
-                query?: {
-                    /** @description Base64-encoded cursor for keyset pagination */
-                    cursor?: string;
-                    /** @description Number of items per page (10, 20, 50, or 100) */
-                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
-                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
-                    sort_order?: "asc" | "desc";
-                    /** @description Filter by job state. Can be single value or comma-separated list (e.g., 'RUNNING,COMPLETED') */
-                    state?: ("QUEUED" | "RUNNING" | "COMPLETED" | "STOPPED") | string;
-                    /** @description Filter by exact job ID */
-                    job?: string;
-                    /** @description Filter by deployment revision number */
-                    revision?: number;
-                    /** @description Filter jobs created after this date (ISO 8601 format) */
-                    created_after?: string;
-                    /** @description Filter jobs created before this date (ISO 8601 format) */
-                    created_before?: string;
-                };
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of jobs for the deployment with pagination. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            jobs: components["schemas"]["Job"][];
-                            pagination: {
-                                /** @description Cursor for next page, null if no more pages */
-                                cursor_next: string | null;
-                                /** @description Cursor for previous page, null if on first page */
-                                cursor_prev: string | null;
-                                /** @description Total number of items in collection */
-                                total_items: number;
-                            };
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/{deployment}/revisions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get revisions for a specific deployment. */
-        get: {
-            parameters: {
-                query?: {
-                    /** @description Base64-encoded cursor for keyset pagination */
-                    cursor?: string;
-                    /** @description Number of items per page (10, 20, 50, or 100) */
-                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
-                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
-                    sort_order?: "asc" | "desc";
-                    /** @description Filter by exact revision number */
-                    revision?: number;
-                    /** @description Filter revisions created after this date (ISO 8601 format) */
-                    created_after?: string;
-                    /** @description Filter revisions created before this date (ISO 8601 format) */
-                    created_before?: string;
-                };
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of revisions for the deployment with pagination. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            revisions: components["schemas"]["Revision"][];
-                            pagination: {
-                                /** @description Cursor for next page, null if no more pages */
-                                cursor_next: string | null;
-                                /** @description Cursor for previous page, null if on first page */
-                                cursor_prev: string | null;
-                                /** @description Total number of items in collection */
-                                total_items: number;
-                            };
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/{deployment}/events": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get events for a specific deployment. */
-        get: {
-            parameters: {
-                query?: {
-                    /** @description Base64-encoded cursor for keyset pagination */
-                    cursor?: string;
-                    /** @description Number of items per page (10, 20, 50, or 100) */
-                    limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
-                    /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
-                    sort_order?: "asc" | "desc";
-                    /** @description Filter by event category: 'Deployment' or 'Event'. Can be comma-separated list */
-                    category?: ("Deployment" | "Event") | string;
-                    /** @description Filter by event type. Can be single value or comma-separated list */
-                    type?: string;
-                    /** @description Filter events created after this date (ISO 8601 format) */
-                    created_after?: string;
-                    /** @description Filter events created before this date (ISO 8601 format) */
-                    created_before?: string;
-                };
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of events for the deployment with pagination. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            events: components["schemas"]["Event"][];
-                            pagination: {
-                                /** @description Cursor for next page, null if no more pages */
-                                cursor_next: string | null;
-                                /** @description Cursor for previous page, null if on first page */
-                                cursor_prev: string | null;
-                                /** @description Total number of items in collection */
-                                total_items: number;
-                            };
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/create": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Create a new deployment. */
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["DeploymentCreateBody"];
-                };
-            };
-            responses: {
-                /** @description Deployment created successfully. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Deployment"];
-                    };
-                };
-                /** @description Invalid request body. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/{deployment}/create-revision": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Create a new deployment revision. */
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["JobDefinition"];
-                };
-            };
-            responses: {
-                /** @description Deployment CreateRevisioned successfully. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            active_revision: number;
-                            endpoints: {
-                                opId: string;
-                                port: number | string;
-                                url: string;
-                            }[];
-                            revisions: {
-                                revision: number;
-                                deployment: string;
-                                ipfs_definition_hash: string;
-                                job_definition: components["schemas"]["JobDefinition"];
-                                /** Format: date-time */
-                                created_at: string;
-                            }[];
-                            /** Format: date-time */
-                            updated_at: string;
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/{deployment}/start": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Start an existing deployment. */
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Deployment started successfully. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            status: "STARTING";
-                            /** Format: date-time */
-                            updated_at: string;
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/{deployment}/stop": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Stop a deployment */
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Deployment stopped successfully. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            status: "STOPPING";
-                            /** Format: date-time */
-                            updated_at: string;
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/{deployment}/archive": {
+    "/deployments/{deployment}/archive": {
         parameters: {
             query?: never;
             header?: never;
@@ -1255,75 +764,218 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Archive a deployment */
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Deployment archived successfully. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            status: "ARCHIVED";
-                            /** Format: date-time */
-                            updated_at: string;
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        post: operations["postDeploymentsByDeploymentArchive"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-active-revision": {
+    "/deployments/{deployment}/create-revision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Create a new deployment revision. */
+        post: operations["postDeploymentsByDeploymentCreateRevision"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Duplicate a deployment. Creates a new DRAFT deployment (or starts it right away with `autostart`) with the same vault, market, replicas, timeout, strategy, confidentiality and SSH keys, and the source's active revision as its first revision. The source is left untouched. */
+        post: operations["postDeploymentsByDeploymentDuplicate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get events for a specific deployment. */
+        get: operations["getDeploymentsByDeploymentEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/header": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get header for a specific deployment. */
+        get: operations["getDeploymentsByDeploymentHeader"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get jobs for a specific deployment. */
+        get: operations["getDeploymentsByDeploymentJobs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/jobs/{job}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get a specific deployment job by ID. */
+        get: operations["getDeploymentsByDeploymentJobsByJob"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get revisions for a specific deployment. */
+        get: operations["getDeploymentsByDeploymentRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/ssh-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get the SSH public keys currently granted access to the deployment's jobs. */
+        get: operations["getDeploymentsByDeploymentSshKeys"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Start an existing deployment. */
+        post: operations["postDeploymentsByDeploymentStart"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Stop a deployment */
+        post: operations["postDeploymentsByDeploymentStop"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Server-sent stream of a deployment's changes. Each message is one `DeploymentStreamEvent`, discriminated by `type`. The stream starts with the current deployment, its active jobs and its outstanding tasks, then emits live changes. Historical jobs and events remain available through their paginated endpoints. */
+        get: operations["getDeploymentsByDeploymentStream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get scheduled tasks for a specific deployment. */
+        get: operations["getDeploymentsByDeploymentTasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/{deployment}/update-active-revision": {
         parameters: {
             query?: never;
             header?: never;
@@ -1337,76 +989,44 @@ export interface paths {
         options?: never;
         head?: never;
         /** @description Update deployment active revision. */
-        patch: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        active_revision: number;
-                    };
-                };
-            };
-            responses: {
-                /** @description Deployment active revision updated successfully. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            active_revision: number;
-                            endpoints: components["schemas"]["Endpoint"][];
-                            updated_at: string;
-                        };
-                    };
-                };
-                /** @description Bad Request. Invalid input data. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        patch: operations["patchDeploymentsByDeploymentUpdateActiveRevision"];
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-replica-count": {
+    "/deployments/{deployment}/update-market": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Update the market of a deployment. A RUNNING deployment's current jobs are stopped and relisted on the new market: SIMPLE and SIMPLE-EXTEND relist the stopped count immediately, INFINITE refills each stopped replica, and SCHEDULED lists on its next scheduled run. */
+        patch: operations["patchDeploymentsByDeploymentUpdateMarket"];
+        trace?: never;
+    };
+    "/deployments/{deployment}/update-name": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Update the name of a deployment */
+        patch: operations["patchDeploymentsByDeploymentUpdateName"];
+        trace?: never;
+    };
+    "/deployments/{deployment}/update-replica-count": {
         parameters: {
             query?: never;
             header?: never;
@@ -1420,76 +1040,10 @@ export interface paths {
         options?: never;
         head?: never;
         /** @description Update the replica count of a deployment */
-        patch: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        replicas: number;
-                    };
-                };
-            };
-            responses: {
-                /** @description Deployment replica count updated successfully. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            replicas: number;
-                            /** Format: date-time */
-                            updated_at: string;
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        patch: operations["patchDeploymentsByDeploymentUpdateReplicaCount"];
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-schedule": {
+    "/deployments/{deployment}/update-schedule": {
         parameters: {
             query?: never;
             header?: never;
@@ -1503,77 +1057,44 @@ export interface paths {
         options?: never;
         head?: never;
         /** @description Update deployment schedule. */
-        patch: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        /** @description Cron expression for scheduled deployments */
-                        schedule: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Deployment schedule updated successfully. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @description Cron expression for scheduled deployments */
-                            schedule: string;
-                            updated_at: string;
-                        };
-                    };
-                };
-                /** @description Bad Request. Invalid input data. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        patch: operations["patchDeploymentsByDeploymentUpdateSchedule"];
         trace?: never;
     };
-    "/api/deployments/{deployment}/update-timeout": {
+    "/deployments/{deployment}/update-ssh-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Replace the deployment's SSH public keys. The new set is stored on the deployment (not on a revision — no new revision or restart) and injected into every job posted from now on. New keys are also authorized on the node of every job currently running; removed keys stop working only when a job restarts. */
+        patch: operations["patchDeploymentsByDeploymentUpdateSshKeys"];
+        trace?: never;
+    };
+    "/deployments/{deployment}/update-startup-timeout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Update the startup timeout of an INFINITE deployment. */
+        patch: operations["patchDeploymentsByDeploymentUpdateStartupTimeout"];
+        trace?: never;
+    };
+    "/deployments/{deployment}/update-timeout": {
         parameters: {
             query?: never;
             header?: never;
@@ -1587,75 +1108,27 @@ export interface paths {
         options?: never;
         head?: never;
         /** @description Update deployment timeout */
-        patch: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        timeout: number;
-                    };
-                };
-            };
-            responses: {
-                /** @description Deployment timeout updated successfully. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            timeout: number;
-                            updated_at: string;
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        patch: operations["patchDeploymentsByDeploymentUpdateTimeout"];
         trace?: never;
     };
-    "/api/deployments/jobs/{job}/job-definition": {
+    "/deployments/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Create a new deployment. */
+        post: operations["postDeploymentsCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/jobs/{job}/job-definition": {
         parameters: {
             query?: never;
             header?: never;
@@ -1663,49 +1136,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Returns the job definition for a job. */
-        get: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Signed authentication message, */
-                    authorization: string;
-                };
-                path: {
-                    job: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Job definition details. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["JobDefinition"];
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        get: operations["getDeploymentsJobsByJobJobDefinition"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1714,7 +1145,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/jobs/{job}/results": {
+    "/deployments/jobs/{job}/results": {
         parameters: {
             query?: never;
             header?: never;
@@ -1724,63 +1155,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Post results for your running job. */
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Signed authentication message, */
-                    authorization: string;
-                };
-                path: {
-                    job: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["JobResults"];
-                };
-            };
-            responses: {
-                /** @description Job results details. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            message: "Success";
-                        };
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        post: operations["postDeploymentsJobsByJobResults"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/vaults": {
+    "/deployments/vaults": {
         parameters: {
             query?: never;
             header?: never;
@@ -1788,52 +1170,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description List all user vaults. */
-        get: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of vaults. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Vaults"];
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        get: operations["getDeploymentsVaults"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1842,69 +1179,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/deployments/vaults/create": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Create a shared vault. */
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Vault created successfully. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Vault"];
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/deployments/vaults/{vault}/withdraw": {
+    "/deployments/vaults/{vault}/withdraw": {
         parameters: {
             query?: never;
             header?: never;
@@ -1914,81 +1189,1350 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Withdraw from a vault. */
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
-                    "x-user-id"?: string;
-                    /**
-                     * @description Authentication token, either an API key or a wallet-signed message.
-                     * @example Bearer <ApiKey> or WalletSignedMessage
-                     */
-                    authorization: string;
-                };
-                path: {
-                    vault: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": {
-                        SOL?: number;
-                        NOS?: number;
-                    };
-                };
-            };
-            responses: {
-                /** @description Withdrawal successful. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            transaction: string;
-                        };
-                    };
-                };
-                /** @description Invalid request body. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
-                    };
-                };
-                /** @description Vault not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
+        post: operations["postDeploymentsVaultsByVaultWithdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/deployments/vaults/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
+        get?: never;
+        put?: never;
+        /** @description Get or create the caller's shared vault: returns their existing (oldest) vault, creating one only if they have none. */
+        post: operations["postDeploymentsVaultsCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/errors/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List error logs (admin) */
+        get: operations["getErrors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/errors/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit error log (SDK) */
+        post: operations["postErrorsReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List jobs
+         * @description List jobs with optional filtering by state, market, node, poster, and payer
+         */
+        get: operations["getJobs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get job by address
+         * @description Retrieve a job account by its address
+         */
+        get: operations["getJobsByAddress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a job's on-chain transaction events
+         * @description Returns the decoded Nosana Jobs instructions recorded for a job (list, delist, work/pickup, extend, end/stop, finish, complete), oldest first, with typed event data in `data` (e.g. Extend → { timeout } where timeout is the job's new absolute timeout after extending). Events are indexed going forward only, so an older job may return an empty list.
+         */
+        get: operations["getJobsByAddressEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/extend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Extend a job using credits
+         * @description Extend a job using credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...). Pass an `Idempotency-Key` header to make the call safely retryable (the extension is applied at most once per key). An already-terminal job is an idempotent no-op: 200 with a null `tx` and no `credits` (nothing is charged).
+         */
+        post: operations["postJobsByAddressExtend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop a job paid with credits
+         * @description Stop a job paid with credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...). Pass an `Idempotency-Key` header to make the call safely retryable: the stop is sent at most once per key and settlement runs exactly once. An already-terminal job returns 200 with `outcome: already_terminal` and a null `tx`.
+         */
+        post: operations["postJobsByAddressStop"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get jobs by addresses
+         * @description Retrieve multiple jobs by a list of addresses (full job fields except jobDefinition and jobResult). Maximum of 100 addresses per request.
+         */
+        post: operations["postJobsBatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count jobs
+         * @description Get total job count and counts per state (QUEUED, RUNNING, COMPLETED, STOPPED), with optional filtering by market, node, project, and payer
+         */
+        get: operations["getJobsCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a job using credits
+         * @description Create a job using credits. Supports both JWT tokens (Bearer <jwt>) and API keys (Bearer nos_...). Pass an `Idempotency-Key` header (e.g. the DM task's stable `taskId:unit:epoch`) to make the call safely retryable: the job is posted at most once per key. Replays return the original result; a key whose transaction is provably dead returns 409 `IDEMPOTENCY_KEY_EXPIRED` (bump the epoch and retry).
+         */
+        post: operations["postJobsList"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/long-running": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get long-running jobs
+         * @description Returns jobs running longer than their timeout, optionally filtered by market or payer
+         */
+        get: operations["getJobsLong-running"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/running": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get running jobs count per market */
+        get: operations["getJobsRunning"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/running-nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get running nodes for a market */
+        get: operations["getJobsRunning-nodes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get job statistics
+         * @description Get aggregated job statistics with optional grouping and time series (filter by market, node, poster, payer)
+         */
+        get: operations["getJobsStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/stats/timestamps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get job timestamps */
+        get: operations["getJobsStatsTimestamps"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/stats/timestamps-hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get GPU compute hours over time
+         * @description Time series of GPU compute hours (sum of effective completed-job runtime) bucketed by period, mirroring /stats/timestamps but with hours instead of job counts.
+         */
+        get: operations["getJobsStatsTimestamps-hours"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMarkets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMarketsById"];
+        put: operations["putMarketsById"];
+        post?: never;
+        delete: operations["deleteMarketsById"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/{id}/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMarketsByIdMetadata"];
+        put?: never;
+        post: operations["postMarketsByIdMetadata"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/{id}/metadata/{metaId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["putMarketsByIdMetadataByMetaId"];
+        post?: never;
+        delete: operations["deleteMarketsByIdMetadataByMetaId"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/{id}/required-resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMarketsByIdRequired-resources"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/docker-images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMarketsDocker-images"];
+        put?: never;
+        post: operations["postMarketsDocker-images"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/docker-images/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMarketsDocker-imagesById"];
+        put: operations["putMarketsDocker-imagesById"];
+        post?: never;
+        delete: operations["deleteMarketsDocker-imagesById"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/price": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current NOS token price in USD */
+        get: operations["getMarketsPrice"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMarketsPrices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/remote-resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMarketsRemote-resources"];
+        put?: never;
+        post: operations["postMarketsRemote-resources"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/remote-resources/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMarketsRemote-resourcesById"];
+        put: operations["putMarketsRemote-resourcesById"];
+        post?: never;
+        delete: operations["deleteMarketsRemote-resourcesById"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/update-prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Manually trigger market price update (admin) */
+        post: operations["postMarketsUpdate-prices"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}/address": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patchNodesByIdAddress"];
+        trace?: never;
+    };
+    "/nodes/{id}/contact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patchNodesByIdContact"];
+        trace?: never;
+    };
+    "/nodes/{id}/full": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesByIdFull"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}/info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesByIdInfo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesByIdMetrics"];
+        put?: never;
+        post: operations["postNodesByIdMetrics"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesByIdNotes"];
+        put?: never;
+        post: operations["postNodesByIdNotes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}/notes/{noteId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteNodesByIdNotesByNoteId"];
+        options?: never;
+        head?: never;
+        patch: operations["patchNodesByIdNotesByNoteId"];
+        trace?: never;
+    };
+    "/nodes/{id}/recent-benchmarks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesByIdRecent-benchmarks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{id}/rewards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesByIdRewards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/access-key/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesAccess-keySubmit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/assign-node": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesAssign-node"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/available-gpus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesAvailable-gpus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/ban": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesBan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/demote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesDemote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/heartbeat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesHeartbeat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/heartbeats/aggregate-historical": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesHeartbeatsAggregate-historical"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/heartbeats/next-max": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesHeartbeatsNext-max"];
+        put?: never;
+        post: operations["postNodesHeartbeatsNext-max"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/heartbeats/uptime-reward-threshold-percentage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesHeartbeatsUptime-reward-threshold-percentage"];
+        put?: never;
+        post: operations["postNodesHeartbeatsUptime-reward-threshold-percentage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/heartbeats/uptime/{node}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesHeartbeatsUptimeByNode"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/invalidate-metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesInvalidate-metrics"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/kick-from-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesKick-from-queue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/market-relation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesMarket-relation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/minimum-required-version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesMinimum-required-version"];
+        put: operations["putNodesMinimum-required-version"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/move-market": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesMove-market"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesPayment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/promote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesPromote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/queued-nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesQueued-nodes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesRegister"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/remove-market-assignment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesRemove-market-assignment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/request-market": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesRequest-market"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/rewards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesRewards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/sync-node": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesSync-node"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/unban": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesUnban"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/with-access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodesWith-access"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rpc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRpc"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stats/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get the latest statistics */
+        get: operations["getStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stats/earning-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Flexible endpoint to retrieve earning history of node with custom date ranges and grouping options. */
+        get: operations["getStatsEarning-history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stats/nodes-country": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStatsNodes-country"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stats/price": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get NOS price for a date or timestamp
+         * @description Returns the NOS price (USD). Defaults to current time when neither timestamp nor date is provided. Query: timestamp (Unix seconds), date (YYYY-MM-DD), or omit for now; optional maxAgeMinutes for cache tolerance.
+         */
+        get: operations["getStatsPrice"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stats/spending-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Flexible endpoint to retrieve spending history with custom date ranges and grouping options. */
+        get: operations["getStatsSpending-history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/templates/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all templates */
+        get: operations["getTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/templates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get template by ID */
+        get: operations["getTemplatesById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/templates/{id}/{variantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get template variant */
+        get: operations["getTemplatesByIdByVariantId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/templates/grouped": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get templates grouped by category */
+        get: operations["getTemplatesGrouped"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/templates/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all templates
+         * @description Alias of `/templates/`; new callers should use that path.
+         */
+        get: operations["getJobsTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/templates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get template by ID
+         * @description Alias of `/templates/{id}`; new callers should use that path.
+         */
+        get: operations["getJobsTemplatesById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/templates/{id}/{variantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get template variant
+         * @description Alias of `/templates/{id}/{variantId}`; new callers should use that path.
+         */
+        get: operations["getJobsTemplatesByIdByVariantId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/templates/grouped": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get templates grouped by category
+         * @description Alias of `/templates/grouped`; new callers should use that path.
+         */
+        get: operations["getJobsTemplatesGrouped"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2003,25 +2547,23 @@ export interface components {
          * Headers
          * @description Headers for deployment routes
          */
-        Headers: {
-            /** @description Required when using Wallet Authentication. The public key used to sign authentication header. */
+        DeploymentManagerHeaders: {
             "x-user-id": string;
-            /**
-             * @description Authentication token, either an API key or a wallet-signed message.
-             * @example Bearer <ApiKey> or WalletSignedMessage
-             */
+            /** @description Signed authentication message, */
             authorization: string;
+            /** @description Nosana API key */
+            "x-nosana-api"?: string;
         };
         /**
          * HostHeaders
          * @description Headers for deployment routes
          */
-        HostHeaders: {
+        DeploymentManagerHostHeaders: {
             /** @description Signed authentication message, */
             authorization: string;
         };
         /** Deployment */
-        Deployment: {
+        DeploymentManagerDeployment: {
             id: string;
             name: string;
             vault: string;
@@ -2034,6 +2576,8 @@ export interface components {
                 opId: string;
                 port: number | string;
                 url: string;
+                /** @description Whether the deployment currently answers here. Per opId: a node opens one load-balanced proxy per op, so every port that op exposes reports the same value. */
+                online: boolean;
             }[];
             confidential: boolean;
             active_revision: number;
@@ -2054,24 +2598,92 @@ export interface components {
             /** @enum {string} */
             strategy: "INFINITE";
             rotation_time: number;
+            startup_timeout?: number;
         });
         /** Deployments */
-        Deployments: components["schemas"]["Deployment"][];
+        DeploymentManagerDeployments: components["schemas"]["DeploymentManagerDeployment"][];
         /** DeploymentStatus */
-        DeploymentStatus: "DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED";
+        DeploymentManagerDeploymentStatus: "DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED";
+        /** DeploymentStreamEvent */
+        DeploymentManagerDeploymentStreamEvent: {
+            /** @enum {string} */
+            type: "deployment";
+            status: "DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED";
+            replicas: number;
+            active_revision: number;
+        } | {
+            /** @enum {string} */
+            type: "job";
+            job: string;
+            state: "QUEUED" | "RUNNING" | "COMPLETED" | "STOPPED";
+            node: string | null;
+            timeStart: number;
+            timeEnd: number;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+        } | {
+            /** @enum {string} */
+            type: "jobs";
+            jobs: string[];
+        } | {
+            /** @enum {string} */
+            type: "event";
+            category: "Deployment" | "Event";
+            event: string;
+            message: string;
+            tx: string | null;
+            /** Format: date-time */
+            created_at: string;
+        } | {
+            /** @enum {string} */
+            type: "task";
+            id: string;
+            task: "LIST" | "EXTEND" | "STOP";
+            status: "PENDING" | "PROCESSING";
+            attempts: number;
+            /** Format: date-time */
+            due_at: string;
+            job: string | null;
+        } | {
+            /** @enum {string} */
+            type: "endpoint";
+            opId: string;
+            port: number | string;
+            url: string;
+            /** @description Whether the deployment currently answers here. Per opId: a node opens one load-balanced proxy per op, so every port that op exposes reports the same value. */
+            online: boolean;
+        } | {
+            /** @enum {string} */
+            type: "task";
+            id: string;
+            task: "LIST" | "EXTEND" | "STOP";
+            /** @enum {string} */
+            status: "DONE";
+        };
         /** DeploymentStrategy */
-        DeploymentStrategy: "SIMPLE" | "SIMPLE-EXTEND" | "SCHEDULED" | "INFINITE";
+        DeploymentManagerDeploymentStrategy: "SIMPLE" | "SIMPLE-EXTEND" | "SCHEDULED" | "INFINITE";
         /** DeploymentCreateBody */
-        DeploymentCreateBody: {
+        DeploymentManagerDeploymentCreateBody: {
             name: string;
             market: string;
             replicas: number;
             /** @description Timeout in minutes, must be at least 1 minute. */
             timeout: number;
-            vault?: string;
             confidential?: boolean;
-            job_definition: components["schemas"]["JobDefinition"];
+            /** @description If true, the deployment is started immediately after creation instead of being left as a DRAFT. */
+            autostart?: boolean;
+            /** @description The complete set of SSH public keys allowed to reach this deployment's jobs (at most 10). Replaces the current set; an empty array revokes SSH access. */
+            ssh_public_keys?: string[];
+            job_definition: components["schemas"]["DeploymentManagerJobDefinition"];
         } & ({
+            vault?: string;
+            new_vault?: unknown;
+        } | {
+            /** @description If true, a brand-new vault is created for this deployment instead of reusing the owner's shared (oldest) vault. */
+            new_vault?: boolean;
+            vault?: unknown;
+        }) & ({
             strategy: "SIMPLE" | "SIMPLE-EXTEND";
         } | {
             /** @enum {string} */
@@ -2085,19 +2697,23 @@ export interface components {
             strategy: "INFINITE";
             /** @description Rotation time in seconds. Must be at least 10 minutes less than timeout to allow for proper rotation. */
             rotation_time?: number;
+            /** @description Minutes a job has, from the moment a node starts running it, to open its network tunnel. A job that does not come online in time is stopped and replaced on another node. Must cover the image pull and any operations that run before the exposed one. Requires the job definition to expose at least one port. */
+            startup_timeout?: number;
         });
         /** Endpoint */
-        Endpoint: {
+        DeploymentManagerEndpoint: {
             opId: string;
             port: number | string;
             url: string;
+            /** @description Whether the deployment currently answers here. Per opId: a node opens one load-balanced proxy per op, so every port that op exposes reports the same value. */
+            online: boolean;
         };
         /** Error */
-        Error: {
+        DeploymentManagerError: {
             error: string;
         };
         /** Event */
-        Event: {
+        DeploymentManagerEvent: {
             category: "Deployment" | "Event";
             deploymentId: string;
             type: string;
@@ -2107,11 +2723,12 @@ export interface components {
             created_at: string;
         };
         /** Job */
-        Job: {
+        DeploymentManagerJob: {
             tx: string;
-            job: string;
             deployment: string;
+            job: string;
             market: string;
+            node: string | null;
             revision: number;
             state: "QUEUED" | "RUNNING" | "COMPLETED" | "STOPPED";
             time_start: number;
@@ -2121,9 +2738,9 @@ export interface components {
             updated_at: string;
         };
         /** PublicKey */
-        PublicKey: string;
+        DeploymentManagerPublicKey: string;
         /** Task */
-        Task: {
+        DeploymentManagerTask: {
             task: "LIST" | "EXTEND" | "STOP";
             deploymentId: string;
             tx?: string;
@@ -2136,30 +2753,30 @@ export interface components {
             created_at: string;
         };
         /** Vault */
-        Vault: {
+        DeploymentManagerVault: {
             vault: string;
             owner: string;
             /** Format: date-time */
             created_at: string;
         };
         /** Vaults */
-        Vaults: {
+        DeploymentManagerVaults: {
             vault: string;
             owner: string;
             /** Format: date-time */
             created_at: string;
         }[];
         /** Revision */
-        Revision: {
+        DeploymentManagerRevision: {
             revision: number;
             deployment: string;
             ipfs_definition_hash: string;
-            job_definition: components["schemas"]["JobDefinition"];
+            job_definition: components["schemas"]["DeploymentManagerJobDefinition"];
             /** Format: date-time */
             created_at: string;
         };
         /** JobDefinition */
-        JobDefinition: {
+        DeploymentManagerJobDefinition: {
             /** @enum {string} */
             version: "0.1";
             /** @enum {string} */
@@ -2191,6 +2808,9 @@ export interface components {
                 };
             };
             deployment_id?: string;
+            ssh?: {
+                public_keys?: string[];
+            };
             meta?: {
                 trigger?: string;
                 /** @description Construct a type with a set of properties K of type T */
@@ -2366,15 +2986,17 @@ export interface components {
                 };
                 execution?: {
                     group?: string;
+                    timeout?: number;
                     depends_on: string[];
                     stop_if_dependent_stops?: boolean;
                 } | {
                     group?: string;
+                    timeout?: number;
                 };
             }[];
         };
         /** JobResults */
-        JobResults: {
+        DeploymentManagerJobResults: {
             status: string;
             startTime: number;
             endTime: number | null;
@@ -2449,6 +3071,58 @@ export interface components {
                 } | ("private" | "public");
             };
         };
+        /**
+         * @description Machine-readable idempotency control code. Branch on this, not the HTTP status alone. IN_PROGRESS → retry the SAME key; EXPIRED → mint a fresh key and re-post; PAYLOAD_MISMATCH → key reused with a different payload, do not retry.
+         * @enum {string}
+         */
+        ClientManagerIdempotencyCode: "IDEMPOTENCY_KEY_PAYLOAD_MISMATCH" | "IDEMPOTENCY_KEY_EXPIRED" | "IDEMPOTENCY_KEY_IN_PROGRESS";
+        /** @description Idempotency control response. Branch on `code`, never on the HTTP status. */
+        ClientManagerIdempotencyError: {
+            code?: components["schemas"]["ClientManagerIdempotencyCode"];
+            message: string;
+            /** @description Seconds to wait before retrying the SAME key. Present for IDEMPOTENCY_KEY_IN_PROGRESS; mirrors the Retry-After header. */
+            retryAfter?: number;
+        };
+        /** @description Ordinary business error. Has no `code` field (unlike IdempotencyError). */
+        ClientManagerJobError: {
+            message: string;
+        };
+        ClientManagerCreateJobWithCreditsResponse: {
+            tx: string;
+            job: string;
+            run: string;
+            credits: {
+                costUSD: number;
+                creditsUsed: number;
+                reservationId: string;
+                project: string;
+            };
+        };
+        ClientManagerExtendJobWithCreditsResponse: {
+            tx: (string | null) | null;
+            job: string;
+            credits?: {
+                costUSD: number;
+                creditsUsed: number;
+                reservationId: string;
+            };
+        };
+        ClientManagerStopJobWithCreditsResponse: {
+            tx: (string | null) | null;
+            job: string;
+            delisted: boolean;
+            outcome?: "delisted" | "ended" | "already_terminal";
+        };
+        ClientManagerJobsBatchResponse: {
+            items: {
+                index: number;
+                status: "confirmed" | "expired";
+                job?: string;
+                run?: string;
+                /** @description On-chain transaction signature (base58). */
+                tx?: string;
+            }[];
+        };
     };
     responses: never;
     parameters: never;
@@ -2458,12 +3132,565 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    postApiJobsList: {
+    "getApi-keys": {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Authorization header: Bearer <jwt> or Bearer <key> */
-                authorization?: string;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        keys: {
+                            id: string;
+                            name: string;
+                            /** @description Full API key */
+                            key: string;
+                            status: string;
+                            lastUsedAt: (string | null) | null;
+                            expiresAt: (string | null) | null;
+                            createdAt: string;
+                            updatedAt: string;
+                        }[];
+                        total: number;
+                    };
+                    "multipart/form-data": {
+                        keys: {
+                            id: string;
+                            name: string;
+                            /** @description Full API key */
+                            key: string;
+                            status: string;
+                            lastUsedAt: (string | null) | null;
+                            expiresAt: (string | null) | null;
+                            createdAt: string;
+                            updatedAt: string;
+                        }[];
+                        total: number;
+                    };
+                    "text/plain": {
+                        keys: {
+                            id: string;
+                            name: string;
+                            /** @description Full API key */
+                            key: string;
+                            status: string;
+                            lastUsedAt: (string | null) | null;
+                            expiresAt: (string | null) | null;
+                            createdAt: string;
+                            updatedAt: string;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "postApi-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description A descriptive name for the API key. */
+                    name: string;
+                    /** @description Key expiration time in seconds. If not provided, key never expires. */
+                    expiresIn?: number;
+                };
+                "multipart/form-data": {
+                    /** @description A descriptive name for the API key. */
+                    name: string;
+                    /** @description Key expiration time in seconds. If not provided, key never expires. */
+                    expiresIn?: number;
+                };
+                "text/plain": {
+                    /** @description A descriptive name for the API key. */
+                    name: string;
+                    /** @description Key expiration time in seconds. If not provided, key never expires. */
+                    expiresIn?: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The full API key. */
+                        key: string;
+                        id: string;
+                        name: string;
+                        status: string;
+                        expiresAt: (string | null) | null;
+                        createdAt: string;
+                    };
+                    "multipart/form-data": {
+                        /** @description The full API key. */
+                        key: string;
+                        id: string;
+                        name: string;
+                        status: string;
+                        expiresAt: (string | null) | null;
+                        createdAt: string;
+                    };
+                    "text/plain": {
+                        /** @description The full API key. */
+                        key: string;
+                        id: string;
+                        name: string;
+                        status: string;
+                        expiresAt: (string | null) | null;
+                        createdAt: string;
+                    };
+                };
+            };
+        };
+    };
+    "getApi-keysById": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        name: string;
+                        /** @description Full API key */
+                        key: string;
+                        status: string;
+                        lastUsedAt: (string | null) | null;
+                        expiresAt: (string | null) | null;
+                        createdAt: string;
+                        updatedAt: string;
+                    };
+                    "multipart/form-data": {
+                        id: string;
+                        name: string;
+                        /** @description Full API key */
+                        key: string;
+                        status: string;
+                        lastUsedAt: (string | null) | null;
+                        expiresAt: (string | null) | null;
+                        createdAt: string;
+                        updatedAt: string;
+                    };
+                    "text/plain": {
+                        id: string;
+                        name: string;
+                        /** @description Full API key */
+                        key: string;
+                        status: string;
+                        lastUsedAt: (string | null) | null;
+                        expiresAt: (string | null) | null;
+                        createdAt: string;
+                        updatedAt: string;
+                    };
+                };
+            };
+        };
+    };
+    "postApi-keysByIdDelete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                    };
+                    "multipart/form-data": {
+                        success: boolean;
+                    };
+                    "text/plain": {
+                        success: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "postApi-keysByIdUpdate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Update the key name. */
+                    name?: string;
+                    /** @description Update the key status. */
+                    status?: "active" | "disabled";
+                };
+                "multipart/form-data": {
+                    /** @description Update the key name. */
+                    name?: string;
+                    /** @description Update the key status. */
+                    status?: "active" | "disabled";
+                };
+                "text/plain": {
+                    /** @description Update the key name. */
+                    name?: string;
+                    /** @description Update the key status. */
+                    status?: "active" | "disabled";
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        name: string;
+                        /** @description Full API key */
+                        key: string;
+                        status: string;
+                        lastUsedAt: (string | null) | null;
+                        expiresAt: (string | null) | null;
+                        createdAt: string;
+                        updatedAt: string;
+                    };
+                    "multipart/form-data": {
+                        id: string;
+                        name: string;
+                        /** @description Full API key */
+                        key: string;
+                        status: string;
+                        lastUsedAt: (string | null) | null;
+                        expiresAt: (string | null) | null;
+                        createdAt: string;
+                        updatedAt: string;
+                    };
+                    "text/plain": {
+                        id: string;
+                        name: string;
+                        /** @description Full API key */
+                        key: string;
+                        status: string;
+                        lastUsedAt: (string | null) | null;
+                        expiresAt: (string | null) | null;
+                        createdAt: string;
+                        updatedAt: string;
+                    };
+                };
+            };
+        };
+    };
+    "postAuthSign-messageExternal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The message to be signed with the user's private key */
+                    message: string;
+                    includeTime?: boolean;
+                };
+                "multipart/form-data": {
+                    /** @description The message to be signed with the user's private key */
+                    message: string;
+                    includeTime?: boolean;
+                };
+                "text/plain": {
+                    /** @description The message to be signed with the user's private key */
+                    message: string;
+                    includeTime?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The signed message in base58 format */
+                        signature: string;
+                        /** @description The original message that was signed */
+                        message: string;
+                        /** @description The address of the user whose private key should be used for signing */
+                        userAddress: string;
+                        /** @description Unix ms when the signature was created; present when includeTime was true */
+                        timestamp?: number;
+                    };
+                    "multipart/form-data": {
+                        /** @description The signed message in base58 format */
+                        signature: string;
+                        /** @description The original message that was signed */
+                        message: string;
+                        /** @description The address of the user whose private key should be used for signing */
+                        userAddress: string;
+                        /** @description Unix ms when the signature was created; present when includeTime was true */
+                        timestamp?: number;
+                    };
+                    "text/plain": {
+                        /** @description The signed message in base58 format */
+                        signature: string;
+                        /** @description The original message that was signed */
+                        message: string;
+                        /** @description The address of the user whose private key should be used for signing */
+                        userAddress: string;
+                        /** @description Unix ms when the signature was created; present when includeTime was true */
+                        timestamp?: number;
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        name: string;
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        name: string;
+                        message: string;
+                    };
+                    "text/plain": {
+                        name: string;
+                        message: string;
+                    };
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        name: string;
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        name: string;
+                        message: string;
+                    };
+                    "text/plain": {
+                        name: string;
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "postAuthValidate-api-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    apiKey: string;
+                };
+                "multipart/form-data": {
+                    apiKey: string;
+                };
+                "text/plain": {
+                    apiKey: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        valid: boolean;
+                        user?: {
+                            id: string;
+                            legacyUserId: (string | null) | null;
+                            email: string;
+                            name: (string | null) | null;
+                            provider: (string | null) | null;
+                            providerUsername: (string | null) | null;
+                            generatedAddress: string;
+                            authenticationHeader: string;
+                            systemApiKey: string;
+                            created_at: ((Record<string, never> | string | number) | null) | null;
+                        };
+                        apiKeyId?: string;
+                    };
+                    "multipart/form-data": {
+                        valid: boolean;
+                        user?: {
+                            id: string;
+                            legacyUserId: (string | null) | null;
+                            email: string;
+                            name: (string | null) | null;
+                            provider: (string | null) | null;
+                            providerUsername: (string | null) | null;
+                            generatedAddress: string;
+                            authenticationHeader: string;
+                            systemApiKey: string;
+                            created_at: ((Record<string, never> | string | number) | null) | null;
+                        };
+                        apiKeyId?: string;
+                    };
+                    "text/plain": {
+                        valid: boolean;
+                        user?: {
+                            id: string;
+                            legacyUserId: (string | null) | null;
+                            email: string;
+                            name: (string | null) | null;
+                            provider: (string | null) | null;
+                            providerUsername: (string | null) | null;
+                            generatedAddress: string;
+                            authenticationHeader: string;
+                            systemApiKey: string;
+                            created_at: ((Record<string, never> | string | number) | null) | null;
+                        };
+                        apiKeyId?: string;
+                    };
+                };
+            };
+        };
+    };
+    "postAuthValidate-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    cookieHeader?: string;
+                };
+                "multipart/form-data": {
+                    cookieHeader?: string;
+                };
+                "text/plain": {
+                    cookieHeader?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        valid: boolean;
+                        user?: {
+                            id: string;
+                            supertokensUserId: (string | null) | null;
+                            legacyUserId: (string | null) | null;
+                            email: string;
+                            name: (string | null) | null;
+                            provider: (string | null) | null;
+                            providerUsername: (string | null) | null;
+                            generatedAddress: string;
+                            authenticationHeader: string;
+                            systemApiKey: string;
+                            created_at: ((Record<string, never> | string | number) | null) | null;
+                        };
+                        session?: {
+                            handle?: string;
+                            expiresAt?: string;
+                        };
+                    };
+                    "multipart/form-data": {
+                        valid: boolean;
+                        user?: {
+                            id: string;
+                            supertokensUserId: (string | null) | null;
+                            legacyUserId: (string | null) | null;
+                            email: string;
+                            name: (string | null) | null;
+                            provider: (string | null) | null;
+                            providerUsername: (string | null) | null;
+                            generatedAddress: string;
+                            authenticationHeader: string;
+                            systemApiKey: string;
+                            created_at: ((Record<string, never> | string | number) | null) | null;
+                        };
+                        session?: {
+                            handle?: string;
+                            expiresAt?: string;
+                        };
+                    };
+                    "text/plain": {
+                        valid: boolean;
+                        user?: {
+                            id: string;
+                            supertokensUserId: (string | null) | null;
+                            legacyUserId: (string | null) | null;
+                            email: string;
+                            name: (string | null) | null;
+                            provider: (string | null) | null;
+                            providerUsername: (string | null) | null;
+                            generatedAddress: string;
+                            authenticationHeader: string;
+                            systemApiKey: string;
+                            created_at: ((Record<string, never> | string | number) | null) | null;
+                        };
+                        session?: {
+                            handle?: string;
+                            expiresAt?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "postBenchmark-templatesApply": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
             };
             path?: never;
             cookie?: never;
@@ -2471,22 +3698,100 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    ipfsHash: string;
-                    market: string;
-                    timeout?: string | number;
-                    node?: string;
+                    thresholds?: {
+                        name: string;
+                        description?: string;
+                        metric?: (string | null) | null;
+                        group?: (string | null) | null;
+                        isGating?: boolean;
+                        failureMessage?: string;
+                        marketThresholds: {
+                            marketAddresses: (string | null)[];
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                            interval?: (string | null) | null;
+                            isOptional?: boolean;
+                        }[];
+                    }[];
+                    reconciliations?: {
+                        slug: string;
+                        targetThresholdId: (number | null) | null;
+                        add: {
+                            marketAddress: string;
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        remove: {
+                            thresholdId: number;
+                            marketAddress: string;
+                        }[];
+                    }[];
                 };
                 "multipart/form-data": {
-                    ipfsHash: string;
-                    market: string;
-                    timeout?: string | number;
-                    node?: string;
+                    thresholds?: {
+                        name: string;
+                        description?: string;
+                        metric?: (string | null) | null;
+                        group?: (string | null) | null;
+                        isGating?: boolean;
+                        failureMessage?: string;
+                        marketThresholds: {
+                            marketAddresses: (string | null)[];
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                            interval?: (string | null) | null;
+                            isOptional?: boolean;
+                        }[];
+                    }[];
+                    reconciliations?: {
+                        slug: string;
+                        targetThresholdId: (number | null) | null;
+                        add: {
+                            marketAddress: string;
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        remove: {
+                            thresholdId: number;
+                            marketAddress: string;
+                        }[];
+                    }[];
                 };
                 "text/plain": {
-                    ipfsHash: string;
-                    market: string;
-                    timeout?: string | number;
-                    node?: string;
+                    thresholds?: {
+                        name: string;
+                        description?: string;
+                        metric?: (string | null) | null;
+                        group?: (string | null) | null;
+                        isGating?: boolean;
+                        failureMessage?: string;
+                        marketThresholds: {
+                            marketAddresses: (string | null)[];
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                            interval?: (string | null) | null;
+                            isOptional?: boolean;
+                        }[];
+                    }[];
+                    reconciliations?: {
+                        slug: string;
+                        targetThresholdId: (number | null) | null;
+                        add: {
+                            marketAddress: string;
+                            jsonLogic: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        remove: {
+                            thresholdId: number;
+                            marketAddress: string;
+                        }[];
+                    }[];
                 };
             };
         };
@@ -2497,64 +3802,2207 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        tx: string;
-                        job: string;
-                        run: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
-                            project: string;
-                        };
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on?: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
                     };
                     "multipart/form-data": {
-                        tx: string;
-                        job: string;
-                        run: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
-                            project: string;
-                        };
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on?: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
                     };
                     "text/plain": {
-                        tx: string;
-                        job: string;
-                        run: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
-                            project: string;
-                        };
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on?: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
                     };
                 };
             };
         };
     };
-    postApiJobsByAddressExtend: {
+    "getBenchmark-templatesConfig": {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Authorization header: Bearer <jwt> or Bearer <key> */
-                authorization?: string;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        benchmarks: {
+                            slug: string;
+                            operationId: number;
+                            operation: {
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on?: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            };
+                            thresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            marketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        benchmarks: {
+                            slug: string;
+                            operationId: number;
+                            operation: {
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on?: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            };
+                            thresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            marketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                        }[];
+                    };
+                    "text/plain": {
+                        benchmarks: {
+                            slug: string;
+                            operationId: number;
+                            operation: {
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on?: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            };
+                            thresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            marketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "getBenchmark-templatesRefresh": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on?: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on?: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
+                    };
+                    "text/plain": {
+                        changes: {
+                            slug: string;
+                            status: "added" | "updated" | "removed" | "unchanged";
+                            operation: ({
+                                name: string;
+                                description?: string;
+                                source?: string;
+                                ops: {
+                                    /** @enum {string} */
+                                    type: "container/run" | "container/create-volume";
+                                    id: string;
+                                    args: {
+                                        image: string;
+                                        aliases?: string | string[];
+                                        cmd?: string | string[];
+                                        volumes?: {
+                                            name: string;
+                                            dest: string;
+                                        }[];
+                                        expose?: number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        } | (number | string | {
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            port: number;
+                                            /** @enum {string} */
+                                            type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                            health_checks?: ({
+                                                /** @enum {string} */
+                                                type: "http";
+                                                path: string;
+                                                /** @enum {string} */
+                                                method: "GET" | "POST" | "PUT" | "DELETE";
+                                                expected_status: number;
+                                                /** @description Construct a type with a set of properties K of type T */
+                                                headers?: {
+                                                    [key: string]: string;
+                                                };
+                                                body?: unknown;
+                                                continuous: boolean;
+                                            } | {
+                                                /** @enum {string} */
+                                                type: "websocket";
+                                                expected_response: string;
+                                                continuous: boolean;
+                                            })[];
+                                        })[];
+                                        gpu?: boolean;
+                                        work_dir?: string;
+                                        entrypoint?: string | string[];
+                                        env?: {
+                                            [key: string]: string;
+                                        };
+                                        restart_policy?: {
+                                            /** @enum {string} */
+                                            policy: "on-failure";
+                                            restart_tries?: number;
+                                        } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                        private?: boolean;
+                                        resources?: ({
+                                            __spread__: string;
+                                            chunked?: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            files?: string[];
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            bucket: string;
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "S3";
+                                            target: string;
+                                            buckets: {
+                                                url: string;
+                                                files?: string[];
+                                            }[];
+                                            url?: string;
+                                            allowWrite?: boolean;
+                                            IAM?: {
+                                                REGION: string;
+                                                ACCESS_KEY_ID: string;
+                                                SECRET_ACCESS_KEY: string;
+                                            };
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "HF";
+                                            target: string;
+                                            repo: string;
+                                            revision?: string;
+                                            files?: string[];
+                                            accessToken?: string;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "Ollama";
+                                            model: string;
+                                            target?: string;
+                                        } | "__remove-if-empty__")[];
+                                        authentication?: {
+                                            docker?: {
+                                                username?: string;
+                                                password?: string;
+                                                email?: string;
+                                                server?: string;
+                                            };
+                                        };
+                                    } | {
+                                        name: string;
+                                    };
+                                    results?: {
+                                        [key: string]: string | {
+                                            regex: string;
+                                            logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                        };
+                                    };
+                                    execution?: {
+                                        group?: string;
+                                        timeout?: number;
+                                        depends_on?: string[];
+                                        stop_if_dependent_stops?: boolean;
+                                    };
+                                }[];
+                                metrics: {
+                                    [key: string]: unknown;
+                                }[];
+                            } | null) | null;
+                            requirements: {
+                                [key: string]: unknown;
+                            }[];
+                            metricChanges: {
+                                added: string[];
+                                updated: string[];
+                                removed: string[];
+                                unchanged: string[];
+                            };
+                            conflictKeys: string[];
+                            supportedMarkets: string[];
+                            existingThresholds: {
+                                id: number;
+                                name: string;
+                                metric: (string | null) | null;
+                                group: (string | null) | null;
+                                isGating: boolean;
+                            }[];
+                            existingMarketThresholds: {
+                                thresholdId: number;
+                                marketAddress: (string | null) | null;
+                                jsonLogic: {
+                                    [key: string]: unknown;
+                                };
+                                isOptional: boolean;
+                            }[];
+                            reconciliation: {
+                                inSync: boolean;
+                                actionable: boolean;
+                                needsThreshold: boolean;
+                                hasGlobalLink: boolean;
+                                targetThresholdId: (number | null) | null;
+                                targetMetricKey: (string | null) | null;
+                                add: {
+                                    marketAddress: string;
+                                    jsonLogic: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                remove: {
+                                    thresholdId: number;
+                                    marketAddress: string;
+                                }[];
+                                benchmarkMetricKeys: string[];
+                                defaultMetricKey: (string | null) | null;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    postBenchmarksByIdPrediction: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
             };
             path: {
-                address: string;
+                id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
                 "application/json": {
-                    seconds?: number;
+                    uuid: string;
+                    prediction: number;
                 };
                 "multipart/form-data": {
-                    seconds?: number;
+                    uuid: string;
+                    prediction: number;
                 };
                 "text/plain": {
-                    seconds?: number;
+                    uuid: string;
+                    prediction: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBenchmarksByIdSeed: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    uuid: string;
+                    type: string;
+                }[];
+                "multipart/form-data": {
+                    uuid: string;
+                    type: string;
+                }[];
+                "text/plain": {
+                    uuid: string;
+                    type: string;
+                }[];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        seeds: {
+                            [key: string]: number;
+                        };
+                    };
+                    "multipart/form-data": {
+                        seeds: {
+                            [key: string]: number;
+                        };
+                    };
+                    "text/plain": {
+                        seeds: {
+                            [key: string]: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "postBenchmarksByIdSubmit-results": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    status?: string;
+                    startTime?: number;
+                    endTime?: (number | null) | null;
+                    errors?: unknown[];
+                    opStates: {
+                        providerId?: (string | null) | null;
+                        operationId?: (string | null) | null;
+                        group?: (string | null) | null;
+                        status?: (string | null) | null;
+                        startTime?: (number | null) | null;
+                        endTime?: (number | null) | null;
+                        exitCode: (number | null) | null;
+                        logs?: {
+                            type: "stdin" | "stdout" | "stderr" | "nodeerr";
+                            log?: string;
+                            timestamp?: string;
+                        }[];
+                        results?: {
+                            [key: string]: string | string[];
+                        };
+                        error?: {
+                            event: string;
+                            message: string;
+                            code?: number;
+                        };
+                        diagnostics?: {
+                            reason: {
+                                hostShutDown: boolean;
+                                jobStopped: boolean;
+                                jobExpired: boolean;
+                                reason?: string;
+                            };
+                            state?: {
+                                Status: string;
+                                Running: boolean;
+                                Paused: boolean;
+                                Restarting: boolean;
+                                OOMKilled: boolean;
+                                Dead: boolean;
+                                Pid: number;
+                                ExitCode: number;
+                                Error: string;
+                                StartedAt: string;
+                                FinishedAt: string;
+                                RestartCount: number;
+                                Health?: {
+                                    Status: string;
+                                    FailingStreak: number;
+                                    Log: {
+                                        Start: string;
+                                        End: string;
+                                        ExitCode: number;
+                                        Output: string;
+                                    }[];
+                                };
+                            };
+                        };
+                        env?: {
+                            [key: string]: string;
+                        };
+                    }[];
+                    secrets?: {
+                        [key: string]: unknown;
+                    };
+                };
+                "multipart/form-data": {
+                    status?: string;
+                    startTime?: number;
+                    endTime?: (number | null) | null;
+                    errors?: unknown[];
+                    opStates: {
+                        providerId?: (string | null) | null;
+                        operationId?: (string | null) | null;
+                        group?: (string | null) | null;
+                        status?: (string | null) | null;
+                        startTime?: (number | null) | null;
+                        endTime?: (number | null) | null;
+                        exitCode: (number | null) | null;
+                        logs?: {
+                            type: "stdin" | "stdout" | "stderr" | "nodeerr";
+                            log?: string;
+                            timestamp?: string;
+                        }[];
+                        results?: {
+                            [key: string]: string | string[];
+                        };
+                        error?: {
+                            event: string;
+                            message: string;
+                            code?: number;
+                        };
+                        diagnostics?: {
+                            reason: {
+                                hostShutDown: boolean;
+                                jobStopped: boolean;
+                                jobExpired: boolean;
+                                reason?: string;
+                            };
+                            state?: {
+                                Status: string;
+                                Running: boolean;
+                                Paused: boolean;
+                                Restarting: boolean;
+                                OOMKilled: boolean;
+                                Dead: boolean;
+                                Pid: number;
+                                ExitCode: number;
+                                Error: string;
+                                StartedAt: string;
+                                FinishedAt: string;
+                                RestartCount: number;
+                                Health?: {
+                                    Status: string;
+                                    FailingStreak: number;
+                                    Log: {
+                                        Start: string;
+                                        End: string;
+                                        ExitCode: number;
+                                        Output: string;
+                                    }[];
+                                };
+                            };
+                        };
+                        env?: {
+                            [key: string]: string;
+                        };
+                    }[];
+                    secrets?: {
+                        [key: string]: unknown;
+                    };
+                };
+                "text/plain": {
+                    status?: string;
+                    startTime?: number;
+                    endTime?: (number | null) | null;
+                    errors?: unknown[];
+                    opStates: {
+                        providerId?: (string | null) | null;
+                        operationId?: (string | null) | null;
+                        group?: (string | null) | null;
+                        status?: (string | null) | null;
+                        startTime?: (number | null) | null;
+                        endTime?: (number | null) | null;
+                        exitCode: (number | null) | null;
+                        logs?: {
+                            type: "stdin" | "stdout" | "stderr" | "nodeerr";
+                            log?: string;
+                            timestamp?: string;
+                        }[];
+                        results?: {
+                            [key: string]: string | string[];
+                        };
+                        error?: {
+                            event: string;
+                            message: string;
+                            code?: number;
+                        };
+                        diagnostics?: {
+                            reason: {
+                                hostShutDown: boolean;
+                                jobStopped: boolean;
+                                jobExpired: boolean;
+                                reason?: string;
+                            };
+                            state?: {
+                                Status: string;
+                                Running: boolean;
+                                Paused: boolean;
+                                Restarting: boolean;
+                                OOMKilled: boolean;
+                                Dead: boolean;
+                                Pid: number;
+                                ExitCode: number;
+                                Error: string;
+                                StartedAt: string;
+                                FinishedAt: string;
+                                RestartCount: number;
+                                Health?: {
+                                    Status: string;
+                                    FailingStreak: number;
+                                    Log: {
+                                        Start: string;
+                                        End: string;
+                                        ExitCode: number;
+                                        Output: string;
+                                    }[];
+                                };
+                            };
+                        };
+                        env?: {
+                            [key: string]: string;
+                        };
+                    }[];
+                    secrets?: {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -2565,43 +6013,4419 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        tx: string;
-                        job: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
+                        status: "success" | "failed";
+                        report?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                            }[];
                         };
                     };
                     "multipart/form-data": {
-                        tx: string;
-                        job: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
+                        status: "success" | "failed";
+                        report?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                            }[];
                         };
                     };
                     "text/plain": {
-                        tx: string;
-                        job: string;
-                        credits: {
-                            costUSD: number;
-                            creditsUsed: number;
-                            reservationId: string;
+                        status: "success" | "failed";
+                        report?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                            }[];
                         };
                     };
                 };
             };
         };
     };
-    postApiJobsByAddressStop: {
+    "getBenchmarksBenchmark-version": {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Authorization header: Bearer <jwt> or Bearer <key> */
-                authorization?: string;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
+        };
+    };
+    "postBenchmarksBenchmark-version": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    value: string;
+                };
+                "multipart/form-data": {
+                    value: string;
+                };
+                "text/plain": {
+                    value: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getBenchmarksMarket-metric-aggregates": {
+        parameters: {
+            query?: {
+                metrics?: string | string[];
+                marketAddress?: string;
+                nodeId?: string;
+                aggregate?: "average" | "min" | "max" | "median";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        aggregate: "average" | "min" | "max" | "median";
+                        markets: {
+                            marketAddress: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
+                        }[];
+                        /** @description Aggregate across all individual benchmark runs for this node. */
+                        node?: {
+                            nodeId: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
+                        };
+                    };
+                    "multipart/form-data": {
+                        aggregate: "average" | "min" | "max" | "median";
+                        markets: {
+                            marketAddress: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
+                        }[];
+                        /** @description Aggregate across all individual benchmark runs for this node. */
+                        node?: {
+                            nodeId: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
+                        };
+                    };
+                    "text/plain": {
+                        aggregate: "average" | "min" | "max" | "median";
+                        markets: {
+                            marketAddress: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
+                        }[];
+                        /** @description Aggregate across all individual benchmark runs for this node. */
+                        node?: {
+                            nodeId: string;
+                            metrics: {
+                                [key: string]: number;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "getBenchmarksMarket-thresholds": {
+        parameters: {
+            query?: {
+                thresholdId?: string | number;
+                marketAddress?: string;
+            };
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postBenchmarksMarket-thresholdsCreate": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+                "multipart/form-data": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+                "text/plain": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "deleteBenchmarksMarket-thresholdsDelete": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    thresholdId: number;
+                    marketAddress: string | null;
+                };
+                "multipart/form-data": {
+                    thresholdId: number;
+                    marketAddress: string | null;
+                };
+                "text/plain": {
+                    thresholdId: number;
+                    marketAddress: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postBenchmarksMarket-thresholdsDescribe": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    subject?: string;
+                };
+                "multipart/form-data": {
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    subject?: string;
+                };
+                "text/plain": {
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    subject?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        description: string;
+                    };
+                    "multipart/form-data": {
+                        description: string;
+                    };
+                    "text/plain": {
+                        description: string;
+                    };
+                };
+            };
+        };
+    };
+    "postBenchmarksMarket-thresholdsUpdate": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+                "multipart/form-data": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+                "text/plain": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getBenchmarksMetric-processors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBenchmarksMetrics: {
+        parameters: {
+            query?: {
+                operationId?: string | number;
+            };
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteBenchmarksMetricsByKeyDelete: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBenchmarksMetricsByKeyUpdate: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
+                };
+                "multipart/form-data": {
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
+                };
+                "text/plain": {
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBenchmarksMetricsCreate: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
+                };
+                "multipart/form-data": {
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
+                };
+                "text/plain": {
+                    key: string;
+                    invalidatedByMetricKey?: (string | null) | null;
+                    input?: string;
+                    type?: string;
+                    expiry?: string;
+                    internal?: boolean;
+                    lifecycle?: boolean;
+                    processor?: string;
+                    operationId?: number;
+                    group?: (string | null) | null;
+                    multiValue?: boolean;
+                    instanceKey?: (string | null) | null;
+                    defaultValue: unknown;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBenchmarksOperations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteBenchmarksOperationsByIdDelete: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBenchmarksOperationsByIdUpdate: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on?: string[];
+                            stop_if_dependent_stops?: boolean;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+                "multipart/form-data": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on?: string[];
+                            stop_if_dependent_stops?: boolean;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+                "text/plain": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on?: string[];
+                            stop_if_dependent_stops?: boolean;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBenchmarksOperationsCreate: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on?: string[];
+                            stop_if_dependent_stops?: boolean;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+                "multipart/form-data": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on?: string[];
+                            stop_if_dependent_stops?: boolean;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+                "text/plain": {
+                    name: string;
+                    description?: string;
+                    ops: {
+                        /** @enum {string} */
+                        type: "container/run" | "container/create-volume";
+                        id: string;
+                        args: {
+                            image: string;
+                            aliases?: string | string[];
+                            cmd?: string | string[];
+                            volumes?: {
+                                name: string;
+                                dest: string;
+                            }[];
+                            expose?: number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            } | (number | string | {
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                port: number;
+                                /** @enum {string} */
+                                type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                health_checks?: ({
+                                    /** @enum {string} */
+                                    type: "http";
+                                    path: string;
+                                    /** @enum {string} */
+                                    method: "GET" | "POST" | "PUT" | "DELETE";
+                                    expected_status: number;
+                                    /** @description Construct a type with a set of properties K of type T */
+                                    headers?: {
+                                        [key: string]: string;
+                                    };
+                                    body?: unknown;
+                                    continuous: boolean;
+                                } | {
+                                    /** @enum {string} */
+                                    type: "websocket";
+                                    expected_response: string;
+                                    continuous: boolean;
+                                })[];
+                            })[];
+                            gpu?: boolean;
+                            work_dir?: string;
+                            entrypoint?: string | string[];
+                            env?: {
+                                [key: string]: string;
+                            };
+                            restart_policy?: {
+                                /** @enum {string} */
+                                policy: "on-failure";
+                                restart_tries?: number;
+                            } | ("on-failure" | "no" | "always" | "unless-stopped");
+                            private?: boolean;
+                            resources?: ({
+                                __spread__: string;
+                                chunked?: boolean;
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                files?: string[];
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                bucket: string;
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "S3";
+                                target: string;
+                                buckets: {
+                                    url: string;
+                                    files?: string[];
+                                }[];
+                                url?: string;
+                                allowWrite?: boolean;
+                                IAM?: {
+                                    REGION: string;
+                                    ACCESS_KEY_ID: string;
+                                    SECRET_ACCESS_KEY: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "HF";
+                                target: string;
+                                repo: string;
+                                revision?: string;
+                                files?: string[];
+                                accessToken?: string;
+                            } | {
+                                /** @enum {string} */
+                                type: "Ollama";
+                                model: string;
+                                target?: string;
+                            } | "__remove-if-empty__")[];
+                            authentication?: {
+                                docker?: {
+                                    username?: string;
+                                    password?: string;
+                                    email?: string;
+                                    server?: string;
+                                };
+                            };
+                        } | {
+                            name: string;
+                        };
+                        results?: {
+                            [key: string]: string | {
+                                regex: string;
+                                logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                            };
+                        };
+                        execution?: {
+                            group?: string;
+                            timeout?: number;
+                            depends_on?: string[];
+                            stop_if_dependent_stops?: boolean;
+                        };
+                    }[];
+                    source?: string;
+                    timeoutSeconds?: string | number;
+                    metrics?: {
+                        key: string;
+                        invalidatedByMetricKey?: (string | null) | null;
+                        input?: string;
+                        type?: string;
+                        expiry?: string;
+                        internal?: boolean;
+                        lifecycle?: boolean;
+                        processor?: string;
+                        operationId?: number;
+                        group?: (string | null) | null;
+                        multiValue?: boolean;
+                        instanceKey?: (string | null) | null;
+                        defaultValue: unknown;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBenchmarksRecent: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        feedbackReport: ({
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        } | null) | null;
+                        benchmarks: {
+                            id: string;
+                            status: string;
+                            createdAt: Record<string, never> | string | number;
+                            submittedAt: ((Record<string, never> | string | number) | null) | null;
+                            rawResults: (unknown | null) | null;
+                            operations: {
+                                operationId: number;
+                            }[];
+                            metrics: {
+                                metricKey: string;
+                                instance: string;
+                                value: unknown;
+                                isValid: boolean;
+                                createdAt: Record<string, never> | string | number;
+                            }[];
+                            antiSpoofs: {
+                                gpuType: string;
+                                gpuUUID: string;
+                                verified: boolean;
+                                seedAt: Record<string, never> | string | number;
+                                predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            }[];
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        feedbackReport: ({
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        } | null) | null;
+                        benchmarks: {
+                            id: string;
+                            status: string;
+                            createdAt: Record<string, never> | string | number;
+                            submittedAt: ((Record<string, never> | string | number) | null) | null;
+                            rawResults: (unknown | null) | null;
+                            operations: {
+                                operationId: number;
+                            }[];
+                            metrics: {
+                                metricKey: string;
+                                instance: string;
+                                value: unknown;
+                                isValid: boolean;
+                                createdAt: Record<string, never> | string | number;
+                            }[];
+                            antiSpoofs: {
+                                gpuType: string;
+                                gpuUUID: string;
+                                verified: boolean;
+                                seedAt: Record<string, never> | string | number;
+                                predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            }[];
+                        }[];
+                    };
+                    "text/plain": {
+                        feedbackReport: ({
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        } | null) | null;
+                        benchmarks: {
+                            id: string;
+                            status: string;
+                            createdAt: Record<string, never> | string | number;
+                            submittedAt: ((Record<string, never> | string | number) | null) | null;
+                            rawResults: (unknown | null) | null;
+                            operations: {
+                                operationId: number;
+                            }[];
+                            metrics: {
+                                metricKey: string;
+                                instance: string;
+                                value: unknown;
+                                isValid: boolean;
+                                createdAt: Record<string, never> | string | number;
+                            }[];
+                            antiSpoofs: {
+                                gpuType: string;
+                                gpuUUID: string;
+                                verified: boolean;
+                                seedAt: Record<string, never> | string | number;
+                                predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    getBenchmarksThresholds: {
+        parameters: {
+            query?: {
+                metric?: string;
+                marketAddress?: string;
+            };
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteBenchmarksThresholdsByIdDelete: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBenchmarksThresholdsByIdUpdate: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
+                };
+                "multipart/form-data": {
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
+                };
+                "text/plain": {
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBenchmarksThresholdsCreate: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
+                };
+                "multipart/form-data": {
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
+                };
+                "text/plain": {
+                    name: string;
+                    description?: string;
+                    metric?: (string | null) | null;
+                    group?: (string | null) | null;
+                    isGating?: boolean;
+                    failureMessage?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCreditsBalance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Credits assigned to the user in USD cents. */
+                        assignedCredits: number;
+                        /** @description Credits reserved for active jobs in USD cents. */
+                        reservedCredits: number;
+                        /** @description Credits that have been used/settled in USD cents. */
+                        settledCredits: number;
+                    };
+                    "multipart/form-data": {
+                        /** @description Credits assigned to the user in USD cents. */
+                        assignedCredits: number;
+                        /** @description Credits reserved for active jobs in USD cents. */
+                        reservedCredits: number;
+                        /** @description Credits that have been used/settled in USD cents. */
+                        settledCredits: number;
+                    };
+                    "text/plain": {
+                        /** @description Credits assigned to the user in USD cents. */
+                        assignedCredits: number;
+                        /** @description Credits reserved for active jobs in USD cents. */
+                        reservedCredits: number;
+                        /** @description Credits that have been used/settled in USD cents. */
+                        settledCredits: number;
+                    };
+                };
+            };
+        };
+    };
+    postCreditsClaim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The credit code to claim. */
+                    code: string;
+                };
+                "multipart/form-data": {
+                    /** @description The credit code to claim. */
+                    code: string;
+                };
+                "text/plain": {
+                    /** @description The credit code to claim. */
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                        amount: number;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                        amount: number;
+                    };
+                    "text/plain": {
+                        message: string;
+                        amount: number;
+                    };
+                };
+            };
+        };
+    };
+    getCreditsInvitationsByToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        creditsAmount: number;
+                        expirationDate: (((Record<string, never> | string | number) | string) | null) | null;
+                        restrictedEmail: (string | null) | null;
+                        restrictedAccountName: (string | null) | null;
+                        isClaimed: boolean;
+                        isExpired: boolean;
+                    };
+                    "multipart/form-data": {
+                        creditsAmount: number;
+                        expirationDate: (((Record<string, never> | string | number) | string) | null) | null;
+                        restrictedEmail: (string | null) | null;
+                        restrictedAccountName: (string | null) | null;
+                        isClaimed: boolean;
+                        isExpired: boolean;
+                    };
+                    "text/plain": {
+                        creditsAmount: number;
+                        expirationDate: (((Record<string, never> | string | number) | string) | null) | null;
+                        restrictedEmail: (string | null) | null;
+                        restrictedAccountName: (string | null) | null;
+                        isClaimed: boolean;
+                        isExpired: boolean;
+                    };
+                };
+            };
+        };
+    };
+    postCreditsInvitationsByTokenClaim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                        amount: number;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                        amount: number;
+                    };
+                    "text/plain": {
+                        message: string;
+                        amount: number;
+                    };
+                };
+            };
+        };
+    };
+    postCreditsRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                        amount: number;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                        amount: number;
+                    };
+                    "text/plain": {
+                        message: string;
+                        amount: number;
+                    };
+                };
+            };
+        };
+    };
+    getCreditsRequestEligibility: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        eligible: boolean;
+                        message?: string;
+                        amount?: number;
+                    };
+                    "multipart/form-data": {
+                        eligible: boolean;
+                        message?: string;
+                        amount?: number;
+                    };
+                    "text/plain": {
+                        eligible: boolean;
+                        message?: string;
+                        amount?: number;
+                    };
+                };
+            };
+        };
+    };
+    "getCreditsSpending-history": {
+        parameters: {
+            query: {
+                start_date: string;
+                end_date?: string;
+                group_by?: "day" | "month";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        userAddress: string;
+                        startDate: string;
+                        endDate: string;
+                        groupBy: string;
+                        results: {
+                            period: string;
+                            total_usd: number;
+                            breakdown: {
+                                market: string;
+                                totalSpent: number;
+                            }[];
+                            daily_breakdown?: {
+                                [key: string]: {
+                                    [key: string]: number;
+                                };
+                            };
+                        }[];
+                        forecast: number | null;
+                        comparison: {
+                            prevMonthTotal: number;
+                            pctChange: number | null;
+                        } | null;
+                        sameDayComparison: {
+                            sameDayLastMonthSpent: number;
+                            currentMonthSpent: number;
+                            pctChangeSoFar?: number | null;
+                        } | null;
+                        currentMonth: {
+                            currentMonthSpent: number;
+                        } | null;
+                    };
+                    "multipart/form-data": {
+                        userAddress: string;
+                        startDate: string;
+                        endDate: string;
+                        groupBy: string;
+                        results: {
+                            period: string;
+                            total_usd: number;
+                            breakdown: {
+                                market: string;
+                                totalSpent: number;
+                            }[];
+                            daily_breakdown?: {
+                                [key: string]: {
+                                    [key: string]: number;
+                                };
+                            };
+                        }[];
+                        forecast: number | null;
+                        comparison: {
+                            prevMonthTotal: number;
+                            pctChange: number | null;
+                        } | null;
+                        sameDayComparison: {
+                            sameDayLastMonthSpent: number;
+                            currentMonthSpent: number;
+                            pctChangeSoFar?: number | null;
+                        } | null;
+                        currentMonth: {
+                            currentMonthSpent: number;
+                        } | null;
+                    };
+                    "text/plain": {
+                        userAddress: string;
+                        startDate: string;
+                        endDate: string;
+                        groupBy: string;
+                        results: {
+                            period: string;
+                            total_usd: number;
+                            breakdown: {
+                                market: string;
+                                totalSpent: number;
+                            }[];
+                            daily_breakdown?: {
+                                [key: string]: {
+                                    [key: string]: number;
+                                };
+                            };
+                        }[];
+                        forecast: number | null;
+                        comparison: {
+                            prevMonthTotal: number;
+                            pctChange: number | null;
+                        } | null;
+                        sameDayComparison: {
+                            sameDayLastMonthSpent: number;
+                            currentMonthSpent: number;
+                            pctChangeSoFar?: number | null;
+                        } | null;
+                        currentMonth: {
+                            currentMonthSpent: number;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    getCreditsTransactions: {
+        parameters: {
+            query: {
+                limit: string | number;
+                offset: string | number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        transactions: {
+                            id: string;
+                            type: string;
+                            amountUsd: number;
+                            createdAt: string;
+                            method: string | null;
+                        }[];
+                        total: number;
+                    };
+                    "multipart/form-data": {
+                        transactions: {
+                            id: string;
+                            type: string;
+                            amountUsd: number;
+                            createdAt: string;
+                            method: string | null;
+                        }[];
+                        total: number;
+                    };
+                    "text/plain": {
+                        transactions: {
+                            id: string;
+                            type: string;
+                            amountUsd: number;
+                            createdAt: string;
+                            method: string | null;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    getDeployments: {
+        parameters: {
+            query?: {
+                /** @description Base64-encoded cursor for keyset pagination */
+                cursor?: string;
+                /** @description Number of items per page (10, 20, 50, or 100) */
+                limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                sort_order?: "asc" | "desc";
+                /** @description Search for partial matches in deployment ID or name (case-insensitive) */
+                search?: string;
+                /** @description Filter by exact deployment ID */
+                id?: string;
+                /** @description Filter by exact deployment name */
+                name?: string;
+                /** @description Filter by deployment status. Can be single value or comma-separated list */
+                status?: ("DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED") | string;
+                /** @description Filter by deployment strategy. Can be single value or comma-separated list */
+                strategy?: ("SIMPLE" | "SIMPLE-EXTEND" | "SCHEDULED" | "INFINITE") | string;
+                /** @description Filter by vault public key */
+                vault?: string;
+                /** @description Filter deployments created after this date (ISO 8601 format) */
+                created_after?: string;
+                /** @description Filter deployments created before this date (ISO 8601 format) */
+                created_before?: string;
+            };
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of deployments with pagination. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        deployments: components["schemas"]["DeploymentManagerDeployment"][];
+                        pagination: {
+                            /** @description Cursor for next page, null if no more pages */
+                            cursor_next: string | null;
+                            /** @description Cursor for previous page, null if on first page */
+                            cursor_prev: string | null;
+                            /** @description Total number of items in collection */
+                            total_items: number;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getDeploymentsByDeployment: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Gets a deployment by ID. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerDeployment"];
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    deleteDeploymentsByDeployment: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deployment deleted successfully. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    postDeploymentsByDeploymentArchive: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deployment archived successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "ARCHIVED";
+                        /** Format: date-time */
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    postDeploymentsByDeploymentCreateRevision: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DeploymentManagerJobDefinition"];
+            };
+        };
+        responses: {
+            /** @description Deployment CreateRevisioned successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        active_revision: number;
+                        endpoints: {
+                            opId: string;
+                            port: number | string;
+                            url: string;
+                            /** @description Whether the deployment currently answers here. Per opId: a node opens one load-balanced proxy per op, so every port that op exposes reports the same value. */
+                            online: boolean;
+                        }[];
+                        revisions: {
+                            revision: number;
+                            deployment: string;
+                            ipfs_definition_hash: string;
+                            job_definition: components["schemas"]["DeploymentManagerJobDefinition"];
+                            /** Format: date-time */
+                            created_at: string;
+                        }[];
+                        /** Format: date-time */
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    postDeploymentsByDeploymentDuplicate: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Name of the new deployment. */
+                    name: string;
+                    /** @description If true, the new deployment is started immediately after creation instead of being left as a DRAFT. */
+                    autostart?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Deployment duplicated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerDeployment"];
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getDeploymentsByDeploymentEvents: {
+        parameters: {
+            query?: {
+                /** @description Base64-encoded cursor for keyset pagination */
+                cursor?: string;
+                /** @description Number of items per page (10, 20, 50, or 100) */
+                limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                sort_order?: "asc" | "desc";
+                /** @description Filter by event category: 'Deployment' or 'Event'. Can be comma-separated list */
+                category?: ("Deployment" | "Event") | string;
+                /** @description Filter by event type. Can be single value or comma-separated list */
+                type?: string;
+                /** @description Filter events created after this date (ISO 8601 format) */
+                created_after?: string;
+                /** @description Filter events created before this date (ISO 8601 format) */
+                created_before?: string;
+            };
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of events for the deployment with pagination. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: components["schemas"]["DeploymentManagerEvent"][];
+                        pagination: {
+                            /** @description Cursor for next page, null if no more pages */
+                            cursor_next: string | null;
+                            /** @description Cursor for previous page, null if on first page */
+                            cursor_prev: string | null;
+                            /** @description Total number of items in collection */
+                            total_items: number;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getDeploymentsByDeploymentHeader: {
+        parameters: {
+            query?: {
+                /** @description Include a timestamp in the signed message. */
+                includeTime?: "true" | "false";
+                /** @description Custom message to sign. Defaults to "DEPLOYMENT_HEADER". */
+                message?: string;
+            };
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Returns authorization header to interact with the vaults jobs. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        header: string;
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getDeploymentsByDeploymentJobs: {
+        parameters: {
+            query?: {
+                /** @description Base64-encoded cursor for keyset pagination */
+                cursor?: string;
+                /** @description Number of items per page (10, 20, 50, or 100) */
+                limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                sort_order?: "asc" | "desc";
+                /** @description Filter by job state. Can be single value or comma-separated list (e.g., 'RUNNING,COMPLETED') */
+                state?: ("QUEUED" | "RUNNING" | "COMPLETED" | "STOPPED") | string;
+                /** @description Filter by exact job ID */
+                job?: string;
+                /** @description Filter by deployment revision number */
+                revision?: number;
+                /** @description Filter jobs created after this date (ISO 8601 format) */
+                created_after?: string;
+                /** @description Filter jobs created before this date (ISO 8601 format) */
+                created_before?: string;
+            };
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of jobs for the deployment with pagination. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        jobs: components["schemas"]["DeploymentManagerJob"][];
+                        pagination: {
+                            /** @description Cursor for next page, null if no more pages */
+                            cursor_next: string | null;
+                            /** @description Cursor for previous page, null if on first page */
+                            cursor_prev: string | null;
+                            /** @description Total number of items in collection */
+                            total_items: number;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getDeploymentsByDeploymentJobsByJob: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+                job: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Gets a deployment job by ID. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        confidential: boolean;
+                        revision: number;
+                        market: string;
+                        node: string;
+                        state: string | number;
+                        jobStatus: string | null;
+                        jobDefinition: components["schemas"]["DeploymentManagerJobDefinition"];
+                        jobResult: components["schemas"]["DeploymentManagerJobResults"] | null;
+                        timeStart: number;
+                        timeEnd: number;
+                        listedAt: number;
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getDeploymentsByDeploymentRevisions: {
+        parameters: {
+            query?: {
+                /** @description Base64-encoded cursor for keyset pagination */
+                cursor?: string;
+                /** @description Number of items per page (10, 20, 50, or 100) */
+                limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                sort_order?: "asc" | "desc";
+                /** @description Filter by exact revision number */
+                revision?: number;
+                /** @description Filter revisions created after this date (ISO 8601 format) */
+                created_after?: string;
+                /** @description Filter revisions created before this date (ISO 8601 format) */
+                created_before?: string;
+            };
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of revisions for the deployment with pagination. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        revisions: components["schemas"]["DeploymentManagerRevision"][];
+                        pagination: {
+                            /** @description Cursor for next page, null if no more pages */
+                            cursor_next: string | null;
+                            /** @description Cursor for previous page, null if on first page */
+                            cursor_prev: string | null;
+                            /** @description Total number of items in collection */
+                            total_items: number;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getDeploymentsByDeploymentSshKeys: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The deployment's SSH public keys (empty when SSH access is not configured). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        public_keys: string[];
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    postDeploymentsByDeploymentStart: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deployment started successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "STARTING";
+                        /** Format: date-time */
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    postDeploymentsByDeploymentStop: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deployment stopped successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "STOPPING";
+                        /** Format: date-time */
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getDeploymentsByDeploymentStream: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": components["schemas"]["DeploymentManagerDeploymentStreamEvent"];
+                };
+            };
+        };
+    };
+    getDeploymentsByDeploymentTasks: {
+        parameters: {
+            query?: {
+                /** @description Base64-encoded cursor for keyset pagination */
+                cursor?: string;
+                /** @description Number of items per page (10, 20, 50, or 100) */
+                limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
+                /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
+                sort_order?: "asc" | "desc";
+                /** @description Filter by task type. Can be single value or comma-separated list */
+                task?: ("LIST" | "EXTEND" | "STOP") | string;
+                /** @description Filter tasks due after this date (ISO 8601 format) */
+                due_after?: string;
+                /** @description Filter tasks due before this date (ISO 8601 format) */
+                due_before?: string;
+            };
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of scheduled tasks for the deployment with pagination. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        tasks: components["schemas"]["DeploymentManagerTask"][];
+                        pagination: {
+                            /** @description Cursor for next page, null if no more pages */
+                            cursor_next: string | null;
+                            /** @description Cursor for previous page, null if on first page */
+                            cursor_prev: string | null;
+                            /** @description Total number of items in collection */
+                            total_items: number;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    patchDeploymentsByDeploymentUpdateActiveRevision: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    active_revision: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Deployment active revision updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        active_revision: number;
+                        endpoints: components["schemas"]["DeploymentManagerEndpoint"][];
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Bad Request. Invalid input data. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    patchDeploymentsByDeploymentUpdateMarket: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    market: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Deployment market updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        market: string;
+                        /** Format: date-time */
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    patchDeploymentsByDeploymentUpdateName: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Deployment name updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        name: string;
+                        /** Format: date-time */
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    patchDeploymentsByDeploymentUpdateReplicaCount: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    replicas: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Deployment replica count updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        replicas: number;
+                        /** Format: date-time */
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    patchDeploymentsByDeploymentUpdateSchedule: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Cron expression for scheduled deployments */
+                    schedule: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Deployment schedule updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Cron expression for scheduled deployments */
+                        schedule: string;
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Bad Request. Invalid input data. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    patchDeploymentsByDeploymentUpdateSshKeys: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The complete set of SSH public keys allowed to reach this deployment's jobs (at most 10). Replaces the current set; an empty array revokes SSH access. */
+                    public_keys: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description SSH keys updated. Check `jobs` for nodes that rejected or did not receive the new keys. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        public_keys: string[];
+                        /** Format: date-time */
+                        updated_at: string;
+                        /** @description Per running job: whether its node authorized the new keys. Empty when the new set is empty — a revocation cannot reach running jobs. */
+                        jobs: {
+                            job: string;
+                            node: string;
+                            status: "authorized" | "failed";
+                            error?: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Bad Request. A key is not a valid OpenSSH public key, or the set exceeds the limits. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    patchDeploymentsByDeploymentUpdateStartupTimeout: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Minutes a job has, from the moment a node starts running it, to open its network tunnel. A job that does not come online in time is stopped and replaced on another node. The new value applies to jobs started after the update. INFINITE deployments only, and the job definition must expose at least one port. */
+                    startup_timeout: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Deployment startup timeout updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        startup_timeout: number;
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Bad Request. The deployment is not INFINITE, or its job definition exposes no ports. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    patchDeploymentsByDeploymentUpdateTimeout: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                deployment: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    timeout: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Deployment timeout updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        timeout: number;
+                        updated_at: string;
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Deployment not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    postDeploymentsCreate: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DeploymentManagerDeploymentCreateBody"];
+            };
+        };
+        responses: {
+            /** @description Deployment created successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerDeployment"];
+                };
+            };
+            /** @description Invalid request body. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getDeploymentsJobsByJobJobDefinition: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Signed authentication message, */
+                authorization: string;
+            };
+            path: {
+                job: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Job definition details. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerJobDefinition"];
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    postDeploymentsJobsByJobResults: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Signed authentication message, */
+                authorization: string;
+            };
+            path: {
+                job: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DeploymentManagerJobResults"];
+            };
+        };
+        responses: {
+            /** @description Job results details. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        message: "Success";
+                    };
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getDeploymentsVaults: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of vaults. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerVaults"];
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    postDeploymentsVaultsByVaultWithdraw: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path: {
+                vault: components["schemas"]["DeploymentManagerPublicKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    SOL?: number;
+                    NOS?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Withdrawal successful. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        transaction: string;
+                    };
+                };
+            };
+            /** @description Invalid request body. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Vault not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    postDeploymentsVaultsCreate: {
+        parameters: {
+            query?: never;
+            header: {
+                "x-user-id": string;
+                /** @description Signed authentication message, */
+                authorization: string;
+                /** @description Nosana API key */
+                "x-nosana-api"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The caller's shared vault (existing, or newly created). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerVault"];
+                };
+            };
+            /** @description Unauthorized. Invalid or missing authentication. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": "Unauthorized";
+                };
+            };
+            /** @description Internal Server Error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentManagerError"];
+                };
+            };
+        };
+    };
+    getErrors: {
+        parameters: {
+            query?: {
+                node?: string;
+                since?: string;
+                limit?: string;
+            };
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postErrorsReport: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string;
+                    error_type?: string;
+                    error_name?: string;
+                    error_message?: string;
+                    error_stack?: string;
+                };
+                "multipart/form-data": {
+                    address: string;
+                    error_type?: string;
+                    error_name?: string;
+                    error_message?: string;
+                    error_stack?: string;
+                };
+                "text/plain": {
+                    address: string;
+                    error_type?: string;
+                    error_name?: string;
+                    error_message?: string;
+                    error_stack?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                    };
+                    "multipart/form-data": {
+                        success: boolean;
+                    };
+                    "text/plain": {
+                        success: boolean;
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    getJobs: {
+        parameters: {
+            query?: {
+                limit?: string | number;
+                offset?: string | number;
+                state?: "QUEUED" | "RUNNING" | "COMPLETED" | "STOPPED";
+                market?: string;
+                node?: string;
+                poster?: string;
+                payer?: string;
+                timeStart?: string | number;
+                timeEnd?: string | number;
+                groupBy?: "project" | "market";
+                timeSeriesInterval?: "day" | "week" | "month";
+                useMultiplier?: boolean | string;
+                skipCache?: boolean | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getJobsByAddress: {
+        parameters: {
+            query?: never;
+            header?: never;
             path: {
                 address: string;
             };
@@ -2614,26 +10438,30 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    "application/json": Record<string, never>;
+                    "multipart/form-data": Record<string, never>;
+                    "text/plain": Record<string, never>;
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "application/json": {
-                        tx: string;
-                        job: string;
-                        delisted: boolean;
+                        message: string;
                     };
                     "multipart/form-data": {
-                        tx: string;
-                        job: string;
-                        delisted: boolean;
+                        message: string;
                     };
                     "text/plain": {
-                        tx: string;
-                        job: string;
-                        delisted: boolean;
+                        message: string;
                     };
                 };
             };
         };
     };
-    getApiJobsByAddress: {
+    getJobsByAddressEvents: {
         parameters: {
             query?: never;
             header?: never;
@@ -2650,77 +10478,1061 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        ipfsJob: string;
-                        ipfsResult: string | null;
+                        jobAddress: (string | null) | null;
+                        nodeAddress: (string | null) | null;
+                        marketAddress: (string | null) | null;
+                        runAddress: (string | null) | null;
+                        type: string;
+                        signature: string;
+                        instructionIndex: number;
+                        slot: (number | null) | null;
+                        blockTime: (number | null) | null;
+                        data: (unknown | null) | null;
+                    }[];
+                    "multipart/form-data": {
+                        jobAddress: (string | null) | null;
+                        nodeAddress: (string | null) | null;
+                        marketAddress: (string | null) | null;
+                        runAddress: (string | null) | null;
+                        type: string;
+                        signature: string;
+                        instructionIndex: number;
+                        slot: (number | null) | null;
+                        blockTime: (number | null) | null;
+                        data: (unknown | null) | null;
+                    }[];
+                    "text/plain": {
+                        jobAddress: (string | null) | null;
+                        nodeAddress: (string | null) | null;
+                        marketAddress: (string | null) | null;
+                        runAddress: (string | null) | null;
+                        type: string;
+                        signature: string;
+                        instructionIndex: number;
+                        slot: (number | null) | null;
+                        blockTime: (number | null) | null;
+                        data: (unknown | null) | null;
+                    }[];
+                };
+            };
+        };
+    };
+    postJobsByAddressExtend: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description De-duplicates retried requests sharing the same key, making the call safely retryable. Optional here; required on the batch endpoints. */
+                "Idempotency-Key"?: string;
+            };
+            path: {
+                /** @description Job address */
+                address: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Number of seconds to extend the job */
+                    seconds: string | number;
+                };
+                "multipart/form-data": {
+                    /** @description Number of seconds to extend the job */
+                    seconds: string | number;
+                };
+                "text/plain": {
+                    /** @description Number of seconds to extend the job */
+                    seconds: string | number;
+                };
+            };
+        };
+        responses: {
+            /** @description Job extended and charged to credits. An already-terminal job is an idempotent no-op: `tx` is null and `credits` is omitted (nothing was charged). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerExtendJobWithCreditsResponse"];
+                };
+            };
+            /** @description Invalid request (e.g. unknown market). Ordinary error: no `code` field. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerJobError"];
+                };
+            };
+            /** @description Caller does not own the job, or the market is not credit-eligible. Ordinary error: no `code` field. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerJobError"];
+                };
+            };
+            /** @description Job, credit-job, or user not found — or an Idempotency-Key minted by a different user. Ordinary error: no `code` field. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerJobError"];
+                };
+            };
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
+            409: {
+                headers: {
+                    /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerIdempotencyError"];
+                };
+            };
+        };
+    };
+    postJobsByAddressStop: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description De-duplicates retried requests sharing the same key, making the call safely retryable. Optional here; required on the batch endpoints. */
+                "Idempotency-Key"?: string;
+            };
+            path: {
+                /** @description Job address */
+                address: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Job stopped (or already terminal). `tx` is null and `outcome` is `already_terminal` when the job was already terminal and no transaction was minted. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerStopJobWithCreditsResponse"];
+                };
+            };
+            /** @description Caller does not own the job, or the market is not credit-eligible. Ordinary error: no `code` field. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerJobError"];
+                };
+            };
+            /** @description Job, credit-job, or user not found — or an Idempotency-Key minted by a different user. Ordinary error: no `code` field. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerJobError"];
+                };
+            };
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
+            409: {
+                headers: {
+                    /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerIdempotencyError"];
+                };
+            };
+        };
+    };
+    postJobsBatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    addresses: string[];
+                    limit?: string | number;
+                };
+                "multipart/form-data": {
+                    addresses: string[];
+                    limit?: string | number;
+                };
+                "text/plain": {
+                    addresses: string[];
+                    limit?: string | number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: number;
+                        address: string;
+                        ipfsJob: (string | null) | null;
+                        ipfsResult: (string | null) | null;
                         market: string;
                         node: string;
                         payer: string;
                         price: number;
                         project: string;
                         state: number;
-                        type: string | null;
-                        jobDefinition: unknown | null;
-                        jobResult: unknown | null;
-                        jobStatus: string | null;
+                        type: (string | null) | null;
+                        jobStatus: (string | null) | null;
                         timeEnd: number;
                         timeStart: number;
-                        benchmarkProcessedAt: (Record<string, never> | string) | null;
                         timeout: number;
-                        usdRewardPerHour: number | null;
-                        listedAt: number | null;
+                        usdRewardPerHour: (number | null) | null;
+                        listedAt: (number | null) | null;
+                    }[];
+                    "multipart/form-data": {
+                        id: number;
+                        address: string;
+                        ipfsJob: (string | null) | null;
+                        ipfsResult: (string | null) | null;
+                        market: string;
+                        node: string;
+                        payer: string;
+                        price: number;
+                        project: string;
+                        state: number;
+                        type: (string | null) | null;
+                        jobStatus: (string | null) | null;
+                        timeEnd: number;
+                        timeStart: number;
+                        timeout: number;
+                        usdRewardPerHour: (number | null) | null;
+                        listedAt: (number | null) | null;
+                    }[];
+                    "text/plain": {
+                        id: number;
+                        address: string;
+                        ipfsJob: (string | null) | null;
+                        ipfsResult: (string | null) | null;
+                        market: string;
+                        node: string;
+                        payer: string;
+                        price: number;
+                        project: string;
+                        state: number;
+                        type: (string | null) | null;
+                        jobStatus: (string | null) | null;
+                        timeEnd: number;
+                        timeStart: number;
+                        timeout: number;
+                        usdRewardPerHour: (number | null) | null;
+                        listedAt: (number | null) | null;
+                    }[];
+                };
+            };
+        };
+    };
+    getJobsCount: {
+        parameters: {
+            query?: {
+                market?: string;
+                node?: string;
+                poster?: string;
+                payer?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        total: number;
+                        byState: {
+                            QUEUED: number;
+                            RUNNING: number;
+                            COMPLETED: number;
+                            STOPPED: number;
+                        };
                     };
                     "multipart/form-data": {
-                        ipfsJob: string;
-                        ipfsResult: string | null;
-                        market: string;
-                        node: string;
-                        payer: string;
-                        price: number;
-                        project: string;
-                        state: number;
-                        type: string | null;
-                        jobDefinition: unknown | null;
-                        jobResult: unknown | null;
-                        jobStatus: string | null;
-                        timeEnd: number;
-                        timeStart: number;
-                        benchmarkProcessedAt: (Record<string, never> | string) | null;
-                        timeout: number;
-                        usdRewardPerHour: number | null;
-                        listedAt: number | null;
+                        total: number;
+                        byState: {
+                            QUEUED: number;
+                            RUNNING: number;
+                            COMPLETED: number;
+                            STOPPED: number;
+                        };
                     };
                     "text/plain": {
-                        ipfsJob: string;
-                        ipfsResult: string | null;
-                        market: string;
-                        node: string;
-                        payer: string;
-                        price: number;
-                        project: string;
-                        state: number;
-                        type: string | null;
-                        jobDefinition: unknown | null;
-                        jobResult: unknown | null;
-                        jobStatus: string | null;
-                        timeEnd: number;
-                        timeStart: number;
-                        benchmarkProcessedAt: (Record<string, never> | string) | null;
-                        timeout: number;
-                        usdRewardPerHour: number | null;
-                        listedAt: number | null;
+                        total: number;
+                        byState: {
+                            QUEUED: number;
+                            RUNNING: number;
+                            COMPLETED: number;
+                            STOPPED: number;
+                        };
                     };
                 };
             };
         };
     };
-    getApiMarkets: {
+    postJobsList: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description De-duplicates retried requests sharing the same key, making the call safely retryable. Optional here; required on the batch endpoints. */
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description IPFS hash of the job definition */
+                    ipfsHash: string;
+                    /** @description Market address */
+                    market: string;
+                    /** @description Job timeout in seconds (default: 3600). Credit-paid jobs must run at least 3600 seconds; a shorter timeout returns 400. */
+                    timeout?: number;
+                    /** @description Optional node address */
+                    node?: string;
+                };
+                "multipart/form-data": {
+                    /** @description IPFS hash of the job definition */
+                    ipfsHash: string;
+                    /** @description Market address */
+                    market: string;
+                    /** @description Job timeout in seconds (default: 3600). Credit-paid jobs must run at least 3600 seconds; a shorter timeout returns 400. */
+                    timeout?: number;
+                    /** @description Optional node address */
+                    node?: string;
+                };
+                "text/plain": {
+                    /** @description IPFS hash of the job definition */
+                    ipfsHash: string;
+                    /** @description Market address */
+                    market: string;
+                    /** @description Job timeout in seconds (default: 3600). Credit-paid jobs must run at least 3600 seconds; a shorter timeout returns 400. */
+                    timeout?: number;
+                    /** @description Optional node address */
+                    node?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Job listed on the market and charged to credits. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerCreateJobWithCreditsResponse"];
+                };
+            };
+            /** @description Invalid request (e.g. unknown market). Ordinary error: no `code` field. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerJobError"];
+                };
+            };
+            /** @description Caller does not own the job, or the market is not credit-eligible. Ordinary error: no `code` field. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerJobError"];
+                };
+            };
+            /** @description Job, credit-job, or user not found — or an Idempotency-Key minted by a different user. Ordinary error: no `code` field. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerJobError"];
+                };
+            };
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
+            409: {
+                headers: {
+                    /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientManagerIdempotencyError"];
+                };
+            };
+        };
+    };
+    "getJobsLong-running": {
+        parameters: {
+            query?: {
+                market?: string;
+                payer?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getJobsRunning: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getJobsRunning-nodes": {
+        parameters: {
+            query: {
+                market: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getJobsStats: {
+        parameters: {
+            query?: {
+                limit?: string | number;
+                offset?: string | number;
+                state?: "QUEUED" | "RUNNING" | "COMPLETED" | "STOPPED";
+                market?: string;
+                node?: string;
+                poster?: string;
+                payer?: string;
+                timeStart?: string | number;
+                timeEnd?: string | number;
+                groupBy?: "project" | "market";
+                timeSeriesInterval?: "day" | "week" | "month";
+                useMultiplier?: boolean | string;
+                skipCache?: boolean | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getJobsStatsTimestamps: {
+        parameters: {
+            query?: {
+                period?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getJobsStatsTimestamps-hours": {
+        parameters: {
+            query?: {
+                period?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getMarkets: {
         parameters: {
             query?: {
                 filterKey?: string;
                 filterValue?: string;
                 limit?: string;
-                type?: "PREMIUM" | "COMMUNITY" | "OTHER";
+                type?: "PREMIUM" | "COMMUNITY";
             };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getMarketsById: {
+        parameters: {
+            query?: {
+                nodes?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    putMarketsById: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    slug?: string;
+                    name?: string;
+                    type?: string;
+                    sft?: (string | null) | null;
+                    usd_reward_per_hour?: number;
+                    nos_reward_per_second?: number;
+                    utilization_target?: (number | null) | null;
+                    job_price?: number;
+                    job_timeout?: number;
+                    job_expiration?: number;
+                    node_access_key?: string;
+                    minimum_stake?: number;
+                    required_images?: {
+                        id: number;
+                    }[];
+                    required_remote_resources?: {
+                        id: number;
+                    }[];
+                    client?: boolean;
+                    metadata?: {
+                        key: string;
+                        value: string;
+                    }[];
+                };
+                "multipart/form-data": {
+                    slug?: string;
+                    name?: string;
+                    type?: string;
+                    sft?: (string | null) | null;
+                    usd_reward_per_hour?: number;
+                    nos_reward_per_second?: number;
+                    utilization_target?: (number | null) | null;
+                    job_price?: number;
+                    job_timeout?: number;
+                    job_expiration?: number;
+                    node_access_key?: string;
+                    minimum_stake?: number;
+                    required_images?: {
+                        id: number;
+                    }[];
+                    required_remote_resources?: {
+                        id: number;
+                    }[];
+                    client?: boolean;
+                    metadata?: {
+                        key: string;
+                        value: string;
+                    }[];
+                };
+                "text/plain": {
+                    slug?: string;
+                    name?: string;
+                    type?: string;
+                    sft?: (string | null) | null;
+                    usd_reward_per_hour?: number;
+                    nos_reward_per_second?: number;
+                    utilization_target?: (number | null) | null;
+                    job_price?: number;
+                    job_timeout?: number;
+                    job_expiration?: number;
+                    node_access_key?: string;
+                    minimum_stake?: number;
+                    required_images?: {
+                        id: number;
+                    }[];
+                    required_remote_resources?: {
+                        id: number;
+                    }[];
+                    client?: boolean;
+                    metadata?: {
+                        key: string;
+                        value: string;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteMarketsById: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getMarketsByIdMetadata: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postMarketsByIdMetadata: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    key: string;
+                    value: string;
+                };
+                "multipart/form-data": {
+                    key: string;
+                    value: string;
+                };
+                "text/plain": {
+                    key: string;
+                    value: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    putMarketsByIdMetadataByMetaId: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+                metaId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    key: string;
+                    value: string;
+                };
+                "multipart/form-data": {
+                    key: string;
+                    value: string;
+                };
+                "text/plain": {
+                    key: string;
+                    value: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteMarketsByIdMetadataByMetaId: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+                metaId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getMarketsByIdRequired-resources": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        required_images: {
+                            name: string;
+                            server?: string;
+                            username?: string;
+                            password?: string;
+                        }[];
+                        required_remote_resources: ({
+                            /** @constant */
+                            type: "Ollama";
+                            model: string;
+                        } | {
+                            type: "S3" | "HF";
+                            url: string;
+                            IAM?: {
+                                access_key_id: string;
+                                secret_access_key: string;
+                            };
+                        })[];
+                    };
+                    "multipart/form-data": {
+                        required_images: {
+                            name: string;
+                            server?: string;
+                            username?: string;
+                            password?: string;
+                        }[];
+                        required_remote_resources: ({
+                            /** @constant */
+                            type: "Ollama";
+                            model: string;
+                        } | {
+                            type: "S3" | "HF";
+                            url: string;
+                            IAM?: {
+                                access_key_id: string;
+                                secret_access_key: string;
+                            };
+                        })[];
+                    };
+                    "text/plain": {
+                        required_images: {
+                            name: string;
+                            server?: string;
+                            username?: string;
+                            password?: string;
+                        }[];
+                        required_remote_resources: ({
+                            /** @constant */
+                            type: "Ollama";
+                            model: string;
+                        } | {
+                            type: "S3" | "HF";
+                            url: string;
+                            IAM?: {
+                                access_key_id: string;
+                                secret_access_key: string;
+                            };
+                        })[];
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "getMarketsDocker-images": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postMarketsDocker-images": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
+                };
+                "multipart/form-data": {
+                    name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
+                };
+                "text/plain": {
+                    name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getMarketsDocker-imagesById": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "putMarketsDocker-imagesById": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
+                };
+                "multipart/form-data": {
+                    name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
+                };
+                "text/plain": {
+                    name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "deleteMarketsDocker-imagesById": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getMarketsPrice: {
+        parameters: {
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -2733,131 +11545,356 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        address: string;
-                        slug: string;
-                        name: string;
-                        sft: string;
-                        type: "PREMIUM" | "COMMUNITY" | "OTHER";
-                        usd_reward_per_hour: unknown;
-                        nos_reward_per_second: number;
-                        nos_job_price_per_second: number;
-                        network_fee_percentage: number;
-                        premium_community_relation: string | null;
-                        gpu_types: string[];
-                        required_images: string[];
-                        required_remote_resources: ({
-                            /** @constant */
-                            type: "Ollama";
-                            model: string;
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                            IAM: {
-                                access_key_id: string;
-                                secret_access_key: string;
-                            };
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                        })[];
-                        nodes?: unknown[];
-                        client: boolean;
-                        lowest_vram?: number;
-                        max_usd_uptime_reward_per_day?: number;
-                    }[];
+                        price: number;
+                    };
                     "multipart/form-data": {
-                        address: string;
-                        slug: string;
-                        name: string;
-                        sft: string;
-                        type: "PREMIUM" | "COMMUNITY" | "OTHER";
-                        usd_reward_per_hour: unknown;
-                        nos_reward_per_second: number;
-                        nos_job_price_per_second: number;
-                        network_fee_percentage: number;
-                        premium_community_relation: string | null;
-                        gpu_types: string[];
-                        required_images: string[];
-                        required_remote_resources: ({
-                            /** @constant */
-                            type: "Ollama";
-                            model: string;
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                            IAM: {
-                                access_key_id: string;
-                                secret_access_key: string;
-                            };
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                        })[];
-                        nodes?: unknown[];
-                        client: boolean;
-                        lowest_vram?: number;
-                        max_usd_uptime_reward_per_day?: number;
-                    }[];
+                        price: number;
+                    };
                     "text/plain": {
-                        address: string;
-                        slug: string;
-                        name: string;
-                        sft: string;
-                        type: "PREMIUM" | "COMMUNITY" | "OTHER";
-                        usd_reward_per_hour: unknown;
-                        nos_reward_per_second: number;
-                        nos_job_price_per_second: number;
-                        network_fee_percentage: number;
-                        premium_community_relation: string | null;
-                        gpu_types: string[];
-                        required_images: string[];
-                        required_remote_resources: ({
-                            /** @constant */
-                            type: "Ollama";
-                            model: string;
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                            IAM: {
-                                access_key_id: string;
-                                secret_access_key: string;
-                            };
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                        })[];
-                        nodes?: unknown[];
-                        client: boolean;
-                        lowest_vram?: number;
-                        max_usd_uptime_reward_per_day?: number;
-                    }[];
+                        price: number;
+                    };
                 };
             };
-            500: {
+        };
+    };
+    getMarketsPrices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getMarketsRemote-resources": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postMarketsRemote-resources": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    id?: number;
+                    type: string;
+                    url: string;
+                    iamAccessKeyId?: (string | null) | null;
+                    iamSecretAccessKey?: (string | null) | null;
+                };
+                "multipart/form-data": {
+                    id?: number;
+                    type: string;
+                    url: string;
+                    iamAccessKeyId?: (string | null) | null;
+                    iamSecretAccessKey?: (string | null) | null;
+                };
+                "text/plain": {
+                    id?: number;
+                    type: string;
+                    url: string;
+                    iamAccessKeyId?: (string | null) | null;
+                    iamSecretAccessKey?: (string | null) | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getMarketsRemote-resourcesById": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "putMarketsRemote-resourcesById": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    id?: number;
+                    type: string;
+                    url: string;
+                    iamAccessKeyId?: (string | null) | null;
+                    iamSecretAccessKey?: (string | null) | null;
+                };
+                "multipart/form-data": {
+                    id?: number;
+                    type: string;
+                    url: string;
+                    iamAccessKeyId?: (string | null) | null;
+                    iamSecretAccessKey?: (string | null) | null;
+                };
+                "text/plain": {
+                    id?: number;
+                    type: string;
+                    url: string;
+                    iamAccessKeyId?: (string | null) | null;
+                    iamSecretAccessKey?: (string | null) | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "deleteMarketsRemote-resourcesById": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postMarketsUpdate-prices": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        name: string;
+                        ok: boolean;
+                    };
+                    "multipart/form-data": {
+                        ok: boolean;
+                    };
+                    "text/plain": {
+                        ok: boolean;
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
                         message: string;
                     };
                     "multipart/form-data": {
-                        name: string;
                         message: string;
                     };
                     "text/plain": {
-                        name: string;
+                        message: string;
+                    };
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
                         message: string;
                     };
                 };
             };
         };
     };
-    getApiMarketsById: {
+    getNodes: {
+        parameters: {
+            query?: {
+                state?: ("REJECTED" | "ONBOARDED" | "PREMIUM") | ("REJECTED" | "ONBOARDED" | "PREMIUM")[];
+                state_neq?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_notIn?: ("REJECTED" | "ONBOARDED" | "PREMIUM")[];
+                state_gt?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_lt?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_gte?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_lte?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_like?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                state_ilike?: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                market?: string | string[];
+                market_neq?: string;
+                market_notIn?: string[];
+                market_gt?: string;
+                market_lt?: string;
+                market_gte?: string;
+                market_lte?: string;
+                market_like?: string;
+                market_ilike?: string;
+                orderBy?: "nodeAddress" | "status" | "marketAddress" | "createdAt";
+                order?: "asc" | "desc";
+                limit?: string | number;
+                offset?: string | number;
+                search?: string;
+                csv_export?: boolean | string;
+            };
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        nodes: {
+                            nodeAddress: string;
+                            email: string;
+                            status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                            accessKeyMint: (string | null) | null;
+                            marketAddress: (string | null) | null;
+                            assignedMarket: (string | null) | null;
+                            destinedMarket: (string | null) | null;
+                            recommendedMarket: (string | null) | null;
+                            discord: (string | null) | null;
+                            twitter: (string | null) | null;
+                            createdAt: ((Record<string, never> | string | number) | null) | null;
+                            updatedAt: ((Record<string, never> | string | number) | null) | null;
+                            metrics: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        total: number;
+                    } | string;
+                    "multipart/form-data": {
+                        nodes: {
+                            nodeAddress: string;
+                            email: string;
+                            status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                            accessKeyMint: (string | null) | null;
+                            marketAddress: (string | null) | null;
+                            assignedMarket: (string | null) | null;
+                            destinedMarket: (string | null) | null;
+                            recommendedMarket: (string | null) | null;
+                            discord: (string | null) | null;
+                            twitter: (string | null) | null;
+                            createdAt: ((Record<string, never> | string | number) | null) | null;
+                            updatedAt: ((Record<string, never> | string | number) | null) | null;
+                            metrics: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        total: number;
+                    } | string;
+                    "text/plain": {
+                        nodes: {
+                            nodeAddress: string;
+                            email: string;
+                            status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                            accessKeyMint: (string | null) | null;
+                            marketAddress: (string | null) | null;
+                            assignedMarket: (string | null) | null;
+                            destinedMarket: (string | null) | null;
+                            recommendedMarket: (string | null) | null;
+                            discord: (string | null) | null;
+                            twitter: (string | null) | null;
+                            createdAt: ((Record<string, never> | string | number) | null) | null;
+                            updatedAt: ((Record<string, never> | string | number) | null) | null;
+                            metrics: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        total: number;
+                    } | string;
+                };
+            };
+        };
+    };
+    getNodesById: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
             path: {
                 id: string;
             };
@@ -2871,131 +11908,102 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        address: string;
-                        slug: string;
-                        name: string;
-                        sft: string;
-                        type: "PREMIUM" | "COMMUNITY" | "OTHER";
-                        usd_reward_per_hour: unknown;
-                        nos_reward_per_second: number;
-                        nos_job_price_per_second: number;
-                        network_fee_percentage: number;
-                        premium_community_relation: string | null;
-                        gpu_types: string[];
-                        required_images: string[];
-                        required_remote_resources: ({
-                            /** @constant */
-                            type: "Ollama";
-                            model: string;
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                            IAM: {
-                                access_key_id: string;
-                                secret_access_key: string;
-                            };
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                        })[];
-                        nodes?: unknown[];
-                        client: boolean;
-                        lowest_vram?: number;
-                        max_usd_uptime_reward_per_day?: number;
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
                     };
                     "multipart/form-data": {
-                        address: string;
-                        slug: string;
-                        name: string;
-                        sft: string;
-                        type: "PREMIUM" | "COMMUNITY" | "OTHER";
-                        usd_reward_per_hour: unknown;
-                        nos_reward_per_second: number;
-                        nos_job_price_per_second: number;
-                        network_fee_percentage: number;
-                        premium_community_relation: string | null;
-                        gpu_types: string[];
-                        required_images: string[];
-                        required_remote_resources: ({
-                            /** @constant */
-                            type: "Ollama";
-                            model: string;
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                            IAM: {
-                                access_key_id: string;
-                                secret_access_key: string;
-                            };
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                        })[];
-                        nodes?: unknown[];
-                        client: boolean;
-                        lowest_vram?: number;
-                        max_usd_uptime_reward_per_day?: number;
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
                     };
                     "text/plain": {
-                        address: string;
-                        slug: string;
-                        name: string;
-                        sft: string;
-                        type: "PREMIUM" | "COMMUNITY" | "OTHER";
-                        usd_reward_per_hour: unknown;
-                        nos_reward_per_second: number;
-                        nos_job_price_per_second: number;
-                        network_fee_percentage: number;
-                        premium_community_relation: string | null;
-                        gpu_types: string[];
-                        required_images: string[];
-                        required_remote_resources: ({
-                            /** @constant */
-                            type: "Ollama";
-                            model: string;
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                            IAM: {
-                                access_key_id: string;
-                                secret_access_key: string;
-                            };
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url: string;
-                        })[];
-                        nodes?: unknown[];
-                        client: boolean;
-                        lowest_vram?: number;
-                        max_usd_uptime_reward_per_day?: number;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        name: string;
-                        message: string;
-                    };
-                    "multipart/form-data": {
-                        name: string;
-                        message: string;
-                    };
-                    "text/plain": {
-                        name: string;
-                        message: string;
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
                     };
                 };
             };
         };
     };
-    "getApiMarketsByIdRequired-resources": {
+    patchNodesByIdAddress: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string;
+                };
+                "multipart/form-data": {
+                    address: string;
+                };
+                "text/plain": {
+                    address: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patchNodesByIdContact: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    email?: string;
+                    discord?: string | null;
+                    twitter?: string | null;
+                };
+                "multipart/form-data": {
+                    email?: string;
+                    discord?: string | null;
+                    twitter?: string | null;
+                };
+                "text/plain": {
+                    email?: string;
+                    discord?: string | null;
+                    twitter?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getNodesByIdFull: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
             path: {
                 id: string;
             };
@@ -3007,121 +12015,1288 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": {
-                        required_images: string[];
-                        required_remote_resources: ({
-                            /** @constant */
-                            type: "Ollama";
-                            model: string;
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url?: string;
-                            files?: string[];
-                            buckets?: {
-                                url: string;
-                                files?: string[];
-                            }[];
-                            IAM: {
-                                access_key_id: string;
-                                secret_access_key: string;
-                            };
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url?: string;
-                            files?: string[];
-                            buckets?: {
-                                url: string;
-                                files?: string[];
-                            }[];
-                        })[];
-                    };
-                    "multipart/form-data": {
-                        required_images: string[];
-                        required_remote_resources: ({
-                            /** @constant */
-                            type: "Ollama";
-                            model: string;
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url?: string;
-                            files?: string[];
-                            buckets?: {
-                                url: string;
-                                files?: string[];
-                            }[];
-                            IAM: {
-                                access_key_id: string;
-                                secret_access_key: string;
-                            };
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url?: string;
-                            files?: string[];
-                            buckets?: {
-                                url: string;
-                                files?: string[];
-                            }[];
-                        })[];
-                    };
-                    "text/plain": {
-                        required_images: string[];
-                        required_remote_resources: ({
-                            /** @constant */
-                            type: "Ollama";
-                            model: string;
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url?: string;
-                            files?: string[];
-                            buckets?: {
-                                url: string;
-                                files?: string[];
-                            }[];
-                            IAM: {
-                                access_key_id: string;
-                                secret_access_key: string;
-                            };
-                        } | {
-                            type: "S3" | "Ollama" | "HF";
-                            url?: string;
-                            files?: string[];
-                            buckets?: {
-                                url: string;
-                                files?: string[];
-                            }[];
-                        })[];
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        name: string;
-                        message: string;
-                    };
-                    "multipart/form-data": {
-                        name: string;
-                        message: string;
-                    };
-                    "text/plain": {
-                        name: string;
-                        message: string;
-                    };
-                };
+                content?: never;
             };
         };
     };
-    getApiCreditsBalance: {
+    getNodesByIdInfo: {
         parameters: {
             query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getNodesByIdMetrics: {
+        parameters: {
+            query?: {
+                metrics?: string | string[];
+            };
             header?: {
-                /** @description Authorization header: Bearer <jwt> or Bearer <key> */
                 authorization?: string;
             };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
+                        gpus?: {
+                            nodeAddress: string;
+                            gpu: string;
+                            uuid: (string | null) | null;
+                            deviceId: (number | null) | null;
+                            vramMb: (number | null) | null;
+                            majorArchitecture: (number | null) | null;
+                            minorArchitecture: (number | null) | null;
+                        }[];
+                        metrics: {
+                            [key: string]: unknown;
+                        };
+                        lastUpdatedAt: ((Record<string, never> | string | number) | null) | null;
+                        email?: string;
+                        discord?: (string | null) | null;
+                        twitter?: (string | null) | null;
+                        createdAt?: ((Record<string, never> | string | number) | null) | null;
+                        notes?: {
+                            id: number;
+                            nodeAddress: string;
+                            content: string;
+                            source: "ADMIN" | "SYSTEM";
+                            createdAt: Record<string, never> | string | number;
+                            updatedAt: Record<string, never> | string | number;
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
+                        gpus?: {
+                            nodeAddress: string;
+                            gpu: string;
+                            uuid: (string | null) | null;
+                            deviceId: (number | null) | null;
+                            vramMb: (number | null) | null;
+                            majorArchitecture: (number | null) | null;
+                            minorArchitecture: (number | null) | null;
+                        }[];
+                        metrics: {
+                            [key: string]: unknown;
+                        };
+                        lastUpdatedAt: ((Record<string, never> | string | number) | null) | null;
+                        email?: string;
+                        discord?: (string | null) | null;
+                        twitter?: (string | null) | null;
+                        createdAt?: ((Record<string, never> | string | number) | null) | null;
+                        notes?: {
+                            id: number;
+                            nodeAddress: string;
+                            content: string;
+                            source: "ADMIN" | "SYSTEM";
+                            createdAt: Record<string, never> | string | number;
+                            updatedAt: Record<string, never> | string | number;
+                        }[];
+                    };
+                    "text/plain": {
+                        nodeAddress: string;
+                        status: "REJECTED" | "ONBOARDED" | "PREMIUM";
+                        marketAddress: (string | null) | null;
+                        gpus?: {
+                            nodeAddress: string;
+                            gpu: string;
+                            uuid: (string | null) | null;
+                            deviceId: (number | null) | null;
+                            vramMb: (number | null) | null;
+                            majorArchitecture: (number | null) | null;
+                            minorArchitecture: (number | null) | null;
+                        }[];
+                        metrics: {
+                            [key: string]: unknown;
+                        };
+                        lastUpdatedAt: ((Record<string, never> | string | number) | null) | null;
+                        email?: string;
+                        discord?: (string | null) | null;
+                        twitter?: (string | null) | null;
+                        createdAt?: ((Record<string, never> | string | number) | null) | null;
+                        notes?: {
+                            id: number;
+                            nodeAddress: string;
+                            content: string;
+                            source: "ADMIN" | "SYSTEM";
+                            createdAt: Record<string, never> | string | number;
+                            updatedAt: Record<string, never> | string | number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    postNodesByIdMetrics: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    metricKey: string;
+                    value: unknown;
+                    instance?: string;
+                };
+                "multipart/form-data": {
+                    metricKey: string;
+                    value: unknown;
+                    instance?: string;
+                };
+                "text/plain": {
+                    metricKey: string;
+                    value: unknown;
+                    instance?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getNodesByIdNotes: {
+        parameters: {
+            query?: {
+                source?: "ADMIN" | "SYSTEM";
+                limit?: string | number;
+                offset?: string | number;
+            };
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postNodesByIdNotes: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    content: string;
+                };
+                "multipart/form-data": {
+                    content: string;
+                };
+                "text/plain": {
+                    content: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteNodesByIdNotesByNoteId: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+                noteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patchNodesByIdNotesByNoteId: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+                noteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    content: string;
+                };
+                "multipart/form-data": {
+                    content: string;
+                };
+                "text/plain": {
+                    content: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getNodesByIdRecent-benchmarks": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        nodeAddress: string;
+                        jobDefinition: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on?: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                };
+                            }[];
+                        };
+                        rawResults: (unknown | null) | null;
+                        status: string;
+                        createdAt: Record<string, never> | string | number;
+                        submittedAt: ((Record<string, never> | string | number) | null) | null;
+                        operations: {
+                            benchmarkId: string;
+                            operationId: number;
+                        }[];
+                        antiSpoofs: {
+                            benchmarkId: string;
+                            seed: (number | null) | null;
+                            gpuType: string;
+                            gpuUUID: string;
+                            prediction: (number | null) | null;
+                            verified: boolean;
+                            seedAt: Record<string, never> | string | number;
+                            predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            seedRef: ({
+                                seed: number;
+                                gpuType: string;
+                                prediction: number;
+                                maximumDurationSeconds: (number | null) | null;
+                            } | null) | null;
+                        }[];
+                        nodeMetrics: {
+                            nodeAddress: string;
+                            benchmarkId: (string | null) | null;
+                            metricKey: string;
+                            instance: string;
+                            value: unknown;
+                            isValid: boolean;
+                            createdAt: Record<string, never> | string | number;
+                        }[];
+                    }[];
+                    "multipart/form-data": {
+                        id: string;
+                        nodeAddress: string;
+                        jobDefinition: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on?: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                };
+                            }[];
+                        };
+                        rawResults: (unknown | null) | null;
+                        status: string;
+                        createdAt: Record<string, never> | string | number;
+                        submittedAt: ((Record<string, never> | string | number) | null) | null;
+                        operations: {
+                            benchmarkId: string;
+                            operationId: number;
+                        }[];
+                        antiSpoofs: {
+                            benchmarkId: string;
+                            seed: (number | null) | null;
+                            gpuType: string;
+                            gpuUUID: string;
+                            prediction: (number | null) | null;
+                            verified: boolean;
+                            seedAt: Record<string, never> | string | number;
+                            predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            seedRef: ({
+                                seed: number;
+                                gpuType: string;
+                                prediction: number;
+                                maximumDurationSeconds: (number | null) | null;
+                            } | null) | null;
+                        }[];
+                        nodeMetrics: {
+                            nodeAddress: string;
+                            benchmarkId: (string | null) | null;
+                            metricKey: string;
+                            instance: string;
+                            value: unknown;
+                            isValid: boolean;
+                            createdAt: Record<string, never> | string | number;
+                        }[];
+                    }[];
+                    "text/plain": {
+                        id: string;
+                        nodeAddress: string;
+                        jobDefinition: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on?: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                };
+                            }[];
+                        };
+                        rawResults: (unknown | null) | null;
+                        status: string;
+                        createdAt: Record<string, never> | string | number;
+                        submittedAt: ((Record<string, never> | string | number) | null) | null;
+                        operations: {
+                            benchmarkId: string;
+                            operationId: number;
+                        }[];
+                        antiSpoofs: {
+                            benchmarkId: string;
+                            seed: (number | null) | null;
+                            gpuType: string;
+                            gpuUUID: string;
+                            prediction: (number | null) | null;
+                            verified: boolean;
+                            seedAt: Record<string, never> | string | number;
+                            predictedAt: ((Record<string, never> | string | number) | null) | null;
+                            seedRef: ({
+                                seed: number;
+                                gpuType: string;
+                                prediction: number;
+                                maximumDurationSeconds: (number | null) | null;
+                            } | null) | null;
+                        }[];
+                        nodeMetrics: {
+                            nodeAddress: string;
+                            benchmarkId: (string | null) | null;
+                            metricKey: string;
+                            instance: string;
+                            value: unknown;
+                            isValid: boolean;
+                            createdAt: Record<string, never> | string | number;
+                        }[];
+                    }[];
+                };
+            };
+        };
+    };
+    getNodesByIdRewards: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                    "multipart/form-data": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                    "text/plain": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                };
+            };
+        };
+    };
+    "postNodesAccess-keySubmit": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    signedTx: string;
+                };
+                "multipart/form-data": {
+                    signedTx: string;
+                };
+                "text/plain": {
+                    signedTx: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        status: "confirmed" | "failed" | "unknown";
+                        signature?: string;
+                        market?: (string | null) | null;
+                        reason?: string;
+                    };
+                    "multipart/form-data": {
+                        status: "confirmed" | "failed" | "unknown";
+                        signature?: string;
+                        market?: (string | null) | null;
+                        reason?: string;
+                    };
+                    "text/plain": {
+                        status: "confirmed" | "failed" | "unknown";
+                        signature?: string;
+                        market?: (string | null) | null;
+                        reason?: string;
+                    };
+                };
+            };
+        };
+    };
+    "postNodesAssign-node": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string;
+                    market: string;
+                };
+                "multipart/form-data": {
+                    address: string;
+                    market: string;
+                };
+                "text/plain": {
+                    address: string;
+                    market: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getNodesAvailable-gpus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postNodesBan: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postNodesDemote: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postNodesHeartbeat: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -3133,28 +13308,2214 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description Total credits assigned to the user (USD) */
-                        assignedCredits: number;
-                        /** @description Credits reserved for pending jobs (USD) */
-                        reservedCredits: number;
-                        /** @description Credits spent/settled for completed jobs (USD) */
-                        settledCredits: number;
+                        success: boolean;
+                        maxHeartbeatsPerDay: number;
                     };
                     "multipart/form-data": {
-                        /** @description Total credits assigned to the user (USD) */
-                        assignedCredits: number;
-                        /** @description Credits reserved for pending jobs (USD) */
-                        reservedCredits: number;
-                        /** @description Credits spent/settled for completed jobs (USD) */
-                        settledCredits: number;
+                        success: boolean;
+                        maxHeartbeatsPerDay: number;
                     };
                     "text/plain": {
-                        /** @description Total credits assigned to the user (USD) */
-                        assignedCredits: number;
-                        /** @description Credits reserved for pending jobs (USD) */
-                        reservedCredits: number;
-                        /** @description Credits spent/settled for completed jobs (USD) */
-                        settledCredits: number;
+                        success: boolean;
+                        maxHeartbeatsPerDay: number;
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "postNodesHeartbeatsAggregate-historical": {
+        parameters: {
+            query?: {
+                batchHours?: string | number;
+            };
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        message: string;
+                        hasMore: boolean;
+                        nextStartTime?: Record<string, never> | string | number;
+                    };
+                    "multipart/form-data": {
+                        success: boolean;
+                        message: string;
+                        hasMore: boolean;
+                        nextStartTime?: Record<string, never> | string | number;
+                    };
+                    "text/plain": {
+                        success: boolean;
+                        message: string;
+                        hasMore: boolean;
+                        nextStartTime?: Record<string, never> | string | number;
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "getNodesHeartbeatsNext-max": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        next: string;
+                        current: string;
+                    };
+                    "multipart/form-data": {
+                        next: string;
+                        current: string;
+                    };
+                    "text/plain": {
+                        next: string;
+                        current: string;
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "postNodesHeartbeatsNext-max": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    value: string;
+                };
+                "multipart/form-data": {
+                    value: string;
+                };
+                "text/plain": {
+                    value: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                    };
+                    "multipart/form-data": {
+                        success: boolean;
+                    };
+                    "text/plain": {
+                        success: boolean;
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "getNodesHeartbeatsUptime-reward-threshold-percentage": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                    "multipart/form-data": string;
+                    "text/plain": string;
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "postNodesHeartbeatsUptime-reward-threshold-percentage": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    value: string;
+                };
+                "multipart/form-data": {
+                    value: string;
+                };
+                "text/plain": {
+                    value: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                    };
+                    "multipart/form-data": {
+                        success: boolean;
+                    };
+                    "text/plain": {
+                        success: boolean;
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    getNodesHeartbeatsUptimeByNode: {
+        parameters: {
+            query?: {
+                startDate?: string;
+                endDate?: string;
+            };
+            header?: never;
+            path: {
+                node: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        dayStart: string;
+                        uptimePercentage: number;
+                    }[];
+                    "multipart/form-data": {
+                        dayStart: string;
+                        uptimePercentage: number;
+                    }[];
+                    "text/plain": {
+                        dayStart: string;
+                        uptimePercentage: number;
+                    }[];
+                };
+            };
+        };
+    };
+    "postNodesInvalidate-metrics": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string;
+                };
+                "multipart/form-data": {
+                    address: string;
+                };
+                "text/plain": {
+                    address: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postNodesKick-from-queue": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getNodesMarket-relation": {
+        parameters: {
+            query?: {
+                market?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getNodesMinimum-required-version": {
+        parameters: {
+            query?: {
+                isNext?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "putNodesMinimum-required-version": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    version: string;
+                    isNext?: boolean;
+                };
+                "multipart/form-data": {
+                    version: string;
+                    isNext?: boolean;
+                };
+                "text/plain": {
+                    version: string;
+                    isNext?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "postNodesMove-market": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postNodesPayment: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        message: string;
+                        claimableAmount: number;
+                        transactionSignature?: string;
+                        daysProcessed?: number;
+                    };
+                    "multipart/form-data": {
+                        success: boolean;
+                        message: string;
+                        claimableAmount: number;
+                        transactionSignature?: string;
+                        daysProcessed?: number;
+                    };
+                    "text/plain": {
+                        success: boolean;
+                        message: string;
+                        claimableAmount: number;
+                        transactionSignature?: string;
+                        daysProcessed?: number;
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    postNodesPromote: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getNodesQueued-nodes": {
+        parameters: {
+            query?: {
+                marketAddress?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postNodesRegister: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    email: string;
+                    discord?: string;
+                    twitter?: string;
+                };
+                "multipart/form-data": {
+                    email: string;
+                    discord?: string;
+                    twitter?: string;
+                };
+                "text/plain": {
+                    email: string;
+                    discord?: string;
+                    twitter?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        status: "registered";
+                        nodeAddress: string;
+                    };
+                    "multipart/form-data": {
+                        /** @constant */
+                        status: "registered";
+                        nodeAddress: string;
+                    };
+                    "text/plain": {
+                        /** @constant */
+                        status: "registered";
+                        nodeAddress: string;
+                    };
+                };
+            };
+        };
+    };
+    "postNodesRemove-market-assignment": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string;
+                };
+                "multipart/form-data": {
+                    address: string;
+                };
+                "text/plain": {
+                    address: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getNodesRequest-market": {
+        parameters: {
+            query?: {
+                market?: string;
+                session?: string;
+            };
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        benchmarkId?: string;
+                        jobDefinition?: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on?: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                };
+                            }[];
+                        };
+                        market?: {
+                            address: string | null;
+                            accessKeyTx?: string;
+                        };
+                        feedbackReport?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        };
+                        nextTestAt?: string;
+                        status?: string;
+                        session?: string;
+                    };
+                    "multipart/form-data": {
+                        benchmarkId?: string;
+                        jobDefinition?: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on?: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                };
+                            }[];
+                        };
+                        market?: {
+                            address: string | null;
+                            accessKeyTx?: string;
+                        };
+                        feedbackReport?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        };
+                        nextTestAt?: string;
+                        status?: string;
+                        session?: string;
+                    };
+                    "text/plain": {
+                        benchmarkId?: string;
+                        jobDefinition?: {
+                            /** @enum {string} */
+                            version: "0.1";
+                            /** @enum {string} */
+                            type: "container";
+                            logistics?: {
+                                send: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                                receive: {
+                                    /**
+                                     * @description api        - we receive and send via an endpoint endpoint
+                                     *     api-listen - we create an endpoint to listen for incoming requests
+                                     * @enum {string}
+                                     */
+                                    type: "api" | "api-listen";
+                                    /** @description Make all properties in T optional */
+                                    args: {
+                                        endpoint?: string;
+                                    };
+                                };
+                            };
+                            deployment_id?: string;
+                            ssh?: {
+                                public_keys?: string[];
+                            };
+                            meta?: {
+                                trigger?: string;
+                                /** @description Construct a type with a set of properties K of type T */
+                                system_resources?: {
+                                    [key: string]: string | number;
+                                };
+                            } & {
+                                [key: string]: string | number | (string | number)[] | {
+                                    [key: string]: string | number | (string | number)[];
+                                };
+                            };
+                            global?: {
+                                image?: string;
+                                gpu?: boolean;
+                                entrypoint?: string | string[];
+                                env?: {
+                                    [key: string]: string;
+                                };
+                                work_dir?: string;
+                                variables?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            ops: {
+                                /** @enum {string} */
+                                type: "container/run" | "container/create-volume";
+                                id: string;
+                                args: {
+                                    image: string;
+                                    aliases?: string | string[];
+                                    cmd?: string | string[];
+                                    volumes?: {
+                                        name: string;
+                                        dest: string;
+                                    }[];
+                                    expose?: number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    } | (number | string | {
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        port: number;
+                                        /** @enum {string} */
+                                        type?: "api" | "web" | "websocket" | "webapi" | "none";
+                                        health_checks?: ({
+                                            /** @enum {string} */
+                                            type: "http";
+                                            path: string;
+                                            /** @enum {string} */
+                                            method: "GET" | "POST" | "PUT" | "DELETE";
+                                            expected_status: number;
+                                            /** @description Construct a type with a set of properties K of type T */
+                                            headers?: {
+                                                [key: string]: string;
+                                            };
+                                            body?: unknown;
+                                            continuous: boolean;
+                                        } | {
+                                            /** @enum {string} */
+                                            type: "websocket";
+                                            expected_response: string;
+                                            continuous: boolean;
+                                        })[];
+                                    })[];
+                                    gpu?: boolean;
+                                    work_dir?: string;
+                                    entrypoint?: string | string[];
+                                    env?: {
+                                        [key: string]: string;
+                                    };
+                                    restart_policy?: {
+                                        /** @enum {string} */
+                                        policy: "on-failure";
+                                        restart_tries?: number;
+                                    } | ("on-failure" | "no" | "always" | "unless-stopped");
+                                    private?: boolean;
+                                    resources?: ({
+                                        __spread__: string;
+                                        chunked?: boolean;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        files?: string[];
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        bucket: string;
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "S3";
+                                        target: string;
+                                        buckets: {
+                                            url: string;
+                                            files?: string[];
+                                        }[];
+                                        url?: string;
+                                        allowWrite?: boolean;
+                                        IAM?: {
+                                            REGION: string;
+                                            ACCESS_KEY_ID: string;
+                                            SECRET_ACCESS_KEY: string;
+                                        };
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "HF";
+                                        target: string;
+                                        repo: string;
+                                        revision?: string;
+                                        files?: string[];
+                                        accessToken?: string;
+                                    } | {
+                                        /** @enum {string} */
+                                        type: "Ollama";
+                                        model: string;
+                                        target?: string;
+                                    } | "__remove-if-empty__")[];
+                                    authentication?: {
+                                        docker?: {
+                                            username?: string;
+                                            password?: string;
+                                            email?: string;
+                                            server?: string;
+                                        };
+                                    };
+                                } | {
+                                    name: string;
+                                };
+                                results?: {
+                                    [key: string]: string | {
+                                        regex: string;
+                                        logType: ("stdin" | "stdout" | "stderr" | "nodeerr")[];
+                                    };
+                                };
+                                execution?: {
+                                    group?: string;
+                                    timeout?: number;
+                                    depends_on?: string[];
+                                    stop_if_dependent_stops?: boolean;
+                                };
+                            }[];
+                        };
+                        market?: {
+                            address: string | null;
+                            accessKeyTx?: string;
+                        };
+                        feedbackReport?: {
+                            marketAddress: string;
+                            marketName?: string;
+                            passed: boolean;
+                            metrics: {
+                                metricKey: string;
+                                measuredValue?: number | string | boolean | null | (number | string | boolean | null)[];
+                                ruleDescription: string;
+                                passed: boolean;
+                                failureMessage?: string;
+                                isOptional: boolean;
+                            }[];
+                        };
+                        nextTestAt?: string;
+                        status?: string;
+                        session?: string;
+                    };
+                };
+            };
+        };
+    };
+    getNodesRewards: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                    "multipart/form-data": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                    "text/plain": {
+                        claimableUptimeNosRewards: number;
+                        claimableUptimeUsdRewards: number;
+                        totalClaimedUptimeNosRewards: number;
+                        totalClaimedUptimeUsdRewards: number;
+                    };
+                };
+            };
+        };
+    };
+    "postNodesSync-node": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string;
+                };
+                "multipart/form-data": {
+                    address: string;
+                };
+                "text/plain": {
+                    address: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postNodesUnban: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address: string | string[];
+                };
+                "multipart/form-data": {
+                    address: string | string[];
+                };
+                "text/plain": {
+                    address: string | string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getNodesWith-access": {
+        parameters: {
+            query?: {
+                marketAddress?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getRpc: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        url: string | Record<string, never>;
+                    };
+                    "multipart/form-data": {
+                        url: string | Record<string, never>;
+                    };
+                    "text/plain": {
+                        url: string | Record<string, never>;
+                    };
+                };
+            };
+        };
+    };
+    getStats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getStatsEarning-history": {
+        parameters: {
+            query: {
+                address: string;
+                start_date: string;
+                end_date?: string;
+                group_by?: "day" | "month";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "getStatsNodes-country": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        country: (string | null) | null;
+                        total: number;
+                        active: number;
+                        offline: number;
+                    }[];
+                    "multipart/form-data": {
+                        country: (string | null) | null;
+                        total: number;
+                        active: number;
+                        offline: number;
+                    }[];
+                    "text/plain": {
+                        country: (string | null) | null;
+                        total: number;
+                        active: number;
+                        offline: number;
+                    }[];
+                };
+            };
+        };
+    };
+    getStatsPrice: {
+        parameters: {
+            query?: {
+                timestamp?: string;
+                date?: string;
+                maxAgeMinutes?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        price: number | null;
+                    };
+                    "multipart/form-data": {
+                        price: number | null;
+                    };
+                    "text/plain": {
+                        price: number | null;
+                    };
+                };
+            };
+        };
+    };
+    "getStatsSpending-history": {
+        parameters: {
+            query: {
+                address: string;
+                start_date: string;
+                end_date?: string;
+                group_by?: "day" | "month";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    }[];
+                    "multipart/form-data": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    }[];
+                    "text/plain": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    getTemplatesById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    };
+                    "multipart/form-data": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    };
+                    "text/plain": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    };
+                };
+            };
+        };
+    };
+    getTemplatesByIdByVariantId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "multipart/form-data": unknown;
+                    "text/plain": unknown;
+                };
+            };
+        };
+    };
+    getTemplatesGrouped: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: {
+                            id: string;
+                            name: string;
+                            jobDefinition: unknown;
+                            icon: (string | null) | null;
+                            readme: (string | null) | null;
+                            category: (string | null) | null;
+                            vram_requirement: (number | null) | null;
+                            cuda_requirement: (number[] | null) | null;
+                            is_variant_template: (boolean | null) | null;
+                            parent_template_id: (string | null) | null;
+                            variants: unknown;
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        [key: string]: {
+                            id: string;
+                            name: string;
+                            jobDefinition: unknown;
+                            icon: (string | null) | null;
+                            readme: (string | null) | null;
+                            category: (string | null) | null;
+                            vram_requirement: (number | null) | null;
+                            cuda_requirement: (number[] | null) | null;
+                            is_variant_template: (boolean | null) | null;
+                            parent_template_id: (string | null) | null;
+                            variants: unknown;
+                        }[];
+                    };
+                    "text/plain": {
+                        [key: string]: {
+                            id: string;
+                            name: string;
+                            jobDefinition: unknown;
+                            icon: (string | null) | null;
+                            readme: (string | null) | null;
+                            category: (string | null) | null;
+                            vram_requirement: (number | null) | null;
+                            cuda_requirement: (number[] | null) | null;
+                            is_variant_template: (boolean | null) | null;
+                            parent_template_id: (string | null) | null;
+                            variants: unknown;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    getJobsTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    }[];
+                    "multipart/form-data": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    }[];
+                    "text/plain": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    getJobsTemplatesById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    };
+                    "multipart/form-data": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    };
+                    "text/plain": {
+                        id: string;
+                        name: string;
+                        jobDefinition: unknown;
+                        icon: (string | null) | null;
+                        readme: (string | null) | null;
+                        category: (string | null) | null;
+                        vram_requirement: (number | null) | null;
+                        cuda_requirement: (number[] | null) | null;
+                        is_variant_template: (boolean | null) | null;
+                        parent_template_id: (string | null) | null;
+                        variants: unknown;
+                    };
+                };
+            };
+        };
+    };
+    getJobsTemplatesByIdByVariantId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "multipart/form-data": unknown;
+                    "text/plain": unknown;
+                };
+            };
+        };
+    };
+    getJobsTemplatesGrouped: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: {
+                            id: string;
+                            name: string;
+                            jobDefinition: unknown;
+                            icon: (string | null) | null;
+                            readme: (string | null) | null;
+                            category: (string | null) | null;
+                            vram_requirement: (number | null) | null;
+                            cuda_requirement: (number[] | null) | null;
+                            is_variant_template: (boolean | null) | null;
+                            parent_template_id: (string | null) | null;
+                            variants: unknown;
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        [key: string]: {
+                            id: string;
+                            name: string;
+                            jobDefinition: unknown;
+                            icon: (string | null) | null;
+                            readme: (string | null) | null;
+                            category: (string | null) | null;
+                            vram_requirement: (number | null) | null;
+                            cuda_requirement: (number[] | null) | null;
+                            is_variant_template: (boolean | null) | null;
+                            parent_template_id: (string | null) | null;
+                            variants: unknown;
+                        }[];
+                    };
+                    "text/plain": {
+                        [key: string]: {
+                            id: string;
+                            name: string;
+                            jobDefinition: unknown;
+                            icon: (string | null) | null;
+                            readme: (string | null) | null;
+                            category: (string | null) | null;
+                            vram_requirement: (number | null) | null;
+                            cuda_requirement: (number[] | null) | null;
+                            is_variant_template: (boolean | null) | null;
+                            parent_template_id: (string | null) | null;
+                            variants: unknown;
+                        }[];
                     };
                 };
             };

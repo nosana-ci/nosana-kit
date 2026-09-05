@@ -1,6 +1,7 @@
 export * from './deploymentArchive.js';
 export * from './deploymentCreateNewRevision.js';
 export * from './deploymentDelete.js';
+export * from './deploymentDuplicate.js';
 export * from './deploymentGetEvents.js';
 export * from './deploymentGetJob.js';
 export * from './deploymentGetJobs.js';
@@ -10,6 +11,7 @@ export * from './deploymentStart.js';
 export * from './deploymentStop.js';
 export * from './deploymentGenerateAuthHeader.js';
 export * from './deploymentUpdateActiveRevision.js';
+export * from './deploymentUpdateMarket.js';
 export * from './deploymentUpdateReplicaCount.js';
 export * from './deploymentUpdateSchedule.js';
 export * from './deploymentUpdateTimeout.js';

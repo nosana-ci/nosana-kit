@@ -122,6 +122,7 @@ All groups are wired into `createNosanaApi()`.
 | `deployments.pipe().archive()` | POST | `/deployments/{deployment}/archive` | Archive a deployment |
 | `deployments.pipe().createRevision()` | POST | `/deployments/{deployment}/create-revision` | Create a new deployment revision. |
 | `deployments.pipe().delete()` | DELETE | `/deployments/{deployment}` | Delete a deployment permanently |
+| `deployments.pipe().duplicate()` | POST | `/deployments/{deployment}/duplicate` | Duplicate a deployment into a new DRAFT (or autostarted) deployment. |
 | `deployments.pipe().generateAuthHeader()` | GET | `/deployments/{deployment}/header` | Get header for a specific deployment. |
 | `deployments.pipe().getEvents()` | GET | `/deployments/{deployment}/events` | Get events for a specific deployment. |
 | `deployments.pipe().getJob()` | GET | `/deployments/{deployment}/jobs/{job}` | Get a specific deployment job by ID. |
@@ -131,6 +132,7 @@ All groups are wired into `createNosanaApi()`.
 | `deployments.pipe().start()` | POST | `/deployments/{deployment}/start` | Start an existing deployment. |
 | `deployments.pipe().stop()` | POST | `/deployments/{deployment}/stop` | Stop a deployment |
 | `deployments.pipe().updateActiveRevision()` | PATCH | `/deployments/{deployment}/update-active-revision` | Update deployment active revision. |
+| `deployments.pipe().updateMarket()` | PATCH | `/deployments/{deployment}/update-market` | Update the market of a deployment; running jobs are relisted on the new market. |
 | `deployments.pipe().updateName()` | PATCH | `/deployments/{deployment}/update-name` | Update the name of a deployment |
 | `deployments.pipe().updateReplicaCount()` | PATCH | `/deployments/{deployment}/update-replica-count` | Update the replica count of a deployment |
 | `deployments.pipe().updateSchedule()` | PATCH | `/deployments/{deployment}/update-schedule` | Update deployment schedule. |
@@ -305,6 +307,7 @@ Legend: a method name = exposed as a curated SDK method; **—** = reachable onl
 | GET | `/deployments/{deployment}` | Get a specific deployment by ID. | `deployments.get()` |
 | POST | `/deployments/{deployment}/archive` | Archive a deployment | `deployments.pipe().archive()` |
 | POST | `/deployments/{deployment}/create-revision` | Create a new deployment revision. | `deployments.pipe().createRevision()` |
+| POST | `/deployments/{deployment}/duplicate` | Duplicate a deployment into a new DRAFT (or autostarted) deployment. | `deployments.pipe().duplicate()` |
 | GET | `/deployments/{deployment}/events` | Get events for a specific deployment. | `deployments.pipe().getEvents()` |
 | GET | `/deployments/{deployment}/header` | Get header for a specific deployment. | `deployments.pipe().generateAuthHeader()` |
 | GET | `/deployments/{deployment}/jobs` | Get jobs for a specific deployment. | `deployments.pipe().getJobs()` |
@@ -314,6 +317,7 @@ Legend: a method name = exposed as a curated SDK method; **—** = reachable onl
 | POST | `/deployments/{deployment}/stop` | Stop a deployment | `deployments.pipe().stop()` |
 | GET | `/deployments/{deployment}/tasks` | Get scheduled tasks for a specific deployment. | `deployments.pipe().getTasks()` |
 | PATCH | `/deployments/{deployment}/update-active-revision` | Update deployment active revision. | `deployments.pipe().updateActiveRevision()` |
+| PATCH | `/deployments/{deployment}/update-market` | Update the market of a deployment; running jobs are relisted on the new market. | `deployments.pipe().updateMarket()` |
 | PATCH | `/deployments/{deployment}/update-name` | Update the name of a deployment | `deployments.pipe().updateName()` |
 | PATCH | `/deployments/{deployment}/update-replica-count` | Update the replica count of a deployment | `deployments.pipe().updateReplicaCount()` |
 | PATCH | `/deployments/{deployment}/update-schedule` | Update deployment schedule. | `deployments.pipe().updateSchedule()` |

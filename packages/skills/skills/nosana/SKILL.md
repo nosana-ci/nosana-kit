@@ -121,8 +121,14 @@ await deployment.updateReplicaCount(3);
 await deployment.updateTimeout(120); // minutes
 await deployment.updateSchedule('0 0 * * *');
 await deployment.updateName('new-name');
+await deployment.updateMarket('MARKET_ADDRESS'); // running jobs are relisted on the new market
 await deployment.createRevision(newJobDefinition);
 await deployment.updateActiveRevision(2);
+
+// Copy a deployment (same vault, market, strategy, active revision); source is untouched.
+// The copy is a full deployment object, so drive it like any other:
+const copy = await deployment.duplicate({ name: 'my-copy' });
+await copy.start(); // or pass { autostart: true } to skip this
 ```
 
 `delete()` leaves the vault intact and makes the deployment object unusable.

@@ -579,6 +579,7 @@ export type {
   DeploymentCreateBody,
   DeploymentState,
   DeploymentJob,
+  DeploymentDuplicateOptions,
   Vault,
   TopupVaultOptions,
   DeploymentsApi,

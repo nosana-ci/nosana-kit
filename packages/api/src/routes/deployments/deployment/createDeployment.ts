@@ -16,6 +16,8 @@ import {
   deploymentUpdateName,
   deploymentGenerateAuthHeader,
   deploymentDelete,
+  deploymentUpdateMarket,
+  deploymentDuplicate,
 } from './actions/index.js';
 import { createVault } from './createVault.js';
 
@@ -33,6 +35,7 @@ import type {
   DeploymentRevisionsSearchParams,
   DeploymentEventsSearchParams,
   DeploymentAuthHeaderParams,
+  DeploymentDuplicateOptions,
   DeploymentStreamHandlers,
   DeploymentStreamSubscription,
 } from '../types.js';
@@ -158,6 +161,34 @@ export function createDeployment(
    */
   const updateName = async (name: string) => {
     await deploymentUpdateName(name, client, state);
+  };
+
+  /**
+   * @param market New market address for the deployment
+   * @throws Error if there is an error updating the market
+   * @returns Promise<void>
+   * @description Updates the market of the deployment.
+   * A RUNNING deployment's current jobs are stopped and relisted on the new market.
+   */
+  const updateMarket = async (market: string) => {
+    await deploymentUpdateMarket(market, client, state);
+  };
+
+  /**
+   * @param options Name for the new deployment and whether to start it right away
+   * @throws Error if there is an error duplicating the deployment
+   * @returns Promise<Deployment | ApiDeployment> The newly created deployment
+   * @description Duplicates the deployment.
+   * The copy shares the vault, market, replicas, timeout, strategy, confidentiality
+   * and SSH keys, and starts from this deployment's active revision. It is left as
+   * a DRAFT unless `autostart` is set. This deployment is left untouched.
+   */
+  const duplicate = async (options: DeploymentDuplicateOptions) => {
+    const copy = await deploymentDuplicate(options, client, state);
+
+    return !hasApiKey && 'solana' in clients
+      ? createDeployment(copy, clients, false)
+      : createDeployment(copy, clients, true);
   };
 
   /**
@@ -288,5 +319,7 @@ export function createDeployment(
     updateTimeout,
     updateSchedule,
     updateName,
+    updateMarket,
+    duplicate,
   });
 }
