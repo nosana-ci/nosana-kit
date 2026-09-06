@@ -145,6 +145,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.0.3
         version: 4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.13)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2))
+      bs58:
+        specifier: ^6.0.0
+        version: 6.0.0
       eslint:
         specifier: ^9.31.0
         version: 9.39.2
@@ -157,6 +160,9 @@ importers:
       openapi-typescript:
         specifier: ^7.8.0
         version: 7.13.0(typescript@5.9.3)
+      tweetnacl:
+        specifier: ^1.0.3
+        version: 1.0.3
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
