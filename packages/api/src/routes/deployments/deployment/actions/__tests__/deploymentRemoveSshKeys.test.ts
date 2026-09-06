@@ -14,73 +14,36 @@ describe('deploymentRemoveSshKeys', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (mockClient.GET as Mock).mockResolvedValue({
-      data: { public_keys: [alice, bob] },
+    (mockClient.DELETE as Mock).mockResolvedValue({
+      data: { public_keys: [alice], updated_at: '2026-08-26T12:00:00.000Z', jobs: [] },
       error: null,
     });
-    (mockClient.PATCH as Mock).mockImplementation(async (_path, { body }) => ({
-      data: {
-        public_keys: body.public_keys,
-        updated_at: '2026-08-26T12:00:00.000Z',
-        jobs: [],
-      },
-      error: null,
-    }));
   });
 
-  it('removes the given keys from the current set', async () => {
+  it('deletes the given keys and returns the resulting set', async () => {
     const result = await deploymentRemoveSshKeys([bob], mockClient, mockState);
 
-    expect(mockClient.GET).toHaveBeenCalledWith(
-      '/deployments/{deployment}/ssh-keys',
-      { params: { path: { deployment: mockState.id } } },
-    );
-    expect(mockClient.PATCH).toHaveBeenCalledWith(
-      '/deployments/{deployment}/update-ssh-keys',
-      {
-        params: { path: { deployment: mockState.id } },
-        body: { public_keys: [alice] },
-      },
-    );
+    expect(mockClient.DELETE).toHaveBeenCalledWith('/deployments/{deployment}/ssh-keys', {
+      params: { path: { deployment: mockState.id } },
+      body: { public_keys: [bob] },
+    });
     expect(result.public_keys).toEqual([alice]);
   });
 
-  it('accepts a single key', async () => {
+  it('accepts a single key as a one-element array', async () => {
     await deploymentRemoveSshKeys(alice, mockClient, mockState);
 
-    expect(mockClient.PATCH).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({ body: { public_keys: [bob] } }),
-    );
-  });
-
-  it('matches a key by its type and material, ignoring the comment', async () => {
-    await deploymentRemoveSshKeys('ssh-rsa AAAAbob someone@else', mockClient, mockState);
-
-    expect(mockClient.PATCH).toHaveBeenCalledWith(
-      expect.any(String),
+    expect(mockClient.DELETE).toHaveBeenCalledWith(
+      '/deployments/{deployment}/ssh-keys',
       expect.objectContaining({ body: { public_keys: [alice] } }),
     );
   });
 
-  it('leaves the set unchanged when the key is not present', async () => {
-    await deploymentRemoveSshKeys('ssh-ed25519 AAAAunknown x@example.com', mockClient, mockState);
+  it('throws a formatted error when the request fails', async () => {
+    (mockClient.DELETE as Mock).mockResolvedValue({ data: null, error: { message: 'Request failed' } });
 
-    expect(mockClient.PATCH).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({ body: { public_keys: [alice, bob] } }),
+    await expect(deploymentRemoveSshKeys(alice, mockClient, mockState)).rejects.toThrow(
+      'Error revoking deployment SSH keys',
     );
-  });
-
-  it('throws a formatted error when reading the current keys fails', async () => {
-    (mockClient.GET as Mock).mockResolvedValue({
-      data: null,
-      error: { message: 'Request failed' },
-    });
-
-    await expect(
-      deploymentRemoveSshKeys(alice, mockClient, mockState),
-    ).rejects.toThrow('Error getting deployment SSH keys');
-    expect(mockClient.PATCH).not.toHaveBeenCalled();
   });
 });

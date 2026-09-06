@@ -6,6 +6,7 @@ export * from "./hosts/index.js";
 export * from "./jobs/index.js";
 export * from "./markets/index.js";
 export * from "./newsletter/index.js";
+export * from "./node/index.js";
 export * from "./payments/index.js";
 export * from "./stats/index.js";
 export * from "./templates/index.js";

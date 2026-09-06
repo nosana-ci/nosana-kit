@@ -12,6 +12,7 @@ Monorepo for the [Nosana](https://nosana.com) developer toolkit: TypeScript pack
 | [@nosana/authorization](./packages/authorisation) | Message signing and validation for API auth. |
 | [@nosana/endpoints](./packages/endpoints) | Endpoint and environment configuration. |
 | [@nosana/ipfs](./packages/ipfs) | IPFS pinning and retrieval. |
+| [@nosana/ssh](./packages/ssh) | SSH key pairs, key validation and node access for jobs. |
 | [@nosana/jobs-program](./packages/generated_clients/jobs) | Generated Solana jobs program client. |
 | [@nosana/stake-program](./packages/generated_clients/stake) | Generated Solana stake program client. |
 | [@nosana/merkle-distributor-program](./packages/generated_clients/merkle_distributor) | Generated Solana merkle distributor program client. |

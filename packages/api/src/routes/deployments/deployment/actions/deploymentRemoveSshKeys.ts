@@ -1,30 +1,26 @@
-import { deploymentGetSshKeys } from './deploymentGetSshKeys.js';
-import { deploymentUpdateSshKeys } from './deploymentUpdateSshKeys.js';
-import { sshKeyIdentity } from '../../../../utils/sshKeyIdentity.js';
+import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
 import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
-import type {
-  DeploymentState,
-  DeploymentUpdateSshKeysResult,
-} from '../../types.js';
+import type { DeploymentSshKeysResult, DeploymentState } from '../../types.js';
 
 /**
- * Revokes one or more SSH public keys from a deployment's jobs.
- * A removed key stops working on a running job only when that job restarts.
+ * Revokes one or more SSH public keys from a deployment's jobs. A key is matched
+ * by its type and material, so a differing comment still revokes it; the node
+ * revokes it on every job currently running.
  */
 export async function deploymentRemoveSshKeys(
   publicKeys: string | string[],
   client: DeploymentManagerClient,
   state: DeploymentState,
-): Promise<DeploymentUpdateSshKeysResult> {
-  const { public_keys } = await deploymentGetSshKeys(client, state);
-  const revoked = new Set(
-    (Array.isArray(publicKeys) ? publicKeys : [publicKeys]).map(sshKeyIdentity),
-  );
+): Promise<DeploymentSshKeysResult> {
+  const { data, error } = await client.DELETE('/deployments/{deployment}/ssh-keys', {
+    params: { path: { deployment: state.id } },
+    body: { public_keys: Array.isArray(publicKeys) ? publicKeys : [publicKeys] },
+  });
 
-  return await deploymentUpdateSshKeys(
-    public_keys.filter((key) => !revoked.has(sshKeyIdentity(key))),
-    client,
-    state,
-  );
+  if (error || !data) {
+    throw errorFormatter('Error revoking deployment SSH keys', error);
+  }
+
+  return data;
 }

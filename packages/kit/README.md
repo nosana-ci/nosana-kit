@@ -1712,6 +1712,10 @@ MIT
 
 ## SSH access
 
-`client.ssh` supports temporary and permanent keys, listing, replacement, and
-revocation on running jobs. See the [SSH access guide](../../docs/kit/ssh-access.md)
-for the node contract and deployment-manager integration.
+Keys are granted on the node running a job, through the node job API:
+`(await client.api.jobs(job)).ssh` lists, adds and removes keys and describes the
+`ssh` command to connect with. `client.api.jobs(job)` finds the node for you and
+returns the job's current state merged with its node API; it works under both
+wallet and API-key auth. Key pairs and key validation come from
+[`@nosana/ssh`](../ssh), which the kit re-exports. See the
+[SSH access guide](../../docs/kit/ssh-access.md).

@@ -13,7 +13,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "openapi"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -26,6 +27,7 @@
     "generate": "openapi-typescript https://api.nosana.com/openapi.json -o ./src/Schemas/api.ts",
     "generate:dev": "openapi-typescript https://dashboard.k8s.dev.nos.ci/openapi.json -o ./src/Schemas/api.ts",
     "generate:local": "openapi-typescript http://localhost:3000/openapi.json -o ./src/Schemas/api.ts",
+    "generate:node": "node scripts/export-node-openapi.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

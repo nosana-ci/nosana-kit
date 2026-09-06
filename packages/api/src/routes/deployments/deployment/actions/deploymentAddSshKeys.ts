@@ -1,36 +1,26 @@
-import { deploymentGetSshKeys } from './deploymentGetSshKeys.js';
-import { deploymentUpdateSshKeys } from './deploymentUpdateSshKeys.js';
-import { sshKeyIdentity } from '../../../../utils/sshKeyIdentity.js';
+import { errorFormatter } from '../../../../utils/errorFormatter.js';
 
 import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
-import type {
-  DeploymentState,
-  DeploymentUpdateSshKeysResult,
-} from '../../types.js';
+import type { DeploymentSshKeysResult, DeploymentState } from '../../types.js';
 
 /**
- * Grants one or more SSH public keys access to a deployment's jobs.
- * Keys already present are left as they are.
+ * Grants one or more SSH public keys access to a deployment's jobs. Keys already
+ * present (same type and material) are left as they are; the node authorizes the
+ * new keys on every job currently running.
  */
 export async function deploymentAddSshKeys(
   publicKeys: string | string[],
   client: DeploymentManagerClient,
   state: DeploymentState,
-): Promise<DeploymentUpdateSshKeysResult> {
-  const { public_keys } = await deploymentGetSshKeys(client, state);
-  const known = new Set(public_keys.map(sshKeyIdentity));
-  const additions: string[] = [];
+): Promise<DeploymentSshKeysResult> {
+  const { data, error } = await client.POST('/deployments/{deployment}/ssh-keys', {
+    params: { path: { deployment: state.id } },
+    body: { public_keys: Array.isArray(publicKeys) ? publicKeys : [publicKeys] },
+  });
 
-  for (const key of Array.isArray(publicKeys) ? publicKeys : [publicKeys]) {
-    const identity = sshKeyIdentity(key);
-    if (known.has(identity)) continue;
-    known.add(identity);
-    additions.push(key);
+  if (error || !data) {
+    throw errorFormatter('Error adding deployment SSH keys', error);
   }
 
-  return await deploymentUpdateSshKeys(
-    [...public_keys, ...additions],
-    client,
-    state,
-  );
+  return data;
 }

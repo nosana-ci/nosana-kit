@@ -17,7 +17,6 @@ export * from './deploymentUpdateActiveRevision.js';
 export * from './deploymentUpdateMarket.js';
 export * from './deploymentUpdateReplicaCount.js';
 export * from './deploymentUpdateSchedule.js';
-export * from './deploymentUpdateSshKeys.js';
 export * from './deploymentUpdateTimeout.js';
 export * from './deploymentUpdateName.js';
 export * from './deploymentStream.js';

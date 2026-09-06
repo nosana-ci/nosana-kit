@@ -57,6 +57,8 @@
     "vitest": "^4.0.3"
   },
   "dependencies": {
+    "@nosana/authorization": "workspace:*",
+    "@nosana/ssh": "workspace:*",
     "@nosana/types": "workspace:*",
     "eventsource": "^4.1.0",
     "openapi-fetch": "^0.14.0"

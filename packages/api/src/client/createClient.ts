@@ -6,14 +6,17 @@ import type {
   AuthenticatedPaths,
   ClientConnection,
 } from './type.utils.js';
-import type { ApiKeyAuth, SignerAuth, CreateNosanaApiOptions } from '../types.js';
+import type { ApiKeyAuth, SignedHeaderAuth, CreateNosanaApiOptions } from '../types.js';
+
+/** The message signer auth signs on every request; nodes accept it on their sockets too. */
+export const NOSANA_API_AUTH_MESSAGE = 'NosanaApiAuthentication';
 
 /**
  * The headers the client sends on every request. Resolved per call: signer auth
  * signs a fresh message each time.
  */
 export async function authHeaders(
-  authParams: ApiKeyAuth | SignerAuth | undefined,
+  authParams: ApiKeyAuth | SignedHeaderAuth | undefined,
 ): Promise<Record<string, string>> {
   if (!authParams) return {};
 
@@ -22,8 +25,8 @@ export async function authHeaders(
   }
 
   return {
-    'x-user-id': authParams.identifier,
-    Authorization: await authParams.generate('NosanaApiAuthentication'),
+    ...(authParams.identifier ? { 'x-user-id': authParams.identifier } : {}),
+    Authorization: await authParams.generate(NOSANA_API_AUTH_MESSAGE),
   };
 }
 
@@ -39,7 +42,7 @@ export async function authHeaders(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createAuthenticatedClient<Paths extends Record<string, any>>(
   baseUrl: string,
-  authParams: ApiKeyAuth | SignerAuth | undefined,
+  authParams: ApiKeyAuth | SignedHeaderAuth | undefined,
   options?: Pick<CreateNosanaApiOptions, 'include_credentials'>,
   defaultHeaders?: Record<string, string>,
 ): AuthenticatedClient<Paths> & { connection: ClientConnection } {

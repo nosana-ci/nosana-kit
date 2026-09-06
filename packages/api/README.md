@@ -182,6 +182,38 @@ await vault.topup({ NOS: 100 });
 | `getTemplatePerformance` | `nodeId: string` | `Promise<Record<string, unknown>>` |
 | `getBenchmarkSummary` | `request?: BenchmarkSummaryRequest` | `Promise<Record<string, unknown>>` |
 
+### `api.node` / `api.jobs(job)` — Node access
+
+A node verifies the job owner's signature, and the client manager signs on the
+caller's behalf — so node access works under both wallet and API-key auth, and is
+absent only when unauthenticated.
+
+| Call | Parameters | Returns |
+|--------|-----------|---------|
+| `node(address)` | `address: string` | `Promise<NodeInfo>` — a node's public info |
+| `jobs(job)` | `job: string` | `Promise<Job & NodeJobApi>` — the job's current indexer state flat-merged with its node job API |
+
+`jobs` is callable **and** an object: the indexer query methods (`get`, `getAll`,
+`list`, …) hang off it, so `(await api.jobs(id)).ssh.add(key)` and `api.jobs.list(...)`
+both work.
+
+**Node job methods** (on `await api.jobs(job)`, alongside the job's indexer fields):
+
+| Method | Parameters | Returns |
+|--------|-----------|---------|
+| `definition` / `setDefinition` | — / `definition: JobDefinition` | `Promise<JobDefinition>` / `Promise<void>` |
+| `results` | — | `Promise<FlowState>` |
+| `operations` / `operation` / `group` | — / `op: string` / `group?: string` | `Promise<NodeOperationStatuses>` |
+| `restartGroup` / `restartOperation` | `group: string` / `group: string, op: string` | `Promise<void>` |
+| `stopGroup` / `stopOperation` / `stop` | `group: string` / `group: string, op: string` / — | `Promise<void>` |
+| `endpoints` | — | `Promise<NodeJobEndpoints>` |
+| `stats` | `query?: NodeStatsQuery` | `Promise<NodeTaskStat[]>` |
+| `streamInfo` / `streamStats` | `handlers, query?` | `NodeStreamSubscription` |
+| `logs` / `status` | `handlers, filter?, options?` | `NodeStreamSubscription` |
+| `ssh.keys` / `ssh.add` / `ssh.remove` | — / `publicKey, { expiresAt? }` / `publicKey` | see `NodeJobSsh` |
+| `ssh.command` | `options?: SshCommandOptions` | `SshConnectionDescriptor` |
+| `terminal` | `options: NodeTerminalOptions` | `Promise<TerminalSession>` |
+
 ### `api.stats` — Platform Statistics
 
 | Method | Parameters | Returns |

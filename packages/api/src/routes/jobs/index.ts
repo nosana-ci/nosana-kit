@@ -2,8 +2,10 @@ import { errorFormatter } from '../../utils/errorFormatter.js';
 
 import type { BlockchainIndexerClient } from '../../client/blockchain-indexer/index.js';
 import type { ClientManagerClient } from '../../client/client-manager/index.js';
+import type { NosanaNodeApi } from '../node/types.js';
 import type {
   NosanaJobsApi,
+  NosanaApiKeyJobsApi,
   NosanaJobActionOptions,
   NosanaJobBatchOptions,
   NosanaApiExtendJobRequest,
@@ -21,6 +23,7 @@ import type {
   NosanaApiStopJobBatchRequest,
   NosanaApiJobsBatchResponse,
   Job,
+  NodeJob,
   JobRunningNodesRequest,
   JobLongRunningRequest,
   JobStatsRequest,
@@ -41,29 +44,39 @@ function idempotencyInit({ idempotencyKey }: NosanaJobActionOptions = {}) {
   return idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : {};
 }
 
-export function createNosanaJobsApi(clients: {
+interface JobsRouteClients {
   blockchainIndexer: BlockchainIndexerClient;
   clientManager: ClientManagerClient;
-}): NosanaJobsApi {
-  const { blockchainIndexer, clientManager } = clients;
-  return {
-    async get(
-      address: NosanaApiGetJobByAddressRequest,
-    ): Promise<NosanaApiGetJobByAddressResponse> {
-      const { data, error, response } = await blockchainIndexer.GET('/jobs/{address}', {
-        params: {
-          path: {
-            address,
-          },
+}
+
+/** With a node API the jobs API can reach a job on its node; without one it cannot. */
+export function createNosanaJobsApi(clients: JobsRouteClients & { node: NosanaNodeApi }): NosanaJobsApi;
+export function createNosanaJobsApi(clients: JobsRouteClients): NosanaApiKeyJobsApi;
+export function createNosanaJobsApi(
+  clients: JobsRouteClients & { node?: NosanaNodeApi },
+): NosanaJobsApi | NosanaApiKeyJobsApi {
+  const { blockchainIndexer, clientManager, node } = clients;
+
+  const get = async (
+    address: NosanaApiGetJobByAddressRequest,
+  ): Promise<NosanaApiGetJobByAddressResponse> => {
+    const { data, error, response } = await blockchainIndexer.GET('/jobs/{address}', {
+      params: {
+        path: {
+          address,
         },
-      });
+      },
+    });
 
-      if (error || !data) {
-        throw errorFormatter('Failed to get job', error, response);
-      }
+    if (error || !data) {
+      throw errorFormatter('Failed to get job', error, response);
+    }
 
-      return data as unknown as NosanaApiGetJobByAddressResponse;
-    },
+    return data as unknown as NosanaApiGetJobByAddressResponse;
+  };
+
+  const api: NosanaApiKeyJobsApi = {
+    get,
     async getAll(
       request?: NosanaApiGetAllJobsRequest,
     ): Promise<NosanaApiGetAllJobsResponse> {
@@ -260,4 +273,19 @@ export function createNosanaJobsApi(clients: {
       return data;
     },
   };
+
+  if (!node) return api;
+
+  // `jobs(address)`: the job's current state from the indexer, merged flat with
+  // the node job API so `jobs(id).ssh`, `jobs(id).terminal` and `jobs(id).state`
+  // all live on the one object.
+  const jobs = async (address: string): Promise<NodeJob> => {
+    const current = await get(address);
+    if (!current.node) {
+      throw new Error(`Job ${address} has no assigned node.`);
+    }
+    return Object.assign({}, current, node(current.node).job(address)) as NodeJob;
+  };
+
+  return Object.assign(jobs, api) as NosanaJobsApi;
 }

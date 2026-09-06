@@ -245,14 +245,9 @@ export type {
 } from './services/solana/SolanaService.js';
 
 /**
- * @group @nosana/kit
+ * @group @nosana/ssh
  */
-export * from './services/ssh/index.js';
-
-/**
- * @group @nosana/kit
- */
-export * from './services/terminal/index.js';
+export * from '@nosana/ssh';
 
 // ============================================================================
 // @nosana/kit - Configuration

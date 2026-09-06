@@ -1,4 +1,4 @@
-import { EventSource } from 'eventsource';
+import { openEventStream } from '../../../../utils/eventStream.js';
 
 import type { DeploymentManagerClient } from '../../../../client/deployment-manager/index.js';
 import type {
@@ -50,10 +50,9 @@ function dispatch<T extends DeploymentStreamEvent['type']>(
  * what picks the handler; the rest of each frame is taken on trust from the
  * manager's schema.
  */
-function isDeploymentStreamEvent(
-  value: { type?: unknown } | null,
-): value is DeploymentStreamEvent {
-  return typeof value?.type === 'string' && value.type in DISPATCH;
+function isDeploymentStreamEvent(value: unknown): value is DeploymentStreamEvent {
+  const type = (value as { type?: unknown } | null)?.type;
+  return typeof type === 'string' && type in DISPATCH;
 }
 
 
@@ -75,38 +74,11 @@ export function deploymentStream(
   state: DeploymentState,
   handlers: DeploymentStreamHandlers,
 ): DeploymentStreamSubscription {
-  const { baseUrl, headers, credentials } = client.connection;
-  const url = `${baseUrl}/deployments/${encodeURIComponent(state.id)}/stream`;
-
-  const source = new EventSource(url, {
-    fetch: async (input, init) =>
-      fetch(input, {
-        ...init,
-        // Under cookie auth there are no headers to copy, so the stream has to
-        // opt into sending the cookie or it authenticates as nobody.
-        ...(credentials ? { credentials } : {}),
-        headers: { ...init.headers, ...(await headers()) },
-      }),
+  return openEventStream(client.connection, `/deployments/${encodeURIComponent(state.id)}/stream`, {
+    onOpen: handlers.onOpen,
+    onError: handlers.onError,
+    onMessage: (frame) => {
+      if (isDeploymentStreamEvent(frame)) dispatch(handlers, frame.type, frame);
+    },
   });
-
-  source.onopen = () => handlers.onOpen?.();
-  source.onerror = (error) => handlers.onError?.(error);
-
-  source.onmessage = ({ data }) => {
-    // Malformed frames are ignored; the catch also swallows a handler that
-    // throws, the price of keeping `parsed` inside the try.
-    try {
-      const parsed = JSON.parse(data);
-
-      if (!isDeploymentStreamEvent(parsed)) return;
-
-      dispatch(handlers, parsed.type, parsed);
-    } catch {
-      return;
-    }
-  };
-
-  return {
-    close: () => source.close(),
-  };
 }

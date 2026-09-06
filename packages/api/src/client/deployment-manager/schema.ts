@@ -1002,8 +1002,172 @@ export interface paths {
             };
         };
         put?: never;
-        post?: never;
-        delete?: never;
+        /** @description Grant one or more SSH public keys access to the deployment's jobs. */
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path: {
+                    deployment: components["schemas"]["PublicKey"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description SSH public keys to grant. Keys already present (same type and material) are left as they are; the deployment holds at most 10. */
+                        public_keys: string[];
+                    };
+                };
+            };
+            responses: {
+                /** @description The deployment's SSH keys after the change. Check `jobs` for nodes that rejected or did not receive the new keys. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            public_keys: string[];
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** @description Per running job whose node was contacted to apply the change. Empty when nothing changed or nothing is running. */
+                            jobs: {
+                                job: string;
+                                node: string;
+                                status: "authorized" | "revoked" | "failed";
+                                error?: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Bad Request. A key is not a valid OpenSSH public key, or the set exceeds the limits. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Deployment not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        /** @description Revoke one or more SSH public keys from the deployment's jobs. */
+        delete: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path: {
+                    deployment: components["schemas"]["PublicKey"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description SSH public keys to revoke. A key is matched by type and material, so a differing comment still revokes it. */
+                        public_keys: string[];
+                    };
+                };
+            };
+            responses: {
+                /** @description The deployment's SSH keys after the change. Check `jobs` for nodes that did not apply the revocation. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            public_keys: string[];
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** @description Per running job whose node was contacted to apply the change. Empty when nothing changed or nothing is running. */
+                            jobs: {
+                                job: string;
+                                node: string;
+                                status: "authorized" | "revoked" | "failed";
+                                error?: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Bad Request. A key is not a valid OpenSSH public key. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Deployment not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -1866,104 +2030,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Deployment not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Internal Server Error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        trace?: never;
-    };
-    "/deployments/{deployment}/update-ssh-keys": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** @description Replace the deployment's SSH public keys. The new set is stored on the deployment (not on a revision — no new revision or restart) and injected into every job posted from now on. New keys are also authorized on the node of every job currently running; removed keys stop working only when a job restarts. */
-        patch: {
-            parameters: {
-                query?: never;
-                header: {
-                    "x-user-id": string;
-                    /** @description Signed authentication message, */
-                    authorization: string;
-                    /** @description Nosana API key */
-                    "x-nosana-api"?: string;
-                };
-                path: {
-                    deployment: components["schemas"]["PublicKey"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        /** @description The complete set of SSH public keys allowed to reach this deployment's jobs (at most 10). Replaces the current set; an empty array revokes SSH access. */
-                        public_keys: string[];
-                    };
-                };
-            };
-            responses: {
-                /** @description SSH keys updated. Check `jobs` for nodes that rejected or did not receive the new keys. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            public_keys: string[];
-                            /** Format: date-time */
-                            updated_at: string;
-                            /** @description Per running job: whether its node authorized the new keys. Empty when the new set is empty — a revocation cannot reach running jobs. */
-                            jobs: {
-                                job: string;
-                                node: string;
-                                status: "authorized" | "failed";
-                                error?: string;
-                            }[];
-                        };
-                    };
-                };
-                /** @description Bad Request. A key is not a valid OpenSSH public key, or the set exceeds the limits. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description Unauthorized. Invalid or missing authentication. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": "Unauthorized";
                     };
                 };
                 /** @description Deployment not found. */
