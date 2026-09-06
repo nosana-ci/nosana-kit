@@ -5,6 +5,7 @@ import { withMermaid } from 'vitepress-plugin-mermaid';
 import { markdownGlossaryPlugin } from 'vitepress-plugin-glossary';
 import chartPlugin from './plugins/chart';
 import glossary from './glossary.json';
+import { writeLlmsTxt } from './llms';
 
 // Generate SDK Reference sidebar - simplified to single link
 function getSdkReferenceSidebar() {
@@ -16,6 +17,15 @@ export default withMermaid(
     title: 'Nosana Docs',
     description: 'Complete documentation for the Nosana Network - SDK, protocols, and guides',
     base: '/',
+
+    sitemap: {
+      hostname: 'https://docs.nosana.com',
+    },
+
+    // Emits llms.txt from the sidebar, so the index agents read stays in step
+    // with the navigation people read.
+    buildEnd: writeLlmsTxt,
+
     themeConfig: {
       siteTitle: false,
       nav: [
