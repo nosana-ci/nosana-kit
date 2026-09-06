@@ -44,9 +44,11 @@ describe('parseTerminalAuthorizationMessage', () => {
   const message = buildTerminalAuthorizationMessage(base);
 
   it('rejects a wrong header', () => {
-    expect(() => parseTerminalAuthorizationMessage(message.replace(TERMINAL_AUTHORIZATION_MESSAGE_HEADER, 'v2'))).toThrow(
-      'header'
-    );
+    expect(() =>
+      parseTerminalAuthorizationMessage(
+        message.replace(TERMINAL_AUTHORIZATION_MESSAGE_HEADER, 'v2')
+      )
+    ).toThrow('header');
   });
 
   it('rejects a duplicated field', () => {
@@ -58,7 +60,10 @@ describe('parseTerminalAuthorizationMessage', () => {
   });
 
   it('requires job, node and expiresAt', () => {
-    const withoutNode = message.split('\n').filter((line) => !line.startsWith('node:')).join('\n');
+    const withoutNode = message
+      .split('\n')
+      .filter((line) => !line.startsWith('node:'))
+      .join('\n');
     expect(() => parseTerminalAuthorizationMessage(withoutNode)).toThrow('node');
   });
 });

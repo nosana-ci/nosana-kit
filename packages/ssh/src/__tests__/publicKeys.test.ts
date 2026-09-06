@@ -18,7 +18,10 @@ const encoder = new TextEncoder();
 /** A valid ed25519 key whose blob (and so identity) is unique to `seed`. */
 function uniqueKey(seed: number, comment = `key-${seed}`): string {
   const algorithm = encoder.encode('ssh-ed25519');
-  const publicKey = Uint8Array.from({ length: 32 }, (_, index) => (index * 7 + seed * 31 + 3) & 0xff);
+  const publicKey = Uint8Array.from(
+    { length: 32 },
+    (_, index) => (index * 7 + seed * 31 + 3) & 0xff
+  );
   const bytes = new Uint8Array(4 + algorithm.length + 4 + publicKey.length);
   const view = new DataView(bytes.buffer);
   view.setUint32(0, algorithm.length);

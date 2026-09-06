@@ -7,7 +7,9 @@ const now = Date.UTC(2025, 0, 1, 0, 0, 0);
 describe('requireFutureSshExpiry', () => {
   it('returns the canonical ISO string for a future UTC timestamp', () => {
     expect(requireFutureSshExpiry('2025-06-01T12:00:00Z', now)).toBe('2025-06-01T12:00:00.000Z');
-    expect(requireFutureSshExpiry('2025-06-01T12:00:00.500Z', now)).toBe('2025-06-01T12:00:00.500Z');
+    expect(requireFutureSshExpiry('2025-06-01T12:00:00.500Z', now)).toBe(
+      '2025-06-01T12:00:00.500Z'
+    );
   });
 
   it.each([
