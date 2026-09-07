@@ -1,5 +1,6 @@
 import bs58 from 'bs58';
 import nacl from 'tweetnacl';
+import { createNosanaAuthorization } from '@nosana/authorization';
 import {
   buildTerminalAuthorizationMessage,
   createTerminalAuthorizationGrant,
@@ -96,6 +97,50 @@ describe('terminal authorization grant', () => {
 });
 
 describe('node job terminal', () => {
+  it('signs each terminal grant without reading or replacing the wallet auth cache', async () => {
+    let cachedHeader: string | undefined;
+    const store = {
+      identifier: 'me',
+      actions: {
+        get: vi.fn(() => cachedHeader),
+        set: vi.fn((_identifier: string, _options: unknown, value: string | undefined) => {
+          cachedHeader = value;
+        }),
+      },
+    };
+    const signMessage = vi.fn(async (message: Uint8Array) =>
+      nacl.sign.detached(message, owner.secretKey),
+    );
+    const authorization = createNosanaAuthorization(signMessage, store);
+    const cachedAuthentication = await authorization.generate('NosanaApiAuthentication');
+    store.actions.get.mockClear();
+    store.actions.set.mockClear();
+    signMessage.mockClear();
+
+    for (const op of ['worker', 'server']) {
+      const { connect } = fixture({ ...signer, generate: authorization.generate });
+      const session = await connect({ op });
+      try {
+        const grant = session.authorization;
+        expect(grant.message).toContain(`op: ${op}`);
+        expect(nacl.sign.detached.verify(
+          new TextEncoder().encode(grant.message),
+          Uint8Array.from(atob(grant.signature), (c) => c.charCodeAt(0)),
+          owner.publicKey,
+        )).toBe(true);
+      } finally {
+        session.close();
+      }
+    }
+
+    expect(signMessage).toHaveBeenCalledTimes(2);
+    expect(store.actions.get).not.toHaveBeenCalled();
+    expect(store.actions.set).not.toHaveBeenCalled();
+    expect(cachedHeader).toBe(cachedAuthentication);
+    expect(await authorization.generate('NosanaApiAuthentication')).toBe(cachedAuthentication);
+    expect(signMessage).toHaveBeenCalledTimes(2);
+  });
+
   it('signs the grant, sends the handshake and relays frames both ways', async () => {
     const { socket, urls, statuses, onData, onExit, connect, message } = fixture();
 

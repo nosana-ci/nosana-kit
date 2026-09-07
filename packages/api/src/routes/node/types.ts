@@ -47,7 +47,7 @@ export interface NodeStreamHandlers<T> extends StreamLifecycleHandlers {
  * `message:base58-signature` authorization string. Lets a deployment's wallet
  * sign for its jobs, through the deployment manager, instead of the client's.
  */
-export type NodeAuthorizationProvider = (message: string) => Promise<string>;
+export type NodeAuthorizationProvider = SignedHeaderAuth['generate'];
 
 export interface NodeSshKeyOptions {
   signal?: AbortSignal;

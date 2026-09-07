@@ -58,7 +58,11 @@ export async function createTerminalAuthorizationGrant({
 
   const expiresAt = new Date(now.getTime() + ttlMs).toISOString();
   const message = buildTerminalAuthorizationMessage({ job, node, expiresAt, op, network });
-  const { signature } = parseAuthorization(await authorize(message), { expected_message: message });
+  // A grant is scoped to this job, operation and expiry. It must neither reuse
+  // a cached API authentication header nor replace one in a wallet's store.
+  const { signature } = parseAuthorization(await authorize(message, { skipCache: true }), {
+    expected_message: message,
+  });
 
   return { message, signature: bytesToBase64(signature), expiresAt };
 }

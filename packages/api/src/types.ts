@@ -2,6 +2,7 @@ import type { ClientManagerClient } from './client/client-manager/index.js';
 import type { BlockchainIndexerClient } from './client/blockchain-indexer/index.js';
 import type { HostManagerClient } from './client/host-manager/index.js';
 import type { DeploymentManagerClient } from './client/deployment-manager/index.js';
+import type { GenerateOptions } from '@nosana/authorization';
 import { TopupVaultOptions } from './routes/deployments/types.js';
 
 // Re-export shared types from @nosana/types
@@ -32,7 +33,7 @@ export type ExternalSolanaFunctions = {
 
 export type SignerAuth = {
   identifier: string;
-  generate: (message: string) => Promise<string>;
+  generate: SignedHeaderAuth['generate'];
   solana: ExternalSolanaFunctions;
 }
 
@@ -44,7 +45,8 @@ export type SignerAuth = {
  */
 export type SignedHeaderAuth = {
   identifier?: string;
-  generate: (message: string) => Promise<string>;
+  /** Terminal grants request fresh signing without touching the normal auth cache. */
+  generate: (message: string, options?: Pick<GenerateOptions, 'skipCache'>) => Promise<string>;
 }
 
 export type CreateNosanaApiOptions = Partial<{
