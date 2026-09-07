@@ -12,6 +12,9 @@
     "url": "git+https://github.com/nosana-ci/nosana-kit.git",
     "directory": "packages/ssh"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist"
   ],
