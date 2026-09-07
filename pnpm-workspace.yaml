@@ -6,6 +6,7 @@ packages:
   - 'packages/authorisation'
   - 'packages/endpoints'
   - 'packages/ipfs'
+  - 'packages/ssh'
   - 'packages/types'
   - 'packages/skills'
   - 'docs'

@@ -1,0 +1,47 @@
+{
+  "name": "@nosana/ssh",
+  "version": "2.12.0",
+  "description": "SSH tooling for Nosana jobs: OpenSSH key pairs, public-key validation, job definition keys and the ssh command that reaches a job",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "author": "Nosana",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
+    "directory": "packages/ssh"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "tsc --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... --parallel run dev",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint --fix ./src",
+    "format": "prettier --config ../../.prettierrc --check \"src/**/*.ts\"",
+    "format:fix": "prettier --config ../../.prettierrc --write \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@nosana/types": "workspace:*",
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.14",
+    "@vitest/coverage-v8": "^4.0.16",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  }
+}

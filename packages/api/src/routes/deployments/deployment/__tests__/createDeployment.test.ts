@@ -8,12 +8,26 @@ vi.mock('../actions/index.js', () => ({
   deploymentArchive: vi.fn(),
   deploymentUpdateReplicaCount: vi.fn(),
   deploymentGetTasks: vi.fn().mockResolvedValue([]),
+  deploymentGetSshKeys: vi.fn().mockResolvedValue({
+    public_keys: ['ssh-ed25519 AAAA test@example.com'],
+  }),
+  deploymentAddSshKeys: vi.fn().mockResolvedValue({
+    public_keys: ['ssh-ed25519 AAAA test@example.com'],
+    updated_at: '2026-08-26T12:00:00.000Z',
+    jobs: [],
+  }),
+  deploymentRemoveSshKeys: vi.fn().mockResolvedValue({
+    public_keys: [],
+    updated_at: '2026-08-26T12:00:00.000Z',
+    jobs: [],
+  }),
   deploymentUpdateTimeout: vi.fn(),
   deploymentCreateNewRevision: vi.fn(),
   deploymentUpdateActiveRevision: vi.fn(),
   deploymentUpdateSchedule: vi.fn(),
   deploymentGenerateAuthHeader: vi.fn().mockResolvedValue('auth-header'),
   deploymentGetJob: vi.fn().mockResolvedValue({ id: 'job-id' }),
+  deploymentGetJobs: vi.fn().mockResolvedValue({ jobs: [], total_items: 0, nextPage: null, previousPage: null }),
   deploymentUpdateMarket: vi.fn(),
   deploymentDuplicate: vi.fn(),
 }));
@@ -39,6 +53,9 @@ describe('createDeployment', () => {
     expect(deployment.getTasks).toBeTypeOf('function');
     expect(deployment.getJob).toBeTypeOf('function');
     expect(deployment.generateAuthHeader).toBeTypeOf('function');
+    expect(deployment.ssh.keys).toBeTypeOf('function');
+    expect(deployment.ssh.add).toBeTypeOf('function');
+    expect(deployment.ssh.remove).toBeTypeOf('function');
     expect(deployment.createRevision).toBeTypeOf('function');
     expect(deployment.updateReplicaCount).toBeTypeOf('function');
     expect(deployment.updateActiveRevision).toBeTypeOf('function');
@@ -83,9 +100,11 @@ describe('createDeployment', () => {
       expect(result).toBe('auth-header');
     });
 
-    test('when getJob method is invoked, it should call getJob action', async () => {
-      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+    test('when getJob is invoked, it calls the action and attaches the node job API', async () => {
+      const NODE = '8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH';
+      (actions.deploymentGetJob as Mock).mockResolvedValueOnce({ node: NODE, jobStatus: 'RUNNING' });
 
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
       const result = await deployment.getJob('job-123');
 
       expect(actions.deploymentGetJob).toHaveBeenCalledWith(
@@ -93,7 +112,81 @@ describe('createDeployment', () => {
         global.TEST_MOCK_DEPLOYMENT.id,
         'job-123',
       );
-      expect(result).toEqual({ id: 'job-id' });
+      // The job's data and its node job API (ssh, terminal, …) are on the one object.
+      expect(result.jobStatus).toBe('RUNNING');
+      expect(result.node).toBe(NODE);
+      expect(result.address).toBe('job-123');
+      expect(result.ssh.add).toBeTypeOf('function');
+      expect(result.terminal).toBeTypeOf('function');
+    });
+
+    test('when getJob returns a job with no assigned node, it throws', async () => {
+      (actions.deploymentGetJob as Mock).mockResolvedValueOnce({ node: '' });
+
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+
+      await expect(deployment.getJob('job-123')).rejects.toThrow('no assigned node');
+    });
+
+    test('when getJobs is invoked, it attaches the node job API to jobs that have a node', async () => {
+      const NODE = '8hP5WVzxX8qQE9s6J7BkUxEsb1vQD5viiEZ1pKVXSQFH';
+      (actions.deploymentGetJobs as Mock).mockResolvedValueOnce({
+        jobs: [
+          { job: 'running', node: NODE, state: 'RUNNING' },
+          { job: 'queued', node: null, state: 'QUEUED' },
+        ],
+        total_items: 2,
+        nextPage: null,
+        previousPage: null,
+      });
+
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+      const result = await deployment.getJobs();
+
+      // The running job carries its node job API; the queued one is left as-is.
+      expect(result.jobs[0].address).toBe('running');
+      expect(result.jobs[0].ssh?.add).toBeTypeOf('function');
+      expect(result.jobs[1].state).toBe('QUEUED');
+      expect(result.jobs[1].ssh).toBeUndefined();
+    });
+
+    test('when ssh.keys is invoked, it should call getSshKeys action and return the keys', async () => {
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+
+      const result = await deployment.ssh.keys();
+
+      expect(actions.deploymentGetSshKeys).toHaveBeenCalledWith(
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
+        expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
+      );
+      expect(result).toEqual(['ssh-ed25519 AAAA test@example.com']);
+    });
+
+    test('when ssh.add is invoked, it should call addSshKeys action', async () => {
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+      const publicKeys = ['ssh-ed25519 AAAA test@example.com'];
+
+      const result = await deployment.ssh.add(publicKeys);
+
+      expect(actions.deploymentAddSshKeys).toHaveBeenCalledWith(
+        publicKeys,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
+        expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
+      );
+      expect(result.public_keys).toEqual(publicKeys);
+    });
+
+    test('when ssh.remove is invoked, it should call removeSshKeys action', async () => {
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+
+      const result = await deployment.ssh.remove('ssh-ed25519 AAAA test@example.com');
+
+      expect(actions.deploymentRemoveSshKeys).toHaveBeenCalledWith(
+        'ssh-ed25519 AAAA test@example.com',
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
+        expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
+      );
+      expect(result.public_keys).toEqual([]);
     });
 
     test('when updateSchedule method is invoked, it should call updateSchedule action', async () => {
@@ -261,4 +354,3 @@ describe('createDeployment', () => {
     });
   });
 });
-

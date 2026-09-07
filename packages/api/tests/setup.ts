@@ -5,6 +5,7 @@
 
 import { vi, beforeEach, afterEach } from 'vitest';
 import { createMockClient, createMockSolanaFunctions } from './mockFactory.js';
+import { NosanaNetwork } from '../src/types.js';
 
 // Mock openapi-fetch globally
 vi.mock('openapi-fetch', () => ({
@@ -25,6 +26,7 @@ global.TEST_MOCK_CLIENT = createMockClient();
 
 global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER = {
   deploymentManager: createMockClient(),
+  environment: NosanaNetwork.MAINNET,
   solana: createMockSolanaFunctions(),
 };
 

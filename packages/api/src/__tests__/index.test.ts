@@ -71,7 +71,12 @@ describe('createNosanaApi', () => {
     createNosanaApi(NosanaNetwork.MAINNET, testSignerAuth, undefined);
 
     expect(createDeploymentsApi).toHaveBeenCalledWith(
-      { deploymentManager: global.TEST_MOCK_CLIENT, solana: testSignerAuth.solana },
+      {
+        deploymentManager: global.TEST_MOCK_CLIENT,
+        environment: NosanaNetwork.MAINNET,
+        options: undefined,
+        solana: testSignerAuth.solana,
+      },
       false
     );
   });
@@ -79,6 +84,27 @@ describe('createNosanaApi', () => {
   test('it should create deployments API with hasApiKey=true for ApiKey', () => {
     createNosanaApi(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
 
-    expect(createDeploymentsApi).toHaveBeenCalledWith({ deploymentManager: global.TEST_MOCK_CLIENT }, true);
+    expect(createDeploymentsApi).toHaveBeenCalledWith(
+      { deploymentManager: global.TEST_MOCK_CLIENT, environment: NosanaNetwork.MAINNET, options: undefined },
+      true
+    );
+  });
+
+  test('under API key auth jobs is callable and node info is exposed (client-manager-signed)', () => {
+    const api = createNosanaApi(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
+    expect(typeof api.jobs).toBe('function');
+    expect('node' in api).toBe(true);
+  });
+
+  test('with SignerAuth jobs is callable and node info is exposed', () => {
+    const api = createNosanaApi(NosanaNetwork.MAINNET, testSignerAuth, undefined);
+    expect(typeof api.jobs).toBe('function');
+    expect('node' in api).toBe(true);
+  });
+
+  test('without auth jobs is query-methods only and there is no node', () => {
+    const api = createNosanaApi(NosanaNetwork.MAINNET, undefined, undefined);
+    expect(typeof api.jobs).toBe('object');
+    expect('node' in api).toBe(false);
   });
 });

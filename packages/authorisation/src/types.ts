@@ -22,6 +22,8 @@ export type ValidateOptions = {
 export type GenerateOptions = {
   includeTime: boolean;
   separator: string;
+  /** Sign without reading or writing the authorization store. */
+  skipCache?: boolean;
 };
 
 export type SignMessageFn = (message: Uint8Array) => Promise<Uint8Array>;

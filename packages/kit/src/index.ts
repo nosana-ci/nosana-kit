@@ -244,6 +244,11 @@ export type {
   SignedBatchTransaction,
 } from './services/solana/SolanaService.js';
 
+/**
+ * @group @nosana/ssh
+ */
+export * from '@nosana/ssh';
+
 // ============================================================================
 // @nosana/kit - Configuration
 // ============================================================================
@@ -580,6 +585,10 @@ export type {
   DeploymentState,
   DeploymentJob,
   DeploymentDuplicateOptions,
+  DeploymentSsh,
+  DeploymentSshKeys,
+  DeploymentSshKeysBody,
+  DeploymentSshKeysResult,
   Vault,
   TopupVaultOptions,
   DeploymentsApi,

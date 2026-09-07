@@ -40,6 +40,7 @@
     "@nosana/ipfs": "workspace:*",
     "@nosana/jobs-program": "workspace:*",
     "@nosana/merkle-distributor-program": "workspace:*",
+    "@nosana/ssh": "workspace:*",
     "@nosana/stake-program": "workspace:*",
     "@nosana/types": "workspace:*",
     "@solana-program/compute-budget": "0.12.0",

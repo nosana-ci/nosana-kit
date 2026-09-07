@@ -1,3 +1,4 @@
+import type { NodeJobApi } from '../node/types.js';
 import type { operations } from '../../client/blockchain-indexer/schema.js';
 import type { operations as clientManagerOperations } from '../../client/client-manager/schema.js';
 
@@ -80,7 +81,14 @@ export interface NosanaJobBatchOptions {
   idempotencyKey: string;
 }
 
-export interface NosanaJobsApi {
+/**
+ * A job's current state (from the indexer) merged with the node job API, so
+ * `jobs(id).ssh`, `jobs(id).terminal` and `jobs(id).state` are all reachable
+ * directly off the one object.
+ */
+export type NodeJob = Job & NodeJobApi;
+
+export interface NosanaJobsApiMethods {
   get: (
     request: NosanaApiGetJobByAddressRequest,
   ) => Promise<NosanaApiGetJobByAddressResponse>;
@@ -111,3 +119,13 @@ export interface NosanaJobsApi {
   getCount: (request?: JobCountRequest) => Promise<JobCountResponse>;
   getBatch: (request: JobBatchRequest) => Promise<Job[]>;
 }
+
+/**
+ * Callable: `jobs(address)` fetches the job's current state and merges it with
+ * the node job API (`jobs(id).ssh.add(key)`). The indexer query methods hang
+ * off the same object.
+ */
+export type NosanaJobsApi = ((address: string) => Promise<NodeJob>) & NosanaJobsApiMethods;
+
+/** The jobs API without node access (unauthenticated): the indexer query methods only. */
+export type NosanaApiKeyJobsApi = NosanaJobsApiMethods;

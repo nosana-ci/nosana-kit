@@ -10,6 +10,7 @@
     { "path": "../ipfs" },
     { "path": "../endpoints" },
     { "path": "../api" },
+    { "path": "../ssh" },
     { "path": "../generated_clients/jobs" },
     { "path": "../generated_clients/stake" },
     { "path": "../generated_clients/merkle_distributor" }

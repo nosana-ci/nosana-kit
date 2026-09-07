@@ -6,6 +6,7 @@
     { "path": "./packages/ipfs" },
     { "path": "./packages/endpoints" },
     { "path": "./packages/api" },
+    { "path": "./packages/ssh" },
     { "path": "./packages/generated_clients/jobs" },
     { "path": "./packages/generated_clients/stake" },
     { "path": "./packages/generated_clients/merkle_distributor" },
