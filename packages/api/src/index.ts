@@ -8,7 +8,6 @@ import { NosanaAuthApi } from './routes/auth/types.js';
 import {
   createNosanaJobsApi,
   type NosanaJobsApi,
-  type NosanaApiKeyJobsApi,
   createNosanaCreditsApi,
   type NosanaCreditsApi,
   createNosanaMarketsApi,
@@ -71,7 +70,7 @@ export interface NosanaApi {
 
 /**
  * API-key auth: a node still verifies the job owner's signature, but the client
- * manager signs on the caller's behalf — so node access (`jobs(id)`, `node`) is
+ * manager signs on the caller's behalf — so node access (`jobs.get(id)`, `node`) is
  * available, without a local wallet. No vault (that needs a signer).
  */
 export interface NosanaApiWithApiKey {
@@ -93,25 +92,11 @@ export interface NosanaApiWithApiKey {
 }
 
 /**
- * Unauthenticated: only the public, indexer-backed reads. There is no signer, so
- * a job's node cannot be reached — `jobs` is the query methods only, and there
- * is no `node`.
+ * Unauthenticated: the public, indexer-backed reads. The shape is the API-key
+ * one so `jobs.get(id)` is the same object under every auth mode; but a node
+ * verifies the job owner's signature, so without a signer its calls fail.
  */
-export interface NosanaPublicApi {
-  auth: NosanaAuthApi;
-  jobs: NosanaApiKeyJobsApi;
-  credits: NosanaCreditsApi;
-  markets: NosanaMarketsApi;
-  deployments: ApiDeploymentsApi;
-  user: NosanaUserApi;
-  templates: NosanaTemplatesApi;
-  hosts: NosanaHostsApi;
-  stats: NosanaStatsApi;
-  payments: NosanaPaymentsApi;
-  newsletter: NosanaNewsletterApi;
-  benchmarks: NosanaBenchmarksApi;
-  clients: NosanaClients;
-}
+export type NosanaPublicApi = NosanaApiWithApiKey;
 
 export type NosanaApiClient = NosanaApi | NosanaApiWithApiKey | NosanaPublicApi;
 
@@ -172,22 +157,15 @@ export function createNosanaApi(
     typeof signerOrApiKey === 'string'
       ? { generate: (message) => auth.signHeader(message) }
       : signerOrApiKey;
-  const node = nodeAuth
-    ? createNosanaNodeApi({ environment, authParams: nodeAuth, options })
-    : undefined;
+  const node = createNosanaNodeApi({ environment, authParams: nodeAuth, options });
 
   return {
     auth,
-    jobs: node
-      ? createNosanaJobsApi({
-          blockchainIndexer: clients.blockchainIndexer,
-          clientManager: clients.clientManager,
-          node,
-        })
-      : createNosanaJobsApi({
-          blockchainIndexer: clients.blockchainIndexer,
-          clientManager: clients.clientManager,
-        }),
+    jobs: createNosanaJobsApi({
+      blockchainIndexer: clients.blockchainIndexer,
+      clientManager: clients.clientManager,
+      node,
+    }),
     credits: createNosanaCreditsApi({ clientManager: clients.clientManager }),
     markets: createNosanaMarketsApi({ hostManager: clients.hostManager }),
     deployments:
@@ -218,7 +196,7 @@ export function createNosanaApi(
       clientManager: clients.clientManager,
     }),
     benchmarks: createNosanaBenchmarksApi({ hostManager: clients.hostManager }),
-    ...(node ? { node: (address: string) => node(address).info() } : {}),
+    node: (address: string) => node(address).info(),
     clients,
   };
 }

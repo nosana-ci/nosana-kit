@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 
 import { createNosanaApi, NosanaNetwork } from '../index.js';
 import { createBlockchainIndexerClient } from '../client/index.js';
@@ -90,21 +90,30 @@ describe('createNosanaApi', () => {
     );
   });
 
-  test('under API key auth jobs is callable and node info is exposed (client-manager-signed)', () => {
+  test('under API key auth jobs.get reaches the node and node info is exposed (client-manager-signed)', async () => {
+    (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({ data: global.TEST_MOCK_JOB, error: null });
     const api = createNosanaApi(NosanaNetwork.MAINNET, global.TEST_API_KEY, undefined);
-    expect(typeof api.jobs).toBe('function');
+    const job = await api.jobs.get('job');
+    expect(job).toMatchObject(global.TEST_MOCK_JOB);
+    expect(job.ssh).toBeDefined();
     expect('node' in api).toBe(true);
   });
 
-  test('with SignerAuth jobs is callable and node info is exposed', () => {
+  test('with SignerAuth jobs.get reaches the node and node info is exposed', async () => {
+    (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({ data: global.TEST_MOCK_JOB, error: null });
     const api = createNosanaApi(NosanaNetwork.MAINNET, testSignerAuth, undefined);
-    expect(typeof api.jobs).toBe('function');
+    const job = await api.jobs.get('job');
+    expect(job).toMatchObject(global.TEST_MOCK_JOB);
+    expect(job.ssh).toBeDefined();
     expect('node' in api).toBe(true);
   });
 
-  test('without auth jobs is query-methods only and there is no node', () => {
+  test('without auth jobs.get has the same shape; the node decides what it answers', async () => {
+    (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({ data: global.TEST_MOCK_JOB, error: null });
     const api = createNosanaApi(NosanaNetwork.MAINNET, undefined, undefined);
-    expect(typeof api.jobs).toBe('object');
-    expect('node' in api).toBe(false);
+    const job = await api.jobs.get('job');
+    expect(job).toMatchObject(global.TEST_MOCK_JOB);
+    expect(job.ssh).toBeDefined();
+    expect('node' in api).toBe(true);
   });
 });

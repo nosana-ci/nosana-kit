@@ -1713,8 +1713,8 @@ MIT
 ## SSH access
 
 Keys are granted on the node running a job, through the node job API:
-`(await client.api.jobs(job)).ssh` lists, adds and removes keys and describes the
-`ssh` command to connect with. `client.api.jobs(job)` finds the node for you and
+`(await client.api.jobs.get(job)).ssh` lists, adds and removes keys and describes the
+`ssh` command to connect with. `client.api.jobs.get(job)` finds the node for you and
 returns the job's current state merged with its node API; it works under both
 wallet and API-key auth. Key pairs and key validation come from
 [`@nosana/ssh`](../ssh), which the kit re-exports. See the

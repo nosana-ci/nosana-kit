@@ -83,10 +83,9 @@ export interface NosanaJobBatchOptions {
 
 /**
  * A job's current state (from the indexer) merged with the node job API, so
- * `jobs(id).ssh`, `jobs(id).terminal` and `jobs(id).state` are all reachable
- * directly off the one object.
+ * `jobs.get(id)` answers `state`, `ssh` and `terminal` on the one object.
  */
-export type NodeJob = Job & NodeJobApi;
+export type NodeJob = NosanaApiGetJobByAddressResponse & NodeJobApi;
 
 export interface NosanaJobsApiMethods {
   get: (
@@ -121,11 +120,13 @@ export interface NosanaJobsApiMethods {
 }
 
 /**
- * Callable: `jobs(address)` fetches the job's current state and merges it with
- * the node job API (`jobs(id).ssh.add(key)`). The indexer query methods hang
- * off the same object.
+ * Authenticated: `get` returns the job's current state merged with its node
+ * job API, so `(await jobs.get(id)).ssh.add(key)` works. Until a node picks the
+ * job up, the node methods are present but fail saying so.
  */
-export type NosanaJobsApi = ((address: string) => Promise<NodeJob>) & NosanaJobsApiMethods;
+export type NosanaJobsApi = Omit<NosanaJobsApiMethods, 'get'> & {
+  get: (request: NosanaApiGetJobByAddressRequest) => Promise<NodeJob>;
+};
 
-/** The jobs API without node access (unauthenticated): the indexer query methods only. */
+/** The jobs API built without a node API: the indexer and client-manager methods only. */
 export type NosanaApiKeyJobsApi = NosanaJobsApiMethods;

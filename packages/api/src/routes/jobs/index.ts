@@ -2,7 +2,7 @@ import { errorFormatter } from '../../utils/errorFormatter.js';
 
 import type { BlockchainIndexerClient } from '../../client/blockchain-indexer/index.js';
 import type { ClientManagerClient } from '../../client/client-manager/index.js';
-import type { NosanaNodeApi } from '../node/types.js';
+import type { NodeJobApi, NosanaNodeApi } from '../node/types.js';
 import type {
   NosanaJobsApi,
   NosanaApiKeyJobsApi,
@@ -276,16 +276,52 @@ export function createNosanaJobsApi(
 
   if (!node) return api;
 
-  // `jobs(address)`: the job's current state from the indexer, merged flat with
-  // the node job API so `jobs(id).ssh`, `jobs(id).terminal` and `jobs(id).state`
-  // all live on the one object.
-  const jobs = async (address: string): Promise<NodeJob> => {
-    const current = await get(address);
-    if (!current.node) {
-      throw new Error(`Job ${address} has no assigned node.`);
-    }
-    return Object.assign({}, current, node(current.node).job(address)) as NodeJob;
+  return {
+    ...api,
+    // The job's current state from the indexer, merged flat with its node job
+    // API, so state, `ssh` and `terminal` all live on the one object. The
+    // indexer's fields win: they are the state, the node API only names the job.
+    async get(address: NosanaApiGetJobByAddressRequest): Promise<NodeJob> {
+      const current = await get(address);
+      const onNode = current.node ? node(current.node).job(address) : unassignedNodeJob(address);
+      return { ...onNode, ...current };
+    },
   };
+}
 
-  return Object.assign(jobs, api) as NosanaJobsApi;
+/**
+ * The node job API of a job no node has picked up yet. Its state is real, but
+ * nothing can be asked of a node, so every call fails saying so rather than
+ * with a DNS error for a host that does not exist. Typed as the full API so
+ * a new node method cannot be forgotten here.
+ */
+function unassignedNodeJob(address: string): NodeJobApi {
+  const reason = () => new Error(`Job ${address} has no assigned node.`);
+  const rejects = () => Promise.reject(reason());
+  const throws = () => {
+    throw reason();
+  };
+  return {
+    address,
+    node: '',
+    definition: rejects,
+    setDefinition: rejects,
+    results: rejects,
+    operations: rejects,
+    operation: rejects,
+    group: rejects,
+    restartGroup: rejects,
+    restartOperation: rejects,
+    stopGroup: rejects,
+    stopOperation: rejects,
+    stop: rejects,
+    endpoints: rejects,
+    stats: rejects,
+    streamInfo: throws,
+    streamStats: throws,
+    logs: throws,
+    status: throws,
+    ssh: { keys: rejects, add: rejects, remove: rejects, command: throws },
+    terminal: rejects,
+  };
 }

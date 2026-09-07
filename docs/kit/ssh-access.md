@@ -7,7 +7,7 @@ works with either a wallet or an API key. (Deployments manage keys through the
 deployment manager instead — see `deployment.ssh`.)
 
 ```ts
-const job = await client.api.jobs('JOB_ADDRESS'); // the job's state, merged with its node job API
+const job = await client.api.jobs.get('JOB_ADDRESS'); // the job's state, merged with its node job API
 
 await job.ssh.keys(); // [{ sshPublicKey, expiresAt? }]
 await job.ssh.add(publicKey); // until removed or the job ends

@@ -182,22 +182,22 @@ await vault.topup({ NOS: 100 });
 | `getTemplatePerformance` | `nodeId: string` | `Promise<Record<string, unknown>>` |
 | `getBenchmarkSummary` | `request?: BenchmarkSummaryRequest` | `Promise<Record<string, unknown>>` |
 
-### `api.node` / `api.jobs(job)` — Node access
+### `api.node` / `api.jobs.get(job)` — Node access
 
 A node verifies the job owner's signature, and the client manager signs on the
-caller's behalf — so node access works under both wallet and API-key auth, and is
-absent only when unauthenticated.
+caller's behalf — so node access works under both wallet and API-key auth. It has
+the same shape unauthenticated, but then the node refuses what needs a signer.
 
 | Call | Parameters | Returns |
 |--------|-----------|---------|
 | `node(address)` | `address: string` | `Promise<NodeInfo>` — a node's public info |
-| `jobs(job)` | `job: string` | `Promise<Job & NodeJobApi>` — the job's current indexer state flat-merged with its node job API |
+| `jobs.get(job)` | `job: string` | `Promise<Job & NodeJobApi>` — the job's current indexer state flat-merged with its node job API |
 
-`jobs` is callable **and** an object: the indexer query methods (`get`, `getAll`,
-`list`, …) hang off it, so `(await api.jobs(id)).ssh.add(key)` and `api.jobs.list(...)`
-both work.
+`jobs.get` returns the job's state with its node job API on the same object, so
+`(await api.jobs.get(id)).ssh.add(key)` works. Until a node picks the job up, the
+node methods are present but fail saying so.
 
-**Node job methods** (on `await api.jobs(job)`, alongside the job's indexer fields):
+**Node job methods** (on `await api.jobs.get(job)`, alongside the job's indexer fields):
 
 | Method | Parameters | Returns |
 |--------|-----------|---------|
