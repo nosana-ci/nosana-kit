@@ -7,17 +7,19 @@ import type { DeploymentDuplicateOptions, DeploymentState } from '../../types.js
 type DeploymentSchema = components['schemas']['Deployment'];
 
 /**
- * @param options Name for the new deployment and whether to start it right away
+ * @param options Optional name and market for the new deployment, and whether to
+ * start it right away
  * @throws Error if there is an error duplicating the deployment
  * @returns Promise<DeploymentSchema> The newly created deployment
  * @description Duplicates the deployment.
- * Creates a new DRAFT deployment (or starts it right away with `autostart`) with
- * the same vault, market, replicas, timeout, strategy, confidentiality and SSH
- * keys, and the source's active revision as its first revision. The source is
- * left untouched.
+ * Creates a new DRAFT deployment (or starts it right away with `autostart`) named
+ * `name`, defaulting to "<source name> (copy)", on the source's market unless
+ * `market` is given, with the same vault, replicas, timeout, strategy,
+ * confidentiality and SSH keys, and the source's active revision as its first
+ * revision. The source is left untouched.
  */
 export async function deploymentDuplicate(
-  options: DeploymentDuplicateOptions,
+  options: DeploymentDuplicateOptions | undefined,
   client: DeploymentManagerClient,
   state: DeploymentState,
 ): Promise<DeploymentSchema> {
@@ -25,7 +27,7 @@ export async function deploymentDuplicate(
     '/deployments/{deployment}/duplicate',
     {
       params: { path: { deployment: state.id } },
-      body: options,
+      body: options ?? {},
     },
   );
 

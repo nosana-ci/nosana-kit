@@ -92,7 +92,7 @@ export type DeploymentJobsSearchParams = paths['/deployments/{deployment}/jobs']
 export type DeploymentEventsSearchParams = paths['/deployments/{deployment}/events']['get']['parameters']['query'];
 export type DeploymentRevisionsSearchParams = paths['/deployments/{deployment}/revisions']['get']['parameters']['query'];
 export type DeploymentAuthHeaderParams = paths['/deployments/{deployment}/header']['get']['parameters']['query'];
-export type DeploymentDuplicateOptions = paths['/deployments/{deployment}/duplicate']['post']['requestBody']['content']['application/json'];
+export type DeploymentDuplicateOptions = NonNullable<paths['/deployments/{deployment}/duplicate']['post']['requestBody']>['content']['application/json'];
 export type DeploymentSshKeys = paths['/deployments/{deployment}/ssh-keys']['get']['responses']['200']['content']['application/json'];
 export type DeploymentSshKeysBody = paths['/deployments/{deployment}/ssh-keys']['post']['requestBody']['content']['application/json'];
 export type DeploymentSshKeysResult = paths['/deployments/{deployment}/ssh-keys']['post']['responses']['200']['content']['application/json'];
@@ -188,14 +188,14 @@ export type ApiDeployment = DeploymentState & {
   updateName: (name: string) => Promise<void>;
   updateMarket: (market: string) => Promise<void>;
   /** Copy this deployment into a new one; the source is left untouched. */
-  duplicate: (options: DeploymentDuplicateOptions) => Promise<ApiDeployment>;
+  duplicate: (options?: DeploymentDuplicateOptions) => Promise<ApiDeployment>;
 };
 
 // Full deployment (with signer auth) - includes vault
 export type Deployment = Omit<ApiDeployment, 'duplicate'> & {
   vault: Vault;
   /** Copy this deployment into a new one; the source is left untouched. */
-  duplicate: (options: DeploymentDuplicateOptions) => Promise<Deployment>;
+  duplicate: (options?: DeploymentDuplicateOptions) => Promise<Deployment>;
 };
 
 // Deployments API interface (with signer auth - includes vault)

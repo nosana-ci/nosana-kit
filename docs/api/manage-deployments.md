@@ -353,7 +353,7 @@ The response will include `status: "ARCHIVED"` when successful.
 
 ## Duplicate a Deployment
 
-Create a copy of an existing deployment. The copy shares the source's vault, market, replicas, timeout, strategy, confidentiality and SSH keys, and starts from the source's active revision as its first revision. It is created as a `DRAFT` unless `autostart` is set. The source deployment is left untouched.
+Create a copy of an existing deployment. The copy shares the source's vault, replicas, timeout, strategy, confidentiality and SSH keys, and starts from the source's active revision as its first revision. It is named `"<source name> (copy)"` unless `name` is given, and runs on the source's market unless `market` is given. It is created as a `DRAFT` unless `autostart` is set. The source deployment is left untouched. The body is optional.
 
 :::tabs
 
@@ -368,6 +368,7 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 // ---cut---
 const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
 const copy = await deployment.duplicate({ name: 'my-copy' }); // new DRAFT deployment
+// pass `market` to run the copy on a different market, or omit the options entirely
 await copy.start(); // the copy is a full deployment object
 ```
 
@@ -384,7 +385,7 @@ curl -s \
 
 :::
 
-The response is the new deployment. In the SDK, `duplicate()` returns a full deployment object with the same methods as `get()`, so you can call `start()`, `updateReplicaCount()`, `stream()` and so on directly on the copy. Pass `autostart: true` to have the API start it for you instead.
+The response is the new deployment. In the SDK, `duplicate()` returns a full deployment object with the same methods as `get()`, so you can call `start()`, `updateReplicaCount()`, `stream()` and so on directly on the copy. Pass `autostart: true` to have the API start it for you instead, and `market` to place the copy on a different market than the source.
 
 ## Manage SSH Keys
 

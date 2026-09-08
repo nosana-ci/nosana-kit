@@ -99,6 +99,7 @@ async function command() {
       return await deployment.duplicate({
         name: args[2],
         autostart: args[3] === 'true',
+        market: args[4],
       });
     case 'createAndDeploy':
       return await client.api.deployments.pipe(

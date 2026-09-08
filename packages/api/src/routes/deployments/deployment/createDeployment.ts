@@ -183,15 +183,18 @@ export function createDeployment(
   };
 
   /**
-   * @param options Name for the new deployment and whether to start it right away
+   * @param options Optional name and market for the new deployment, and whether to
+   * start it right away
    * @throws Error if there is an error duplicating the deployment
    * @returns Promise<Deployment | ApiDeployment> The newly created deployment
    * @description Duplicates the deployment.
-   * The copy shares the vault, market, replicas, timeout, strategy, confidentiality
-   * and SSH keys, and starts from this deployment's active revision. It is left as
-   * a DRAFT unless `autostart` is set. This deployment is left untouched.
+   * The copy shares the vault, replicas, timeout, strategy, confidentiality and SSH
+   * keys, and starts from this deployment's active revision. It is named
+   * "<source name> (copy)" unless `name` is given, runs on this deployment's market
+   * unless `market` is given, and is left as a DRAFT unless `autostart` is set. This
+   * deployment is left untouched.
    */
-  const duplicate = async (options: DeploymentDuplicateOptions) => {
+  const duplicate = async (options?: DeploymentDuplicateOptions) => {
     const copy = await deploymentDuplicate(options, client, state);
 
     return !hasApiKey && 'solana' in clients
