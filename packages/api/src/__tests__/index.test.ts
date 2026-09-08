@@ -3,6 +3,13 @@ import { vi, type Mock } from 'vitest';
 import { createNosanaApi, NosanaNetwork } from '../index.js';
 import { createBlockchainIndexerClient } from '../client/index.js';
 import { createDeploymentsApi } from '../routes/deployments/index.js';
+import { createNosanaNodeApi } from '../routes/node/index.js';
+
+// Real node API, wrapped so tests can see what auth it was built with.
+vi.mock('../routes/node/index.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../routes/node/index.js')>();
+  return { ...actual, createNosanaNodeApi: vi.fn(actual.createNosanaNodeApi) };
+});
 
 vi.mock('../client/index.js', () => ({
   createNosanaClientManagerApiClient: vi.fn(() => global.TEST_MOCK_CLIENT),
@@ -115,5 +122,24 @@ describe('createNosanaApi', () => {
     expect(job).toMatchObject(global.TEST_MOCK_JOB);
     expect(job.ssh).toBeDefined();
     expect('node' in api).toBe(true);
+  });
+
+  test('without auth or cookies the node client stays unsigned', () => {
+    createNosanaApi(NosanaNetwork.MAINNET, undefined, undefined);
+
+    const { authParams } = (createNosanaNodeApi as Mock).mock.calls.at(-1)![0];
+    expect(authParams).toBeUndefined();
+  });
+
+  test('under cookie auth node requests are signed by the client manager, like API-key auth', async () => {
+    (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: { signature: 'sig' }, error: null });
+    createNosanaApi(NosanaNetwork.MAINNET, undefined, { include_credentials: true });
+
+    const { authParams } = (createNosanaNodeApi as Mock).mock.calls.at(-1)![0];
+    await expect(authParams.generate('NosanaApiAuthentication')).resolves.toBe('NosanaApiAuthentication:sig');
+    expect(global.TEST_MOCK_CLIENT.POST).toHaveBeenCalledWith(
+      '/auth/sign-message/external',
+      expect.objectContaining({ body: expect.objectContaining({ message: 'NosanaApiAuthentication' }) }),
+    );
   });
 });

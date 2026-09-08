@@ -150,13 +150,14 @@ export function createNosanaApi(
   const hasApiKey = typeof signerOrApiKey === 'string';
   const clients = createClients(environment, signerOrApiKey, options);
   const auth = createNosanaAuthApi(clients.clientManager);
-  // A node verifies a signed header against the job owner, so an API-key caller
-  // reaches it through the client manager's signing service (custodial key) —
-  // signed lazily, per request, so headers stay fresh and cost nothing until used.
-  const nodeAuth: SignedHeaderAuth | undefined =
-    typeof signerOrApiKey === 'string'
-      ? { generate: (message) => auth.signHeader(message) }
-      : signerOrApiKey;
+  // A node verifies a signed header against the job owner, so a caller without a
+  // local wallet — an API key, or a browser session carried by cookies — reaches
+  // it through the client manager's signing service (custodial key), signed
+  // lazily, per request, so headers stay fresh and cost nothing until used.
+  const custodialSigning = hasApiKey || (!signerOrApiKey && Boolean(options?.include_credentials));
+  const nodeAuth: SignedHeaderAuth | undefined = custodialSigning
+    ? { generate: (message) => auth.signHeader(message) }
+    : signerOrApiKey;
   const node = createNosanaNodeApi({ environment, authParams: nodeAuth, options });
 
   return {
