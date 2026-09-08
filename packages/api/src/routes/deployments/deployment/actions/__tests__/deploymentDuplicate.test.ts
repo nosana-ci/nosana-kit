@@ -48,6 +48,37 @@ describe('deploymentDuplicate', () => {
       expect(mockState.name).toBe(global.TEST_MOCK_DEPLOYMENT.name);
     });
 
+    it('should pass market through to the api', async () => {
+      await deploymentDuplicate(
+        { name: 'copied-deployment', market: 'MarketId1111111111111111111111111111111111' },
+        mockClient,
+        mockState,
+      );
+
+      expect(mockClient.POST).toHaveBeenCalledWith(
+        '/deployments/{deployment}/duplicate',
+        {
+          params: { path: { deployment: mockState.id } },
+          body: {
+            name: 'copied-deployment',
+            market: 'MarketId1111111111111111111111111111111111',
+          },
+        },
+      );
+    });
+
+    it('should send an empty body when no options are given', async () => {
+      await deploymentDuplicate(undefined, mockClient, mockState);
+
+      expect(mockClient.POST).toHaveBeenCalledWith(
+        '/deployments/{deployment}/duplicate',
+        {
+          params: { path: { deployment: mockState.id } },
+          body: {},
+        },
+      );
+    });
+
     it('should pass autostart through to the api', async () => {
       await deploymentDuplicate(
         { name: 'copied-deployment', autostart: true },

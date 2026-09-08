@@ -149,7 +149,7 @@ await vault.topup({ NOS: 100 });
 | `updateActiveRevision` | `active_revision: number` | `Promise<void>` |
 | `updateSchedule` | `schedule: string` | `Promise<void>` |
 | `updateMarket` | `market: string` | `Promise<void>` |
-| `duplicate` | `options: DeploymentDuplicateOptions` | `Promise<Deployment>` |
+| `duplicate` | `options?: DeploymentDuplicateOptions` | `Promise<Deployment>` |
 | `generateAuthHeader` | — | `Promise<unknown>` |
 | `ssh.keys` | — | `Promise<string[]>` |
 | `ssh.add` | `publicKeys: string \| string[]` | `Promise<DeploymentUpdateSshKeysResult>` |

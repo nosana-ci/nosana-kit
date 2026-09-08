@@ -1002,7 +1002,7 @@ export interface paths {
             };
         };
         put?: never;
-        /** @description Grant one or more SSH public keys access to the deployment's jobs. */
+        /** @description Grant one or more SSH public keys access to a deployment's jobs. Keys already present (same type and material) are left as they are. The set is stored on the deployment — not on a revision, so nothing is redeployed — and injected into every job posted from now on; new keys are also authorized on the node of every job currently running. */
         post: {
             parameters: {
                 query?: never;
@@ -1021,7 +1021,7 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        /** @description SSH public keys to grant. Keys already present (same type and material) are left as they are; the deployment holds at most 10. */
+                        /** @description SSH public keys, each an OpenSSH line. At most 10 keys total on a deployment; a key already present (same type and material) is left as it is. */
                         public_keys: string[];
                     };
                 };
@@ -1085,7 +1085,7 @@ export interface paths {
                 };
             };
         };
-        /** @description Revoke one or more SSH public keys from the deployment's jobs. */
+        /** @description Revoke one or more SSH public keys from a deployment's jobs. A key is matched by its type and material, so a differing comment still revokes it. The key is removed from the deployment's set (future jobs won't get it) and revoked on the node of every job currently running, so access stops at once rather than only when a job restarts. */
         delete: {
             parameters: {
                 query?: never;
@@ -1104,7 +1104,7 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        /** @description SSH public keys to revoke. A key is matched by type and material, so a differing comment still revokes it. */
+                        /** @description SSH public keys, each an OpenSSH line. At most 10 keys total on a deployment; a key already present (same type and material) is left as it is. */
                         public_keys: string[];
                     };
                 };
@@ -1349,7 +1349,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Duplicate a deployment. Creates a new DRAFT deployment (or starts it right away with `autostart`) with the same vault, market, replicas, timeout, strategy, confidentiality and SSH keys, and the source's active revision as its first revision. The source is left untouched. */
+        /** @description Duplicate a deployment. Creates a new DRAFT deployment named `name` (defaulting to "<source name> (copy)"), or starts it right away with `autostart`, on the source's market unless `market` is given, with the same vault, replicas, timeout, strategy, confidentiality and SSH keys, and the source's active revision as its first revision. The source is left untouched. The body may be omitted. */
         post: {
             parameters: {
                 query?: never;
@@ -1365,11 +1365,13 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody: {
+            requestBody?: {
                 content: {
                     "application/json": {
-                        /** @description Name of the new deployment. */
-                        name: string;
+                        /** @description Name for the new deployment. Defaults to "<source name> (copy)". */
+                        name?: string;
+                        /** @description Market for the new deployment. Defaults to the source deployment's market. */
+                        market?: string;
                         /** @description If true, the new deployment is started immediately after creation instead of being left as a DRAFT. */
                         autostart?: boolean;
                     };
@@ -2567,7 +2569,7 @@ export interface components {
             confidential?: boolean;
             /** @description If true, the deployment is started immediately after creation instead of being left as a DRAFT. */
             autostart?: boolean;
-            /** @description The complete set of SSH public keys allowed to reach this deployment's jobs (at most 10). Replaces the current set; an empty array revokes SSH access. */
+            /** @description SSH public keys, each an OpenSSH line. At most 10 keys total on a deployment; a key already present (same type and material) is left as it is. */
             ssh_public_keys?: string[];
             job_definition: components["schemas"]["JobDefinition"];
         } & ({
@@ -2881,11 +2883,8 @@ export interface components {
                 execution?: {
                     group?: string;
                     timeout?: number;
-                    depends_on: string[];
+                    depends_on?: string[];
                     stop_if_dependent_stops?: boolean;
-                } | {
-                    group?: string;
-                    timeout?: number;
                 };
             }[];
         };
