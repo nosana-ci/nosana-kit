@@ -43,6 +43,18 @@ describe('node job sockets', () => {
     expect(socket.readyState).toBe(3);
   });
 
+  it('reports the socket closing, so a caller can decide to reopen', async () => {
+    const { job, socket, options } = fixture();
+    const onClose = vi.fn();
+
+    job.logs({ onData: vi.fn(), onClose }, undefined, options);
+    await socket.onopen?.(new Event('open'));
+    expect(onClose).not.toHaveBeenCalled();
+
+    socket.onclose?.(new Event('close') as CloseEvent);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it('passes state frames through as they are', async () => {
     const { job, socket, options, message } = fixture();
     const states: unknown[] = [];

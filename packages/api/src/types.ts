@@ -87,6 +87,11 @@ export interface StreamLifecycleHandlers {
   /** The stream opened, or reopened after dropping: resynchronise from here. */
   onOpen?: () => void;
   onError?: (error: unknown) => void;
+  /**
+   * The stream ended and will not reopen by itself. Only sockets report this;
+   * server-sent event streams reconnect on their own.
+   */
+  onClose?: () => void;
 }
 
 export interface DeploymentRouteClients {

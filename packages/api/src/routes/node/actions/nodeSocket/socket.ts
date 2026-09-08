@@ -61,6 +61,7 @@ export function openNodeSocket<T>(
     if (data !== undefined) handlers.onData(data);
   };
   socket.onerror = (event: Event) => handlers.onError?.(event);
+  socket.onclose = () => handlers.onClose?.();
 
   return { close: () => socket.close() };
 }
