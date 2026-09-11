@@ -24,7 +24,6 @@ import {
   SendableTransaction,
   Transaction,
   appendTransactionMessageInstructions,
-  BaseTransactionMessage,
   pipe,
   assertIsSendableTransaction,
   TransactionSigner,
@@ -76,7 +75,7 @@ function estimateAndSetComputeUnitLimitFactory(
   ...params: Parameters<typeof estimateComputeUnitLimitFactory>
 ) {
   const estimateComputeUnitLimit = estimateComputeUnitLimitFactory(...params);
-  return async <T extends BaseTransactionMessage & TransactionMessageWithFeePayer>(
+  return async <T extends TransactionMessage & TransactionMessageWithFeePayer>(
     transactionMessage: T
   ) => {
     const computeUnitsEstimate = await estimateComputeUnitLimit(transactionMessage);
@@ -379,7 +378,7 @@ export interface SolanaService {
    */
   decompileTransaction(
     transaction: Transaction
-  ): BaseTransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime;
+  ): TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime;
   /**
    * Get an instruction to transfer SOL from one address to another.
    *
@@ -1223,7 +1222,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
      */
     decompileTransaction(
       transaction: Transaction
-    ): BaseTransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime {
+    ): TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime {
       try {
         deps.logger.debug('Decompiling transaction to transaction message');
 
