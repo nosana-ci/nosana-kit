@@ -43,10 +43,10 @@
     "@nosana/ssh": "workspace:*",
     "@nosana/stake-program": "workspace:*",
     "@nosana/types": "workspace:*",
-    "@solana-program/compute-budget": "0.12.0",
-    "@solana-program/system": "0.10.0",
-    "@solana-program/token": "0.9.0",
-    "@solana/kit": "5.4.0",
+    "@solana-program/compute-budget": "0.18.1",
+    "@solana-program/system": "0.14.1",
+    "@solana-program/token": "0.16.1",
+    "@solana/kit": "8.3.0",
     "bs58": "^6.0.0"
   },
   "devDependencies": {
