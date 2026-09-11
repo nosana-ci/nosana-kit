@@ -535,3 +535,39 @@ describe('createNosanaJobsApi', () => {
     });
   });
 });
+
+describe('createNosanaJobsApi with node access', () => {
+  it('get merges the job current state with the node job API of the node the indexer reports', async () => {
+    (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({ data: global.TEST_MOCK_JOB, error: null });
+    const nodeJob = { address: 'job', node: global.TEST_MOCK_JOB.node, ssh: { add: vi.fn() } };
+    const node = vi.fn(() => ({ job: vi.fn(() => nodeJob) }));
+
+    const api = createNosanaJobsApi({
+      blockchainIndexer: global.TEST_MOCK_CLIENT,
+      clientManager: global.TEST_MOCK_CLIENT,
+      node: node as never,
+    });
+
+    const result = await api.get('job');
+    expect(node).toHaveBeenCalledWith(global.TEST_MOCK_JOB.node);
+    // The current state and the node job API (ssh, …) are flat-merged onto one object.
+    expect(result).toEqual({ ...global.TEST_MOCK_JOB, ...nodeJob });
+  });
+
+  it('get still answers a job no node has picked up, whose node methods explain that', async () => {
+    const queued = { ...global.TEST_MOCK_JOB, node: '' };
+    (global.TEST_MOCK_CLIENT.GET as Mock).mockResolvedValue({ data: queued, error: null });
+    const node = vi.fn();
+    const api = createNosanaJobsApi({
+      blockchainIndexer: global.TEST_MOCK_CLIENT,
+      clientManager: global.TEST_MOCK_CLIENT,
+      node: node as never,
+    });
+
+    const job = await api.get('job');
+    expect(job).toMatchObject(queued);
+    expect(node).not.toHaveBeenCalled();
+    await expect(job.ssh.add('ssh-ed25519 AAAA')).rejects.toThrow('Job job has no assigned node.');
+    expect(() => job.ssh.command()).toThrow('Job job has no assigned node.');
+  });
+});

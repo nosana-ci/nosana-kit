@@ -121,8 +121,14 @@ await deployment.updateReplicaCount(3);
 await deployment.updateTimeout(120); // minutes
 await deployment.updateSchedule('0 0 * * *');
 await deployment.updateName('new-name');
+await deployment.updateMarket('MARKET_ADDRESS'); // running jobs are relisted on the new market
 await deployment.createRevision(newJobDefinition);
 await deployment.updateActiveRevision(2);
+
+// Copy a deployment (same vault, market, strategy, active revision); source is untouched.
+// The copy is a full deployment object, so drive it like any other:
+const copy = await deployment.duplicate({ name: 'my-copy' });
+await copy.start(); // or pass { autostart: true } to skip this
 ```
 
 `delete()` leaves the vault intact and makes the deployment object unusable.
@@ -283,7 +289,7 @@ where they do, these were checked against the shipped types and the live API.
    stream returns the string union. `deployment.getJob()` is typed
    `string | number`. Normalise on read.
 3. **Two ways in over HTTP.** Calling directly, use the gateway at
-   `https://dashboard.k8s.prd.nos.ci/api` — one host, every route, and a merged
+   `https://api.nosana.com` — one host, every route, and a merged
    OpenAPI spec (see below). The SDK instead calls the four services behind it
    directly — `client-manager` (auth, credits, templates, job writes),
    `blockchain-indexer` (job reads, stats), `deployment-manager` (deployments,
@@ -329,8 +335,8 @@ spec, so you don't need to know which service owns what:
 
 | | |
 |---|---|
-| Spec | `https://dashboard.k8s.prd.nos.ci/api/openapi.json` |
-| Browsable | `https://dashboard.k8s.prd.nos.ci/api/docs` |
+| Spec | `https://api.nosana.com/openapi.json` |
+| Browsable | `https://api.nosana.com/docs` |
 
 Read the spec when you need a route this skill doesn't cover, an exact request
 or response shape, or a query parameter — it is generated from the running

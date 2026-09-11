@@ -1,3 +1,4 @@
+import type { NodeJobApi } from '../node/types.js';
 import type { operations } from '../../client/blockchain-indexer/schema.js';
 import type { operations as clientManagerOperations } from '../../client/client-manager/schema.js';
 
@@ -80,7 +81,13 @@ export interface NosanaJobBatchOptions {
   idempotencyKey: string;
 }
 
-export interface NosanaJobsApi {
+/**
+ * A job's current state (from the indexer) merged with the node job API, so
+ * `jobs.get(id)` answers `state`, `ssh` and `terminal` on the one object.
+ */
+export type NodeJob = NosanaApiGetJobByAddressResponse & NodeJobApi;
+
+export interface NosanaJobsApiMethods {
   get: (
     request: NosanaApiGetJobByAddressRequest,
   ) => Promise<NosanaApiGetJobByAddressResponse>;
@@ -111,3 +118,15 @@ export interface NosanaJobsApi {
   getCount: (request?: JobCountRequest) => Promise<JobCountResponse>;
   getBatch: (request: JobBatchRequest) => Promise<Job[]>;
 }
+
+/**
+ * Authenticated: `get` returns the job's current state merged with its node
+ * job API, so `(await jobs.get(id)).ssh.add(key)` works. Until a node picks the
+ * job up, the node methods are present but fail saying so.
+ */
+export type NosanaJobsApi = Omit<NosanaJobsApiMethods, 'get'> & {
+  get: (request: NosanaApiGetJobByAddressRequest) => Promise<NodeJob>;
+};
+
+/** The jobs API built without a node API: the indexer and client-manager methods only. */
+export type NosanaApiKeyJobsApi = NosanaJobsApiMethods;

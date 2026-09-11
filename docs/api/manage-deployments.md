@@ -52,7 +52,7 @@ const { deployments } = await client.api.deployments.list();
 ```bash
 curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments | jq .
+  https://api.nosana.com/deployments | jq .
 ```
 
 :::
@@ -78,7 +78,7 @@ const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
 ```bash
 curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID | jq .
 ```
 
 :::
@@ -125,7 +125,7 @@ curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d @job-definition.json \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/create-revision | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/create-revision | jq .
 ```
 
 :::
@@ -157,7 +157,7 @@ curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"replicas": 3}' \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/update-replica-count | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-replica-count | jq .
 ```
 
 :::
@@ -187,7 +187,7 @@ curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"schedule": "0 0 * * *"}' \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/update-schedule | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-schedule | jq .
 ```
 
 :::
@@ -220,7 +220,39 @@ curl -s \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"timeout": 120}' \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/update-timeout | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-timeout | jq .
+```
+
+:::
+
+## Update Market
+
+Move a deployment to a different market. If the deployment is `RUNNING`, its current jobs are stopped and relisted on the new market: `SIMPLE` and `SIMPLE-EXTEND` relist the stopped count immediately, `INFINITE` refills each stopped replica, and `SCHEDULED` lists on its next scheduled run.
+
+:::tabs
+
+== TypeScript SDK
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
+await deployment.updateMarket('NEW_MARKET_ADDRESS');
+```
+
+== HTTP API
+
+```bash
+curl -s \
+  -X PATCH \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"market": "NEW_MARKET_ADDRESS"}' \
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-market | jq .
 ```
 
 :::
@@ -250,7 +282,7 @@ await deployment.start();
 curl -s \
   -X POST \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/YOUR_DEPLOYMENT_ID/start | jq .
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/start | jq .
 ```
 
 :::
@@ -280,7 +312,7 @@ await deployment.stop();
 curl -s \
   -X POST \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/<deployment_id>/stop | jq .
+  https://api.nosana.com/deployments/<deployment_id>/stop | jq .
 ```
 
 :::
@@ -312,12 +344,92 @@ await deployment.archive();
 curl -s \
   -X POST \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
-  https://dashboard.k8s.prd.nos.ci/api/deployments/<deployment_id>/archive | jq .
+  https://api.nosana.com/deployments/<deployment_id>/archive | jq .
 ```
 
 :::
 
 The response will include `status: "ARCHIVED"` when successful.
+
+## Duplicate a Deployment
+
+Create a copy of an existing deployment. The copy shares the source's vault, replicas, timeout, strategy, confidentiality and SSH keys, and starts from the source's active revision as its first revision. It is named `"<source name> (copy)"` unless `name` is given, and runs on the source's market unless `market` is given. It is created as a `DRAFT` unless `autostart` is set. The source deployment is left untouched. The body is optional.
+
+:::tabs
+
+== TypeScript SDK
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
+const copy = await deployment.duplicate({ name: 'my-copy' }); // new DRAFT deployment
+// pass `market` to run the copy on a different market, or omit the options entirely
+await copy.start(); // the copy is a full deployment object
+```
+
+== HTTP API
+
+```bash
+curl -s \
+  -X POST \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-copy", "autostart": true}' \
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/duplicate | jq .
+```
+
+:::
+
+The response is the new deployment. In the SDK, `duplicate()` returns a full deployment object with the same methods as `get()`, so you can call `start()`, `updateReplicaCount()`, `stream()` and so on directly on the copy. Pass `autostart: true` to have the API start it for you instead, and `market` to place the copy on a different market than the source.
+
+## Manage SSH Keys
+
+Grant or revoke SSH access to a deployment's jobs. Keys are stored on the deployment (no new revision or restart) and injected into every job posted from then on. Running jobs are updated in place where their node allows it; a removed key stops working on a running job only when that job restarts.
+
+:::tabs
+
+== TypeScript SDK
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
+const publicKey = 'ssh-ed25519 AAAA... you@example.com';
+
+const { jobs } = await deployment.ssh.add(publicKey); // per running job: did its node accept the key?
+const keys = await deployment.ssh.keys(); // now includes publicKey
+await deployment.ssh.remove(publicKey);
+```
+
+== HTTP API
+
+```bash
+# List the keys
+curl -s \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/ssh-keys | jq .
+
+# Replace the complete set (an empty array revokes access)
+curl -s \
+  -X PATCH \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"public_keys": ["ssh-ed25519 AAAA... you@example.com"]}' \
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-ssh-keys | jq .
+```
+
+:::
+
+`add` and `remove` accept one key or a list, and identify a key by its type and material, so a differing comment neither adds a duplicate nor misses a removal. Both return the stored set plus `jobs`, one entry per running job, saying whether its node accepted the change. The HTTP API replaces the whole set in one call.
 
 ## Pipe Multiple Deployment Operations (SDK Only)
 
@@ -380,4 +492,4 @@ This example gets a deployment, updates its replica count and timeout, and then 
 
 ## Full API Reference
 
-For all deployment endpoints and fields, consult the **[API Swagger reference](https://dashboard.k8s.prd.nos.ci/api/swagger)**.
+For all deployment endpoints and fields, consult the **[API Swagger reference](https://api.nosana.com/api/docs)**.

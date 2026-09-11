@@ -41,7 +41,7 @@ console.log('Available Credits:', balance.assignedCredits - balance.reservedCred
 == HTTP API
 
 ```bash
-curl -X GET https://dashboard.k8s.prd.nos.ci/api/credits/balance \
+curl -X GET https://api.nosana.com/credits/balance \
   -H "Authorization: Bearer nos_xxx_your_api_key"
 ```
 

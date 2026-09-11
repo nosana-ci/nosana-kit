@@ -4,7 +4,7 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "references": [{ "path": "../types" }],
+  "references": [{ "path": "../types" }, { "path": "../ssh" }, { "path": "../authorisation" }],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "tests", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

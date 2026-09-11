@@ -56,3 +56,6 @@ one (or two) of them:
 
 You never need these URLs when using the SDK — they are resolved from the
 network configuration. They matter when calling the HTTP API directly.
+
+All four services are also reachable through a single proxy at
+`https://api.nosana.com`.

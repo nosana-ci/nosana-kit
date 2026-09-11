@@ -8,6 +8,7 @@ export const defaultConfig: Record<typeof NosanaNetwork[keyof typeof NosanaNetwo
     host_manager_url: 'https://host-manager.k8s.prd.nosana.com',
     blockchain_indexer_url: 'https://blockchain-indexer.k8s.prd.nos.ci',
     deployment_manager_url: 'https://deployment-manager.k8s.prd.nos.ci',
+    node_domain: 'node.k8s.prd.nos.ci',
     nos_address: NOS_MINT_ADDRESSES[NosanaNetwork.MAINNET]
   },
   [NosanaNetwork.DEVNET]: {
@@ -15,6 +16,7 @@ export const defaultConfig: Record<typeof NosanaNetwork[keyof typeof NosanaNetwo
     host_manager_url: 'https://host-manager.k8s.dev.nosana.com',
     blockchain_indexer_url: 'https://blockchain-indexer.k8s.dev.nos.ci',
     deployment_manager_url: 'https://deployment-manager.k8s.dev.nos.ci',
+    node_domain: 'node.k8s.dev.nos.ci',
     nos_address: NOS_MINT_ADDRESSES[NosanaNetwork.DEVNET]
   },
   [NosanaNetwork.LOCALNET]: {
@@ -22,6 +24,7 @@ export const defaultConfig: Record<typeof NosanaNetwork[keyof typeof NosanaNetwo
     host_manager_url: 'http://localhost:3004',
     blockchain_indexer_url: 'http://localhost:3003',
     deployment_manager_url: 'http://localhost:3001',
+    node_domain: 'node.k8s.dev.nos.ci',
     nos_address: NOS_MINT_ADDRESSES[NosanaNetwork.LOCALNET]
   }
 };

@@ -78,7 +78,7 @@ console.log('Message is valid:', isValid);
 
 // Generate HTTP header signatures for API requests
 // generateHeaders takes a message string and optional options
-const requestMessage = 'POST /api/jobs';
+const requestMessage = 'POST /jobs';
 const headers: Headers = await client.authorization.generateHeaders(requestMessage, {
   expiry: Date.now() + 3600000, // 1 hour from now
   key: 'authorization',
@@ -87,7 +87,7 @@ const headers: Headers = await client.authorization.generateHeaders(requestMessa
 });
 
 // Use headers in HTTP request
-fetch('https://api.nosana.com/api/jobs', {
+fetch('https://api.nosana.com/jobs', {
   method: 'POST',
   headers: headers,
   body: JSON.stringify({ data: 'example' }),

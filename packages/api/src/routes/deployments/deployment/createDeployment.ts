@@ -6,6 +6,7 @@ import {
   deploymentGetJob,
   deploymentGetJobs,
   deploymentGetRevisions,
+  deploymentGetSshKeys,
   deploymentArchive,
   deploymentUpdateReplicaCount,
   deploymentGetTasks,
@@ -13,11 +14,16 @@ import {
   deploymentCreateNewRevision,
   deploymentUpdateActiveRevision,
   deploymentUpdateSchedule,
+  deploymentAddSshKeys,
+  deploymentRemoveSshKeys,
   deploymentUpdateName,
   deploymentGenerateAuthHeader,
   deploymentDelete,
+  deploymentUpdateMarket,
+  deploymentDuplicate,
 } from './actions/index.js';
 import { createVault } from './createVault.js';
+import { createNosanaNodeApi } from '../../node/index.js';
 
 import type {
   JobDefinition,
@@ -27,19 +33,24 @@ import type {
   PaginationParams,
   TaskListResult,
   JobListResult,
+  DeploymentNodeJob,
+  NodeJobListResult,
   RevisionListResult,
   EventListResult,
   DeploymentJobsSearchParams,
   DeploymentRevisionsSearchParams,
   DeploymentEventsSearchParams,
   DeploymentAuthHeaderParams,
+  DeploymentDuplicateOptions,
   DeploymentStreamHandlers,
   DeploymentStreamSubscription,
+  DeploymentSshKeysResult,
 } from '../types.js';
 import type {
   DeploymentRouteClients,
   DeploymentRouteClientsWithSigner,
 } from '../../../types.js';
+import type { NodeJobApi } from '../../node/types.js';
 import type { components } from '../../../client/deployment-manager/schema.js';
 
 type DeploymentSchema = components['schemas']['Deployment'];
@@ -161,6 +172,37 @@ export function createDeployment(
   };
 
   /**
+   * @param market New market address for the deployment
+   * @throws Error if there is an error updating the market
+   * @returns Promise<void>
+   * @description Updates the market of the deployment.
+   * A RUNNING deployment's current jobs are stopped and relisted on the new market.
+   */
+  const updateMarket = async (market: string) => {
+    await deploymentUpdateMarket(market, client, state);
+  };
+
+  /**
+   * @param options Optional name and market for the new deployment, and whether to
+   * start it right away
+   * @throws Error if there is an error duplicating the deployment
+   * @returns Promise<Deployment | ApiDeployment> The newly created deployment
+   * @description Duplicates the deployment.
+   * The copy shares the vault, replicas, timeout, strategy, confidentiality and SSH
+   * keys, and starts from this deployment's active revision. It is named
+   * "<source name> (copy)" unless `name` is given, runs on this deployment's market
+   * unless `market` is given, and is left as a DRAFT unless `autostart` is set. This
+   * deployment is left untouched.
+   */
+  const duplicate = async (options?: DeploymentDuplicateOptions) => {
+    const copy = await deploymentDuplicate(options, client, state);
+
+    return !hasApiKey && 'solana' in clients
+      ? createDeployment(copy, clients, false)
+      : createDeployment(copy, clients, true);
+  };
+
+  /**
    * @param active_revision
    * @throws Error if there is an error updating the active revision
    * @returns Promise<void>
@@ -192,22 +234,86 @@ export function createDeployment(
     return await deploymentGenerateAuthHeader(client, state, query);
   };
 
-  const getJob = async (job: string) => {
-    return await deploymentGetJob(client, state.id, job);
+  /**
+   * @description SSH key management for the deployment's jobs.
+   * Keys are stored on the deployment (no new revision or restart) and injected
+   * into every job posted from then on. Running jobs are updated in place where
+   * their node allows it; check the returned `jobs` for nodes that did not.
+   */
+  const ssh = {
+    /**
+     * @throws Error if there is an error fetching the keys
+     * @returns Promise<string[]> The SSH public keys currently granted access
+     */
+    keys: async (): Promise<string[]> => {
+      const { public_keys } = await deploymentGetSshKeys(client, state);
+      return public_keys;
+    },
+
+    /**
+     * @param publicKeys One or more OpenSSH public keys to grant access
+     * @throws Error if there is an error updating the keys
+     * @returns Promise<DeploymentSshKeysResult> The stored set and per-job node results
+     * @description Grants the keys access. Keys already present are left as they are.
+     */
+    add: async (publicKeys: string | string[]): Promise<DeploymentSshKeysResult> => {
+      return await deploymentAddSshKeys(publicKeys, client, state);
+    },
+
+    /**
+     * @param publicKeys One or more OpenSSH public keys to revoke
+     * @throws Error if there is an error updating the keys
+     * @returns Promise<DeploymentSshKeysResult> The stored set and per-job node results
+     * @description Revokes the keys. A removed key stops working on a running job only when that job restarts.
+     */
+    remove: async (publicKeys: string | string[]): Promise<DeploymentSshKeysResult> => {
+      return await deploymentRemoveSshKeys(publicKeys, client, state);
+    },
+  };
+
+  // Built lazily on first node access and reused. Every node call is authorized
+  // by the deployment manager signing on the deployment's behalf (no local
+  // wallet; works under API-key auth).
+  let nodeFactory: ReturnType<typeof createNosanaNodeApi> | undefined;
+  const nodeJob = (node: string, jobAddress: string) => {
+    nodeFactory ??= createNosanaNodeApi({
+      environment: clients.environment,
+      authParams: { generate: (message) => generateAuthHeader({ message, includeTime: 'true' }) },
+      options: clients.options,
+    });
+    return nodeFactory(node).job(jobAddress);
+  };
+
+  /** Attaches a job's node job API once it has been scheduled onto a node. */
+  const attachNode = <T extends { node: string | null; job: string }>(
+    item: T,
+  ): T & Partial<NodeJobApi> =>
+    (item.node ? Object.assign({}, item, nodeJob(item.node, item.job)) : item) as T &
+      Partial<NodeJobApi>;
+
+  const attachJobList = (list: JobListResult): NodeJobListResult => ({
+    ...list,
+    jobs: list.jobs.map(attachNode),
+    nextPage: list.nextPage ? async () => attachJobList(await list.nextPage!()) : null,
+    previousPage: list.previousPage ? async () => attachJobList(await list.previousPage!()) : null,
+  });
+
+  /**
+   * One of the deployment's jobs, with its node job API (`ssh`, `terminal`,
+   * `definition`, `logs`, …) attached: `(await getJob(id)).ssh.add(key)`.
+   */
+  const getJob = async (jobId: string): Promise<DeploymentNodeJob> => {
+    const data = await deploymentGetJob(client, state.id, jobId);
+    if (!data.node) throw new Error(`Job ${jobId} has no assigned node.`);
+    return Object.assign({}, data, nodeJob(data.node, jobId)) as DeploymentNodeJob;
   };
 
   /**
-   * @param params Pagination parameters (optional: cursor, limit, sort_order)
-   * @returns Promise<JobListResult>
-   * @throws Error if there is an error fetching the jobs
-   * @throws Error if the deployment is not found
-   * @description Fetches all jobs for the deployment.
-   * This will return the current jobs associated with the deployment.
-   * It is useful for monitoring the deployment's job status.
+   * The deployment's jobs. Each job that has been scheduled onto a node carries
+   * its node job API (`ssh`, `terminal`, …); queued jobs are returned as-is.
    */
-  const getJobs = async (searchParams?: DeploymentJobsSearchParams): Promise<JobListResult> => {
-    return await deploymentGetJobs(client, state, searchParams);
-  };
+  const getJobs = async (searchParams?: DeploymentJobsSearchParams): Promise<NodeJobListResult> =>
+    attachJobList(await deploymentGetJobs(client, state, searchParams));
 
   /**
    * @param params Pagination parameters (optional: cursor, limit, sort_order)
@@ -282,11 +388,14 @@ export function createDeployment(
     getEvents,
     stream,
     generateAuthHeader,
+    ssh,
     createRevision,
     updateReplicaCount,
     updateActiveRevision,
     updateTimeout,
     updateSchedule,
     updateName,
+    updateMarket,
+    duplicate,
   });
 }

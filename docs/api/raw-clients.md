@@ -46,6 +46,9 @@ schema, so your editor autocompletes routes and payloads.
 | `clients.deploymentManager` | Deployments & vaults | `https://deployment-manager.k8s.prd.nos.ci` |
 | `clients.hostManager` | Markets, nodes, benchmarks | `https://host-manager.k8s.prd.nosana.com` |
 
+All four services are also reachable through a single proxy at
+`https://api.nosana.com`.
+
 The full mapping of every production endpoint to its SDK method (and which
 endpoints are raw-client-only) is maintained in
 [`packages/api/API_ENDPOINTS.md`](https://github.com/nosana-ci/nosana-kit/blob/main/packages/api/API_ENDPOINTS.md).

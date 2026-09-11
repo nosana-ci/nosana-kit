@@ -72,7 +72,7 @@ await client.api.jobs.list(
 Send the `Idempotency-Key` header:
 
 ```bash
-curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
+curl -X POST https://api.nosana.com/jobs/list \
   -H "Authorization: Bearer nos_xxx_your_api_key" \
   -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
   -H "Content-Type: application/json" \
@@ -157,7 +157,7 @@ console.log('Job Definition IPFS hash:', job.ipfsJob);
 == HTTP API
 
 ```bash
-curl -X GET https://dashboard.k8s.prd.nos.ci/api/jobs/{address} \
+curl -X GET https://api.nosana.com/jobs/{address} \
   -H "Authorization: Bearer nos_xxx_your_api_key"
 ```
 
@@ -197,7 +197,7 @@ console.log('Job Address:', job.job);
 
 ```bash
 # The Idempotency-Key header is optional.
-curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list \
+curl -X POST https://api.nosana.com/jobs/list \
   -H "Authorization: Bearer nos_xxx_your_api_key" \
   -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
   -H "Content-Type: application/json" \
@@ -293,7 +293,7 @@ if (result.tx === null) {
 
 ```bash
 # The Idempotency-Key header is optional.
-curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/{address}/extend \
+curl -X POST https://api.nosana.com/jobs/{address}/extend \
   -H "Authorization: Bearer nos_xxx_your_api_key" \
   -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
   -H "Content-Type: application/json" \
@@ -332,7 +332,7 @@ const stopped = await client.api.jobs.stop('job-address-here', {
 
 ```bash
 # The Idempotency-Key header is optional.
-curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/{address}/stop \
+curl -X POST https://api.nosana.com/jobs/{address}/stop \
   -H "Authorization: Bearer nos_xxx_your_api_key" \
   -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11"
 ```
@@ -400,7 +400,7 @@ const expired = result.items.filter((i) => i.status === 'expired');
 
 ```bash
 # The Idempotency-Key header is REQUIRED for batch endpoints (400 if omitted).
-curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/list/batch \
+curl -X POST https://api.nosana.com/jobs/list/batch \
   -H "Authorization: Bearer nos_xxx_your_api_key" \
   -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
   -H "Content-Type: application/json" \
@@ -441,7 +441,7 @@ const result = await client.api.jobs.extendBatch(
 == HTTP API
 
 ```bash
-curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/extend/batch \
+curl -X POST https://api.nosana.com/jobs/extend/batch \
   -H "Authorization: Bearer nos_xxx_your_api_key" \
   -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
   -H "Content-Type: application/json" \
@@ -477,7 +477,7 @@ const result = await client.api.jobs.stopBatch(
 == HTTP API
 
 ```bash
-curl -X POST https://dashboard.k8s.prd.nos.ci/api/jobs/stop/batch \
+curl -X POST https://api.nosana.com/jobs/stop/batch \
   -H "Authorization: Bearer nos_xxx_your_api_key" \
   -H "Idempotency-Key: 0f8c1e9a-7b2d-4c3e-9f1a-2b6d8e4f0a11" \
   -H "Content-Type: application/json" \

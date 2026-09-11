@@ -24,7 +24,6 @@ import {
   SendableTransaction,
   Transaction,
   appendTransactionMessageInstructions,
-  BaseTransactionMessage,
   pipe,
   assertIsSendableTransaction,
   TransactionSigner,
@@ -71,12 +70,20 @@ const DEFAULT_INSTRUCTION_COMPUTE_UNITS = 200_000;
 /**
  * Factory function to create an estimateAndSetComputeUnitLimit function
  * that estimates compute units and adds the set compute unit limit instruction
+ *
+ * Version 1 messages are excluded: they take their compute limit from the message
+ * config rather than a `SetComputeUnitLimit` instruction, so appending one here
+ * would leave the limit unset (which a v1 transaction budgets as zero compute
+ * units). Use `estimateAndSetResourceLimitsFactory` from `@solana/kit` if v1
+ * support is needed.
  */
 function estimateAndSetComputeUnitLimitFactory(
   ...params: Parameters<typeof estimateComputeUnitLimitFactory>
 ) {
   const estimateComputeUnitLimit = estimateComputeUnitLimitFactory(...params);
-  return async <T extends BaseTransactionMessage & TransactionMessageWithFeePayer>(
+  return async <
+    T extends Exclude<TransactionMessage, { version: 1 }> & TransactionMessageWithFeePayer,
+  >(
     transactionMessage: T
   ) => {
     const computeUnitsEstimate = await estimateComputeUnitLimit(transactionMessage);
@@ -379,7 +386,7 @@ export interface SolanaService {
    */
   decompileTransaction(
     transaction: Transaction
-  ): BaseTransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime;
+  ): TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime;
   /**
    * Get an instruction to transfer SOL from one address to another.
    *
@@ -1223,7 +1230,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
      */
     decompileTransaction(
       transaction: Transaction
-    ): BaseTransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime {
+    ): TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithLifetime {
       try {
         deps.logger.debug('Decompiling transaction to transaction message');
 

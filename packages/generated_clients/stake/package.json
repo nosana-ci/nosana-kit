@@ -29,7 +29,7 @@
     "format:fix": "echo 'No format:fix' && exit 0"
   },
   "dependencies": {
-    "@solana/kit": "5.4.0"
+    "@solana/kit": "8.3.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

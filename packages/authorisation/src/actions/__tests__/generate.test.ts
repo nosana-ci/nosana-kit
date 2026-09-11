@@ -21,6 +21,29 @@ describe("generate", () => {
   });
 
   describe('when a store is provided', () => {
+    test.each([undefined, 'storedSignature'])('skipCache bypasses reads and writes with cached value %s', async (cached) => {
+      const mockStore: AuthorizationStore = {
+        identifier: 'test-identifier',
+        actions: {
+          get: vi.fn().mockResolvedValue(cached),
+          set: vi.fn(),
+        },
+      };
+
+      const signature = await generate(
+        'validationString',
+        { skipCache: true },
+        global.TEST_WALLET,
+        mockStore,
+      );
+
+      expect(signature).toBe(
+        'validationString:4hEXBxCVbFm6uPYScs5k24UcqpqHpTh4XrxrArg7uW57LW3i5e7WPJdZyYgL5nzacxYEHjywpbrL4Dq1ryHaC2ot',
+      );
+      expect(mockStore.actions.get).not.toHaveBeenCalled();
+      expect(mockStore.actions.set).not.toHaveBeenCalled();
+    });
+
     test('and does not contain a stored signature, should store and return a new signature', async () => {
       const mockStore: AuthorizationStore = {
         identifier: 'test-identifier',

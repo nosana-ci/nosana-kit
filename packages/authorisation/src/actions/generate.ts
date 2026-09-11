@@ -18,7 +18,7 @@ export async function generate(
     ...options,
   };
 
-  if (store) {
+  if (store && !opts.skipCache) {
     const storedSignature = await Promise.resolve(store.actions.get(store.identifier, opts)).catch(() => undefined);
     if (storedSignature) {
       return storedSignature;
@@ -30,7 +30,7 @@ export async function generate(
   const signedMessage = await signMessage(message, signerOrKey);
   const signature = `${message}${separator}${base58.encode(signedMessage)}${includeTime ? separator + new Date().getTime() : ''}`;
 
-  if (store) {
+  if (store && !opts.skipCache) {
     store.actions.set(store.identifier, opts, signature);
   }
 

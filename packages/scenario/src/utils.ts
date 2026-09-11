@@ -5,7 +5,8 @@ import {
   createKeyPairSignerFromBytes,
   createTransactionMessage,
   createTransactionPlanner,
-  getAllSingleTransactionPlans,
+  createClientWithGetMinimumBalanceFromRpc,
+  flattenTransactionPlan,
   type InstructionPlan,
   pipe,
   setTransactionMessageFeePayerSigner,
@@ -91,13 +92,16 @@ export async function ensureLocalnetMint(client: NosanaClient) {
 
   const existingMint = await fetchMaybeMint(client.solana.rpc, mintAddress);
   if (!existingMint.exists) {
-    const createMintPlan = getCreateMintInstructionPlan({
-      payer: client.wallet!,
-      newMint: mintKeypair,
-      decimals: NOS_MINT_DECIMALS,
-      mintAuthority: mintAuthority.address,
-      freezeAuthority: null,
-    });
+    const createMintPlan = await getCreateMintInstructionPlan(
+      createClientWithGetMinimumBalanceFromRpc(client.solana.rpc),
+      {
+        payer: client.wallet!,
+        newMint: mintKeypair,
+        decimals: NOS_MINT_DECIMALS,
+        mintAuthority: mintAuthority.address,
+        freezeAuthority: null,
+      }
+    );
     try {
       await executeInstructionPlan(client, createMintPlan);
     } catch (error) {
@@ -142,7 +146,7 @@ export async function executeInstructionPlan(client: NosanaClient, plan: Instruc
   });
 
   const transactionPlan = await planner(plan);
-  const messages = getAllSingleTransactionPlans(transactionPlan).map((p) => p.message);
+  const messages = flattenTransactionPlan(transactionPlan).map((p) => p.message);
 
   for (const message of messages) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

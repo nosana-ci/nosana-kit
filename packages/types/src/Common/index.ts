@@ -53,3 +53,12 @@ export const NOSANA_PROGRAM_ADDRESSES: Record<
     merkleDistributor: 'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425',
   },
 } as const;
+
+/** A Solana address: base58 without the ambiguous characters, 32 to 44 characters long. */
+export const SOLANA_ADDRESS_PATTERN = '^[1-9A-HJ-NP-Za-km-z]{32,44}$';
+
+const SOLANA_ADDRESS = new RegExp(SOLANA_ADDRESS_PATTERN);
+
+export function isSolanaAddress(value: string): boolean {
+  return SOLANA_ADDRESS.test(value);
+}

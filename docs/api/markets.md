@@ -52,7 +52,7 @@ markets.forEach(market => {
 == HTTP API
 
 ```bash
-curl -X GET https://dashboard.k8s.prd.nos.ci/api/markets/ \
+curl -X GET https://api.nosana.com/markets/ \
   -H "Authorization: Bearer nos_xxx_your_api_key"
 ```
 
@@ -99,7 +99,7 @@ console.log('Price per Hour:', market.price_per_hour_usd);
 == HTTP API
 
 ```bash
-curl -X GET https://dashboard.k8s.prd.nos.ci/api/markets/{id}/ \
+curl -X GET https://api.nosana.com/markets/{id}/ \
   -H "Authorization: Bearer nos_xxx_your_api_key"
 ```
 
@@ -133,7 +133,7 @@ console.log('Required Memory:', resources.required_memory);
 == HTTP API
 
 ```bash
-curl -X GET https://dashboard.k8s.prd.nos.ci/api/markets/{id}/required-resources \
+curl -X GET https://api.nosana.com/markets/{id}/required-resources \
   -H "Authorization: Bearer nos_xxx_your_api_key"
 ```
 

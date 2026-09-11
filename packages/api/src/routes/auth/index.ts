@@ -24,6 +24,23 @@ export function createNosanaAuthApi(
 
       return data.signature;
     },
+    async signHeader(
+      message: string,
+      { includeTime }: { includeTime?: boolean } = {},
+    ): Promise<string> {
+      const { data, error } = await client.POST('/auth/sign-message/external', {
+        body: { message, includeTime },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to sign message', error);
+      }
+
+      // The form @nosana/authorization produces and a node's SDK verifies:
+      // `message:base58signature[:timestamp]`, separator ':'.
+      const header = `${message}:${data.signature}`;
+      return includeTime && data.timestamp !== undefined ? `${header}:${data.timestamp}` : header;
+    },
     async validateSession(cookieHeader?: string): Promise<ValidateSessionResponse> {
       const { data, error } = await client.POST('/auth/validate-session', {
         body: cookieHeader ? { cookieHeader } : {},

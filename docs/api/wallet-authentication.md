@@ -153,7 +153,7 @@ x-user-id: <your-wallet-public-key>
 # Sign the message "NosanaApiAuthentication" with your wallet
 # Then include it in the Authorization header
 
-curl -X POST https://dashboard.k8s.prd.nos.ci/api/deployments/vaults/create \
+curl -X POST https://api.nosana.com/deployments/vaults/create \
   -H "Authorization: NosanaApiAuthentication:<signed-message>" \
   -H "x-user-id: <your-public-key>" \
   -H "Content-Type: application/json"

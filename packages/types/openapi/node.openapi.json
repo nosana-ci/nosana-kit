@@ -1,0 +1,3429 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Nosana Node API",
+    "version": "1.0.0",
+    "description": "The HTTP API every Nosana node serves on its own host for the jobs it runs. Job routes are authorized with the standard Nosana authorization header signed by the job's owner; nodes never accept API keys. The node also multiplexes WebSocket routes over one socket, described under `x-websocket`."
+  },
+  "servers": [
+    {
+      "url": "https://{node}.{domain}",
+      "description": "One node, addressed by its Solana address.",
+      "variables": {
+        "node": {
+          "default": "NODE_ADDRESS",
+          "description": "The node's address."
+        },
+        "domain": {
+          "default": "node.k8s.prd.nos.ci",
+          "enum": [
+            "node.k8s.prd.nos.ci",
+            "node.k8s.dev.nos.ci"
+          ],
+          "description": "Mainnet or devnet nodes."
+        }
+      }
+    }
+  ],
+  "tags": [
+    {
+      "name": "Node",
+      "description": "About the node itself. Public."
+    },
+    {
+      "name": "Job",
+      "description": "A job the node runs, as the node sees it."
+    },
+    {
+      "name": "SSH",
+      "description": "Which SSH keys may reach a job."
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "getNodeAddress",
+        "tags": [
+          "Node"
+        ],
+        "summary": "The node's address",
+        "description": "Answers with the node's own address, as a liveness check.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The node's address.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/node/info": {
+      "get": {
+        "operationId": "getNodeInfo",
+        "tags": [
+          "Node"
+        ],
+        "summary": "Node info",
+        "description": "What the node is, what it runs on and which images and volumes it holds. Public.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The node's info.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeInfo"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/job/{job}/info": {
+      "get": {
+        "operationId": "streamJobInfo",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Stream job info",
+        "description": "Server-sent events: the job's flow without logs plus its task status, sent on open and whenever it changes, until the job ends.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A stream of `JobInfo` frames as unnamed `message` events.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/job-definition": {
+      "get": {
+        "operationId": "getJobDefinition",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Get the job definition",
+        "description": "The job definition. Fails while the job still waits for one. The node labels the body as text, but it is JSON.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The job definition.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDefinition"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "setJobDefinition",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Send the job definition",
+        "description": "Accepted only while the job waits for its definition.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobDefinition"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Acknowledged.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/results": {
+      "get": {
+        "operationId": "getJobResults",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Collect the job results",
+        "description": "The finished flow state. Available once the job waits for its result to be collected; collecting it lets the node finish the job. The node labels the body as text, but it is JSON.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The flow state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowState"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/ops": {
+      "get": {
+        "operationId": "getJobOperations",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Operation statuses",
+        "description": "Status of every operation of the job.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statuses by operation id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationStatuses"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/ops/{op}": {
+      "get": {
+        "operationId": "getJobOperation",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Operation status",
+        "description": "Status of one operation.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "name": "op",
+            "in": "path",
+            "required": true,
+            "description": "An operation id within the job definition.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The operation's status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/group/current": {
+      "get": {
+        "operationId": "getJobCurrentGroup",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Current group statuses",
+        "description": "Status of the operations in the group currently running.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statuses by operation id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationStatuses"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/group/{group}": {
+      "get": {
+        "operationId": "getJobGroup",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Group statuses",
+        "description": "Status of the operations in one group.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "description": "A group of the job definition.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statuses by operation id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationStatuses"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/group/{group}/restart": {
+      "post": {
+        "operationId": "restartJobGroup",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Restart a group",
+        "description": "Restarts every operation of the group.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "description": "A group of the job definition.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Restart initiated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The restart failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/group/{group}/stop": {
+      "post": {
+        "operationId": "stopJobGroup",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Stop a group",
+        "description": "Stops every operation of the group.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "description": "A group of the job definition.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stopped.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The stop failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/group/{group}/operation/{op}/restart": {
+      "post": {
+        "operationId": "restartJobOperation",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Restart an operation",
+        "description": "Restarts one operation of a group.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "description": "A group of the job definition.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "op",
+            "in": "path",
+            "required": true,
+            "description": "An operation id within the job definition.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Restart initiated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The restart failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/group/{group}/operation/{op}/stop": {
+      "post": {
+        "operationId": "stopJobOperation",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Stop an operation",
+        "description": "Stops one operation of a group.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "description": "A group of the job definition.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "op",
+            "in": "path",
+            "required": true,
+            "description": "An operation id within the job definition.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stopped.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The stop failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/endpoints": {
+      "get": {
+        "operationId": "getJobEndpoints",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Exposed endpoints",
+        "description": "The URLs the job exposes and whether they answer yet.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Endpoints and their status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobEndpoints"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The job exposes no endpoint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The node could not read the endpoints.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/stats": {
+      "get": {
+        "operationId": "getJobStats",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Resource stats",
+        "description": "CPU, memory, disk and network samples per operation within a time window.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "description": "Seconds between samples.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start of the window, Unix milliseconds.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End of the window, Unix milliseconds.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Samples, oldest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskStat"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`start` and `end` must be timestamps in milliseconds.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/stats/stream": {
+      "get": {
+        "operationId": "streamJobStats",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Stream resource stats",
+        "description": "Server-sent events: the latest sample per operation, every `interval` seconds, until the job ends.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "description": "Seconds between samples.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A stream of `TaskStat[]` frames as unnamed `message` events.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/stop": {
+      "post": {
+        "operationId": "stopJob",
+        "tags": [
+          "Job"
+        ],
+        "summary": "Stop the job",
+        "description": "Asks the node to stop the job.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stopped.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No running job with that address, or the id is not part of it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The stop failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/ssh/authorize": {
+      "post": {
+        "operationId": "authorizeJobSshKey",
+        "tags": [
+          "SSH"
+        ],
+        "summary": "Grant an SSH key",
+        "description": "Lets the key reach the job, permanently or until `expiresAt`. The signature must be the job owner's.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SshAuthorizationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The key is authorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SshAuthorization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The key is not a valid OpenSSH public key, or the expiry is invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No active job with SSH access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "The node could not apply the change.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The SSH provider is not available.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    },
+    "/job/{job}/ssh/keys": {
+      "get": {
+        "operationId": "getJobSshKeys",
+        "tags": [
+          "SSH"
+        ],
+        "summary": "List SSH keys",
+        "description": "The keys currently allowed to reach the job, with their expiry when temporary.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The job's keys.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SshKeys"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No active job with SSH access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "The node could not read its keys.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "revokeJobSshKey",
+        "tags": [
+          "SSH"
+        ],
+        "summary": "Revoke an SSH key",
+        "description": "Removes the key whatever its expiry. Open sessions stay until they disconnect.",
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "The job's address.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SshRevocationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The key is revoked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SshRevocation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The key is not a valid OpenSSH public key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The authorization header is missing, invalid, or not signed by the job's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No active job with SSH access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "The node could not apply the change.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NosanaAuthorization": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "JobDefinition": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "const": "0.1"
+          },
+          "type": {
+            "const": "container"
+          },
+          "logistics": {
+            "$ref": "#/components/schemas/Logistics"
+          },
+          "deployment_id": {
+            "type": "string"
+          },
+          "ssh": {
+            "$ref": "#/components/schemas/SSH"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "global": {
+            "$ref": "#/components/schemas/Global"
+          },
+          "ops": {
+            "$ref": "#/components/schemas/Ops"
+          }
+        },
+        "required": [
+          "version",
+          "type",
+          "ops"
+        ]
+      },
+      "Logistics": {
+        "type": "object",
+        "properties": {
+          "send": {
+            "$ref": "#/components/schemas/Logistic"
+          },
+          "receive": {
+            "$ref": "#/components/schemas/Logistic"
+          }
+        },
+        "required": [
+          "send",
+          "receive"
+        ]
+      },
+      "Logistic": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/LogisticType"
+          },
+          "args": {
+            "$ref": "#/components/schemas/Partial__type"
+          }
+        },
+        "required": [
+          "type",
+          "args"
+        ]
+      },
+      "LogisticType": {
+        "oneOf": [
+          {
+            "const": "api"
+          },
+          {
+            "const": "api-listen"
+          }
+        ],
+        "description": "api        - we receive and send via an endpoint endpoint\napi-listen - we create an endpoint to listen for incoming requests"
+      },
+      "Partial__type": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string"
+          }
+        },
+        "required": [],
+        "description": "Make all properties in T optional"
+      },
+      "SSH": {
+        "type": "object",
+        "properties": {
+          "public_keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": []
+      },
+      "Meta": {
+        "type": "object",
+        "properties": {
+          "trigger": {
+            "type": "string"
+          },
+          "system_resources": {
+            "$ref": "#/components/schemas/Recordstringstringnumber"
+          }
+        },
+        "required": [],
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              }
+            },
+            {
+              "$ref": "#/components/schemas/Recordstringstringnumber_stringnumber_"
+            }
+          ]
+        }
+      },
+      "Recordstringstringnumber": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "Construct a type with a set of properties K of type T",
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "Recordstringstringnumber_stringnumber_": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "Construct a type with a set of properties K of type T",
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Global": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string"
+          },
+          "gpu": {
+            "type": "boolean"
+          },
+          "entrypoint": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/components/schemas/CMDArray"
+              }
+            ]
+          },
+          "env": {
+            "$ref": "#/components/schemas/Env"
+          },
+          "work_dir": {
+            "type": "string"
+          },
+          "variables": {
+            "$ref": "#/components/schemas/Variables"
+          }
+        },
+        "required": []
+      },
+      "CMDArray": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "Env": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "Variables": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "Ops": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/OperationkeyofOperationArgsMap"
+        }
+      },
+      "OperationkeyofOperationArgsMap": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "oneOf": [
+              {
+                "const": "container/run"
+              },
+              {
+                "const": "container/create-volume"
+              }
+            ]
+          },
+          "id": {
+            "$ref": "#/components/schemas/OperationId"
+          },
+          "args": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContainerRun"
+              },
+              {
+                "$ref": "#/components/schemas/ContainerCreateVolume"
+              }
+            ]
+          },
+          "results": {
+            "$ref": "#/components/schemas/OperationResults"
+          },
+          "execution": {
+            "$ref": "#/components/schemas/Execution"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "args"
+        ]
+      },
+      "OperationId": {
+        "type": "string"
+      },
+      "ContainerRun": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string"
+          },
+          "aliases": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/components/schemas/Aliases"
+              }
+            ]
+          },
+          "cmd": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/components/schemas/CMDArray"
+              }
+            ]
+          },
+          "volumes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Volume"
+            }
+          },
+          "expose": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "$ref": "#/components/schemas/ExposedPort"
+              },
+              {
+                "$ref": "#/components/schemas/LiteralString"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "__spread__": {
+                    "$ref": "#/components/schemas/LiteralString"
+                  },
+                  "chunked": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "__spread__"
+                ]
+              },
+              {
+                "$ref": "#/components/schemas/UniqueExposedPorts"
+              }
+            ]
+          },
+          "gpu": {
+            "type": "boolean"
+          },
+          "work_dir": {
+            "type": "string"
+          },
+          "entrypoint": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/components/schemas/CMDArray"
+              }
+            ]
+          },
+          "env": {
+            "$ref": "#/components/schemas/Env"
+          },
+          "restart_policy": {
+            "oneOf": [
+              {
+                "const": "no"
+              },
+              {
+                "const": "always"
+              },
+              {
+                "const": "unless-stopped"
+              },
+              {
+                "const": "on-failure"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "policy": {
+                    "const": "on-failure"
+                  },
+                  "restart_tries": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "policy"
+                ]
+              }
+            ]
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "resources": {
+            "$ref": "#/components/schemas/Resources"
+          },
+          "authentication": {
+            "$ref": "#/components/schemas/Authentication"
+          }
+        },
+        "required": [
+          "image"
+        ]
+      },
+      "Aliases": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "Volume": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "dest": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "dest"
+        ]
+      },
+      "ExposedPort": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "number"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "const": "api"
+              },
+              {
+                "const": "web"
+              },
+              {
+                "const": "webapi"
+              },
+              {
+                "const": "websocket"
+              },
+              {
+                "const": "none"
+              }
+            ]
+          },
+          "health_checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HealthCheck"
+            }
+          }
+        },
+        "required": [
+          "port"
+        ]
+      },
+      "HealthCheck": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/HttpHealthCheck"
+          },
+          {
+            "$ref": "#/components/schemas/WebSocketHealthCheck"
+          }
+        ]
+      },
+      "HttpHealthCheck": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "http"
+          },
+          "path": {
+            "type": "string"
+          },
+          "method": {
+            "oneOf": [
+              {
+                "const": "GET"
+              },
+              {
+                "const": "POST"
+              },
+              {
+                "const": "PUT"
+              },
+              {
+                "const": "DELETE"
+              }
+            ]
+          },
+          "expected_status": {
+            "type": "number"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/Recordstringstring"
+          },
+          "body": {},
+          "continuous": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type",
+          "path",
+          "method",
+          "expected_status",
+          "continuous"
+        ]
+      },
+      "Recordstringstring": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "Construct a type with a set of properties K of type T",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "WebSocketHealthCheck": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "websocket"
+          },
+          "expected_response": {
+            "type": "string"
+          },
+          "continuous": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type",
+          "expected_response",
+          "continuous"
+        ]
+      },
+      "LiteralString": {
+        "type": "string"
+      },
+      "UniqueExposedPorts": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ExposeBase"
+        }
+      },
+      "ExposeBase": {
+        "oneOf": [
+          {
+            "type": "number"
+          },
+          {
+            "$ref": "#/components/schemas/ExposedPort"
+          },
+          {
+            "$ref": "#/components/schemas/LiteralString"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "__spread__": {
+                "$ref": "#/components/schemas/LiteralString"
+              },
+              "chunked": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "__spread__"
+            ]
+          }
+        ]
+      },
+      "Resources": {
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "const": "__remove-if-empty__"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "__spread__": {
+                  "$ref": "#/components/schemas/LiteralString"
+                },
+                "chunked": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "__spread__"
+              ]
+            },
+            {
+              "$ref": "#/components/schemas/S3Base"
+            },
+            {
+              "$ref": "#/components/schemas/S3WithBucket"
+            },
+            {
+              "$ref": "#/components/schemas/S3WithBuckets"
+            },
+            {
+              "$ref": "#/components/schemas/HFResource"
+            },
+            {
+              "$ref": "#/components/schemas/OllamaResource"
+            }
+          ]
+        }
+      },
+      "S3Base": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "S3"
+          },
+          "target": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "allowWrite": {
+            "type": "boolean"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "IAM": {
+            "$ref": "#/components/schemas/S3Auth"
+          }
+        },
+        "required": [
+          "type",
+          "target"
+        ]
+      },
+      "S3Auth": {
+        "type": "object",
+        "properties": {
+          "REGION": {
+            "type": "string"
+          },
+          "ACCESS_KEY_ID": {
+            "type": "string"
+          },
+          "SECRET_ACCESS_KEY": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "REGION",
+          "ACCESS_KEY_ID",
+          "SECRET_ACCESS_KEY"
+        ]
+      },
+      "S3WithBucket": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "S3"
+          },
+          "target": {
+            "type": "string"
+          },
+          "bucket": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "allowWrite": {
+            "type": "boolean"
+          },
+          "IAM": {
+            "$ref": "#/components/schemas/S3Auth"
+          }
+        },
+        "required": [
+          "type",
+          "target",
+          "bucket"
+        ]
+      },
+      "S3WithBuckets": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "S3"
+          },
+          "target": {
+            "type": "string"
+          },
+          "buckets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string"
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "url"
+              ]
+            }
+          },
+          "url": {
+            "type": "string"
+          },
+          "allowWrite": {
+            "type": "boolean"
+          },
+          "IAM": {
+            "$ref": "#/components/schemas/S3Auth"
+          }
+        },
+        "required": [
+          "type",
+          "target",
+          "buckets"
+        ]
+      },
+      "HFResource": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "HF"
+          },
+          "target": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "string"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "accessToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "target",
+          "repo"
+        ]
+      },
+      "OllamaResource": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "Ollama"
+          },
+          "model": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "model"
+        ]
+      },
+      "Authentication": {
+        "type": "object",
+        "properties": {
+          "docker": {
+            "$ref": "#/components/schemas/DockerAuth"
+          }
+        },
+        "required": []
+      },
+      "DockerAuth": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "server": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "ContainerCreateVolume": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "OperationResults": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/components/schemas/OperationResult"
+            }
+          ]
+        }
+      },
+      "OperationResult": {
+        "type": "object",
+        "properties": {
+          "regex": {
+            "type": "string"
+          },
+          "logType": {
+            "$ref": "#/components/schemas/LogTypeTuple"
+          }
+        },
+        "required": [
+          "regex",
+          "logType"
+        ]
+      },
+      "LogTypeTuple": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/StdOption"
+        }
+      },
+      "StdOption": {
+        "oneOf": [
+          {
+            "const": "stdin"
+          },
+          {
+            "const": "stdout"
+          },
+          {
+            "const": "stderr"
+          },
+          {
+            "const": "nodeerr"
+          }
+        ]
+      },
+      "Execution": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string"
+          },
+          "timeout": {
+            "type": "number"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "stop_if_dependent_stops": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      },
+      "FlowState": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "number"
+          },
+          "endTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "errors": {
+            "type": "array",
+            "items": {}
+          },
+          "opStates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OpState"
+            }
+          },
+          "secrets": {
+            "$ref": "#/components/schemas/FlowSecrets"
+          }
+        },
+        "required": [
+          "status",
+          "startTime",
+          "endTime",
+          "opStates"
+        ]
+      },
+      "OpState": {
+        "type": "object",
+        "properties": {
+          "providerId": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "operationId": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "group": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "startTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "endTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "exitCode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "logs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Log"
+            }
+          },
+          "results": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "code": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "event",
+              "message"
+            ]
+          },
+          "diagnostics": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "$ref": "#/components/schemas/DiagnosticsReason"
+              },
+              "state": {
+                "$ref": "#/components/schemas/DiagnosticsState"
+              }
+            },
+            "required": [
+              "reason"
+            ]
+          }
+        },
+        "required": [
+          "providerId",
+          "operationId",
+          "group",
+          "status",
+          "startTime",
+          "endTime",
+          "exitCode",
+          "logs",
+          "diagnostics"
+        ]
+      },
+      "Log": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/StdOption"
+          },
+          "log": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "timestamp"
+        ]
+      },
+      "DiagnosticsReason": {
+        "type": "object",
+        "properties": {
+          "hostShutDown": {
+            "type": "boolean"
+          },
+          "jobStopped": {
+            "type": "boolean"
+          },
+          "jobExpired": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "hostShutDown",
+          "jobStopped",
+          "jobExpired"
+        ]
+      },
+      "DiagnosticsState": {
+        "type": "object",
+        "properties": {
+          "Status": {
+            "type": "string"
+          },
+          "Running": {
+            "type": "boolean"
+          },
+          "Paused": {
+            "type": "boolean"
+          },
+          "Restarting": {
+            "type": "boolean"
+          },
+          "OOMKilled": {
+            "type": "boolean"
+          },
+          "Dead": {
+            "type": "boolean"
+          },
+          "Pid": {
+            "type": "number"
+          },
+          "ExitCode": {
+            "type": "number"
+          },
+          "Error": {
+            "type": "string"
+          },
+          "StartedAt": {
+            "type": "string"
+          },
+          "FinishedAt": {
+            "type": "string"
+          },
+          "Health": {
+            "type": "object",
+            "properties": {
+              "Status": {
+                "type": "string"
+              },
+              "FailingStreak": {
+                "type": "number"
+              },
+              "Log": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Start": {
+                          "type": "string"
+                        },
+                        "End": {
+                          "type": "string"
+                        },
+                        "ExitCode": {
+                          "type": "number"
+                        },
+                        "Output": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "Start",
+                        "End",
+                        "ExitCode",
+                        "Output"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "required": [
+              "Status",
+              "FailingStreak",
+              "Log"
+            ]
+          },
+          "RestartCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "Status",
+          "Running",
+          "Paused",
+          "Restarting",
+          "OOMKilled",
+          "Dead",
+          "Pid",
+          "ExitCode",
+          "Error",
+          "StartedAt",
+          "FinishedAt",
+          "RestartCount"
+        ]
+      },
+      "FlowSecrets": {
+        "type": "object",
+        "properties": {
+          "urlmode": {
+            "oneOf": [
+              {
+                "const": "public"
+              },
+              {
+                "const": "private"
+              }
+            ]
+          }
+        },
+        "required": [],
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "const": "public"
+            },
+            {
+              "const": "private"
+            },
+            {
+              "$ref": "#/components/schemas/JobExposeSecrets"
+            }
+          ]
+        }
+      },
+      "JobExposeSecrets": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/EndpointSecret"
+        }
+      },
+      "EndpointSecret": {
+        "type": "object",
+        "properties": {
+          "opID": {
+            "type": "string"
+          },
+          "port": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EndpointStatus"
+          }
+        },
+        "required": [
+          "opID",
+          "port",
+          "url",
+          "status"
+        ]
+      },
+      "EndpointStatus": {
+        "oneOf": [
+          {
+            "const": "ONLINE"
+          },
+          {
+            "const": "OFFLINE"
+          },
+          {
+            "const": "UNKNOWN"
+          }
+        ]
+      },
+      "Address": {
+        "type": "string",
+        "pattern": "^[1-9A-HJ-NP-Za-km-z]{32,44}$",
+        "description": "A Solana address in base58."
+      },
+      "NodeError": {
+        "description": "The node answers failures with a sentence or with `{ error }`.",
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "required": [
+              "error"
+            ],
+            "properties": {
+              "error": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "NodeInfo": {
+        "type": "object",
+        "required": [
+          "state",
+          "info",
+          "resources"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "state": {
+            "type": "string",
+            "description": "What the node is doing right now, as classified by its monitor."
+          },
+          "info": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "gpus": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "devices": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "properties": {
+                        "index": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "memory": {},
+                        "network_architecture": {}
+                      }
+                    }
+                  }
+                }
+              },
+              "network": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Network details with the IP address redacted."
+              }
+            }
+          },
+          "resources": {
+            "type": "object",
+            "required": [
+              "images",
+              "volumes"
+            ],
+            "properties": {
+              "images": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "volumes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "OpStateSummary": {
+        "type": "object",
+        "description": "An operation's state as the info stream sends it: `OpState` without its logs and provider handle.",
+        "properties": {
+          "operationId": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "group": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "startTime": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "endTime": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "exitCode": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "results": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "error": {
+            "type": "object",
+            "required": [
+              "event",
+              "message"
+            ],
+            "properties": {
+              "event": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "code": {
+                "type": "integer"
+              }
+            }
+          },
+          "diagnostics": {
+            "type": "object",
+            "required": [
+              "reason"
+            ],
+            "properties": {
+              "reason": {
+                "$ref": "#/components/schemas/DiagnosticsReason"
+              },
+              "state": {
+                "$ref": "#/components/schemas/DiagnosticsState"
+              }
+            }
+          }
+        }
+      },
+      "OperationStatuses": {
+        "type": "object",
+        "description": "Status per operation, keyed by operation id.",
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "JobInfo": {
+        "type": "object",
+        "description": "One frame of the job info stream: the flow without logs, plus task status.",
+        "required": [
+          "status",
+          "startTime",
+          "endTime",
+          "errors",
+          "opStates",
+          "operations"
+        ],
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "integer"
+          },
+          "endTime": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "errors": {
+            "type": "array",
+            "items": {}
+          },
+          "opStates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OpStateSummary"
+            }
+          },
+          "secrets": {
+            "$ref": "#/components/schemas/FlowSecrets"
+          },
+          "operations": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "all",
+                  "currentGroupStatus"
+                ],
+                "properties": {
+                  "all": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/OperationStatuses"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "currentGroup": {
+                    "type": "string"
+                  },
+                  "currentGroupStatus": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/OperationStatuses"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "JobEndpoints": {
+        "type": "object",
+        "required": [
+          "urls",
+          "status"
+        ],
+        "properties": {
+          "urls": {
+            "$ref": "#/components/schemas/JobExposeSecrets"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ONLINE",
+              "OFFLINE"
+            ]
+          }
+        }
+      },
+      "TaskStat": {
+        "type": "object",
+        "required": [
+          "opId",
+          "timestamp",
+          "cpu",
+          "memory",
+          "disk",
+          "network"
+        ],
+        "properties": {
+          "opId": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "Unix milliseconds."
+          },
+          "cpu": {
+            "type": "object",
+            "required": [
+              "cpu_percent"
+            ],
+            "properties": {
+              "cpu_percent": {
+                "type": "number"
+              }
+            }
+          },
+          "memory": {
+            "type": "object",
+            "required": [
+              "memory_usage",
+              "memory_limit",
+              "memory_percent"
+            ],
+            "properties": {
+              "memory_usage": {
+                "type": "number"
+              },
+              "memory_limit": {
+                "type": "number"
+              },
+              "memory_percent": {
+                "type": "number"
+              }
+            }
+          },
+          "disk": {
+            "type": "object",
+            "required": [
+              "read",
+              "write"
+            ],
+            "properties": {
+              "read": {
+                "type": "number"
+              },
+              "write": {
+                "type": "number"
+              }
+            }
+          },
+          "network": {
+            "type": "object",
+            "required": [
+              "received",
+              "sent"
+            ],
+            "properties": {
+              "received": {
+                "type": "number"
+              },
+              "sent": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "TaskLog": {
+        "type": "object",
+        "required": [
+          "opId",
+          "group",
+          "type",
+          "timestamp",
+          "message"
+        ],
+        "properties": {
+          "opId": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {}
+        }
+      },
+      "ActionResult": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "SshPublicKey": {
+        "type": "string",
+        "maxLength": 8192,
+        "description": "One OpenSSH `authorized_keys` line: algorithm, base64 key material and an optional comment."
+      },
+      "SshAuthorizationRequest": {
+        "type": "object",
+        "required": [
+          "sshPublicKey"
+        ],
+        "properties": {
+          "sshPublicKey": {
+            "$ref": "#/components/schemas/SshPublicKey"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Omit for access until the key is revoked or the job ends."
+          }
+        }
+      },
+      "SshAuthorization": {
+        "type": "object",
+        "required": [
+          "job",
+          "sshUser",
+          "authorized"
+        ],
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "sshUser": {
+            "type": "string",
+            "description": "Always `nosana`; the hostname identifies the job and operation."
+          },
+          "authorized": {
+            "type": "boolean",
+            "const": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SshAuthorizedKey": {
+        "type": "object",
+        "required": [
+          "sshPublicKey"
+        ],
+        "properties": {
+          "sshPublicKey": {
+            "$ref": "#/components/schemas/SshPublicKey"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Absent for permanent keys."
+          }
+        }
+      },
+      "SshKeys": {
+        "type": "object",
+        "required": [
+          "job",
+          "sshUser",
+          "keys"
+        ],
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "sshUser": {
+            "type": "string"
+          },
+          "keys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SshAuthorizedKey"
+            }
+          }
+        }
+      },
+      "SshRevocationRequest": {
+        "type": "object",
+        "required": [
+          "sshPublicKey"
+        ],
+        "properties": {
+          "sshPublicKey": {
+            "$ref": "#/components/schemas/SshPublicKey"
+          }
+        }
+      },
+      "SshRevocation": {
+        "type": "object",
+        "required": [
+          "job",
+          "sshUser",
+          "revoked"
+        ],
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "sshUser": {
+            "type": "string"
+          },
+          "revoked": {
+            "type": "boolean",
+            "const": true
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "NosanaAuthorization": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "authorization",
+        "description": "`message:base58-signature[:timestamp]` as produced by `@nosana/authorization`, signed by the wallet that owns the job. Any message is accepted; a timestamp, when present, must be within the job's timeout."
+      }
+    }
+  },
+  "x-websocket": {
+    "description": "One WebSocket endpoint at the node's origin. The first frame is a JSON handshake `{ path, header, body }` where `header` is the same authorization string the HTTP routes take and `body` names the job; every later frame is `{ path, data }`. Only the terminal takes over the socket for raw frames.",
+    "routes": {
+      "/log": {
+        "body": {
+          "jobAddress": "Address"
+        },
+        "frames": {
+          "path": "log",
+          "data": "a log message"
+        },
+        "description": "Node and container logs for basic job posters."
+      },
+      "/flog": {
+        "body": {
+          "jobAddress": "Address",
+          "group?": "string",
+          "opId?": "string",
+          "type?": "string"
+        },
+        "frames": {
+          "path": "flog",
+          "data": "TaskLog, JSON-encoded"
+        },
+        "description": "Task manager logs: history first, then live."
+      },
+      "/status": {
+        "body": {
+          "jobAddress": "Address"
+        },
+        "frames": {
+          "path": "state",
+          "data": "a state message"
+        },
+        "description": "State updates for the job. The node's own signature is accepted as well as the owner's."
+      },
+      "/terminal": {
+        "body": {
+          "jobAddress": "Address",
+          "message": "the signed grant text",
+          "signature": "base64 of the raw 64-byte signature",
+          "op?": "string",
+          "cols?": "integer",
+          "rows?": "integer"
+        },
+        "frames": {
+          "client": [
+            {
+              "type": "stdin",
+              "data": "string"
+            },
+            {
+              "type": "resize",
+              "cols": "integer",
+              "rows": "integer"
+            }
+          ],
+          "node": [
+            "binary frames: raw stdout and stderr",
+            {
+              "type": "exit",
+              "code": "integer or null"
+            },
+            {
+              "type": "error",
+              "message": "string"
+            }
+          ]
+        },
+        "description": "An interactive shell or one operation's tty. The grant is `Nosana Terminal Authorization v1` followed by `job`, `node`, `expiresAt`, optional `op`, `network` and `audience: nosana-web-terminal` lines, valid for at most five minutes, signed by the job's owner."
+      }
+    }
+  }
+}

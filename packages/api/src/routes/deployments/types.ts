@@ -2,6 +2,8 @@ import type {
   JobDefinition,
 } from '@nosana/types';
 import type { components, paths } from '../../client/deployment-manager/schema.js';
+import type { StreamLifecycleHandlers, StreamSubscription } from '../../types.js';
+import type { NodeJobApi } from '../node/types.js';
 
 // Re-export types from @nosana/types for reuse
 export type { JobDefinition } from '@nosana/types';
@@ -39,6 +41,14 @@ export type PaginatedResult<T> = T & {
 export type DeploymentListResult = PaginatedResult<{ deployments: Deployment[] }>;
 export type ApiDeploymentListResult = PaginatedResult<{ deployments: ApiDeployment[] }>;
 export type JobListResult = PaginatedResult<{ jobs: DeploymentJobItem[] }>;
+/**
+ * A deployment job with its node job API attached (`ssh`, `terminal`, …). On a
+ * list item the node methods are optional, since a job that has not been
+ * scheduled onto a node yet cannot be reached.
+ */
+export type DeploymentNodeJob = DeploymentJob & NodeJobApi;
+export type DeploymentJobItemWithNode = DeploymentJobItem & Partial<NodeJobApi>;
+export type NodeJobListResult = PaginatedResult<{ jobs: DeploymentJobItemWithNode[] }>;
 export type EventListResult = PaginatedResult<{ events: DeploymentEventItem[] }>;
 export type RevisionListResult = PaginatedResult<{ revisions: DeploymentRevisionItem[] }>;
 export type TaskListResult = PaginatedResult<{ tasks: DeploymentTaskItem[] }>;
@@ -82,6 +92,10 @@ export type DeploymentJobsSearchParams = paths['/deployments/{deployment}/jobs']
 export type DeploymentEventsSearchParams = paths['/deployments/{deployment}/events']['get']['parameters']['query'];
 export type DeploymentRevisionsSearchParams = paths['/deployments/{deployment}/revisions']['get']['parameters']['query'];
 export type DeploymentAuthHeaderParams = paths['/deployments/{deployment}/header']['get']['parameters']['query'];
+export type DeploymentDuplicateOptions = NonNullable<paths['/deployments/{deployment}/duplicate']['post']['requestBody']>['content']['application/json'];
+export type DeploymentSshKeys = paths['/deployments/{deployment}/ssh-keys']['get']['responses']['200']['content']['application/json'];
+export type DeploymentSshKeysBody = paths['/deployments/{deployment}/ssh-keys']['post']['requestBody']['content']['application/json'];
+export type DeploymentSshKeysResult = paths['/deployments/{deployment}/ssh-keys']['post']['responses']['200']['content']['application/json'];
 
 // Item types extracted from paginated responses
 export type DeploymentJobItem = DeploymentJobs['jobs'][number];
@@ -102,11 +116,10 @@ export type DeploymentStreamEvent =
 export type DeploymentStreamEventOf<T extends DeploymentStreamEvent['type']> =
   Extract<DeploymentStreamEvent, { type: T }>;
 
-/** An open stream, for as long as the caller wants it. */
-export type DeploymentStreamSubscription = { close: () => void };
+export type DeploymentStreamSubscription = StreamSubscription;
 
 /** What a caller wants to hear about while streaming a deployment. */
-export type DeploymentStreamHandlers = {
+export type DeploymentStreamHandlers = StreamLifecycleHandlers & {
   onDeployment?: (event: DeploymentStreamEventOf<'deployment'>) => void;
   onJob?: (event: DeploymentStreamEventOf<'job'>) => void;
   /** A new entry in the deployment's event log. */
@@ -118,9 +131,31 @@ export type DeploymentStreamHandlers = {
    * one op share a tunnel and so are restated together.
    */
   onEndpoint?: (event: DeploymentStreamEventOf<'endpoint'>) => void;
-  /** The stream opened, or reopened after dropping: resynchronise from here. */
-  onOpen?: () => void;
-  onError?: (error: unknown) => void;
+  /**
+   * The authoritative set of the deployment's active jobs, by id, sent once when
+   * the stream opens (ahead of the per-job frames). Prune any active job still
+   * shown whose id is absent here: a completion missed while disconnected is not
+   * replayed as a `job` frame, so this is the only signal that it is gone.
+   */
+  onJobs?: (event: DeploymentStreamEventOf<'jobs'>) => void;
+};
+
+/** SSH key management for a deployment's jobs, under `deployment.ssh`. */
+export type DeploymentSsh = {
+  /** The SSH public keys currently granted access to the deployment's jobs. */
+  keys: () => Promise<string[]>;
+  /**
+   * Grant one or more OpenSSH public keys access. Keys already present are left
+   * as they are: a key is identified by its type and material, so a differing
+   * comment does not add it twice.
+   */
+  add: (publicKeys: string | string[]) => Promise<DeploymentSshKeysResult>;
+  /**
+   * Revoke one or more OpenSSH public keys. A key is identified by its type and
+   * material, so a differing comment still revokes it; access is removed from
+   * every running job at once, not only when a job restarts.
+   */
+  remove: (publicKeys: string | string[]) => Promise<DeploymentSshKeysResult>;
 };
 
 // API deployment (with API key auth) - no vault
@@ -130,24 +165,37 @@ export type ApiDeployment = DeploymentState & {
   archive: () => Promise<void>;
   delete: () => Promise<void>;
   getTasks: (searchParams?: PaginationParams) => Promise<TaskListResult>;
-  getJob: (job: string) => Promise<DeploymentJob>;
-  getJobs: (searchParams?: DeploymentJobsSearchParams) => Promise<JobListResult>;
+  /**
+   * One of the deployment's jobs, with the node job API (`ssh`, `terminal`,
+   * `definition`, `logs`, …) attached — authorized by the deployment manager
+   * signing on the deployment's behalf, so `(await getJob(id)).ssh.add(key)`
+   * works without a local wallet.
+   */
+  getJob: (job: string) => Promise<DeploymentNodeJob>;
+  /** The deployment's jobs; each job that has a node carries its node job API (`ssh`, `terminal`, …). */
+  getJobs: (searchParams?: DeploymentJobsSearchParams) => Promise<NodeJobListResult>;
   getRevisions: (searchParams?: DeploymentRevisionsSearchParams) => Promise<RevisionListResult>;
   getEvents: (searchParams?: DeploymentEventsSearchParams) => Promise<EventListResult>;
   /** Stream changes over server-sent events; close it to stop. */
   stream: (handlers: DeploymentStreamHandlers) => DeploymentStreamSubscription;
   generateAuthHeader: (query?: DeploymentAuthHeaderParams) => Promise<string>;
+  ssh: DeploymentSsh;
   createRevision: (jobDefinition: JobDefinition) => Promise<void>;
   updateActiveRevision: (revision: number) => Promise<void>;
   updateReplicaCount: (replicas: number) => Promise<void>;
   updateTimeout: (timeout: number) => Promise<void>;
   updateSchedule: (schedule: string) => Promise<void>;
   updateName: (name: string) => Promise<void>;
+  updateMarket: (market: string) => Promise<void>;
+  /** Copy this deployment into a new one; the source is left untouched. */
+  duplicate: (options?: DeploymentDuplicateOptions) => Promise<ApiDeployment>;
 };
 
 // Full deployment (with signer auth) - includes vault
-export type Deployment = ApiDeployment & {
+export type Deployment = Omit<ApiDeployment, 'duplicate'> & {
   vault: Vault;
+  /** Copy this deployment into a new one; the source is left untouched. */
+  duplicate: (options?: DeploymentDuplicateOptions) => Promise<Deployment>;
 };
 
 // Deployments API interface (with signer auth - includes vault)

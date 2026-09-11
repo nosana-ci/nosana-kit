@@ -148,7 +148,12 @@ await vault.topup({ NOS: 100 });
 | `updateTimeout` | `timeout: number` | `Promise<void>` |
 | `updateActiveRevision` | `active_revision: number` | `Promise<void>` |
 | `updateSchedule` | `schedule: string` | `Promise<void>` |
+| `updateMarket` | `market: string` | `Promise<void>` |
+| `duplicate` | `options?: DeploymentDuplicateOptions` | `Promise<Deployment>` |
 | `generateAuthHeader` | — | `Promise<unknown>` |
+| `ssh.keys` | — | `Promise<string[]>` |
+| `ssh.add` | `publicKeys: string \| string[]` | `Promise<DeploymentUpdateSshKeysResult>` |
+| `ssh.remove` | `publicKeys: string \| string[]` | `Promise<DeploymentUpdateSshKeysResult>` |
 
 ### `api.templates` — Deployment Templates
 
@@ -176,6 +181,38 @@ await vault.topup({ NOS: 100 });
 | `getBenchmarkReport` | `request?: BenchmarkReportRequest` | `Promise<Record<string, unknown>>` |
 | `getTemplatePerformance` | `nodeId: string` | `Promise<Record<string, unknown>>` |
 | `getBenchmarkSummary` | `request?: BenchmarkSummaryRequest` | `Promise<Record<string, unknown>>` |
+
+### `api.node` / `api.jobs.get(job)` — Node access
+
+A node verifies the job owner's signature, and the client manager signs on the
+caller's behalf — so node access works under both wallet and API-key auth. It has
+the same shape unauthenticated, but then the node refuses what needs a signer.
+
+| Call | Parameters | Returns |
+|--------|-----------|---------|
+| `node(address)` | `address: string` | `Promise<NodeInfo>` — a node's public info |
+| `jobs.get(job)` | `job: string` | `Promise<Job & NodeJobApi>` — the job's current indexer state flat-merged with its node job API |
+
+`jobs.get` returns the job's state with its node job API on the same object, so
+`(await api.jobs.get(id)).ssh.add(key)` works. Until a node picks the job up, the
+node methods are present but fail saying so.
+
+**Node job methods** (on `await api.jobs.get(job)`, alongside the job's indexer fields):
+
+| Method | Parameters | Returns |
+|--------|-----------|---------|
+| `definition` / `setDefinition` | — / `definition: JobDefinition` | `Promise<JobDefinition>` / `Promise<void>` |
+| `results` | — | `Promise<FlowState>` |
+| `operations` / `operation` / `group` | — / `op: string` / `group?: string` | `Promise<NodeOperationStatuses>` |
+| `restartGroup` / `restartOperation` | `group: string` / `group: string, op: string` | `Promise<void>` |
+| `stopGroup` / `stopOperation` / `stop` | `group: string` / `group: string, op: string` / — | `Promise<void>` |
+| `endpoints` | — | `Promise<NodeJobEndpoints>` |
+| `stats` | `query?: NodeStatsQuery` | `Promise<NodeTaskStat[]>` |
+| `streamInfo` / `streamStats` | `handlers, query?` | `NodeStreamSubscription` |
+| `logs` / `status` | `handlers, filter?, options?` | `NodeStreamSubscription` |
+| `ssh.keys` / `ssh.add` / `ssh.remove` | — / `publicKey, { expiresAt? }` / `publicKey` | see `NodeJobSsh` |
+| `ssh.command` | `options?: SshCommandOptions` | `SshConnectionDescriptor` |
+| `terminal` | `options: NodeTerminalOptions` | `Promise<TerminalSession>` |
 
 ### `api.stats` — Platform Statistics
 

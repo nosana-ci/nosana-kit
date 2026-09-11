@@ -37,6 +37,7 @@
     "@nosana/authorization",
     "@nosana/connect",
     "@nosana/ipfs",
+    "@nosana/ssh",
     "@nosana/endpoints",
     "@nosana/api",
     "@nosana/types",

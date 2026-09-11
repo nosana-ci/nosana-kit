@@ -30,6 +30,8 @@ import {
   type NosanaNewsletterApi,
   createNosanaBenchmarksApi,
   type NosanaBenchmarksApi,
+  createNosanaNodeApi,
+  type NodeInfo,
 } from './routes/index.js';
 
 import { NosanaNetwork } from './types.js';
@@ -37,6 +39,7 @@ import type {
   ApiKeyAuth,
   CreateNosanaApiOptions,
   SignerAuth,
+  SignedHeaderAuth,
   NosanaNetwork as NosanaNetworkType,
   NosanaClients,
 } from './types.js';
@@ -54,6 +57,8 @@ export interface NosanaApi {
   payments: NosanaPaymentsApi;
   newsletter: NosanaNewsletterApi;
   benchmarks: NosanaBenchmarksApi;
+  /** A node's public info, addressed by node address. */
+  node: (address: string) => Promise<NodeInfo>;
   /**
    * The raw, fully-typed per-service OpenAPI clients. Use these to call any
    * endpoint not covered by the curated groups above — every route of each
@@ -63,6 +68,11 @@ export interface NosanaApi {
   clients: NosanaClients;
 }
 
+/**
+ * API-key auth: a node still verifies the job owner's signature, but the client
+ * manager signs on the caller's behalf — so node access (`jobs.get(id)`, `node`) is
+ * available, without a local wallet. No vault (that needs a signer).
+ */
 export interface NosanaApiWithApiKey {
   auth: NosanaAuthApi;
   jobs: NosanaJobsApi;
@@ -76,16 +86,19 @@ export interface NosanaApiWithApiKey {
   payments: NosanaPaymentsApi;
   newsletter: NosanaNewsletterApi;
   benchmarks: NosanaBenchmarksApi;
-  /**
-   * The raw, fully-typed per-service OpenAPI clients. Use these to call any
-   * endpoint not covered by the curated groups above — every route of each
-   * service is available with path autocompletion and typed params/responses,
-   * e.g. `api.clients.hostManager.POST('/nodes/ban', { body })`.
-   */
+  /** A node's public info, addressed by node address. */
+  node: (address: string) => Promise<NodeInfo>;
   clients: NosanaClients;
 }
 
-export type NosanaApiClient = NosanaApi | NosanaApiWithApiKey;
+/**
+ * Unauthenticated: the public, indexer-backed reads. The shape is the API-key
+ * one so `jobs.get(id)` is the same object under every auth mode; but a node
+ * verifies the job owner's signature, so without a signer its calls fail.
+ */
+export type NosanaPublicApi = NosanaApiWithApiKey;
+
+export type NosanaApiClient = NosanaApi | NosanaApiWithApiKey | NosanaPublicApi;
 
 function createClients(
   environment: NosanaNetworkType,
@@ -135,12 +148,23 @@ export function createNosanaApi(
   options?: CreateNosanaApiOptions,
 ): NosanaApiClient {
   const clients = createClients(environment, signerOrApiKey, options);
+  const auth = createNosanaAuthApi(clients.clientManager);
+  // A node verifies a signed header against the job owner, so a caller without a
+  // local wallet — an API key, or a browser session carried by cookies — reaches
+  // it through the client manager's signing service (custodial key), signed
+  // lazily, per request, so headers stay fresh and cost nothing until used.
+  const custodialSigning = hasApiKey || (!signerOrApiKey && Boolean(options?.include_credentials));
+  const nodeAuth: SignedHeaderAuth | undefined = custodialSigning
+    ? { generate: (message) => auth.signHeader(message) }
+    : signerOrApiKey;
+  const node = createNosanaNodeApi({ environment, authParams: nodeAuth, options });
 
   return {
-    auth: createNosanaAuthApi(clients.clientManager),
+    auth,
     jobs: createNosanaJobsApi({
       blockchainIndexer: clients.blockchainIndexer,
       clientManager: clients.clientManager,
+      node,
     }),
     credits: createNosanaCreditsApi({ clientManager: clients.clientManager }),
     markets: createNosanaMarketsApi({ hostManager: clients.hostManager }),
@@ -151,12 +175,14 @@ export function createNosanaApi(
         ? createDeploymentsApi(
             {
               deploymentManager: clients.deploymentManager,
+              environment,
+              options,
               solana: signerOrApiKey.solana,
             },
             false,
           )
         : createDeploymentsApi(
-            { deploymentManager: clients.deploymentManager },
+            { deploymentManager: clients.deploymentManager, environment, options },
             true,
           ),
     user: createNosanaUserApi({ clientManager: clients.clientManager }),
@@ -172,6 +198,7 @@ export function createNosanaApi(
       clientManager: clients.clientManager,
     }),
     benchmarks: createNosanaBenchmarksApi({ hostManager: clients.hostManager }),
+    node: (address: string) => node(address).info(),
     clients,
   };
 }
@@ -193,3 +220,4 @@ export type * from './routes/jobs/types.js';
 export type * from './routes/credits/types.js';
 export type * from './routes/markets/types.js';
 export type * from './routes/deployments/types.js';
+export type * from './routes/node/types.js';

@@ -53,6 +53,46 @@ describe('createNosanaAuthApi', () => {
     });
   });
 
+  describe('signHeader', () => {
+    it('assembles a message:signature authorization header', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({
+        data: { signature: TEST_SIGNATURE, message: TEST_MESSAGE },
+        error: null,
+      });
+
+      const api = createNosanaAuthApi(global.TEST_MOCK_CLIENT);
+      const result = await api.signHeader(TEST_MESSAGE);
+
+      expect(result).toBe(`${TEST_MESSAGE}:${TEST_SIGNATURE}`);
+      expect(global.TEST_MOCK_CLIENT.POST).toHaveBeenCalledWith(
+        '/auth/sign-message/external',
+        { body: { message: TEST_MESSAGE, includeTime: undefined } },
+      );
+    });
+
+    it('appends the timestamp when includeTime is set', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({
+        data: { signature: TEST_SIGNATURE, message: TEST_MESSAGE, timestamp: 1717000000000 },
+        error: null,
+      });
+
+      const api = createNosanaAuthApi(global.TEST_MOCK_CLIENT);
+      const result = await api.signHeader(TEST_MESSAGE, { includeTime: true });
+
+      expect(result).toBe(`${TEST_MESSAGE}:${TEST_SIGNATURE}:1717000000000`);
+    });
+
+    test('when an error is returned, it should throw a formatted error', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({
+        data: null,
+        error: { message: 'Unauthorized' },
+      });
+
+      const api = createNosanaAuthApi(global.TEST_MOCK_CLIENT);
+      await expect(api.signHeader(TEST_MESSAGE)).rejects.toThrow('Failed to sign message');
+    });
+  });
+
   describe('validateSession', () => {
     it('should return session validation result', async () => {
       const mockResponse = { valid: true, user: 'test-user' };
