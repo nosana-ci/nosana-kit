@@ -2,7 +2,12 @@ import { NosanaNetwork } from '@nosana/types';
 import { NosanaApiClient } from '@nosana/api';
 import { createIpfsClient, NosanaIpfsClient } from '@nosana/ipfs';
 import { createNosanaAuthorization, type NosanaAuthorization } from '@nosana/authorization';
-import { createConnect, defaultEndpoints, isConnectSession, issuerForNetwork } from '@nosana/connect';
+import {
+  createConnect,
+  defaultEndpoints,
+  isConnectSession,
+  issuerForNetwork,
+} from '@nosana/connect';
 import type { ConnectFactoryConfig, ConnectSession } from '@nosana/connect';
 import type { BrowserConnect } from '@nosana/connect/browser';
 import type { ServerConnect } from '@nosana/connect/server';
