@@ -83,6 +83,54 @@ curl -s \
 
 :::
 
+## Get a Deployment Job
+
+Fetch a single job belonging to a deployment. The returned job carries the node
+job API (`ssh`, `terminal`, `definition`, `logs`, …) attached — authorized by
+the deployment manager signing on the deployment's behalf, so it works without a
+local wallet. Throws if the job has no assigned node yet.
+
+:::tabs
+
+== TypeScript SDK
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
+const job = await deployment.getJob('YOUR_JOB_ID');
+
+// Stream the job's task logs (history first, then live). `logs()` returns a
+// subscription; call close() when you're done.
+const logs = job.logs({
+  onData: (log) => console.log(`[${log.opId}]`, log.message),
+  onError: (err) => console.error('log stream error:', err),
+});
+// …later
+logs.close();
+
+// Connect over SSH: authorize a public key, then print the ready-to-run command.
+await job.ssh.add('ssh-ed25519 AAAA... you@laptop');
+const ssh = job.ssh.command({ identityFile: '~/.ssh/id_ed25519' });
+console.log(ssh.formattedCommand);
+```
+
+== HTTP API
+
+```bash
+curl -s \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/jobs/YOUR_JOB_ID | jq .
+```
+
+:::
+
+The job carries the same node job API as [`jobs.get`](/api/jobs#manage-an-active-job) — inspect operations, stream stats, restart or stop operations, collect results, and open a terminal, all on the returned object.
+
 ## Update Job Definition (Create a Revision)
 
 Create a new revision of the job definition for an existing deployment:

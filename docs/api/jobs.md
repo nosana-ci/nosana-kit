@@ -152,6 +152,22 @@ const job = await client.api.jobs.get('job-address-here');
 console.log('Job State:', job.state);
 console.log('Node:', job.node);
 console.log('Job Definition IPFS hash:', job.ipfsJob);
+
+// The node job API rides on the same object — no extra fetch, no local wallet.
+
+// Stream task logs (history first, then live). `logs()` returns a subscription;
+// call close() when you're done.
+const logs = job.logs({
+  onData: (log) => console.log(`[${log.opId}]`, log.message),
+  onError: (err) => console.error('log stream error:', err),
+});
+// …later
+logs.close();
+
+// Connect over SSH: authorize a public key, then print the ready-to-run command.
+await job.ssh.add('ssh-ed25519 AAAA... you@laptop');
+const ssh = job.ssh.command({ identityFile: '~/.ssh/id_ed25519' });
+console.log(ssh.formattedCommand);
 ```
 
 == HTTP API
@@ -162,6 +178,77 @@ curl -X GET https://api.nosana.com/jobs/{address} \
 ```
 
 :::
+
+The returned job merges the indexer state (`state`, `node`, `ipfsJob`, …) with
+the live node job API, so `definition()`, `results()`, `logs()`, `ssh` and
+`terminal()` all live on the one object. The node calls are authorized on your
+behalf (signer, API key, or a browser session), so they work without a local
+wallet; under unauthenticated public access the shape is identical but those
+node calls will fail.
+
+## Manage an Active Job
+
+Once a job is running, the object returned by `jobs.get(id)` exposes the node's
+live job API — inspect its operations, stream stats, restart or stop individual
+operations, collect results, or open an interactive terminal. These reach the
+node directly and require an authenticated client, so they are SDK-only.
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const job = await client.api.jobs.get('job-address-here');
+
+// Inspect the job's operations and the endpoints it exposes.
+console.log('Operations:', await job.operations());
+console.log('Endpoints:', await job.endpoints());
+
+// Stream resource stats (CPU / memory / …) as the node samples them.
+const stats = job.streamStats(
+  { onData: (samples) => console.log('stats:', samples) },
+  { interval: 5 },
+);
+// …later
+stats.close();
+
+// Restart or stop a single operation within a group.
+await job.restartOperation('default', 'my-op');
+await job.stopOperation('default', 'my-op');
+
+// Stop the whole job.
+await job.stop();
+
+// Once finished, collect the flow results (the node hands them over once).
+console.log('Results:', await job.results());
+```
+
+### Open an Interactive Terminal
+
+Attach a PTY to the running job. The node streams output through `onData`; write
+back with `sendInput`, resize with `resize`, and end the session with `close`.
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+const job = await client.api.jobs.get('job-address-here');
+// ---cut---
+const terminal = await job.terminal({
+  cols: 80,
+  rows: 24,
+  onData: (bytes) => console.log(new TextDecoder().decode(bytes)),
+  onStatus: (status) => console.log('terminal:', status),
+});
+
+terminal.sendInput('ls -la\n');
+terminal.resize(120, 40);
+terminal.close();
+```
 
 ## Post Job
 
