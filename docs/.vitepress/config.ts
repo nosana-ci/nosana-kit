@@ -127,6 +127,7 @@ export default withMermaid(
               { text: 'Jobs', link: '/api/jobs' },
               { text: 'Markets', link: '/api/markets' },
               { text: 'Credits', link: '/api/credits' },
+              { text: 'LLM Inference', link: '/api/llm' },
               { text: 'Templates', link: '/api/templates' },
               { text: 'Hosts', link: '/api/hosts' },
               { text: 'Stats', link: '/api/stats' },
