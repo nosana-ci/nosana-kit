@@ -28,7 +28,7 @@ describe('node job sockets', () => {
     await socket.onopen?.(new Event('open'));
     expect(JSON.parse(socket.sent[0])).toEqual({
       path: '/flog',
-      header: 'NosanaApiAuthentication:signed',
+      header: `${JOB}:signed`,
       body: { jobAddress: JOB, group: 'setup' },
     });
     expect(onOpen).toHaveBeenCalled();
@@ -83,6 +83,6 @@ describe('node job sockets', () => {
     });
     await socket.onopen?.(new Event('open'));
 
-    expect(JSON.parse(socket.sent[0]).header).toBe('NosanaApiAuthentication:by-deployment');
+    expect(JSON.parse(socket.sent[0]).header).toBe(`${JOB}:by-deployment`);
   });
 });
