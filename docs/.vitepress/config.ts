@@ -32,6 +32,7 @@ export default withMermaid(
         { text: 'About', link: '/about/introduction' },
         { text: 'Deployments', link: '/deployments/intro' },
         { text: 'API', link: '/api/intro' },
+        { text: 'MCP', link: '/mcp/intro' },
         { text: 'SDK', link: '/kit/' },
         { text: 'CLI', link: '/inference/quick_start' },
         { text: 'Host GPUs', link: '/hosts/grid' },
@@ -135,6 +136,12 @@ export default withMermaid(
               { text: 'Benchmarks', link: '/api/benchmarks' },
               { text: 'Raw Clients', link: '/api/raw-clients' },
             ],
+          },
+        ],
+        '/mcp/': [
+          {
+            text: 'MCP Server',
+            items: [{ text: 'Introduction', link: '/mcp/intro' }],
           },
         ],
         '/about/': [
