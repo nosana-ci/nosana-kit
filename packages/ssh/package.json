@@ -1,6 +1,6 @@
 {
   "name": "@nosana/ssh",
-  "version": "2.13.1",
+  "version": "2.14.0",
   "description": "SSH tooling for Nosana jobs: OpenSSH key pairs, public-key validation, job definition keys and the ssh command that reaches a job",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

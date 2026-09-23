@@ -1,6 +1,6 @@
 {
   "name": "@nosana/ipfs",
-  "version": "2.7.3",
+  "version": "2.14.0",
   "description": "Nosana IPFS module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
