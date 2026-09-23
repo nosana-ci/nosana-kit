@@ -14,7 +14,15 @@ export interface SolanaConfig {
   network: string;
 }
 
-export type ApiKeyAuth = string
+/**
+ * A dynamic bearer-token source, resolved on every request — e.g. an OAuth
+ * session from @nosana/connect that transparently refreshes. Returns the
+ * current access token.
+ */
+export type TokenProvider = () => string | Promise<string>;
+
+/** A static API key / access token, or a provider that yields one per request. */
+export type ApiKeyAuth = string | TokenProvider
 
 /**
  * SignerAuth provides identifier and generate function for API authentication.

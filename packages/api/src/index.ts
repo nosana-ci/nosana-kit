@@ -147,7 +147,9 @@ export function createNosanaApi(
   signerOrApiKey: SignerAuth | ApiKeyAuth | undefined,
   options?: CreateNosanaApiOptions,
 ): NosanaApiClient {
-  const hasApiKey = typeof signerOrApiKey === 'string';
+  // An API key is a bearer credential (a static string or a token provider),
+  // as opposed to a wallet-backed SignerAuth object.
+  const hasApiKey = typeof signerOrApiKey === 'string' || typeof signerOrApiKey === 'function';
   const clients = createClients(environment, signerOrApiKey, options);
   const auth = createNosanaAuthApi(clients.clientManager);
   // A node verifies a signed header against the job owner, so a caller without a
@@ -157,7 +159,8 @@ export function createNosanaApi(
   const custodialSigning = hasApiKey || (!signerOrApiKey && Boolean(options?.include_credentials));
   const nodeAuth: SignedHeaderAuth | undefined = custodialSigning
     ? { generate: (message) => auth.signHeader(message) }
-    : signerOrApiKey;
+    : // Not custodial ⇒ not an API key, so this is a wallet SignerAuth or undefined.
+      (signerOrApiKey as SignerAuth | undefined);
   const node = createNosanaNodeApi({ environment, authParams: nodeAuth, options });
 
   return {
@@ -169,8 +172,10 @@ export function createNosanaApi(
     }),
     credits: createNosanaCreditsApi({ clientManager: clients.clientManager }),
     markets: createNosanaMarketsApi({ hostManager: clients.hostManager }),
+    // Only a wallet-backed SignerAuth (an object) can sign deployment
+    // transactions locally; string / token-provider (bearer) auth uses the proxy.
     deployments:
-      !hasApiKey && signerOrApiKey
+      typeof signerOrApiKey === 'object' && signerOrApiKey !== null
         ? createDeploymentsApi(
             {
               deploymentManager: clients.deploymentManager,

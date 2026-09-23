@@ -35,6 +35,7 @@
   "groupOrder": [
     "@nosana/kit",
     "@nosana/authorization",
+    "@nosana/connect",
     "@nosana/ipfs",
     "@nosana/ssh",
     "@nosana/endpoints",

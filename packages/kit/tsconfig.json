@@ -7,6 +7,7 @@
   "references": [
     { "path": "../types" },
     { "path": "../authorisation" },
+    { "path": "../connect" },
     { "path": "../ipfs" },
     { "path": "../endpoints" },
     { "path": "../api" },

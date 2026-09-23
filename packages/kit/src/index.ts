@@ -552,6 +552,7 @@ export type {
   CreateNosanaApiOptions,
   ApiKeyAuth,
   SignerAuth,
+  TokenProvider,
   ApiConfig,
   // Job API types
   NosanaJobsApi,
@@ -613,3 +614,65 @@ export { createIpfsClient, solBytesArrayToIpfsHash, ipfsHashToSolBytesArray } fr
  * @group @nosana/ipfs
  */
 export type { IPFSConfig, GetOverride, PostOverride, FetchClient } from '@nosana/ipfs';
+
+// ============================================================================
+// @nosana/connect - "Connect with Nosana" OAuth
+// ============================================================================
+
+/**
+ * Create a "Connect with Nosana" session, picking browser (no secret) or server
+ * (with secret) from your config. Pass it as the client's `connect` option:
+ * `createNosanaClient(network, { connect })`.
+ * @group @nosana/connect
+ */
+export { createConnect } from '@nosana/connect';
+
+/**
+ * "Connect with Nosana" for browser apps. Pass the session (or its config) as
+ * the client's `connect` option to authenticate `client.api.*` calls:
+ * `createNosanaClient(network, { connect })`.
+ * @group @nosana/connect
+ */
+export { createBrowserConnect } from '@nosana/connect/browser';
+
+/**
+ * The default `sessionStorage`-backed store for a browser Connect session (PKCE
+ * state + tokens). Pass a custom `store` to override where they're kept.
+ * @group @nosana/connect
+ */
+export { sessionStorageStore } from '@nosana/connect/browser';
+
+/**
+ * "Connect with Nosana" for apps with a backend (confidential clients). Run the
+ * sign-in on your server, then pass the session to the client's `connect` option
+ * or its token via `api.getToken`.
+ * @group @nosana/connect
+ */
+export { createServerConnect } from '@nosana/connect/server';
+
+/**
+ * @group @nosana/connect
+ */
+export type { ServerConnect, ServerLoginOptions } from '@nosana/connect/server';
+
+/**
+ * @group @nosana/connect
+ */
+export type { BrowserConnect, LoginRedirectOptions, CallbackResult } from '@nosana/connect/browser';
+
+/**
+ * @group @nosana/connect
+ */
+export { NosanaConnectClient, DEFAULT_ISSUER, memoryStore } from '@nosana/connect';
+
+/**
+ * @group @nosana/connect
+ */
+export type {
+  ConnectConfig,
+  ConnectFactoryConfig,
+  ConnectSession,
+  ConnectStore,
+  AuthorizationRequest,
+  TokenResponse as ConnectTokenResponse,
+} from '@nosana/connect';

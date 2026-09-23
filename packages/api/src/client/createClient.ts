@@ -24,6 +24,10 @@ export async function authHeaders(
     return { Authorization: `Bearer ${authParams}` };
   }
 
+  if (typeof authParams === 'function') {
+    return { Authorization: `Bearer ${await authParams()}` };
+  }
+
   return {
     ...(authParams.identifier ? { 'x-user-id': authParams.identifier } : {}),
     Authorization: await authParams.generate(NOSANA_API_AUTH_MESSAGE),

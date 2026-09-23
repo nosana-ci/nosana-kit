@@ -998,7 +998,7 @@ The API service provides access to Nosana APIs for jobs, credits, and markets. I
 
 ### Authentication Methods
 
-The API service supports two authentication methods:
+The API service supports three authentication methods:
 
 1. **API Key Authentication** (Recommended for server-side applications)
    - Provide an API key in the configuration
@@ -1008,6 +1008,12 @@ The API service supports two authentication methods:
    - Set a wallet on the client
    - Uses message signing for authentication
    - Automatically enabled when a wallet is configured
+
+3. **Connect (OAuth) Authentication** (For third-party apps — "Connect with Nosana")
+   - Users sign in with their Nosana account via `@nosana/connect`
+   - Provide `api.getToken` returning the current access token
+   - Resolved per request, so the token transparently refreshes
+   - See [Connect with Nosana (OAuth)](#connect-with-nosana-oauth) below
 
 ### Configuration
 
@@ -1076,6 +1082,57 @@ if (client.api) {
 client.wallet = undefined; // API becomes undefined
 client.wallet = anotherWallet; // API is recreated with new wallet
 ```
+
+## Connect with Nosana (OAuth)
+
+For third-party browser apps, `@nosana/connect` provides a **"Connect with Nosana"** flow:
+users sign in with their Nosana account and your app calls the API on their behalf — no
+pasted API key. Pass a `connect` session (or config) and the client wires its
+(auto-refreshed) token into `client.api` and exposes it as `client.connect` — no manual
+`getToken`.
+
+Register your app under **Account → Connected Apps** in the Nosana dashboard to get a
+`client_id` (`stcl_…`).
+
+```typescript
+import { createNosanaClient, createBrowserConnect, NosanaNetwork } from '@nosana/kit';
+
+// Build the session (keep the reference for the login flow) and pass it to the client.
+const connect = createBrowserConnect({
+  clientId: 'stcl_…',
+  redirectUri: location.origin + '/callback',
+  // issuer defaults to Nosana production; pass `issuer` to target devnet
+});
+const client = createNosanaClient(NosanaNetwork.MAINNET, { connect });
+
+// On your "Connect with Nosana" button:
+await connect.loginWithRedirect({ appState: { returnTo: location.pathname } });
+
+// On your /callback route:
+const { appState } = await connect.handleRedirectCallback();
+location.assign((appState as { returnTo?: string })?.returnTo ?? '/');
+
+// Authenticated calls — the token is attached for you.
+const balance = await client.api.credits.balance();
+```
+
+Prefer a one-liner? Let the client build the session from config —
+`createNosanaClient(NETWORK, { connect: { clientId, redirectUri } })` — and reach it via
+`client.connect`.
+
+### Notes
+
+- The token is resolved on **every** request, so it stays fresh — a static `api.apiKey`
+  would go stale. See the [`@nosana/connect` README](../connect/README.md) for the full API.
+- **Environment follows the network.** When the kit builds the session from a `connect`
+  config, the OAuth issuer defaults from the network you pass — `NosanaNetwork.MAINNET` →
+  `deploy.nosana.com`, `NosanaNetwork.DEVNET` → `devnet.nosana.com`. Override with
+  `connect.issuer`. (A session you build yourself and pass in keeps its own issuer.)
+- **Server-side web apps** (acting for a logged-in user) run the confidential redirect flow
+  on your backend, then pass that user's token to the client via
+  `api: { getToken: () => usersAccessToken }` — `connect` is the browser convenience.
+- **First-party apps** on a `*.nosana.com` domain can skip Connect and ride the session
+  cookie with `api: { include_credentials: true }`.
 
 ## Authorization Service
 

@@ -34,6 +34,7 @@ export default withMermaid(
         { text: 'API', link: '/api/intro' },
         { text: 'MCP', link: '/mcp/intro' },
         { text: 'SDK', link: '/kit/' },
+        { text: 'Connect', link: '/connect/' },
         { text: 'CLI', link: '/inference/quick_start' },
         { text: 'Host GPUs', link: '/hosts/grid' },
         { text: 'Programs', link: '/programs/start' },
@@ -211,6 +212,20 @@ export default withMermaid(
             ],
           },
           ...getSdkReferenceSidebar(),
+        ],
+        '/connect/': [
+          {
+            text: 'Connect with Nosana',
+            items: [
+              { text: 'Overview', link: '/connect/' },
+              { text: 'Browser apps', link: '/connect/#browser-apps' },
+              { text: 'Server apps', link: '/connect/#server-apps' },
+            ],
+          },
+          {
+            text: 'Reference',
+            items: [{ text: 'SDK Reference', link: '/kit/reference/' }],
+          },
         ],
         '/hosts/': [
           {

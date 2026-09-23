@@ -4,21 +4,22 @@ Monorepo for the [Nosana](https://nosana.com) developer toolkit: TypeScript pack
 
 ## Packages
 
-| Package | Description |
-|--------|-------------|
-| [**@nosana/kit**](./packages/kit) | Main SDK for jobs, markets, runs, staking, IPFS, and API integration. Start here for building on Nosana. |
-| [@nosana/types](./packages/types) | Shared types and schemas. |
-| [@nosana/api](./packages/api) | Nosana API client. |
-| [@nosana/authorization](./packages/authorisation) | Message signing and validation for API auth. |
-| [@nosana/endpoints](./packages/endpoints) | Endpoint and environment configuration. |
-| [@nosana/ipfs](./packages/ipfs) | IPFS pinning and retrieval. |
-| [@nosana/ssh](./packages/ssh) | SSH key pairs, key validation and node access for jobs. |
-| [@nosana/jobs-program](./packages/generated_clients/jobs) | Generated Solana jobs program client. |
-| [@nosana/stake-program](./packages/generated_clients/stake) | Generated Solana stake program client. |
-| [@nosana/merkle-distributor-program](./packages/generated_clients/merkle_distributor) | Generated Solana merkle distributor program client. |
-| [**@nosana/localnet**](./packages/localnet) | Docker-based Solana test validator with pre-baked Nosana programs. |
-| [**@nosana/scenario**](./packages/scenario) | Network-aware scenario test helpers (localnet / devnet / mainnet). |
-| [**@nosana/docs**](./docs) | Documentation site (VitePress). |
+| Package                                                                               | Description                                                                                              |
+| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [**@nosana/kit**](./packages/kit)                                                     | Main SDK for jobs, markets, runs, staking, IPFS, and API integration. Start here for building on Nosana. |
+| [@nosana/types](./packages/types)                                                     | Shared types and schemas.                                                                                |
+| [@nosana/api](./packages/api)                                                         | Nosana API client.                                                                                       |
+| [@nosana/authorization](./packages/authorisation)                                     | Message signing and validation for API auth.                                                             |
+| [@nosana/connect](./packages/connect)                                                 | "Connect with Nosana" OAuth 2.1 / OIDC client for third-party apps.                                      |
+| [@nosana/endpoints](./packages/endpoints)                                             | Endpoint and environment configuration.                                                                  |
+| [@nosana/ipfs](./packages/ipfs)                                                       | IPFS pinning and retrieval.                                                                              |
+| [@nosana/ssh](./packages/ssh)                                                         | SSH key pairs, key validation and node access for jobs.                                                  |
+| [@nosana/jobs-program](./packages/generated_clients/jobs)                             | Generated Solana jobs program client.                                                                    |
+| [@nosana/stake-program](./packages/generated_clients/stake)                           | Generated Solana stake program client.                                                                   |
+| [@nosana/merkle-distributor-program](./packages/generated_clients/merkle_distributor) | Generated Solana merkle distributor program client.                                                      |
+| [**@nosana/localnet**](./packages/localnet)                                           | Docker-based Solana test validator with pre-baked Nosana programs.                                       |
+| [**@nosana/scenario**](./packages/scenario)                                           | Network-aware scenario test helpers (localnet / devnet / mainnet).                                       |
+| [**@nosana/docs**](./docs)                                                            | Documentation site (VitePress).                                                                          |
 
 For detailed SDK usage, see the [**Nosana Kit** README](./packages/kit/README.md).
 
@@ -36,8 +37,8 @@ Install it by typing these at the Claude Code prompt (not in your shell):
 
 ## Requirements
 
-- **Node.js** >= 20.18.0  
-- **pnpm** >= 9.15.0  
+- **Node.js** >= 20.18.0
+- **pnpm** >= 9.15.0
 - **TypeScript** >= 5.3.0 (for development)
 
 ## Development
