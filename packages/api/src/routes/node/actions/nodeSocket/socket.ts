@@ -1,4 +1,3 @@
-import { NOSANA_API_AUTH_MESSAGE } from '../../../../client/createClient.js';
 import { tryParseJson } from '../../../../utils/json.js';
 import { requireNodeAuthorization } from '../authorization.js';
 
@@ -46,7 +45,10 @@ export function openNodeSocket<T>(
 
   socket.onopen = async () => {
     try {
-      socket.send(JSON.stringify({ ...handshake, header: await authorize(NOSANA_API_AUTH_MESSAGE) }));
+      // Bind the socket's header to the job it opens, so a captured handshake
+      // cannot be replayed against another job (matches the REST/SSE routes).
+      const header = await authorize(handshake.body.jobAddress, { skipCache: true });
+      socket.send(JSON.stringify({ ...handshake, header }));
       handlers.onOpen?.();
     } catch (error) {
       handlers.onError?.(error);

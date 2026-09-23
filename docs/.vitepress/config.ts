@@ -32,6 +32,7 @@ export default withMermaid(
         { text: 'About', link: '/about/introduction' },
         { text: 'Deployments', link: '/deployments/intro' },
         { text: 'API', link: '/api/intro' },
+        { text: 'MCP', link: '/mcp/intro' },
         { text: 'SDK', link: '/kit/' },
         { text: 'Connect', link: '/connect/' },
         { text: 'CLI', link: '/inference/quick_start' },
@@ -128,6 +129,7 @@ export default withMermaid(
               { text: 'Jobs', link: '/api/jobs' },
               { text: 'Markets', link: '/api/markets' },
               { text: 'Credits', link: '/api/credits' },
+              { text: 'LLM Inference', link: '/api/llm' },
               { text: 'Templates', link: '/api/templates' },
               { text: 'Hosts', link: '/api/hosts' },
               { text: 'Stats', link: '/api/stats' },
@@ -135,6 +137,12 @@ export default withMermaid(
               { text: 'Benchmarks', link: '/api/benchmarks' },
               { text: 'Raw Clients', link: '/api/raw-clients' },
             ],
+          },
+        ],
+        '/mcp/': [
+          {
+            text: 'MCP Server',
+            items: [{ text: 'Introduction', link: '/mcp/intro' }],
           },
         ],
         '/about/': [
