@@ -116,6 +116,10 @@ localnet:docker:push-hub:
   extends: .localnet-docker
   needs:
     - localnet:docker:tag
+  # The tag job above is allowed to fail, and GitLab still runs dependents of an
+  # allowed failure. When no image was re-tagged there is nothing to push, and
+  # that must not fail the child pipeline and block the npm publish at the root.
+  allow_failure: true
   before_script:
     - export DOCKER_TLS_CERTDIR=
     - export DOCKER_TLS_VERIFY=
