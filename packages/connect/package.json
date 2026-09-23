@@ -1,6 +1,6 @@
 {
   "name": "@nosana/connect",
-  "version": "2.14.0",
+  "version": "2.14.1",
   "description": "Nosana Connect — OAuth 2.1 / OIDC client for \"Connect with Nosana\"",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

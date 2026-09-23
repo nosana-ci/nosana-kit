@@ -1,6 +1,6 @@
 {
   "name": "@nosana/jobs-program",
-  "version": "2.14.0",
+  "version": "2.14.1",
   "description": "Nosana Jobs program generated client",
   "repository": {
     "type": "git",
