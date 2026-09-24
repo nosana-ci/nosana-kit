@@ -24,6 +24,25 @@ Then follow the steps for where your app runs:
 Both use the same connection settings — add a **Client Secret** and it switches to the
 server flow; leave it out and it stays a browser app.
 
+## Choose what your app can do
+
+When you register your app, tick the **Permissions** it needs. Those are the most it can
+ever ask for. When someone signs in, the consent screen lists what your app is asking for,
+and your app's token only carries what the user approves. See
+[Permissions (Scopes)](/api/scopes) for what each permission allows.
+
+By default the SDK asks for all of your app's permissions. To ask for fewer, pass
+`scopes`. Keep `openid` and `offline_access` in the list: `openid` lets you read the
+user's profile, and `offline_access` keeps them signed in.
+
+```ts
+await client.connect.loginWithRedirect({
+  scopes: ['openid', 'offline_access', 'credits:read'],
+});
+```
+
+You can also set `scopes` once, in the `connect` config.
+
 ## Browser apps
 
 ### 1. Add a "Connect with Nosana" button

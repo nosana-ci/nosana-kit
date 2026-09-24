@@ -37,7 +37,7 @@ The MCP server uses **OAuth**. You don't need an API key.
 2. Your client opens a browser window where you sign in with your Nosana account and approve access.
 3. The client stores the resulting access token and sends it with every request.
 
-Every tool call runs as **you**, with the same permissions and credit balance as your account on [Nosana Deploy](https://deploy.nosana.com). The MCP server never stores credentials of its own.
+Every tool call runs as **you**, with your credit balance on [Nosana Deploy](https://deploy.nosana.com), but only with the [permissions](/api/scopes) you approved when you signed in. The consent screen lists them: reading your credits, reading and managing your jobs and deployments, and signing with your wallet. Permissions that are for API keys only, such as LLM inference and managing your API keys, aren't available through MCP. The MCP server never stores credentials of its own.
 
 :::warning
 Tools can create, start, stop and delete deployments, and running deployments spend your credits. Review what your assistant is about to do before you approve a tool call that changes your deployments, especially if your client auto-approves tool calls.
@@ -131,6 +131,7 @@ If the assistant returns your deployments, you're connected. If you haven't crea
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | `401 Unauthorized` | The client isn't signed in, or its token has expired | Re-authenticate from your client's MCP settings (for example, `/mcp` in Claude Code) |
+| `403` with `INSUFFICIENT_SCOPE` | The token doesn't include the [permission](/api/scopes) this tool needs | Re-authenticate and approve the permissions on the consent screen |
 | `503` with `Retry-After` | The server couldn't verify your token right now | Wait a few seconds and retry. You don't need to sign in again |
 | `405 Method Not Allowed` on `GET /mcp` | The client is trying to open a server-to-client event stream | This is expected. Clients fall back to `POST`. If yours doesn't, use `mcp-remote` |
 | A tool is missing | Not every API endpoint is exposed as a tool | Call the [API](/api/intro) directly |
