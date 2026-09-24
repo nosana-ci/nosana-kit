@@ -10,7 +10,8 @@ served by the Client Manager.
 
 For how to obtain an API key in the dashboard, see the
 [Get API Key guide](/api/get-api-key). For wallet-based authentication, see
-[Wallet Authentication](/api/wallet-authentication).
+[Wallet Authentication](/api/wallet-authentication). For what a key is allowed to do,
+see [Permissions (Scopes)](/api/scopes).
 
 ## `auth`
 
@@ -37,7 +38,7 @@ const signature = await client.api.auth.signMessage('message-to-sign', {
 
 | Method | HTTP | Path | Description |
 |---|---|---|---|
-| `auth.validateApiKey(apiKey)` | POST | `/auth/validate-api-key` | Validate an API key |
+| `auth.validateApiKey(apiKey)` | POST | `/auth/validate-api-key` | Validate an API key, and see its [permissions](/api/scopes) (`scopes`) |
 | `auth.validateSession(cookieHeader?)` | POST | `/auth/validate-session` | Validate a SuperTokens session |
 | `auth.signMessage(message, options?)` | POST | `/auth/sign-message/external` | Sign a message for external-service auth |
 
@@ -74,3 +75,7 @@ await client.api.user.apiKeys.delete(key.id);
 | `user.apiKeys.get(id)` | GET | `/api-keys/{id}` | Get an API key |
 | `user.apiKeys.update(id, request)` | POST | `/api-keys/{id}/update` | Update an API key |
 | `user.apiKeys.delete(id)` | POST | `/api-keys/{id}/delete` | Delete an API key |
+
+A new key gets every permission of the key that creates it, unless you pass `scopes` in
+the request to limit it. Permissions can't be changed after creation. See
+[Permissions (Scopes)](/api/scopes#api-keys).

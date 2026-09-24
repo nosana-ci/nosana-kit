@@ -126,6 +126,7 @@ export default withMermaid(
             items: [
               { text: 'Overview', link: '/api/reference' },
               { text: 'Authentication & API Keys', link: '/api/auth' },
+              { text: 'Permissions (Scopes)', link: '/api/scopes' },
               { text: 'Jobs', link: '/api/jobs' },
               { text: 'Markets', link: '/api/markets' },
               { text: 'Credits', link: '/api/credits' },

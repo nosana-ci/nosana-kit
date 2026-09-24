@@ -193,6 +193,10 @@ live job API — inspect its operations, stream stats, restart or stop individua
 operations, collect results, or open an interactive terminal. These reach the
 node directly and require an authenticated client, so they are SDK-only.
 
+With an API key or an app's token, the SDK signs these node requests through your
+account, which needs the `wallet:sign` [permission](/api/scopes). To read job data with a
+narrower key, use [Read Job Data](#read-job-data) instead.
+
 ```ts twoslash
 import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
 declare const process: { env: Record<string, string> };
@@ -249,6 +253,45 @@ terminal.sendInput('ls -la\n');
 terminal.resize(120, 40);
 terminal.close();
 ```
+
+## Read Job Data
+
+With the `jobs:read` [permission](/api/scopes), you can read a running job's data from its
+node over plain HTTP. Nosana signs the request to the node for you, so the key doesn't
+need `wallet:sign`, and it can't change the job.
+
+```bash
+curl https://api.nosana.com/jobs/{address}/node/ops \
+  -H "Authorization: Bearer nos_xxx_your_api_key"
+```
+
+| Path | Returns |
+|---|---|
+| `GET /jobs/{address}/node/info` | A live stream (server-sent events) of the job's state and task status, until the job ends |
+| `GET /jobs/{address}/node/job-definition` | The job definition the node is running |
+| `GET /jobs/{address}/node/endpoints` | The URLs the job exposes, and whether they answer yet |
+| `GET /jobs/{address}/node/stats` | CPU, memory, disk and network samples. Accepts `interval`, `start` and `end` |
+| `GET /jobs/{address}/node/ops` | The status of every operation |
+| `GET /jobs/{address}/node/ops/{opId}` | The status of one operation |
+| `GET /jobs/{address}/node/group/current` | The status of the operations in the group that's running |
+| `GET /jobs/{address}/node/group/{group}` | The status of the operations in one group |
+| `GET /jobs/{address}/node/results` | The finished flow state |
+
+:::warning
+`results` is only available once the job is waiting for its results to be collected, and
+reading it lets the node finish the job. Don't call it just to check on a running job.
+:::
+
+Only jobs posted from your account can be read, including your deployments' jobs.
+
+| Status | Meaning |
+|---|---|
+| `404` | No job with that address, or it wasn't posted from your account |
+| `409` | The job hasn't been picked up by a node yet |
+| `502` | The node running the job couldn't be reached |
+
+Any other status comes from the node itself, for example a `400` when a resource isn't
+available in the job's current state.
 
 ## Post Job
 

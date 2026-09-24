@@ -46,7 +46,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Validate API key */
+        /**
+         * Validate API key
+         * @description Check whether an API key is active and report whose it is, with its scopes.
+         */
         post: operations["postAuthValidate-api-key"];
         delete?: never;
         options?: never;
@@ -68,6 +71,26 @@ export interface paths {
          * @description Sign message for external service authentication
          */
         post: operations["postAuthSign-messageExternal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/scopes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List scopes
+         * @description Every scope an API key may hold, with the wording shown to users. Filter on `oauthGrantable` for the set an OAuth app may be given.
+         */
+        get: operations["getAuthScopes"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -129,7 +152,7 @@ export interface paths {
         put?: never;
         /**
          * Update API Key
-         * @description Update an API key (name or status)
+         * @description Update an API key's name, status or model restriction.
          */
         post: operations["postApi-keysByIdUpdate"];
         delete?: never;
@@ -298,6 +321,103 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/credits/internal/llm/finalize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postCreditsInternalLlmFinalize"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/llm/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List LLM inference usage */
+        get: operations["getCreditsLlmUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/internal/llm/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCreditsInternalLlmModels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/admin/llm/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCreditsAdminLlmTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/admin/llm/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCreditsAdminLlmModels"];
+        put?: never;
+        post: operations["postCreditsAdminLlmModels"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credits/admin/llm/models/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patchCreditsAdminLlmModelsById"];
         trace?: never;
     };
     "/templates/": {
@@ -548,6 +668,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payments/setup-intent/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finalize card setup after 3D Secure
+         * @description Re-checks a SetupIntent after the client completes 3D Secure and records the verification result
+         */
+        post: operations["postPaymentsSetup-intentConfirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payments/methods": {
         parameters: {
             query?: never;
@@ -628,6 +768,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payments/payment-intent/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finalize purchase after 3D Secure
+         * @description Re-checks a PaymentIntent after the client completes 3D Secure and grants credits. Idempotent with the payment_intent.succeeded webhook.
+         */
+        post: operations["postPaymentsPayment-intentConfirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payments/purchases": {
         parameters: {
             query?: never;
@@ -642,6 +802,90 @@ export interface paths {
         get: operations["getPaymentsPurchases"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/oauth-apps/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List OAuth apps
+         * @description List the OAuth apps owned by the authenticated user.
+         */
+        get: operations["getOauth-apps"];
+        put?: never;
+        /**
+         * Create OAuth app
+         * @description Register an OAuth 2.1 client (a 'Connect with Nosana' app) owned by the authenticated user.
+         */
+        post: operations["postOauth-apps"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/oauth-apps/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get OAuth app
+         * @description Get one of the authenticated user's OAuth apps by client id.
+         */
+        get: operations["getOauth-appsById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/oauth-apps/{id}/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Update OAuth app
+         * @description Update one of the authenticated user's OAuth apps.
+         */
+        post: operations["postOauth-appsByIdUpdate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/oauth-apps/{id}/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Delete OAuth app
+         * @description Delete one of the authenticated user's OAuth apps.
+         */
+        post: operations["postOauth-appsByIdDelete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -672,6 +916,577 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/node/info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stream job info
+         * @description Server-sent events: the job's flow without logs plus its task status, sent on open and whenever it changes, until the job ends. Signed on your behalf; only jobs you posted are reachable — anything else answers 404.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Job address */
+                    address: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description A stream of `JobInfo` frames as unnamed `message` events. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/event-stream": string;
+                    };
+                };
+                /** @description No job with that address, or the caller does not own it. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description This job has not been picked up by a node yet. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description The indexer or the node running this job could not be reached. */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/node/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Collect the job results
+         * @description The finished flow state. Available once the job waits for its result to be collected; collecting it lets the node finish the job. The node labels the body as text, but it is JSON. Signed on your behalf; only jobs you posted are reachable — anything else answers 404.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Job address */
+                    address: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The flow state. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FlowState"];
+                    };
+                };
+                /** @description No job with that address, or the caller does not own it. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description This job has not been picked up by a node yet. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description The indexer or the node running this job could not be reached. */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/node/job-definition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the job definition
+         * @description The job definition. Fails while the job still waits for one. The node labels the body as text, but it is JSON. Signed on your behalf; only jobs you posted are reachable — anything else answers 404.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Job address */
+                    address: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The job definition. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["JobDefinition"];
+                    };
+                };
+                /** @description No job with that address, or the caller does not own it. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description This job has not been picked up by a node yet. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description The indexer or the node running this job could not be reached. */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/node/endpoints": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exposed endpoints
+         * @description The URLs the job exposes and whether they answer yet. Signed on your behalf; only jobs you posted are reachable — anything else answers 404.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Job address */
+                    address: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Endpoints and their status. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["JobEndpoints"];
+                    };
+                };
+                /** @description No job with that address, or the caller does not own it. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description This job has not been picked up by a node yet. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description The indexer or the node running this job could not be reached. */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/node/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Resource stats
+         * @description CPU, memory, disk and network samples per operation within a time window. Signed on your behalf; only jobs you posted are reachable — anything else answers 404.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Job address */
+                    address: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Samples, oldest first. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TaskStat"][];
+                    };
+                };
+                /** @description No job with that address, or the caller does not own it. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description This job has not been picked up by a node yet. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description The indexer or the node running this job could not be reached. */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/node/ops": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Operation statuses
+         * @description Status of every operation of the job. Signed on your behalf; only jobs you posted are reachable — anything else answers 404.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Job address */
+                    address: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Statuses by operation id. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OperationStatuses"];
+                    };
+                };
+                /** @description No job with that address, or the caller does not own it. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description This job has not been picked up by a node yet. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description The indexer or the node running this job could not be reached. */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/node/ops/{opId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Operation status
+         * @description Status of one operation. Signed on your behalf; only jobs you posted are reachable — anything else answers 404.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Job address */
+                    address: string;
+                    /** @description An operation id within the job definition. */
+                    opId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The operation's status. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+                /** @description No job with that address, or the caller does not own it. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description This job has not been picked up by a node yet. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description The indexer or the node running this job could not be reached. */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/node/group/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Current group statuses
+         * @description Status of the operations in the group currently running. Signed on your behalf; only jobs you posted are reachable — anything else answers 404.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Job address */
+                    address: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Statuses by operation id. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OperationStatuses"];
+                    };
+                };
+                /** @description No job with that address, or the caller does not own it. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description This job has not been picked up by a node yet. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description The indexer or the node running this job could not be reached. */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{address}/node/group/{group}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Group statuses
+         * @description Status of the operations in one group. Signed on your behalf; only jobs you posted are reachable — anything else answers 404.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Job address */
+                    address: string;
+                    /** @description A group name within the job definition. */
+                    group: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Statuses by operation id. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OperationStatuses"];
+                    };
+                };
+                /** @description No job with that address, or the caller does not own it. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description This job has not been picked up by a node yet. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description The indexer or the node running this job could not be reached. */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         put?: never;
         post?: never;
         delete?: never;
@@ -735,6 +1550,449 @@ export interface components {
                 /** @description On-chain transaction signature (base58). */
                 tx?: string;
             }[];
+        };
+        JobDefinition: {
+            /** @constant */
+            version: "0.1";
+            /** @constant */
+            type: "container";
+            logistics?: components["schemas"]["Logistics"];
+            deployment_id?: string;
+            ssh?: components["schemas"]["SSH"];
+            meta?: components["schemas"]["Meta"];
+            global?: components["schemas"]["Global"];
+            ops: components["schemas"]["Ops"];
+        };
+        Logistics: {
+            send: components["schemas"]["Logistic"];
+            receive: components["schemas"]["Logistic"];
+        };
+        Logistic: {
+            type: components["schemas"]["LogisticType"];
+            args: components["schemas"]["Partial__type"];
+        };
+        /**
+         * @description api        - we receive and send via an endpoint endpoint
+         *     api-listen - we create an endpoint to listen for incoming requests
+         */
+        LogisticType: "api" | "api-listen";
+        /** @description Make all properties in T optional */
+        Partial__type: {
+            endpoint?: string;
+        };
+        SSH: {
+            public_keys?: string[];
+        };
+        Meta: {
+            trigger?: string;
+            system_resources?: components["schemas"]["Recordstringstringnumber"];
+        } & {
+            [key: string]: string | number | (string | number)[] | components["schemas"]["Recordstringstringnumber_stringnumber_"];
+        };
+        /** @description Construct a type with a set of properties K of type T */
+        Recordstringstringnumber: {
+            [key: string]: string | number;
+        };
+        /** @description Construct a type with a set of properties K of type T */
+        Recordstringstringnumber_stringnumber_: {
+            [key: string]: string | number | (string | number)[];
+        };
+        Global: {
+            image?: string;
+            gpu?: boolean;
+            entrypoint?: string | components["schemas"]["CMDArray"];
+            env?: components["schemas"]["Env"];
+            work_dir?: string;
+            variables?: components["schemas"]["Variables"];
+        };
+        CMDArray: string[];
+        Env: {
+            [key: string]: string;
+        };
+        Variables: {
+            [key: string]: string;
+        };
+        Ops: components["schemas"]["OperationkeyofOperationArgsMap"][];
+        OperationkeyofOperationArgsMap: {
+            type: "container/run" | "container/create-volume";
+            id: components["schemas"]["OperationId"];
+            args: components["schemas"]["ContainerRun"] | components["schemas"]["ContainerCreateVolume"];
+            results?: components["schemas"]["OperationResults"];
+            execution?: components["schemas"]["Execution"];
+        };
+        OperationId: string;
+        ContainerRun: {
+            image: string;
+            aliases?: string | components["schemas"]["Aliases"];
+            cmd?: string | components["schemas"]["CMDArray"];
+            volumes?: components["schemas"]["Volume"][];
+            expose?: number | components["schemas"]["LiteralString"] | {
+                __spread__: components["schemas"]["LiteralString"];
+                chunked?: boolean;
+            } | components["schemas"]["ExposedPort"] | components["schemas"]["UniqueExposedPorts"];
+            gpu?: boolean;
+            work_dir?: string;
+            entrypoint?: string | components["schemas"]["CMDArray"];
+            env?: components["schemas"]["Env"];
+            restart_policy?: "on-failure" | "no" | "always" | "unless-stopped" | {
+                /** @constant */
+                policy: "on-failure";
+                restart_tries?: number;
+            };
+            private?: boolean;
+            resources?: components["schemas"]["Resources"];
+            authentication?: components["schemas"]["Authentication"];
+        };
+        Aliases: string[];
+        Volume: {
+            name: string;
+            dest: string;
+        };
+        LiteralString: string;
+        ExposedPort: {
+            port: number;
+            type?: "api" | "web" | "websocket" | "webapi" | "none";
+            health_checks?: components["schemas"]["HealthCheck"][];
+        };
+        HealthCheck: components["schemas"]["HttpHealthCheck"] | components["schemas"]["WebSocketHealthCheck"];
+        HttpHealthCheck: {
+            /** @constant */
+            type: "http";
+            path: string;
+            method: "GET" | "POST" | "PUT" | "DELETE";
+            expected_status: number;
+            headers?: components["schemas"]["Recordstringstring"];
+            body?: unknown;
+            continuous: boolean;
+        };
+        /** @description Construct a type with a set of properties K of type T */
+        Recordstringstring: {
+            [key: string]: string;
+        };
+        WebSocketHealthCheck: {
+            /** @constant */
+            type: "websocket";
+            expected_response: string;
+            continuous: boolean;
+        };
+        UniqueExposedPorts: components["schemas"]["ExposeBase"][];
+        ExposeBase: number | components["schemas"]["LiteralString"] | {
+            __spread__: components["schemas"]["LiteralString"];
+            chunked?: boolean;
+        } | components["schemas"]["ExposedPort"];
+        Resources: ("__remove-if-empty__" | {
+            __spread__: components["schemas"]["LiteralString"];
+            chunked?: boolean;
+        } | components["schemas"]["S3Base"] | components["schemas"]["S3WithBucket"] | components["schemas"]["S3WithBuckets"] | components["schemas"]["HFResource"] | components["schemas"]["OllamaResource"])[];
+        S3Base: {
+            /** @constant */
+            type: "S3";
+            target: string;
+            url?: string;
+            allowWrite?: boolean;
+            files?: string[];
+            IAM?: components["schemas"]["S3Auth"];
+        };
+        S3Auth: {
+            REGION: string;
+            ACCESS_KEY_ID: string;
+            SECRET_ACCESS_KEY: string;
+        };
+        S3WithBucket: {
+            /** @constant */
+            type: "S3";
+            target: string;
+            bucket: string;
+            url?: string;
+            allowWrite?: boolean;
+            IAM?: components["schemas"]["S3Auth"];
+        };
+        S3WithBuckets: {
+            /** @constant */
+            type: "S3";
+            target: string;
+            buckets: {
+                url: string;
+                files?: string[];
+            }[];
+            url?: string;
+            allowWrite?: boolean;
+            IAM?: components["schemas"]["S3Auth"];
+        };
+        HFResource: {
+            /** @constant */
+            type: "HF";
+            target: string;
+            repo: string;
+            revision?: string;
+            files?: string[];
+            accessToken?: string;
+        };
+        OllamaResource: {
+            /** @constant */
+            type: "Ollama";
+            model: string;
+            target?: string;
+        };
+        Authentication: {
+            docker?: components["schemas"]["DockerAuth"];
+        };
+        DockerAuth: {
+            username?: string;
+            password?: string;
+            email?: string;
+            server?: string;
+        };
+        ContainerCreateVolume: {
+            name: string;
+        };
+        OperationResults: {
+            [key: string]: string | components["schemas"]["OperationResult"];
+        };
+        OperationResult: {
+            regex: string;
+            logType: components["schemas"]["LogTypeTuple"];
+        };
+        LogTypeTuple: components["schemas"]["StdOption"][];
+        StdOption: "stdin" | "stdout" | "stderr" | "nodeerr";
+        Execution: {
+            group?: string;
+            timeout?: number;
+            depends_on?: string[];
+            stop_if_dependent_stops?: boolean;
+        };
+        FlowState: {
+            status: string;
+            startTime: number;
+            endTime: null | number;
+            errors?: unknown[];
+            opStates: components["schemas"]["OpState"][];
+            secrets?: components["schemas"]["FlowSecrets"];
+        };
+        OpState: {
+            providerId: null | string;
+            operationId: null | string;
+            group: null | string;
+            status: null | string;
+            startTime: null | number;
+            endTime: null | number;
+            exitCode: null | number;
+            logs: components["schemas"]["Log"][];
+            results?: {
+                [key: string]: string | string[];
+            };
+            error?: {
+                event: string;
+                message: string;
+                code?: number;
+            };
+            diagnostics: {
+                reason: components["schemas"]["DiagnosticsReason"];
+                state?: components["schemas"]["DiagnosticsState"];
+            };
+        };
+        Log: {
+            type: components["schemas"]["StdOption"];
+            log?: string;
+            timestamp: string;
+        };
+        DiagnosticsReason: {
+            hostShutDown: boolean;
+            jobStopped: boolean;
+            jobExpired: boolean;
+            reason?: string;
+        };
+        DiagnosticsState: {
+            Status: string;
+            Running: boolean;
+            Paused: boolean;
+            Restarting: boolean;
+            OOMKilled: boolean;
+            Dead: boolean;
+            Pid: number;
+            ExitCode: number;
+            Error: string;
+            StartedAt: string;
+            FinishedAt: string;
+            Health?: {
+                Status: string;
+                FailingStreak: number;
+                Log: null | {
+                    Start: string;
+                    End: string;
+                    ExitCode: number;
+                    Output: string;
+                }[];
+            };
+            RestartCount: number;
+        };
+        FlowSecrets: {
+            urlmode?: "private" | "public";
+        } & {
+            [key: string]: "private" | "public" | components["schemas"]["JobExposeSecrets"];
+        };
+        JobExposeSecrets: {
+            [key: string]: components["schemas"]["EndpointSecret"];
+        };
+        EndpointSecret: {
+            opID: string;
+            port: string | number;
+            url: string;
+            status: components["schemas"]["EndpointStatus"];
+        };
+        EndpointStatus: "ONLINE" | "OFFLINE" | "UNKNOWN";
+        /** @description A Solana address in base58. */
+        Address: string;
+        /** @description The node answers failures with a sentence or with `{ error }`. */
+        NodeError: string | {
+            error: string;
+        };
+        NodeInfo: {
+            /** @description What the node is doing right now, as classified by its monitor. */
+            state: string;
+            info: {
+                gpus?: {
+                    devices?: ({
+                        index?: number;
+                        name?: string;
+                        uuid?: string;
+                        memory?: unknown;
+                        network_architecture?: unknown;
+                    } & {
+                        [key: string]: unknown;
+                    })[];
+                } & {
+                    [key: string]: unknown;
+                };
+                /** @description Network details with the IP address redacted. */
+                network?: {
+                    [key: string]: unknown;
+                };
+            } & {
+                [key: string]: unknown;
+            };
+            resources: {
+                images: string[];
+                volumes: string[];
+            };
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description An operation's state as the info stream sends it: `OpState` without its logs and provider handle. */
+        OpStateSummary: {
+            operationId?: string | null;
+            group?: string | null;
+            status?: string | null;
+            startTime?: number | null;
+            endTime?: number | null;
+            exitCode?: number | null;
+            results?: {
+                [key: string]: string | string[];
+            };
+            error?: {
+                event: string;
+                message: string;
+                code?: number;
+            };
+            diagnostics?: {
+                reason: components["schemas"]["DiagnosticsReason"];
+                state?: components["schemas"]["DiagnosticsState"];
+            };
+        };
+        /** @description Status per operation, keyed by operation id. */
+        OperationStatuses: {
+            [key: string]: string | null;
+        };
+        /** @description One frame of the job info stream: the flow without logs, plus task status. */
+        JobInfo: {
+            status: string;
+            startTime: number;
+            endTime: number | null;
+            errors: unknown[];
+            opStates: components["schemas"]["OpStateSummary"][];
+            secrets?: components["schemas"]["FlowSecrets"];
+            operations: {
+                all: components["schemas"]["OperationStatuses"] | null;
+                currentGroup?: string;
+                currentGroupStatus: components["schemas"]["OperationStatuses"] | null;
+            } | null;
+        };
+        JobEndpoints: {
+            urls: components["schemas"]["JobExposeSecrets"];
+            /** @enum {string} */
+            status: "ONLINE" | "OFFLINE";
+        };
+        TaskStat: {
+            opId: string;
+            /** @description Unix milliseconds. */
+            timestamp: number;
+            cpu: {
+                cpu_percent: number;
+            };
+            memory: {
+                memory_usage: number;
+                memory_limit: number;
+                memory_percent: number;
+            };
+            disk: {
+                read: number;
+                write: number;
+            };
+            network: {
+                received: number;
+                sent: number;
+            };
+        };
+        TaskLog: {
+            opId: string;
+            group: string;
+            type: string;
+            timestamp: number;
+            message: unknown;
+        };
+        ActionResult: {
+            message: string;
+        };
+        /** @description One OpenSSH `authorized_keys` line: algorithm, base64 key material and an optional comment. */
+        SshPublicKey: string;
+        SshAuthorizationRequest: {
+            sshPublicKey: components["schemas"]["SshPublicKey"];
+            /**
+             * Format: date-time
+             * @description Omit for access until the key is revoked or the job ends.
+             */
+            expiresAt?: string;
+        };
+        SshAuthorization: {
+            job: components["schemas"]["Address"];
+            /** @description Always `nosana`; the hostname identifies the job and operation. */
+            sshUser: string;
+            /** @constant */
+            authorized: true;
+            /** Format: date-time */
+            expiresAt?: string;
+        };
+        SshAuthorizedKey: {
+            sshPublicKey: components["schemas"]["SshPublicKey"];
+            /**
+             * Format: date-time
+             * @description Absent for permanent keys.
+             */
+            expiresAt?: string;
+        };
+        SshKeys: {
+            job: components["schemas"]["Address"];
+            sshUser: string;
+            keys: components["schemas"]["SshAuthorizedKey"][];
+        };
+        SshRevocationRequest: {
+            sshPublicKey: components["schemas"]["SshPublicKey"];
+        };
+        SshRevocation: {
+            job: components["schemas"]["Address"];
+            sshUser: string;
+            /** @constant */
+            revoked: true;
         };
     };
     responses: never;
@@ -888,11 +2146,11 @@ export interface operations {
                             provider: (string | null) | null;
                             providerUsername: (string | null) | null;
                             generatedAddress: string;
-                            authenticationHeader: string;
-                            systemApiKey: string;
                             created_at: ((Record<string, never> | string | number) | null) | null;
                         };
                         apiKeyId?: string;
+                        /** @description What the validated key is allowed to do. */
+                        scopes?: string[];
                     };
                     "multipart/form-data": {
                         valid: boolean;
@@ -904,11 +2162,11 @@ export interface operations {
                             provider: (string | null) | null;
                             providerUsername: (string | null) | null;
                             generatedAddress: string;
-                            authenticationHeader: string;
-                            systemApiKey: string;
                             created_at: ((Record<string, never> | string | number) | null) | null;
                         };
                         apiKeyId?: string;
+                        /** @description What the validated key is allowed to do. */
+                        scopes?: string[];
                     };
                     "text/plain": {
                         valid: boolean;
@@ -920,11 +2178,11 @@ export interface operations {
                             provider: (string | null) | null;
                             providerUsername: (string | null) | null;
                             generatedAddress: string;
-                            authenticationHeader: string;
-                            systemApiKey: string;
                             created_at: ((Record<string, never> | string | number) | null) | null;
                         };
                         apiKeyId?: string;
+                        /** @description What the validated key is allowed to do. */
+                        scopes?: string[];
                     };
                 };
             };
@@ -1034,6 +2292,54 @@ export interface operations {
             };
         };
     };
+    getAuthScopes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        scopes: {
+                            /** @description The scope token, e.g. `credits:read`. */
+                            scope: string;
+                            /** @description User-facing wording, as shown on the consent screen. */
+                            description: string;
+                            /** @description Whether an OAuth app may hold this scope. False for scopes whose routes accept an API key only, which no access token can satisfy. */
+                            oauthGrantable: boolean;
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        scopes: {
+                            /** @description The scope token, e.g. `credits:read`. */
+                            scope: string;
+                            /** @description User-facing wording, as shown on the consent screen. */
+                            description: string;
+                            /** @description Whether an OAuth app may hold this scope. False for scopes whose routes accept an API key only, which no access token can satisfy. */
+                            oauthGrantable: boolean;
+                        }[];
+                    };
+                    "text/plain": {
+                        scopes: {
+                            /** @description The scope token, e.g. `credits:read`. */
+                            scope: string;
+                            /** @description User-facing wording, as shown on the consent screen. */
+                            description: string;
+                            /** @description Whether an OAuth app may hold this scope. False for scopes whose routes accept an API key only, which no access token can satisfy. */
+                            oauthGrantable: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "getApi-keys": {
         parameters: {
             query?: never;
@@ -1050,11 +2356,14 @@ export interface operations {
                 content: {
                     "application/json": {
                         keys: {
+                            llmModels: (string[] | null) | null;
                             id: string;
                             name: string;
                             /** @description Full API key */
                             key: string;
                             status: string;
+                            /** @description What this key is allowed to do. */
+                            scopes: string[];
                             lastUsedAt: (string | null) | null;
                             expiresAt: (string | null) | null;
                             createdAt: string;
@@ -1064,11 +2373,14 @@ export interface operations {
                     };
                     "multipart/form-data": {
                         keys: {
+                            llmModels: (string[] | null) | null;
                             id: string;
                             name: string;
                             /** @description Full API key */
                             key: string;
                             status: string;
+                            /** @description What this key is allowed to do. */
+                            scopes: string[];
                             lastUsedAt: (string | null) | null;
                             expiresAt: (string | null) | null;
                             createdAt: string;
@@ -1078,11 +2390,14 @@ export interface operations {
                     };
                     "text/plain": {
                         keys: {
+                            llmModels: (string[] | null) | null;
                             id: string;
                             name: string;
                             /** @description Full API key */
                             key: string;
                             status: string;
+                            /** @description What this key is allowed to do. */
+                            scopes: string[];
                             lastUsedAt: (string | null) | null;
                             expiresAt: (string | null) | null;
                             createdAt: string;
@@ -1104,22 +2419,31 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    llmModels?: (string[] | null) | null;
                     /** @description A descriptive name for the API key. */
                     name: string;
                     /** @description Key expiration time in seconds. If not provided, key never expires. */
                     expiresIn?: number;
+                    /** @description What the key may do. Must be a subset of the scopes the calling credential holds. Defaults to the caller's own scopes. */
+                    scopes?: string[];
                 };
                 "multipart/form-data": {
+                    llmModels?: (string[] | null) | null;
                     /** @description A descriptive name for the API key. */
                     name: string;
                     /** @description Key expiration time in seconds. If not provided, key never expires. */
                     expiresIn?: number;
+                    /** @description What the key may do. Must be a subset of the scopes the calling credential holds. Defaults to the caller's own scopes. */
+                    scopes?: string[];
                 };
                 "text/plain": {
+                    llmModels?: (string[] | null) | null;
                     /** @description A descriptive name for the API key. */
                     name: string;
                     /** @description Key expiration time in seconds. If not provided, key never expires. */
                     expiresIn?: number;
+                    /** @description What the key may do. Must be a subset of the scopes the calling credential holds. Defaults to the caller's own scopes. */
+                    scopes?: string[];
                 };
             };
         };
@@ -1130,29 +2454,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        llmModels: (string[] | null) | null;
                         /** @description The full API key. */
                         key: string;
                         id: string;
                         name: string;
                         status: string;
+                        /** @description What this key is allowed to do. */
+                        scopes: string[];
                         expiresAt: (string | null) | null;
                         createdAt: string;
                     };
                     "multipart/form-data": {
+                        llmModels: (string[] | null) | null;
                         /** @description The full API key. */
                         key: string;
                         id: string;
                         name: string;
                         status: string;
+                        /** @description What this key is allowed to do. */
+                        scopes: string[];
                         expiresAt: (string | null) | null;
                         createdAt: string;
                     };
                     "text/plain": {
+                        llmModels: (string[] | null) | null;
                         /** @description The full API key. */
                         key: string;
                         id: string;
                         name: string;
                         status: string;
+                        /** @description What this key is allowed to do. */
+                        scopes: string[];
                         expiresAt: (string | null) | null;
                         createdAt: string;
                     };
@@ -1177,33 +2510,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        llmModels: (string[] | null) | null;
                         id: string;
                         name: string;
                         /** @description Full API key */
                         key: string;
                         status: string;
+                        /** @description What this key is allowed to do. */
+                        scopes: string[];
                         lastUsedAt: (string | null) | null;
                         expiresAt: (string | null) | null;
                         createdAt: string;
                         updatedAt: string;
                     };
                     "multipart/form-data": {
+                        llmModels: (string[] | null) | null;
                         id: string;
                         name: string;
                         /** @description Full API key */
                         key: string;
                         status: string;
+                        /** @description What this key is allowed to do. */
+                        scopes: string[];
                         lastUsedAt: (string | null) | null;
                         expiresAt: (string | null) | null;
                         createdAt: string;
                         updatedAt: string;
                     };
                     "text/plain": {
+                        llmModels: (string[] | null) | null;
                         id: string;
                         name: string;
                         /** @description Full API key */
                         key: string;
                         status: string;
+                        /** @description What this key is allowed to do. */
+                        scopes: string[];
                         lastUsedAt: (string | null) | null;
                         expiresAt: (string | null) | null;
                         createdAt: string;
@@ -1225,18 +2567,21 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    llmModels?: (string[] | null) | null;
                     /** @description Update the key name. */
                     name?: string;
                     /** @description Update the key status. */
                     status?: "active" | "disabled";
                 };
                 "multipart/form-data": {
+                    llmModels?: (string[] | null) | null;
                     /** @description Update the key name. */
                     name?: string;
                     /** @description Update the key status. */
                     status?: "active" | "disabled";
                 };
                 "text/plain": {
+                    llmModels?: (string[] | null) | null;
                     /** @description Update the key name. */
                     name?: string;
                     /** @description Update the key status. */
@@ -1251,33 +2596,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        llmModels: (string[] | null) | null;
                         id: string;
                         name: string;
                         /** @description Full API key */
                         key: string;
                         status: string;
+                        /** @description What this key is allowed to do. */
+                        scopes: string[];
                         lastUsedAt: (string | null) | null;
                         expiresAt: (string | null) | null;
                         createdAt: string;
                         updatedAt: string;
                     };
                     "multipart/form-data": {
+                        llmModels: (string[] | null) | null;
                         id: string;
                         name: string;
                         /** @description Full API key */
                         key: string;
                         status: string;
+                        /** @description What this key is allowed to do. */
+                        scopes: string[];
                         lastUsedAt: (string | null) | null;
                         expiresAt: (string | null) | null;
                         createdAt: string;
                         updatedAt: string;
                     };
                     "text/plain": {
+                        llmModels: (string[] | null) | null;
                         id: string;
                         name: string;
                         /** @description Full API key */
                         key: string;
                         status: string;
+                        /** @description What this key is allowed to do. */
+                        scopes: string[];
                         lastUsedAt: (string | null) | null;
                         expiresAt: (string | null) | null;
                         createdAt: string;
@@ -1711,6 +3065,238 @@ export interface operations {
             };
         };
     };
+    postCreditsInternalLlmFinalize: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    requestId: string;
+                    usage: {
+                        promptTokens: string | number;
+                        completionTokens: string | number;
+                        costNano: string | number;
+                        estimated?: boolean;
+                        streamed?: boolean;
+                        status: string | number;
+                    };
+                };
+                "multipart/form-data": {
+                    /** Format: uuid */
+                    requestId: string;
+                    usage: {
+                        promptTokens: string | number;
+                        completionTokens: string | number;
+                        costNano: string | number;
+                        estimated?: boolean;
+                        streamed?: boolean;
+                        status: string | number;
+                    };
+                };
+                "text/plain": {
+                    /** Format: uuid */
+                    requestId: string;
+                    usage: {
+                        promptTokens: string | number;
+                        completionTokens: string | number;
+                        costNano: string | number;
+                        estimated?: boolean;
+                        streamed?: boolean;
+                        status: string | number;
+                    };
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCreditsLlmUsage: {
+        parameters: {
+            query?: {
+                limit?: string | number;
+                offset?: string | number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCreditsInternalLlmModels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCreditsAdminLlmTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCreditsAdminLlmModels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postCreditsAdminLlmModels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    templateId: string;
+                    sourceCommit: string;
+                    market: string;
+                    replicas: string | number;
+                    maxHourlyUsd?: number;
+                    pricing: {
+                        prompt: string;
+                        completion: string;
+                    };
+                };
+                "multipart/form-data": {
+                    templateId: string;
+                    sourceCommit: string;
+                    market: string;
+                    replicas: string | number;
+                    maxHourlyUsd?: number;
+                    pricing: {
+                        prompt: string;
+                        completion: string;
+                    };
+                };
+                "text/plain": {
+                    templateId: string;
+                    sourceCommit: string;
+                    market: string;
+                    replicas: string | number;
+                    maxHourlyUsd?: number;
+                    pricing: {
+                        prompt: string;
+                        completion: string;
+                    };
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patchCreditsAdminLlmModelsById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled?: boolean;
+                    pricing?: {
+                        prompt: string;
+                        completion: string;
+                    };
+                    maxHourlyUsd?: number;
+                    replicas?: string | number;
+                    market?: string;
+                };
+                "multipart/form-data": {
+                    enabled?: boolean;
+                    pricing?: {
+                        prompt: string;
+                        completion: string;
+                    };
+                    maxHourlyUsd?: number;
+                    replicas?: string | number;
+                    market?: string;
+                };
+                "text/plain": {
+                    enabled?: boolean;
+                    pricing?: {
+                        prompt: string;
+                        completion: string;
+                    };
+                    maxHourlyUsd?: number;
+                    replicas?: string | number;
+                    market?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getTemplates: {
         parameters: {
             query?: never;
@@ -1931,7 +3517,7 @@ export interface operations {
                     ipfsHash: string;
                     /** @description Market address */
                     market: string;
-                    /** @description Job timeout in seconds (default: 3600) */
+                    /** @description Job timeout in seconds (default: 3600). Credit-paid jobs must run at least 3600 seconds; a shorter timeout returns 400. */
                     timeout?: number;
                     /** @description Optional node address */
                     node?: string;
@@ -1941,7 +3527,7 @@ export interface operations {
                     ipfsHash: string;
                     /** @description Market address */
                     market: string;
-                    /** @description Job timeout in seconds (default: 3600) */
+                    /** @description Job timeout in seconds (default: 3600). Credit-paid jobs must run at least 3600 seconds; a shorter timeout returns 400. */
                     timeout?: number;
                     /** @description Optional node address */
                     node?: string;
@@ -1951,7 +3537,7 @@ export interface operations {
                     ipfsHash: string;
                     /** @description Market address */
                     market: string;
-                    /** @description Job timeout in seconds (default: 3600) */
+                    /** @description Job timeout in seconds (default: 3600). Credit-paid jobs must run at least 3600 seconds; a shorter timeout returns 400. */
                     timeout?: number;
                     /** @description Optional node address */
                     node?: string;
@@ -2027,7 +3613,7 @@ export interface operations {
                         ipfsHash: string;
                         /** @description Market address */
                         market: string;
-                        /** @description Job timeout in seconds (default: 3600) */
+                        /** @description Job timeout in seconds (default: 3600). Same 3600-second minimum as single LIST; one too-short item rejects the whole batch with 400. */
                         timeout?: number;
                     }[];
                 };
@@ -2038,7 +3624,7 @@ export interface operations {
                         ipfsHash: string;
                         /** @description Market address */
                         market: string;
-                        /** @description Job timeout in seconds (default: 3600) */
+                        /** @description Job timeout in seconds (default: 3600). Same 3600-second minimum as single LIST; one too-short item rejects the whole batch with 400. */
                         timeout?: number;
                     }[];
                 };
@@ -2049,7 +3635,7 @@ export interface operations {
                         ipfsHash: string;
                         /** @description Market address */
                         market: string;
-                        /** @description Job timeout in seconds (default: 3600) */
+                        /** @description Job timeout in seconds (default: 3600). Same 3600-second minimum as single LIST; one too-short item rejects the whole batch with 400. */
                         timeout?: number;
                     }[];
                 };
@@ -2494,12 +4080,15 @@ export interface operations {
             content: {
                 "application/json": {
                     paymentMethodId: string;
+                    requireThreeDSecure?: boolean;
                 };
                 "multipart/form-data": {
                     paymentMethodId: string;
+                    requireThreeDSecure?: boolean;
                 };
                 "text/plain": {
                     paymentMethodId: string;
+                    requireThreeDSecure?: boolean;
                 };
             };
         };
@@ -2513,6 +4102,7 @@ export interface operations {
                         accepted: boolean;
                         verificationError: (string | null) | null;
                         paymentVerified: boolean;
+                        threeDSecureAuthenticated: boolean;
                         requiresAction: boolean;
                         clientSecret: (string | null) | null;
                         setupIntentId: (string | null) | null;
@@ -2521,6 +4111,7 @@ export interface operations {
                         accepted: boolean;
                         verificationError: (string | null) | null;
                         paymentVerified: boolean;
+                        threeDSecureAuthenticated: boolean;
                         requiresAction: boolean;
                         clientSecret: (string | null) | null;
                         setupIntentId: (string | null) | null;
@@ -2529,6 +4120,64 @@ export interface operations {
                         accepted: boolean;
                         verificationError: (string | null) | null;
                         paymentVerified: boolean;
+                        threeDSecureAuthenticated: boolean;
+                        requiresAction: boolean;
+                        clientSecret: (string | null) | null;
+                        setupIntentId: (string | null) | null;
+                    };
+                };
+            };
+        };
+    };
+    "postPaymentsSetup-intentConfirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    setupIntentId: string;
+                };
+                "multipart/form-data": {
+                    setupIntentId: string;
+                };
+                "text/plain": {
+                    setupIntentId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        accepted: boolean;
+                        verificationError: (string | null) | null;
+                        paymentVerified: boolean;
+                        threeDSecureAuthenticated: boolean;
+                        requiresAction: boolean;
+                        clientSecret: (string | null) | null;
+                        setupIntentId: (string | null) | null;
+                    };
+                    "multipart/form-data": {
+                        accepted: boolean;
+                        verificationError: (string | null) | null;
+                        paymentVerified: boolean;
+                        threeDSecureAuthenticated: boolean;
+                        requiresAction: boolean;
+                        clientSecret: (string | null) | null;
+                        setupIntentId: (string | null) | null;
+                    };
+                    "text/plain": {
+                        accepted: boolean;
+                        verificationError: (string | null) | null;
+                        paymentVerified: boolean;
+                        threeDSecureAuthenticated: boolean;
                         requiresAction: boolean;
                         clientSecret: (string | null) | null;
                         setupIntentId: (string | null) | null;
@@ -2708,13 +4357,58 @@ export interface operations {
                     "application/json": {
                         clientSecret: (string | null) | null;
                         paymentIntentId: string;
+                        requiresAction: boolean;
                     };
                     "multipart/form-data": {
                         clientSecret: (string | null) | null;
                         paymentIntentId: string;
+                        requiresAction: boolean;
                     };
                     "text/plain": {
                         clientSecret: (string | null) | null;
+                        paymentIntentId: string;
+                        requiresAction: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "postPaymentsPayment-intentConfirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    paymentIntentId: string;
+                };
+                "multipart/form-data": {
+                    paymentIntentId: string;
+                };
+                "text/plain": {
+                    paymentIntentId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        paymentIntentId: string;
+                    };
+                    "multipart/form-data": {
+                        success: boolean;
+                        paymentIntentId: string;
+                    };
+                    "text/plain": {
+                        success: boolean;
                         paymentIntentId: string;
                     };
                 };
@@ -2764,6 +4458,375 @@ export interface operations {
                             cardBrand: (string | null) | null;
                             cardLast4: (string | null) | null;
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "getOauth-apps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        apps: {
+                            clientId: string;
+                            name: string;
+                            redirectUris: string[];
+                            logoUri?: string;
+                            clientUri?: string;
+                            tosUri?: string;
+                            policyUri?: string;
+                            confidential: boolean;
+                            /** @description The app's scope ceiling. */
+                            scopes: string[];
+                            createdAt?: string;
+                        }[];
+                        total: number;
+                        limit: number;
+                    };
+                    "multipart/form-data": {
+                        apps: {
+                            clientId: string;
+                            name: string;
+                            redirectUris: string[];
+                            logoUri?: string;
+                            clientUri?: string;
+                            tosUri?: string;
+                            policyUri?: string;
+                            confidential: boolean;
+                            /** @description The app's scope ceiling. */
+                            scopes: string[];
+                            createdAt?: string;
+                        }[];
+                        total: number;
+                        limit: number;
+                    };
+                    "text/plain": {
+                        apps: {
+                            clientId: string;
+                            name: string;
+                            redirectUris: string[];
+                            logoUri?: string;
+                            clientUri?: string;
+                            tosUri?: string;
+                            policyUri?: string;
+                            confidential: boolean;
+                            /** @description The app's scope ceiling. */
+                            scopes: string[];
+                            createdAt?: string;
+                        }[];
+                        total: number;
+                        limit: number;
+                    };
+                };
+            };
+        };
+    };
+    "postOauth-apps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Display name shown to users on the Nosana consent screen. */
+                    name: string;
+                    /** @description Exact redirect URIs the authorization code may be returned to. */
+                    redirectUris: string[];
+                    /** @description Logo URL shown on the consent screen. */
+                    logoUri?: string;
+                    /** @description The app's homepage URL. */
+                    clientUri?: string;
+                    /** @description Terms of service URL. */
+                    tosUri?: string;
+                    /** @description Privacy policy URL. */
+                    policyUri?: string;
+                    /** @description Server-side app that gets a client secret (no PKCE required). Defaults to false (public app, PKCE). */
+                    confidential?: boolean;
+                    /** @description The app's ceiling: the most it may ever ask a user for. Must be a subset of the scopes the calling credential holds. Each user still chooses what to grant on the consent screen. Defaults to the caller's own scopes. */
+                    scopes?: string[];
+                };
+                "multipart/form-data": {
+                    /** @description Display name shown to users on the Nosana consent screen. */
+                    name: string;
+                    /** @description Exact redirect URIs the authorization code may be returned to. */
+                    redirectUris: string[];
+                    /** @description Logo URL shown on the consent screen. */
+                    logoUri?: string;
+                    /** @description The app's homepage URL. */
+                    clientUri?: string;
+                    /** @description Terms of service URL. */
+                    tosUri?: string;
+                    /** @description Privacy policy URL. */
+                    policyUri?: string;
+                    /** @description Server-side app that gets a client secret (no PKCE required). Defaults to false (public app, PKCE). */
+                    confidential?: boolean;
+                    /** @description The app's ceiling: the most it may ever ask a user for. Must be a subset of the scopes the calling credential holds. Each user still chooses what to grant on the consent screen. Defaults to the caller's own scopes. */
+                    scopes?: string[];
+                };
+                "text/plain": {
+                    /** @description Display name shown to users on the Nosana consent screen. */
+                    name: string;
+                    /** @description Exact redirect URIs the authorization code may be returned to. */
+                    redirectUris: string[];
+                    /** @description Logo URL shown on the consent screen. */
+                    logoUri?: string;
+                    /** @description The app's homepage URL. */
+                    clientUri?: string;
+                    /** @description Terms of service URL. */
+                    tosUri?: string;
+                    /** @description Privacy policy URL. */
+                    policyUri?: string;
+                    /** @description Server-side app that gets a client secret (no PKCE required). Defaults to false (public app, PKCE). */
+                    confidential?: boolean;
+                    /** @description The app's ceiling: the most it may ever ask a user for. Must be a subset of the scopes the calling credential holds. Each user still chooses what to grant on the consent screen. Defaults to the caller's own scopes. */
+                    scopes?: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        clientId: string;
+                        name: string;
+                        redirectUris: string[];
+                        logoUri?: string;
+                        clientUri?: string;
+                        tosUri?: string;
+                        policyUri?: string;
+                        confidential: boolean;
+                        /** @description The app's scope ceiling. */
+                        scopes: string[];
+                        createdAt?: string;
+                        /** @description Confidential apps only — shown once, store it securely. */
+                        clientSecret?: string;
+                    };
+                    "multipart/form-data": {
+                        clientId: string;
+                        name: string;
+                        redirectUris: string[];
+                        logoUri?: string;
+                        clientUri?: string;
+                        tosUri?: string;
+                        policyUri?: string;
+                        confidential: boolean;
+                        /** @description The app's scope ceiling. */
+                        scopes: string[];
+                        createdAt?: string;
+                        /** @description Confidential apps only — shown once, store it securely. */
+                        clientSecret?: string;
+                    };
+                    "text/plain": {
+                        clientId: string;
+                        name: string;
+                        redirectUris: string[];
+                        logoUri?: string;
+                        clientUri?: string;
+                        tosUri?: string;
+                        policyUri?: string;
+                        confidential: boolean;
+                        /** @description The app's scope ceiling. */
+                        scopes: string[];
+                        createdAt?: string;
+                        /** @description Confidential apps only — shown once, store it securely. */
+                        clientSecret?: string;
+                    };
+                };
+            };
+        };
+    };
+    "getOauth-appsById": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        clientId: string;
+                        name: string;
+                        redirectUris: string[];
+                        logoUri?: string;
+                        clientUri?: string;
+                        tosUri?: string;
+                        policyUri?: string;
+                        confidential: boolean;
+                        /** @description The app's scope ceiling. */
+                        scopes: string[];
+                        createdAt?: string;
+                    };
+                    "multipart/form-data": {
+                        clientId: string;
+                        name: string;
+                        redirectUris: string[];
+                        logoUri?: string;
+                        clientUri?: string;
+                        tosUri?: string;
+                        policyUri?: string;
+                        confidential: boolean;
+                        /** @description The app's scope ceiling. */
+                        scopes: string[];
+                        createdAt?: string;
+                    };
+                    "text/plain": {
+                        clientId: string;
+                        name: string;
+                        redirectUris: string[];
+                        logoUri?: string;
+                        clientUri?: string;
+                        tosUri?: string;
+                        policyUri?: string;
+                        confidential: boolean;
+                        /** @description The app's scope ceiling. */
+                        scopes: string[];
+                        createdAt?: string;
+                    };
+                };
+            };
+        };
+    };
+    "postOauth-appsByIdUpdate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name?: string;
+                    redirectUris?: string[];
+                    logoUri?: string;
+                    clientUri?: string;
+                    tosUri?: string;
+                    policyUri?: string;
+                    /** @description Replace the app's scope ceiling. Subject to the same subset check as creation. Narrowing it does not revoke scopes already granted to users; those lapse when their tokens are next refreshed. */
+                    scopes?: string[];
+                };
+                "multipart/form-data": {
+                    name?: string;
+                    redirectUris?: string[];
+                    logoUri?: string;
+                    clientUri?: string;
+                    tosUri?: string;
+                    policyUri?: string;
+                    /** @description Replace the app's scope ceiling. Subject to the same subset check as creation. Narrowing it does not revoke scopes already granted to users; those lapse when their tokens are next refreshed. */
+                    scopes?: string[];
+                };
+                "text/plain": {
+                    name?: string;
+                    redirectUris?: string[];
+                    logoUri?: string;
+                    clientUri?: string;
+                    tosUri?: string;
+                    policyUri?: string;
+                    /** @description Replace the app's scope ceiling. Subject to the same subset check as creation. Narrowing it does not revoke scopes already granted to users; those lapse when their tokens are next refreshed. */
+                    scopes?: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        clientId: string;
+                        name: string;
+                        redirectUris: string[];
+                        logoUri?: string;
+                        clientUri?: string;
+                        tosUri?: string;
+                        policyUri?: string;
+                        confidential: boolean;
+                        /** @description The app's scope ceiling. */
+                        scopes: string[];
+                        createdAt?: string;
+                    };
+                    "multipart/form-data": {
+                        clientId: string;
+                        name: string;
+                        redirectUris: string[];
+                        logoUri?: string;
+                        clientUri?: string;
+                        tosUri?: string;
+                        policyUri?: string;
+                        confidential: boolean;
+                        /** @description The app's scope ceiling. */
+                        scopes: string[];
+                        createdAt?: string;
+                    };
+                    "text/plain": {
+                        clientId: string;
+                        name: string;
+                        redirectUris: string[];
+                        logoUri?: string;
+                        clientUri?: string;
+                        tosUri?: string;
+                        policyUri?: string;
+                        confidential: boolean;
+                        /** @description The app's scope ceiling. */
+                        scopes: string[];
+                        createdAt?: string;
+                    };
+                };
+            };
+        };
+    };
+    "postOauth-appsByIdDelete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                    };
+                    "multipart/form-data": {
+                        success: boolean;
+                    };
+                    "text/plain": {
+                        success: boolean;
                     };
                 };
             };
