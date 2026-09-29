@@ -4,7 +4,7 @@ title: Nosana MCP Server
 
 # Nosana MCP Server
 
-The Nosana API is available as an [MCP](https://modelcontextprotocol.io) (Model Context Protocol) server. Connect it to an AI assistant such as Claude, Cursor or VS Code and you can manage your deployments, check GPU markets and track your credits in plain language.
+The Nosana API is available as an [MCP](https://modelcontextprotocol.io) (Model Context Protocol) server. Connect it to an AI assistant such as Codex, Claude, Cursor or VS Code and you can manage your deployments, check GPU markets and track your credits in plain language.
 
 ```
 https://api.nosana.com/mcp
@@ -48,6 +48,31 @@ Tools can create, start, stop and delete deployments, and running deployments sp
 The Nosana MCP server works with any MCP client that supports remote (Streamable HTTP) servers with OAuth.
 
 :::tabs
+
+== Codex
+
+With the Codex CLI installed, add the server from your terminal:
+
+```bash
+codex mcp add nosana --url https://api.nosana.com/mcp
+```
+
+Sign in with your Nosana account and approve access when prompted. If sign-in doesn't start automatically, run:
+
+```bash
+codex mcp login nosana
+```
+
+Run `codex mcp list` to check that `nosana` is configured.
+
+Alternatively, add the server to `~/.codex/config.toml` (all projects) or `.codex/config.toml` (one trusted project), then run `codex mcp login nosana`:
+
+```toml
+[mcp_servers.nosana]
+url = "https://api.nosana.com/mcp"
+```
+
+See the [Codex MCP documentation](https://developers.openai.com/codex/mcp) for more configuration options.
 
 == Claude Code
 
