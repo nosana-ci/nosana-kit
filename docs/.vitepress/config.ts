@@ -32,7 +32,13 @@ export default withMermaid(
         { text: 'About', link: '/about/introduction' },
         { text: 'Deployments', link: '/deployments/intro' },
         { text: 'API', link: '/api/intro' },
-        { text: 'MCP', link: '/mcp/intro' },
+        {
+          text: 'Agents',
+          items: [
+            { text: 'MCP Server', link: '/mcp/intro' },
+            { text: 'Agent Skill', link: '/agents/skill' },
+          ],
+        },
         { text: 'SDK', link: '/kit/' },
         { text: 'Connect', link: '/connect/' },
         { text: 'CLI', link: '/inference/quick_start' },
@@ -144,6 +150,15 @@ export default withMermaid(
           {
             text: 'MCP Server',
             items: [{ text: 'Introduction', link: '/mcp/intro' }],
+          },
+        ],
+        '/agents/': [
+          {
+            text: 'Agents',
+            items: [
+              { text: 'MCP Server', link: '/mcp/intro' },
+              { text: 'Agent Skill', link: '/agents/skill' },
+            ],
           },
         ],
         '/about/': [
