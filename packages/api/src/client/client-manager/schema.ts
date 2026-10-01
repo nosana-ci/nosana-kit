@@ -414,7 +414,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["deleteCreditsAdminLlmModelsById"];
         options?: never;
         head?: never;
         patch: operations["patchCreditsAdminLlmModelsById"];
@@ -522,6 +522,26 @@ export interface paths {
          * @description Bulk-create jobs in the fewest packed transactions. Requires an `Idempotency-Key` header (one key per batch): the batch is posted at most once per key. The response reports each job's outcome by `index` — `confirmed` (with its `job`/`run` address) or `expired`. Re-post only the expired items under a fresh key. Still-confirming returns 409 `IDEMPOTENCY_KEY_IN_PROGRESS` (retry the same key).
          */
         post: operations["postJobsListBatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/assign/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bulk-assign jobs to nodes using credits
+         * @description Bulk-create jobs assigned directly to the given `node` each (on-chain `assign` instead of listing into the market queue), in the fewest packed transactions. Same contract as `/jobs/list/batch`: requires an `Idempotency-Key` header (one key per batch), the batch is posted at most once per key, and the response reports each job's outcome by `index` — `confirmed` (with its `job`/`run` address) or `expired`. Re-post only the expired items under a fresh key. Still-confirming returns 409 `IDEMPOTENCY_KEY_IN_PROGRESS` (retry the same key).
+         */
+        post: operations["postJobsAssignBatch"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3245,6 +3265,25 @@ export interface operations {
             };
         };
     };
+    deleteCreditsAdminLlmModelsById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     patchCreditsAdminLlmModelsById: {
         parameters: {
             query?: never;
@@ -3637,6 +3676,109 @@ export interface operations {
                         market: string;
                         /** @description Job timeout in seconds (default: 3600). Same 3600-second minimum as single LIST; one too-short item rejects the whole batch with 400. */
                         timeout?: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Per-item results by `index`: `confirmed` (with its job/run address and the packed tx's `tx` signature) or `expired` — re-post only the expired items under a fresh key. `tx` is absent on an already-terminal no-op (nothing was sent); items packed into the same on-chain tx share one `tx`. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobsBatchResponse"];
+                };
+            };
+            /** @description Missing `Idempotency-Key` header (required on batch endpoints) or an otherwise invalid request. Ordinary error: no `code` field. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Caller does not own the job, or the market is not credit-eligible. Ordinary error: no `code` field. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Job, credit-job, or user not found — or an Idempotency-Key minted by a different user. Ordinary error: no `code` field. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobError"];
+                };
+            };
+            /** @description Idempotency control signal — branch on `code` (IDEMPOTENCY_KEY_*), never on the HTTP status. IN_PROGRESS → retry the same key after Retry-After; EXPIRED → mint a fresh key; PAYLOAD_MISMATCH → do not retry. */
+            409: {
+                headers: {
+                    /** @description Seconds to wait before retrying the same key. Sent only for IDEMPOTENCY_KEY_IN_PROGRESS. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdempotencyError"];
+                };
+            };
+        };
+    };
+    postJobsAssignBatch: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description De-duplicates retried requests sharing the same key (one key per batch). Required on batch endpoints — omitting it returns 400. */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Jobs to bulk-assign, each to its node */
+                    jobs: {
+                        /** @description IPFS hash of the job definition */
+                        ipfsHash: string;
+                        /** @description Market address */
+                        market: string;
+                        /** @description Job timeout in seconds (default: 3600). Same 3600-second minimum as single LIST; one too-short item rejects the whole batch with 400. */
+                        timeout?: number;
+                        /** @description Address (base58 public key) of the node to assign the job to */
+                        node: string;
+                    }[];
+                };
+                "multipart/form-data": {
+                    /** @description Jobs to bulk-assign, each to its node */
+                    jobs: {
+                        /** @description IPFS hash of the job definition */
+                        ipfsHash: string;
+                        /** @description Market address */
+                        market: string;
+                        /** @description Job timeout in seconds (default: 3600). Same 3600-second minimum as single LIST; one too-short item rejects the whole batch with 400. */
+                        timeout?: number;
+                        /** @description Address (base58 public key) of the node to assign the job to */
+                        node: string;
+                    }[];
+                };
+                "text/plain": {
+                    /** @description Jobs to bulk-assign, each to its node */
+                    jobs: {
+                        /** @description IPFS hash of the job definition */
+                        ipfsHash: string;
+                        /** @description Market address */
+                        market: string;
+                        /** @description Job timeout in seconds (default: 3600). Same 3600-second minimum as single LIST; one too-short item rejects the whole batch with 400. */
+                        timeout?: number;
+                        /** @description Address (base58 public key) of the node to assign the job to */
+                        node: string;
                     }[];
                 };
             };

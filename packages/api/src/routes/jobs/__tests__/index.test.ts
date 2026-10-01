@@ -270,6 +270,23 @@ describe('createNosanaJobsApi', () => {
       expect(result).toEqual(BATCH_RESPONSE);
     });
 
+    it('assignBatch posts to the assign batch endpoint with the required Idempotency-Key and returns items', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: BATCH_RESPONSE, error: null });
+
+      const api = createNosanaJobsApi({
+        blockchainIndexer: global.TEST_MOCK_CLIENT,
+        clientManager: global.TEST_MOCK_CLIENT,
+      });
+      const request = { jobs: [{ ipfsHash: 'Qm...', market: 'MarketAddr', timeout: 3600, node: 'NodeAddr' }] };
+      const result = await api.assignBatch(request, { idempotencyKey: 'batch-assign-1' });
+
+      const [path, options] = (global.TEST_MOCK_CLIENT.POST as Mock).mock.calls[0];
+      expect(path).toEqual('/jobs/assign/batch');
+      expect(options.body).toEqual(request);
+      expect(options.params.header).toEqual({ 'Idempotency-Key': 'batch-assign-1' });
+      expect(result).toEqual(BATCH_RESPONSE);
+    });
+
     it('extendBatch posts to the batch endpoint with the key', async () => {
       (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: BATCH_RESPONSE, error: null });
 
@@ -309,6 +326,19 @@ describe('createNosanaJobsApi', () => {
       await expect(
         api.listBatch({ jobs: [] }, { idempotencyKey: 'batch-list-err' }),
       ).rejects.toThrow('Failed to list job batch');
+    });
+
+    test('assignBatch throws a formatted error when an error is returned', async () => {
+      (global.TEST_MOCK_CLIENT.POST as Mock).mockResolvedValue({ data: null, error: { message: 'Idempotency-Key required' } });
+
+      const api = createNosanaJobsApi({
+        blockchainIndexer: global.TEST_MOCK_CLIENT,
+        clientManager: global.TEST_MOCK_CLIENT,
+      });
+
+      await expect(
+        api.assignBatch({ jobs: [] }, { idempotencyKey: 'batch-assign-err' }),
+      ).rejects.toThrow('Failed to assign job batch');
     });
   });
 

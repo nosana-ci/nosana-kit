@@ -9,6 +9,8 @@ export type Job =
 // Batch jobs wire types, sourced from the client-manager OpenAPI schema.
 export type NosanaApiListJobBatchRequest =
   clientManagerOperations['postJobsListBatch']['requestBody']['content']['application/json'];
+export type NosanaApiAssignJobBatchRequest =
+  clientManagerOperations['postJobsAssignBatch']['requestBody']['content']['application/json'];
 export type NosanaApiExtendJobBatchRequest =
   clientManagerOperations['postJobsExtendBatch']['requestBody']['content']['application/json'];
 export type NosanaApiStopJobBatchRequest =
@@ -107,6 +109,7 @@ export interface NosanaJobsApiMethods {
     options?: NosanaJobActionOptions,
   ) => Promise<NosanaApiStopJobResponse>;
   listBatch: (request: NosanaApiListJobBatchRequest, options: NosanaJobBatchOptions) => Promise<NosanaApiJobsBatchResponse>;
+  assignBatch: (request: NosanaApiAssignJobBatchRequest, options: NosanaJobBatchOptions) => Promise<NosanaApiJobsBatchResponse>;
   extendBatch: (request: NosanaApiExtendJobBatchRequest, options: NosanaJobBatchOptions) => Promise<NosanaApiJobsBatchResponse>;
   stopBatch: (request: NosanaApiStopJobBatchRequest, options: NosanaJobBatchOptions) => Promise<NosanaApiJobsBatchResponse>;
   getRunning: () => Promise<Record<string, unknown>>;
