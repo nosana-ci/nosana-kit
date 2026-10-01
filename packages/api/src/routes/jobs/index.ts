@@ -19,6 +19,7 @@ import type {
   NosanaApiListJobRequest,
   NosanaApiListJobResponse,
   NosanaApiListJobBatchRequest,
+  NosanaApiAssignJobBatchRequest,
   NosanaApiExtendJobBatchRequest,
   NosanaApiStopJobBatchRequest,
   NosanaApiJobsBatchResponse,
@@ -153,6 +154,18 @@ export function createNosanaJobsApi(
 
       if (error || !data) {
         throw errorFormatter('Failed to list job batch', error, response);
+      }
+
+      return data;
+    },
+    async assignBatch(request: NosanaApiAssignJobBatchRequest, options: NosanaJobBatchOptions): Promise<NosanaApiJobsBatchResponse> {
+      const { data, error, response } = await clientManager.POST('/jobs/assign/batch', {
+        params: { header: { 'Idempotency-Key': options.idempotencyKey } },
+        body: request,
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to assign job batch', error, response);
       }
 
       return data;

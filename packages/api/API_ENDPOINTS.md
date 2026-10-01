@@ -64,6 +64,7 @@ All groups are wired into `createNosanaApi()`.
 
 | SDK method | HTTP | Path | Description |
 |---|---|---|---|
+| `jobs.assignBatch()` | POST | `/jobs/assign/batch` | Bulk-assign jobs to nodes using credits |
 | `jobs.extend()` | POST | `/jobs/{address}/extend` | Extend a job using credits |
 | `jobs.extendBatch()` | POST | `/jobs/extend/batch` | Bulk-extend jobs using credits |
 | `jobs.get()` | GET | `/jobs/{address}` | Get job by address |
@@ -280,6 +281,7 @@ Legend: a method name = exposed as a curated SDK method; **—** = reachable onl
 | GET | `/health` |  | — |
 | POST | `/jobs/{address}/extend` | Extend a job using credits | `jobs.extend()` |
 | POST | `/jobs/{address}/stop` | Stop a job paid with credits | `jobs.stop()` |
+| POST | `/jobs/assign/batch` | Bulk-assign jobs to nodes using credits | `jobs.assignBatch()` |
 | POST | `/jobs/extend/batch` | Bulk-extend jobs using credits | `jobs.extendBatch()` |
 | POST | `/jobs/list` | Create a job using credits | `jobs.list()` |
 | POST | `/jobs/list/batch` | Bulk-create jobs using credits | `jobs.listBatch()` |

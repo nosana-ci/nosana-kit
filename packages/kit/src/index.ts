@@ -567,6 +567,7 @@ export type {
   NosanaApiStopJobRequest,
   NosanaApiStopJobResponse,
   NosanaApiListJobBatchRequest,
+  NosanaApiAssignJobBatchRequest,
   NosanaApiExtendJobBatchRequest,
   NosanaApiStopJobBatchRequest,
   NosanaApiJobsBatchResponse,
