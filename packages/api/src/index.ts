@@ -30,6 +30,8 @@ import {
   type NosanaNewsletterApi,
   createNosanaBenchmarksApi,
   type NosanaBenchmarksApi,
+  createNosanaReservationsApi,
+  type NosanaReservationsApi,
   createNosanaNodeApi,
   type NodeInfo,
 } from './routes/index.js';
@@ -57,6 +59,7 @@ export interface NosanaApi {
   payments: NosanaPaymentsApi;
   newsletter: NosanaNewsletterApi;
   benchmarks: NosanaBenchmarksApi;
+  reservations: NosanaReservationsApi;
   /** A node's public info, addressed by node address. */
   node: (address: string) => Promise<NodeInfo>;
   /**
@@ -86,6 +89,7 @@ export interface NosanaApiWithApiKey {
   payments: NosanaPaymentsApi;
   newsletter: NosanaNewsletterApi;
   benchmarks: NosanaBenchmarksApi;
+  reservations: NosanaReservationsApi;
   /** A node's public info, addressed by node address. */
   node: (address: string) => Promise<NodeInfo>;
   clients: NosanaClients;
@@ -202,6 +206,9 @@ export function createNosanaApi(
       clientManager: clients.clientManager,
     }),
     benchmarks: createNosanaBenchmarksApi({ hostManager: clients.hostManager }),
+    reservations: createNosanaReservationsApi({
+      hostManager: clients.hostManager,
+    }),
     node: (address: string) => node(address).info(),
     clients,
   };
@@ -223,5 +230,6 @@ export type { NosanaApiError } from './utils/errorFormatter.js';
 export type * from './routes/jobs/types.js';
 export type * from './routes/credits/types.js';
 export type * from './routes/markets/types.js';
+export type * from './routes/reservations/types.js';
 export type * from './routes/deployments/types.js';
 export type * from './routes/node/types.js';

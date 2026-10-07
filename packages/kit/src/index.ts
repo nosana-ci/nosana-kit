@@ -579,6 +579,16 @@ export type {
   NosanaMarketsApi,
   Market as ApiMarket,
   MarketRequiredResources,
+  // Reservations API types (host-manager GPU and requirement lookups)
+  NosanaReservationsApi,
+  NosanaRequirements,
+  NosanaGpuModels,
+  NosanaGpuModel,
+  NosanaRequirementOptionsRequest,
+  NosanaRequirementOptions,
+  NosanaRequirementOption,
+  NosanaAvailableNodesRequest,
+  NosanaAvailableNodes,
   // Deployment API types (with methods - takes priority over types-module Deployment)
   ApiDeployment,
   Deployment,

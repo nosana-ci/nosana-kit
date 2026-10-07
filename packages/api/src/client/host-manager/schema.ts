@@ -167,6 +167,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/markets/{id}/spare-capacity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Available spare capacity slots for a market */
+        get: operations["getMarketsByIdSpare-capacity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/markets/{id}/required-resources": {
         parameters: {
             query?: never;
@@ -178,6 +195,38 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/{id}/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMarketsByIdMetadata"];
+        put?: never;
+        post: operations["postMarketsByIdMetadata"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/{id}/metadata/{metaId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["putMarketsByIdMetadataByMetaId"];
+        post?: never;
+        delete: operations["deleteMarketsByIdMetadataByMetaId"];
         options?: never;
         head?: never;
         patch?: never;
@@ -744,6 +793,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/nodes/access-key/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postNodesAccess-keySubmit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/nodes/{id}": {
         parameters: {
             query?: never;
@@ -1264,6 +1329,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/config/failed-metric-retry-minutes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getConfigFailed-metric-retry-minutes"];
+        put?: never;
+        post: operations["postConfigFailed-metric-retry-minutes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve queued nodes from a market for direct job assignment */
+        post: operations["postReservations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/requirements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List metrics usable as reservation requirements with the values nodes have (optionally only `?metrics=a,b`) */
+        get: operations["getReservationsRequirements"];
+        put?: never;
+        /** Requirement options scoped to the queued or working hosts that satisfy the given requirements (e.g. the chosen GPU) */
+        post: operations["postReservationsRequirements"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/gpus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List GPU models (name, VRAM) with how many hosts have them and how many are queued */
+        get: operations["getReservationsGpus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/available": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dry run: queued nodes across all markets that satisfy the requirements */
+        post: operations["postReservationsAvailable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/metrics": {
         parameters: {
             query?: never;
@@ -1447,7 +1597,9 @@ export interface operations {
     "getMarketsDocker-images": {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1474,12 +1626,21 @@ export interface operations {
             content: {
                 "application/json": {
                     name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
                 };
                 "multipart/form-data": {
                     name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
                 };
                 "text/plain": {
                     name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
                 };
             };
         };
@@ -1557,7 +1718,9 @@ export interface operations {
     "getMarketsDocker-imagesById": {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                authorization: string;
+            };
             path: {
                 id: string;
             };
@@ -1588,12 +1751,21 @@ export interface operations {
             content: {
                 "application/json": {
                     name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
                 };
                 "multipart/form-data": {
                     name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
                 };
                 "text/plain": {
                     name: string;
+                    server?: (string | null) | null;
+                    username?: (string | null) | null;
+                    password?: (string | null) | null;
                 };
             };
         };
@@ -1777,7 +1949,10 @@ export interface operations {
                     sft?: (string | null) | null;
                     usd_reward_per_hour?: number;
                     nos_reward_per_second?: number;
+                    max_usd_uptime_reward_per_day?: number;
                     utilization_target?: (number | null) | null;
+                    spare_utilization_percent?: ((string | number) | null) | null;
+                    spare_max_timeout_seconds?: ((string | number) | null) | null;
                     job_price?: number;
                     job_timeout?: number;
                     job_expiration?: number;
@@ -1790,6 +1965,10 @@ export interface operations {
                         id: number;
                     }[];
                     client?: boolean;
+                    metadata?: {
+                        key: string;
+                        value: string;
+                    }[];
                 };
                 "multipart/form-data": {
                     slug?: string;
@@ -1798,7 +1977,10 @@ export interface operations {
                     sft?: (string | null) | null;
                     usd_reward_per_hour?: number;
                     nos_reward_per_second?: number;
+                    max_usd_uptime_reward_per_day?: number;
                     utilization_target?: (number | null) | null;
+                    spare_utilization_percent?: ((string | number) | null) | null;
+                    spare_max_timeout_seconds?: ((string | number) | null) | null;
                     job_price?: number;
                     job_timeout?: number;
                     job_expiration?: number;
@@ -1811,6 +1993,10 @@ export interface operations {
                         id: number;
                     }[];
                     client?: boolean;
+                    metadata?: {
+                        key: string;
+                        value: string;
+                    }[];
                 };
                 "text/plain": {
                     slug?: string;
@@ -1819,7 +2005,10 @@ export interface operations {
                     sft?: (string | null) | null;
                     usd_reward_per_hour?: number;
                     nos_reward_per_second?: number;
+                    max_usd_uptime_reward_per_day?: number;
                     utilization_target?: (number | null) | null;
+                    spare_utilization_percent?: ((string | number) | null) | null;
+                    spare_max_timeout_seconds?: ((string | number) | null) | null;
                     job_price?: number;
                     job_timeout?: number;
                     job_expiration?: number;
@@ -1832,6 +2021,10 @@ export interface operations {
                         id: number;
                     }[];
                     client?: boolean;
+                    metadata?: {
+                        key: string;
+                        value: string;
+                    }[];
                 };
             };
         };
@@ -1865,7 +2058,7 @@ export interface operations {
             };
         };
     };
-    "getMarketsByIdRequired-resources": {
+    "getMarketsByIdSpare-capacity": {
         parameters: {
             query?: never;
             header?: never;
@@ -1882,7 +2075,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        required_images: string[];
+                        slots: number;
+                        maxTimeoutSeconds: (number | null) | null;
+                    };
+                    "multipart/form-data": {
+                        slots: number;
+                        maxTimeoutSeconds: (number | null) | null;
+                    };
+                    "text/plain": {
+                        slots: number;
+                        maxTimeoutSeconds: (number | null) | null;
+                    };
+                };
+            };
+        };
+    };
+    "getMarketsByIdRequired-resources": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        required_images: {
+                            name: string;
+                            server?: string;
+                            username?: string;
+                            password?: string;
+                        }[];
                         required_remote_resources: ({
                             /** @constant */
                             type: "Ollama";
@@ -1897,7 +2129,12 @@ export interface operations {
                         })[];
                     };
                     "multipart/form-data": {
-                        required_images: string[];
+                        required_images: {
+                            name: string;
+                            server?: string;
+                            username?: string;
+                            password?: string;
+                        }[];
                         required_remote_resources: ({
                             /** @constant */
                             type: "Ollama";
@@ -1912,7 +2149,12 @@ export interface operations {
                         })[];
                     };
                     "text/plain": {
-                        required_images: string[];
+                        required_images: {
+                            name: string;
+                            server?: string;
+                            username?: string;
+                            password?: string;
+                        }[];
                         required_remote_resources: ({
                             /** @constant */
                             type: "Ollama";
@@ -1927,6 +2169,138 @@ export interface operations {
                         })[];
                     };
                 };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    getMarketsByIdMetadata: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postMarketsByIdMetadata: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    key: string;
+                    value: string;
+                };
+                "multipart/form-data": {
+                    key: string;
+                    value: string;
+                };
+                "text/plain": {
+                    key: string;
+                    value: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    putMarketsByIdMetadataByMetaId: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+                metaId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    key: string;
+                    value: string;
+                };
+                "multipart/form-data": {
+                    key: string;
+                    value: string;
+                };
+                "text/plain": {
+                    key: string;
+                    value: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteMarketsByIdMetadataByMetaId: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                id: string;
+                metaId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2321,6 +2695,7 @@ export interface operations {
                     expiry?: string;
                     internal?: boolean;
                     lifecycle?: boolean;
+                    match?: (("exact" | "minimum") | null) | null;
                     processor?: string;
                     operationId?: number;
                     group?: (string | null) | null;
@@ -2336,6 +2711,7 @@ export interface operations {
                     expiry?: string;
                     internal?: boolean;
                     lifecycle?: boolean;
+                    match?: (("exact" | "minimum") | null) | null;
                     processor?: string;
                     operationId?: number;
                     group?: (string | null) | null;
@@ -2351,6 +2727,7 @@ export interface operations {
                     expiry?: string;
                     internal?: boolean;
                     lifecycle?: boolean;
+                    match?: (("exact" | "minimum") | null) | null;
                     processor?: string;
                     operationId?: number;
                     group?: (string | null) | null;
@@ -2390,6 +2767,7 @@ export interface operations {
                     expiry?: string;
                     internal?: boolean;
                     lifecycle?: boolean;
+                    match?: (("exact" | "minimum") | null) | null;
                     processor?: string;
                     operationId?: number;
                     group?: (string | null) | null;
@@ -2405,6 +2783,7 @@ export interface operations {
                     expiry?: string;
                     internal?: boolean;
                     lifecycle?: boolean;
+                    match?: (("exact" | "minimum") | null) | null;
                     processor?: string;
                     operationId?: number;
                     group?: (string | null) | null;
@@ -2420,6 +2799,7 @@ export interface operations {
                     expiry?: string;
                     internal?: boolean;
                     lifecycle?: boolean;
+                    match?: (("exact" | "minimum") | null) | null;
                     processor?: string;
                     operationId?: number;
                     group?: (string | null) | null;
@@ -2830,11 +3210,8 @@ export interface operations {
                         execution?: {
                             group?: string;
                             timeout?: number;
-                            depends_on: string[];
+                            depends_on?: string[];
                             stop_if_dependent_stops?: boolean;
-                        } | {
-                            group?: string;
-                            timeout?: number;
                         };
                     }[];
                     source?: string;
@@ -2847,6 +3224,7 @@ export interface operations {
                         expiry?: string;
                         internal?: boolean;
                         lifecycle?: boolean;
+                        match?: (("exact" | "minimum") | null) | null;
                         processor?: string;
                         operationId?: number;
                         group?: (string | null) | null;
@@ -3011,11 +3389,8 @@ export interface operations {
                         execution?: {
                             group?: string;
                             timeout?: number;
-                            depends_on: string[];
+                            depends_on?: string[];
                             stop_if_dependent_stops?: boolean;
-                        } | {
-                            group?: string;
-                            timeout?: number;
                         };
                     }[];
                     source?: string;
@@ -3028,6 +3403,7 @@ export interface operations {
                         expiry?: string;
                         internal?: boolean;
                         lifecycle?: boolean;
+                        match?: (("exact" | "minimum") | null) | null;
                         processor?: string;
                         operationId?: number;
                         group?: (string | null) | null;
@@ -3192,11 +3568,8 @@ export interface operations {
                         execution?: {
                             group?: string;
                             timeout?: number;
-                            depends_on: string[];
+                            depends_on?: string[];
                             stop_if_dependent_stops?: boolean;
-                        } | {
-                            group?: string;
-                            timeout?: number;
                         };
                     }[];
                     source?: string;
@@ -3209,6 +3582,7 @@ export interface operations {
                         expiry?: string;
                         internal?: boolean;
                         lifecycle?: boolean;
+                        match?: (("exact" | "minimum") | null) | null;
                         processor?: string;
                         operationId?: number;
                         group?: (string | null) | null;
@@ -3397,11 +3771,8 @@ export interface operations {
                         execution?: {
                             group?: string;
                             timeout?: number;
-                            depends_on: string[];
+                            depends_on?: string[];
                             stop_if_dependent_stops?: boolean;
-                        } | {
-                            group?: string;
-                            timeout?: number;
                         };
                     }[];
                     source?: string;
@@ -3414,6 +3785,7 @@ export interface operations {
                         expiry?: string;
                         internal?: boolean;
                         lifecycle?: boolean;
+                        match?: (("exact" | "minimum") | null) | null;
                         processor?: string;
                         operationId?: number;
                         group?: (string | null) | null;
@@ -3578,11 +3950,8 @@ export interface operations {
                         execution?: {
                             group?: string;
                             timeout?: number;
-                            depends_on: string[];
+                            depends_on?: string[];
                             stop_if_dependent_stops?: boolean;
-                        } | {
-                            group?: string;
-                            timeout?: number;
                         };
                     }[];
                     source?: string;
@@ -3595,6 +3964,7 @@ export interface operations {
                         expiry?: string;
                         internal?: boolean;
                         lifecycle?: boolean;
+                        match?: (("exact" | "minimum") | null) | null;
                         processor?: string;
                         operationId?: number;
                         group?: (string | null) | null;
@@ -3759,11 +4129,8 @@ export interface operations {
                         execution?: {
                             group?: string;
                             timeout?: number;
-                            depends_on: string[];
+                            depends_on?: string[];
                             stop_if_dependent_stops?: boolean;
-                        } | {
-                            group?: string;
-                            timeout?: number;
                         };
                     }[];
                     source?: string;
@@ -3776,6 +4143,7 @@ export interface operations {
                         expiry?: string;
                         internal?: boolean;
                         lifecycle?: boolean;
+                        match?: (("exact" | "minimum") | null) | null;
                         processor?: string;
                         operationId?: number;
                         group?: (string | null) | null;
@@ -4934,17 +5302,14 @@ export interface operations {
                                 execution?: {
                                     group?: string;
                                     timeout?: number;
-                                    depends_on: string[];
+                                    depends_on?: string[];
                                     stop_if_dependent_stops?: boolean;
-                                } | {
-                                    group?: string;
-                                    timeout?: number;
                                 };
                             }[];
                         };
                         market?: {
                             address: string | null;
-                            sftTx?: string;
+                            accessKeyTx?: string;
                         };
                         feedbackReport?: {
                             marketAddress: string;
@@ -5176,17 +5541,14 @@ export interface operations {
                                 execution?: {
                                     group?: string;
                                     timeout?: number;
-                                    depends_on: string[];
+                                    depends_on?: string[];
                                     stop_if_dependent_stops?: boolean;
-                                } | {
-                                    group?: string;
-                                    timeout?: number;
                                 };
                             }[];
                         };
                         market?: {
                             address: string | null;
-                            sftTx?: string;
+                            accessKeyTx?: string;
                         };
                         feedbackReport?: {
                             marketAddress: string;
@@ -5418,17 +5780,14 @@ export interface operations {
                                 execution?: {
                                     group?: string;
                                     timeout?: number;
-                                    depends_on: string[];
+                                    depends_on?: string[];
                                     stop_if_dependent_stops?: boolean;
-                                } | {
-                                    group?: string;
-                                    timeout?: number;
                                 };
                             }[];
                         };
                         market?: {
                             address: string | null;
-                            sftTx?: string;
+                            accessKeyTx?: string;
                         };
                         feedbackReport?: {
                             marketAddress: string;
@@ -5446,6 +5805,56 @@ export interface operations {
                         nextTestAt?: string;
                         status?: string;
                         session?: string;
+                    };
+                };
+            };
+        };
+    };
+    "postNodesAccess-keySubmit": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    signedTx: string;
+                };
+                "multipart/form-data": {
+                    signedTx: string;
+                };
+                "text/plain": {
+                    signedTx: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        status: "confirmed" | "failed" | "unknown";
+                        signature?: string;
+                        market?: (string | null) | null;
+                        reason?: string;
+                    };
+                    "multipart/form-data": {
+                        status: "confirmed" | "failed" | "unknown";
+                        signature?: string;
+                        market?: (string | null) | null;
+                        reason?: string;
+                    };
+                    "text/plain": {
+                        status: "confirmed" | "failed" | "unknown";
+                        signature?: string;
+                        market?: (string | null) | null;
+                        reason?: string;
                     };
                 };
             };
@@ -5614,7 +6023,6 @@ export interface operations {
                             twitter: (string | null) | null;
                             createdAt: ((Record<string, never> | string | number) | null) | null;
                             updatedAt: ((Record<string, never> | string | number) | null) | null;
-                            outOfSync: ((Record<string, never> | string | number) | null) | null;
                             metrics: {
                                 [key: string]: unknown;
                             };
@@ -5635,7 +6043,6 @@ export interface operations {
                             twitter: (string | null) | null;
                             createdAt: ((Record<string, never> | string | number) | null) | null;
                             updatedAt: ((Record<string, never> | string | number) | null) | null;
-                            outOfSync: ((Record<string, never> | string | number) | null) | null;
                             metrics: {
                                 [key: string]: unknown;
                             };
@@ -5656,7 +6063,6 @@ export interface operations {
                             twitter: (string | null) | null;
                             createdAt: ((Record<string, never> | string | number) | null) | null;
                             updatedAt: ((Record<string, never> | string | number) | null) | null;
-                            outOfSync: ((Record<string, never> | string | number) | null) | null;
                             metrics: {
                                 [key: string]: unknown;
                             };
@@ -6302,11 +6708,8 @@ export interface operations {
                                 execution?: {
                                     group?: string;
                                     timeout?: number;
-                                    depends_on: string[];
+                                    depends_on?: string[];
                                     stop_if_dependent_stops?: boolean;
-                                } | {
-                                    group?: string;
-                                    timeout?: number;
                                 };
                             }[];
                         };
@@ -6558,11 +6961,8 @@ export interface operations {
                                 execution?: {
                                     group?: string;
                                     timeout?: number;
-                                    depends_on: string[];
+                                    depends_on?: string[];
                                     stop_if_dependent_stops?: boolean;
-                                } | {
-                                    group?: string;
-                                    timeout?: number;
                                 };
                             }[];
                         };
@@ -6814,11 +7214,8 @@ export interface operations {
                                 execution?: {
                                     group?: string;
                                     timeout?: number;
-                                    depends_on: string[];
+                                    depends_on?: string[];
                                     stop_if_dependent_stops?: boolean;
-                                } | {
-                                    group?: string;
-                                    timeout?: number;
                                 };
                             }[];
                         };
@@ -7696,11 +8093,8 @@ export interface operations {
                                     execution?: {
                                         group?: string;
                                         timeout?: number;
-                                        depends_on: string[];
+                                        depends_on?: string[];
                                         stop_if_dependent_stops?: boolean;
-                                    } | {
-                                        group?: string;
-                                        timeout?: number;
                                     };
                                 }[];
                                 metrics: {
@@ -7885,11 +8279,8 @@ export interface operations {
                                     execution?: {
                                         group?: string;
                                         timeout?: number;
-                                        depends_on: string[];
+                                        depends_on?: string[];
                                         stop_if_dependent_stops?: boolean;
-                                    } | {
-                                        group?: string;
-                                        timeout?: number;
                                     };
                                 }[];
                                 metrics: {
@@ -8074,11 +8465,8 @@ export interface operations {
                                     execution?: {
                                         group?: string;
                                         timeout?: number;
-                                        depends_on: string[];
+                                        depends_on?: string[];
                                         stop_if_dependent_stops?: boolean;
-                                    } | {
-                                        group?: string;
-                                        timeout?: number;
                                     };
                                 }[];
                                 metrics: {
@@ -8283,11 +8671,8 @@ export interface operations {
                                     execution?: {
                                         group?: string;
                                         timeout?: number;
-                                        depends_on: string[];
+                                        depends_on?: string[];
                                         stop_if_dependent_stops?: boolean;
-                                    } | {
-                                        group?: string;
-                                        timeout?: number;
                                     };
                                 }[];
                                 metrics: {
@@ -8503,11 +8888,8 @@ export interface operations {
                                     execution?: {
                                         group?: string;
                                         timeout?: number;
-                                        depends_on: string[];
+                                        depends_on?: string[];
                                         stop_if_dependent_stops?: boolean;
-                                    } | {
-                                        group?: string;
-                                        timeout?: number;
                                     };
                                 }[];
                                 metrics: {
@@ -8723,11 +9105,8 @@ export interface operations {
                                     execution?: {
                                         group?: string;
                                         timeout?: number;
-                                        depends_on: string[];
+                                        depends_on?: string[];
                                         stop_if_dependent_stops?: boolean;
-                                    } | {
-                                        group?: string;
-                                        timeout?: number;
                                     };
                                 }[];
                                 metrics: {
@@ -9062,11 +9441,8 @@ export interface operations {
                                     execution?: {
                                         group?: string;
                                         timeout?: number;
-                                        depends_on: string[];
+                                        depends_on?: string[];
                                         stop_if_dependent_stops?: boolean;
-                                    } | {
-                                        group?: string;
-                                        timeout?: number;
                                     };
                                 }[];
                                 metrics: {
@@ -9282,11 +9658,8 @@ export interface operations {
                                     execution?: {
                                         group?: string;
                                         timeout?: number;
-                                        depends_on: string[];
+                                        depends_on?: string[];
                                         stop_if_dependent_stops?: boolean;
-                                    } | {
-                                        group?: string;
-                                        timeout?: number;
                                     };
                                 }[];
                                 metrics: {
@@ -9502,11 +9875,8 @@ export interface operations {
                                     execution?: {
                                         group?: string;
                                         timeout?: number;
-                                        depends_on: string[];
+                                        depends_on?: string[];
                                         stop_if_dependent_stops?: boolean;
-                                    } | {
-                                        group?: string;
-                                        timeout?: number;
                                     };
                                 }[];
                                 metrics: {
@@ -9704,6 +10074,630 @@ export interface operations {
                             marketThresholds: unknown[];
                             antiSpoofSeeds: unknown[];
                         };
+                    };
+                };
+            };
+        };
+    };
+    "getConfigFailed-metric-retry-minutes": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        value: number;
+                    };
+                    "multipart/form-data": {
+                        value: number;
+                    };
+                    "text/plain": {
+                        value: number;
+                    };
+                };
+            };
+        };
+    };
+    "postConfigFailed-metric-retry-minutes": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    value: string | number;
+                };
+                "multipart/form-data": {
+                    value: string | number;
+                };
+                "text/plain": {
+                    value: string | number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        value: number;
+                    };
+                    "multipart/form-data": {
+                        value: number;
+                    };
+                    "text/plain": {
+                        value: number;
+                    };
+                };
+            };
+        };
+    };
+    postReservations: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    market: string;
+                    count?: string | number;
+                    idempotencyKey?: string;
+                    requirements?: {
+                        [key: string]: number | string | boolean;
+                    };
+                };
+                "multipart/form-data": {
+                    market: string;
+                    count?: string | number;
+                    idempotencyKey?: string;
+                    requirements?: {
+                        [key: string]: number | string | boolean;
+                    };
+                };
+                "text/plain": {
+                    market: string;
+                    count?: string | number;
+                    idempotencyKey?: string;
+                    requirements?: {
+                        [key: string]: number | string | boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requested: number;
+                        reserved: number;
+                        expiresAt: ((Record<string, never> | string | number) | null) | null;
+                        nodes: {
+                            nodeAddress: string;
+                            market: string;
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        requested: number;
+                        reserved: number;
+                        expiresAt: ((Record<string, never> | string | number) | null) | null;
+                        nodes: {
+                            nodeAddress: string;
+                            market: string;
+                        }[];
+                    };
+                    "text/plain": {
+                        requested: number;
+                        reserved: number;
+                        expiresAt: ((Record<string, never> | string | number) | null) | null;
+                        nodes: {
+                            nodeAddress: string;
+                            market: string;
+                        }[];
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    getReservationsRequirements: {
+        parameters: {
+            query?: {
+                metrics?: string | string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        nodes: number;
+                        metrics: {
+                            key: string;
+                            group: (string | null) | null;
+                            /**
+                             * @default integer
+                             * @enum {string}
+                             */
+                            type: "integer" | "float" | "text" | "boolean" | "json";
+                            /**
+                             * @default exact
+                             * @enum {string}
+                             */
+                            match: "exact" | "minimum";
+                            perInstance: boolean;
+                            min?: number;
+                            max?: number;
+                            values: {
+                                value: number | string | boolean;
+                                nodes: number;
+                            }[];
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        nodes: number;
+                        metrics: {
+                            key: string;
+                            group: (string | null) | null;
+                            /**
+                             * @default integer
+                             * @enum {string}
+                             */
+                            type: "integer" | "float" | "text" | "boolean" | "json";
+                            /**
+                             * @default exact
+                             * @enum {string}
+                             */
+                            match: "exact" | "minimum";
+                            perInstance: boolean;
+                            min?: number;
+                            max?: number;
+                            values: {
+                                value: number | string | boolean;
+                                nodes: number;
+                            }[];
+                        }[];
+                    };
+                    "text/plain": {
+                        nodes: number;
+                        metrics: {
+                            key: string;
+                            group: (string | null) | null;
+                            /**
+                             * @default integer
+                             * @enum {string}
+                             */
+                            type: "integer" | "float" | "text" | "boolean" | "json";
+                            /**
+                             * @default exact
+                             * @enum {string}
+                             */
+                            match: "exact" | "minimum";
+                            perInstance: boolean;
+                            min?: number;
+                            max?: number;
+                            values: {
+                                value: number | string | boolean;
+                                nodes: number;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    postReservationsRequirements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    metrics?: string[];
+                    requirements?: {
+                        [key: string]: number | string | boolean;
+                    };
+                };
+                "multipart/form-data": {
+                    metrics?: string[];
+                    requirements?: {
+                        [key: string]: number | string | boolean;
+                    };
+                };
+                "text/plain": {
+                    metrics?: string[];
+                    requirements?: {
+                        [key: string]: number | string | boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        nodes: number;
+                        metrics: {
+                            key: string;
+                            group: (string | null) | null;
+                            /**
+                             * @default integer
+                             * @enum {string}
+                             */
+                            type: "integer" | "float" | "text" | "boolean" | "json";
+                            /**
+                             * @default exact
+                             * @enum {string}
+                             */
+                            match: "exact" | "minimum";
+                            perInstance: boolean;
+                            min?: number;
+                            max?: number;
+                            values: {
+                                value: number | string | boolean;
+                                nodes: number;
+                            }[];
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        nodes: number;
+                        metrics: {
+                            key: string;
+                            group: (string | null) | null;
+                            /**
+                             * @default integer
+                             * @enum {string}
+                             */
+                            type: "integer" | "float" | "text" | "boolean" | "json";
+                            /**
+                             * @default exact
+                             * @enum {string}
+                             */
+                            match: "exact" | "minimum";
+                            perInstance: boolean;
+                            min?: number;
+                            max?: number;
+                            values: {
+                                value: number | string | boolean;
+                                nodes: number;
+                            }[];
+                        }[];
+                    };
+                    "text/plain": {
+                        nodes: number;
+                        metrics: {
+                            key: string;
+                            group: (string | null) | null;
+                            /**
+                             * @default integer
+                             * @enum {string}
+                             */
+                            type: "integer" | "float" | "text" | "boolean" | "json";
+                            /**
+                             * @default exact
+                             * @enum {string}
+                             */
+                            match: "exact" | "minimum";
+                            perInstance: boolean;
+                            min?: number;
+                            max?: number;
+                            values: {
+                                value: number | string | boolean;
+                                nodes: number;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    getReservationsGpus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        gpus: {
+                            name: string;
+                            vramGb: number;
+                            nodes: number;
+                            available: number;
+                            working: number;
+                            markets: string[];
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        gpus: {
+                            name: string;
+                            vramGb: number;
+                            nodes: number;
+                            available: number;
+                            working: number;
+                            markets: string[];
+                        }[];
+                    };
+                    "text/plain": {
+                        gpus: {
+                            name: string;
+                            vramGb: number;
+                            nodes: number;
+                            available: number;
+                            working: number;
+                            markets: string[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    postReservationsAvailable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    requirements?: {
+                        [key: string]: number | string | boolean;
+                    };
+                };
+                "multipart/form-data": {
+                    requirements?: {
+                        [key: string]: number | string | boolean;
+                    };
+                };
+                "text/plain": {
+                    requirements?: {
+                        [key: string]: number | string | boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        total: number;
+                        price: ({
+                            minUsdPerHour: number;
+                            maxUsdPerHour: number;
+                        } | null) | null;
+                        nodes: {
+                            nodeAddress: string;
+                            market: string;
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        total: number;
+                        price: ({
+                            minUsdPerHour: number;
+                            maxUsdPerHour: number;
+                        } | null) | null;
+                        nodes: {
+                            nodeAddress: string;
+                            market: string;
+                        }[];
+                    };
+                    "text/plain": {
+                        total: number;
+                        price: ({
+                            minUsdPerHour: number;
+                            maxUsdPerHour: number;
+                        } | null) | null;
+                        nodes: {
+                            nodeAddress: string;
+                            market: string;
+                        }[];
+                    };
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
                     };
                 };
             };

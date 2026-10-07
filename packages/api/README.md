@@ -182,6 +182,18 @@ await vault.topup({ NOS: 100 });
 | `getTemplatePerformance` | `nodeId: string` | `Promise<Record<string, unknown>>` |
 | `getBenchmarkSummary` | `request?: BenchmarkSummaryRequest` | `Promise<Record<string, unknown>>` |
 
+### `api.reservations` — GPU Models & Requirement Lookups
+
+Read-only and unauthenticated. A requirement set maps a metric key to a value:
+a number is a minimum, a string or boolean must match exactly, and the GPU
+model is the `name` key.
+
+| Method | Parameters | Returns |
+|--------|-----------|---------|
+| `listGpus` | — | `Promise<NosanaGpuModels>` |
+| `getRequirementOptions` | `request?: NosanaRequirementOptionsRequest` | `Promise<NosanaRequirementOptions>` |
+| `findAvailable` | `request?: NosanaAvailableNodesRequest` | `Promise<NosanaAvailableNodes>` |
+
 ### `api.node` / `api.jobs.get(job)` — Node access
 
 A node verifies the job owner's signature, and the client manager signs on the

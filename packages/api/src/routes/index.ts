@@ -8,6 +8,7 @@ export * from "./markets/index.js";
 export * from "./newsletter/index.js";
 export * from "./node/index.js";
 export * from "./payments/index.js";
+export * from "./reservations/index.js";
 export * from "./stats/index.js";
 export * from "./templates/index.js";
 export * from "./user/index.js";

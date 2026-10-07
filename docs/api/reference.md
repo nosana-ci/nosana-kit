@@ -35,6 +35,7 @@ const markets = await client.api.markets.list();
 | [`stats`](/api/stats) | Network statistics, NOS price, earning/spending history |
 | [`payments`](/api/payments) | Payment methods and credit purchases (Stripe) |
 | [`benchmarks`](/api/benchmarks) | Benchmark data, thresholds, and node benchmark submission |
+| [`reservations`](/api/reservations) | GPU models, requirement options, and hosts available for a requirement set |
 | [Raw clients](/api/raw-clients) | Typed `openapi-fetch` clients for every other endpoint |
 
 Every reference page lists the SDK method next to the HTTP method and path it
@@ -52,7 +53,7 @@ one (or two) of them:
 | Client Manager | `auth`, `user`, `credits`, `payments`, `templates`, job writes | `https://client-manager.k8s.prd.nosana.com` |
 | Blockchain Indexer | `jobs` (reads), `stats` | `https://blockchain-indexer.k8s.prd.nos.ci` |
 | Deployment Manager | `deployments` | `https://deployment-manager.k8s.prd.nos.ci` |
-| Host Manager | `markets`, `hosts`, `benchmarks` | `https://host-manager.k8s.prd.nosana.com` |
+| Host Manager | `markets`, `hosts`, `benchmarks`, `reservations` | `https://host-manager.k8s.prd.nosana.com` |
 
 You never need these URLs when using the SDK — they are resolved from the
 network configuration. They matter when calling the HTTP API directly.

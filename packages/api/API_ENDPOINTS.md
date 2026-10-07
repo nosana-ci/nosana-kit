@@ -230,6 +230,15 @@ All groups are wired into `createNosanaApi()`.
 | `benchmarks.seed()` | POST | `/benchmarks/{id}/seed` |  |
 | `benchmarks.submitResults()` | POST | `/benchmarks/{id}/submit-results` |  |
 
+### `reservations` — GPU Models & Requirement Lookups
+**Client:** Host Manager
+
+| SDK method | HTTP | Path | Description |
+|---|---|---|---|
+| `reservations.findAvailable()` | POST | `/reservations/available` | Queued hosts meeting a requirement set, with the price range |
+| `reservations.getRequirementOptions()` | POST | `/reservations/requirements` | Requirement metrics and their values, scoped by requirements |
+| `reservations.listGpus()` | GET | `/reservations/gpus` | GPU models with host counts and markets |
+
 ---
 
 ## All prd endpoints by service
@@ -428,6 +437,11 @@ Legend: a method name = exposed as a curated SDK method; **—** = reachable onl
 | POST | `/nodes/sync-node` |  | `hosts.syncNode()` |
 | POST | `/nodes/unban` |  | — |
 | GET | `/nodes/with-access` |  | `hosts.getWithAccess()` |
+| POST | `/reservations/` | Reserve queued nodes for a deployment (deployment manager only) | — |
+| POST | `/reservations/available` | Queued hosts meeting a requirement set, with the price range | `reservations.findAvailable()` |
+| GET | `/reservations/gpus` | GPU models with host counts and markets | `reservations.listGpus()` |
+| GET | `/reservations/requirements` | Requirement metrics and their values | — |
+| POST | `/reservations/requirements` | Requirement metrics and their values, scoped by requirements | `reservations.getRequirementOptions()` |
 | GET | `/rpc` |  | — |
 | GET | `/stats/nodes-country` |  | `hosts.getByCountry()` |
 

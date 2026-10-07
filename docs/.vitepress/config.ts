@@ -142,6 +142,7 @@ export default withMermaid(
               { text: 'Stats', link: '/api/stats' },
               { text: 'Payments', link: '/api/payments' },
               { text: 'Benchmarks', link: '/api/benchmarks' },
+              { text: 'GPUs & Requirements', link: '/api/reservations' },
               { text: 'Raw Clients', link: '/api/raw-clients' },
             ],
           },
