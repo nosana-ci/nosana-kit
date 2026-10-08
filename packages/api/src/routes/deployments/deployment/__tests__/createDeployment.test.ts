@@ -29,6 +29,7 @@ vi.mock('../actions/index.js', () => ({
   deploymentGetJob: vi.fn().mockResolvedValue({ id: 'job-id' }),
   deploymentGetJobs: vi.fn().mockResolvedValue({ jobs: [], total_items: 0, nextPage: null, previousPage: null }),
   deploymentUpdateMarket: vi.fn(),
+  deploymentUpdateRequirements: vi.fn(),
   deploymentDuplicate: vi.fn(),
 }));
 
@@ -62,6 +63,7 @@ describe('createDeployment', () => {
     expect(deployment.updateTimeout).toBeTypeOf('function');
     expect(deployment.updateSchedule).toBeTypeOf('function');
     expect(deployment.updateMarket).toBeTypeOf('function');
+    expect(deployment.updateRequirements).toBeTypeOf('function');
     expect(deployment.duplicate).toBeTypeOf('function');
   });
 
@@ -307,6 +309,20 @@ describe('createDeployment', () => {
       await deployment.updateMarket('rdRYm53F9nj7VWenCvuJw4Zf85KEo5op9kAiQk52kFh');
 
       expect(actions.deploymentUpdateMarket).toHaveBeenCalledWith(
+        'rdRYm53F9nj7VWenCvuJw4Zf85KEo5op9kAiQk52kFh',
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
+        expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
+      );
+    });
+
+    test('when updateRequirements method is invoked, it should call updateRequirements action', async () => {
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+      const requirements = { name: 'NVIDIA GeForce RTX 4090', ram_gb: 64 };
+
+      await deployment.updateRequirements(requirements, 'rdRYm53F9nj7VWenCvuJw4Zf85KEo5op9kAiQk52kFh');
+
+      expect(actions.deploymentUpdateRequirements).toHaveBeenCalledWith(
+        requirements,
         'rdRYm53F9nj7VWenCvuJw4Zf85KEo5op9kAiQk52kFh',
         global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
         expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),

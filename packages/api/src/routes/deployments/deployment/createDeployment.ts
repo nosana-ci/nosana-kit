@@ -20,6 +20,7 @@ import {
   deploymentGenerateAuthHeader,
   deploymentDelete,
   deploymentUpdateMarket,
+  deploymentUpdateRequirements,
   deploymentDuplicate,
 } from './actions/index.js';
 import { createVault } from './createVault.js';
@@ -180,6 +181,19 @@ export function createDeployment(
    */
   const updateMarket = async (market: string) => {
     await deploymentUpdateMarket(market, client, state);
+  };
+
+  /**
+   * @param requirements The node requirements to replace the deployment's with, or null to clear them
+   * @param market The market that serves them; it follows the GPU, as on create
+   * @throws Error if there is an error updating the requirements
+   * @returns Promise<void>
+   * @description Replaces the node requirements of the deployment together with
+   * its market. Running jobs keep their hosts unless the market changes; jobs
+   * listed from now on meet the new requirements.
+   */
+  const updateRequirements = async (requirements: DeploymentState['requirements'], market: string) => {
+    await deploymentUpdateRequirements(requirements, market, client, state);
   };
 
   /**
@@ -396,6 +410,7 @@ export function createDeployment(
     updateSchedule,
     updateName,
     updateMarket,
+    updateRequirements,
     duplicate,
   });
 }

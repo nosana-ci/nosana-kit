@@ -187,6 +187,8 @@ export type ApiDeployment = DeploymentState & {
   updateSchedule: (schedule: string) => Promise<void>;
   updateName: (name: string) => Promise<void>;
   updateMarket: (market: string) => Promise<void>;
+  /** Replace the node requirements, or clear them with null, together with the market that serves them. */
+  updateRequirements: (requirements: DeploymentState['requirements'], market: string) => Promise<void>;
   /** Copy this deployment into a new one; the source is left untouched. */
   duplicate: (options?: DeploymentDuplicateOptions) => Promise<ApiDeployment>;
 };

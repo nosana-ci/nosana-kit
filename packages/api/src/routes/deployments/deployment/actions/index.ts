@@ -15,6 +15,7 @@ export * from './deploymentStop.js';
 export * from './deploymentGenerateAuthHeader.js';
 export * from './deploymentUpdateActiveRevision.js';
 export * from './deploymentUpdateMarket.js';
+export * from './deploymentUpdateRequirements.js';
 export * from './deploymentUpdateReplicaCount.js';
 export * from './deploymentUpdateSchedule.js';
 export * from './deploymentUpdateTimeout.js';

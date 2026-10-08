@@ -146,6 +146,8 @@ export interface paths {
                     limit?: 10 | 20 | 50 | 100 | "10" | "20" | "50" | "100";
                     /** @description Sort order: 'asc' (oldest first) or 'desc' (newest first) */
                     sort_order?: "asc" | "desc";
+                    /** @description Exact owner-scoped creation key. */
+                    idempotency_key?: string;
                     /** @description Search for partial matches in deployment ID or name (case-insensitive) */
                     search?: string;
                     /** @description Filter by exact deployment ID */
@@ -1229,6 +1231,15 @@ export interface paths {
                         "application/json": "Unauthorized";
                     };
                 };
+                /** @description A deployment with this creation key already exists. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
                 /** @description Internal Server Error. */
                 500: {
                     headers: {
@@ -1974,6 +1985,93 @@ export interface paths {
         };
         trace?: never;
     };
+    "/deployments/{deployment}/update-requirements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Replace the node requirements of a deployment, or clear them with null, together with the market that serves them: the market follows the GPU, as on create. Every job listed from now on is reserved on nodes that meet the new requirements. On the same market running jobs keep their hosts; on a new one, a RUNNING deployment's jobs are stopped and relisted on it, as with update-market. */
+        patch: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path: {
+                    deployment: components["schemas"]["PublicKey"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        requirements: {
+                            [key: string]: number | string | boolean;
+                        } | null;
+                        market: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Deployment requirements updated successfully. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            requirements: {
+                                [key: string]: number | string | boolean;
+                            } | null;
+                            market: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Deployment not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
     "/deployments/{deployment}/update-schedule": {
         parameters: {
             query?: never;
@@ -2464,6 +2562,9 @@ export interface components {
             name: string;
             vault: string;
             market: string;
+            requirements: {
+                [key: string]: number | string | boolean;
+            } | null;
             owner: string;
             status: "DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED";
             replicas: number;
@@ -2561,8 +2662,14 @@ export interface components {
         DeploymentStrategy: "SIMPLE" | "SIMPLE-EXTEND" | "SCHEDULED" | "INFINITE";
         /** DeploymentCreateBody */
         DeploymentCreateBody: {
+            /** @description Optional owner-scoped create key. A duplicate returns 409; omit for independent creates. Deleting the deployment releases the key. */
+            idempotency_key?: string;
             name: string;
             market: string;
+            /** @description Node requirements as a map of metric key to value: a number is a minimum, a string or boolean an exact match. Keys are validated by the host manager when nodes are reserved. */
+            requirements?: {
+                [key: string]: number | string | boolean;
+            };
             replicas: number;
             /** @description Timeout in minutes, must be at least 1 minute. */
             timeout: number;

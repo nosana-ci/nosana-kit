@@ -305,6 +305,47 @@ curl -s \
 
 :::
 
+## Update Requirements
+
+Replace the node requirements a deployment's jobs are reserved on, or pass `null` to clear them, together with the market that serves them. A number is a minimum and a string or boolean must match exactly; see [GPUs & Requirements](./reservations.md) for the metrics you can set. Every job listed from now on is reserved on a node that meets the new requirements.
+
+The market follows the GPU (`name`), as when creating a deployment. Pass the deployment's current market to keep it: running jobs then keep their hosts. A different GPU means a different market: both change in one update, and a `RUNNING` deployment's jobs move to the new market as they do with [Update Market](#update-market).
+
+:::tabs
+
+== TypeScript SDK
+
+```ts twoslash
+import { createNosanaClient, NosanaNetwork } from '@nosana/kit';
+declare const process: { env: Record<string, string> };
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY },
+});
+// ---cut---
+const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
+// the same GPU, so the same market
+await deployment.updateRequirements(
+  { name: 'NVIDIA GeForce RTX 4090', ram_gb: 64, country: 'NL' },
+  deployment.market,
+);
+
+// a different GPU: the market that serves it
+await deployment.updateRequirements({ name: 'NVIDIA GeForce RTX 5090' }, 'NEW_MARKET_ADDRESS');
+```
+
+== HTTP API
+
+```bash
+curl -s \
+  -X PATCH \
+  -H "Authorization: Bearer $NOSANA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"requirements": {"name": "NVIDIA GeForce RTX 4090", "ram_gb": 64, "country": "NL"}, "market": "MARKET_ADDRESS"}' \
+  https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-requirements | jq .
+```
+
+:::
+
 ## Start a Deployment
 
 Start an existing deployment that is in a draft or stopped state:
