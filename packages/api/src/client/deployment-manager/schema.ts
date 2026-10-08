@@ -522,6 +522,81 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/deployments/{deployment}/headers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get a timestamped authorization header for each of the deployment's running jobs. */
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path: {
+                    deployment: components["schemas"]["PublicKey"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description One header per running job, keyed by job address. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            headers: {
+                                [key: string]: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized. Invalid or missing authentication. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": "Unauthorized";
+                    };
+                };
+                /** @description Deployment not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Internal Server Error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/deployments/{deployment}/jobs/{job}": {
         parameters: {
             query?: never;

@@ -18,12 +18,16 @@ import {
   deploymentRemoveSshKeys,
   deploymentUpdateName,
   deploymentGenerateAuthHeader,
+  deploymentGetAllJobHeaders,
   deploymentDelete,
   deploymentUpdateMarket,
   deploymentUpdateRequirements,
   deploymentDuplicate,
 } from './actions/index.js';
+import { isSolanaAddress } from '@nosana/types';
+
 import { createVault } from './createVault.js';
+import { jobHeaderStoreFor } from './jobHeaderStore.js';
 import { createNosanaNodeApi } from '../../node/index.js';
 
 import type {
@@ -248,6 +252,34 @@ export function createDeployment(
     return await deploymentGenerateAuthHeader(client, state, query);
   };
 
+  // Job headers outlive this object: see jobHeaderStore.ts.
+  const jobHeaders = jobHeaderStoreFor(client, state.id);
+
+  /**
+   * @param job The job address the header is bound to
+   * @returns Promise<string> A timestamped header the job's node accepts
+   * @description Returns the job's stored header while it is still valid, and
+   * otherwise signs a fresh one and stores it.
+   */
+  const generateJobAuthHeader = async (job: string): Promise<string> => {
+    const stored = jobHeaders.get(job);
+    if (stored) return stored;
+    const header = await generateAuthHeader({ message: job, includeTime: 'true' });
+    jobHeaders.set(job, header);
+    return header;
+  };
+
+  /**
+   * @returns Promise<Record<string, string>> A header per running job, keyed by job address
+   * @description Signs a header for every running job in one request and stores
+   * them, so the jobs' node calls need no further signing until they expire.
+   */
+  const generateAllJobAuthHeaders = async (): Promise<Record<string, string>> => {
+    const headers = await deploymentGetAllJobHeaders(client, state);
+    for (const [job, header] of Object.entries(headers)) jobHeaders.set(job, header);
+    return headers;
+  };
+
   /**
    * @description SSH key management for the deployment's jobs.
    * Keys are stored on the deployment (no new revision or restart) and injected
@@ -287,12 +319,19 @@ export function createDeployment(
 
   // Built lazily on first node access and reused. Every node call is authorized
   // by the deployment manager signing on the deployment's behalf (no local
-  // wallet; works under API-key auth).
+  // wallet; works under API-key auth). A job's own header (its address as the
+  // message) comes from the store; any other message (a terminal grant scoped to
+  // an op and expiry) is signed afresh.
   let nodeFactory: ReturnType<typeof createNosanaNodeApi> | undefined;
   const nodeJob = (node: string, jobAddress: string) => {
     nodeFactory ??= createNosanaNodeApi({
       environment: clients.environment,
-      authParams: { generate: (message) => generateAuthHeader({ message, includeTime: 'true' }) },
+      authParams: {
+        generate: (message) =>
+          isSolanaAddress(message)
+            ? generateJobAuthHeader(message)
+            : generateAuthHeader({ message, includeTime: 'true' }),
+      },
       options: clients.options,
     });
     return nodeFactory(node).job(jobAddress);
@@ -402,6 +441,8 @@ export function createDeployment(
     getEvents,
     stream,
     generateAuthHeader,
+    generateJobAuthHeader,
+    generateAllJobAuthHeaders,
     ssh,
     createRevision,
     updateReplicaCount,

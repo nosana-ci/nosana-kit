@@ -26,6 +26,7 @@ vi.mock('../actions/index.js', () => ({
   deploymentUpdateActiveRevision: vi.fn(),
   deploymentUpdateSchedule: vi.fn(),
   deploymentGenerateAuthHeader: vi.fn().mockResolvedValue('auth-header'),
+  deploymentGetAllJobHeaders: vi.fn().mockResolvedValue({}),
   deploymentGetJob: vi.fn().mockResolvedValue({ id: 'job-id' }),
   deploymentGetJobs: vi.fn().mockResolvedValue({ jobs: [], total_items: 0, nextPage: null, previousPage: null }),
   deploymentUpdateMarket: vi.fn(),

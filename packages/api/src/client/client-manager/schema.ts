@@ -77,6 +77,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/sign-messages/external": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign messages for external service authentication
+         * @description Sign up to 100 messages in one call, e.g. one auth header per running job of a deployment.
+         */
+        post: operations["postAuthSign-messagesExternal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/scopes": {
         parameters: {
             query?: never;
@@ -2203,6 +2223,67 @@ export interface operations {
                         apiKeyId?: string;
                         /** @description What the validated key is allowed to do. */
                         scopes?: string[];
+                    };
+                };
+            };
+        };
+    };
+    "postAuthSign-messagesExternal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The messages to sign (1-100) */
+                    messages: string[];
+                    includeTime?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The address of the user whose private key signed the messages */
+                        userAddress: string;
+                        /** @description One signature per message, in request order */
+                        signatures: {
+                            /** @description The original message that was signed */
+                            message: string;
+                            /** @description The signed message in base58 format */
+                            signature: string;
+                            /** @description Unix ms when the signature was created; present when includeTime was true */
+                            timestamp?: number;
+                        }[];
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        name: string;
+                        message: string;
+                    };
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        name: string;
+                        message: string;
                     };
                 };
             };
