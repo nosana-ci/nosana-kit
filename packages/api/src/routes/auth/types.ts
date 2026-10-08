@@ -11,6 +11,11 @@ export type NosanaAuthApi = {
    * owner. Lets an API-key caller reach a node without a local wallet.
    */
   signHeader: (message: string, options?: { includeTime?: boolean }) => Promise<string>;
+  /**
+   * {@link signHeader} for up to 100 messages in one call; headers are returned
+   * in the order of `messages`.
+   */
+  signHeaders: (messages: string[], options?: { includeTime?: boolean }) => Promise<string[]>;
   validateSession: (cookieHeader?: string) => Promise<ValidateSessionResponse>;
   validateApiKey: (apiKey: string) => Promise<ValidateApiKeyResponse>;
 }

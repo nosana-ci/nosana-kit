@@ -13,6 +13,7 @@ export * from './deploymentRemoveSshKeys.js';
 export * from './deploymentStart.js';
 export * from './deploymentStop.js';
 export * from './deploymentGenerateAuthHeader.js';
+export * from './deploymentGetAllJobHeaders.js';
 export * from './deploymentUpdateActiveRevision.js';
 export * from './deploymentUpdateMarket.js';
 export * from './deploymentUpdateRequirements.js';

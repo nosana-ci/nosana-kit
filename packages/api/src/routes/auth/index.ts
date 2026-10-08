@@ -41,6 +41,23 @@ export function createNosanaAuthApi(
       const header = `${message}:${data.signature}`;
       return includeTime && data.timestamp !== undefined ? `${header}:${data.timestamp}` : header;
     },
+    async signHeaders(
+      messages: string[],
+      { includeTime }: { includeTime?: boolean } = {},
+    ): Promise<string[]> {
+      const { data, error } = await client.POST('/auth/sign-messages/external', {
+        body: { messages, includeTime },
+      });
+
+      if (error || !data) {
+        throw errorFormatter('Failed to sign messages', error);
+      }
+
+      return data.signatures.map(({ message, signature, timestamp }) => {
+        const header = `${message}:${signature}`;
+        return includeTime && timestamp !== undefined ? `${header}:${timestamp}` : header;
+      });
+    },
     async validateSession(cookieHeader?: string): Promise<ValidateSessionResponse> {
       const { data, error } = await client.POST('/auth/validate-session', {
         body: cookieHeader ? { cookieHeader } : {},

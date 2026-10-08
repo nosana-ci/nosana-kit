@@ -179,6 +179,10 @@ export type ApiDeployment = DeploymentState & {
   /** Stream changes over server-sent events; close it to stop. */
   stream: (handlers: DeploymentStreamHandlers) => DeploymentStreamSubscription;
   generateAuthHeader: (query?: DeploymentAuthHeaderParams) => Promise<string>;
+  /** A job's timestamped node header: the stored one while still valid, else freshly signed. */
+  generateJobAuthHeader: (job: string) => Promise<string>;
+  /** Sign every running job's header in one request and store them for the jobs' node calls. */
+  generateAllJobAuthHeaders: () => Promise<Record<string, string>>;
   ssh: DeploymentSsh;
   createRevision: (jobDefinition: JobDefinition) => Promise<void>;
   updateActiveRevision: (revision: number) => Promise<void>;
