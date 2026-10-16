@@ -16,6 +16,13 @@ export type DeploymentState = Omit<components['schemas']['Deployment'], "updated
   created_at: Date;
 }
 
+/**
+ * Node requirements: metric key → required value. A number is a minimum, a
+ * string or boolean must match exactly, and a list is any of its values, e.g.
+ * `{ name: ['NVIDIA GeForce RTX 4090', 'NVIDIA GeForce RTX 5090'], ram_gb: 64 }`.
+ */
+export type DeploymentRequirements = NonNullable<DeploymentState['requirements']>;
+
 // Type alias for creating deployments (from OpenAPI schema)
 export type DeploymentCreateBody = components['schemas']['DeploymentCreateBody'];
 
@@ -191,8 +198,12 @@ export type ApiDeployment = DeploymentState & {
   updateSchedule: (schedule: string) => Promise<void>;
   updateName: (name: string) => Promise<void>;
   updateMarket: (market: string) => Promise<void>;
-  /** Replace the node requirements, or clear them with null, together with the market that serves them. */
-  updateRequirements: (requirements: DeploymentState['requirements'], market: string) => Promise<void>;
+  /**
+   * Replace the node requirements, or clear them with null, together with the market
+   * that serves them. Omit the market (or pass null) to post across markets: each job
+   * goes to the cheapest PREMIUM market with a node that meets the requirements.
+   */
+  updateRequirements: (requirements: DeploymentState['requirements'], market?: string | null) => Promise<void>;
   /** Copy this deployment into a new one; the source is left untouched. */
   duplicate: (options?: DeploymentDuplicateOptions) => Promise<ApiDeployment>;
 };

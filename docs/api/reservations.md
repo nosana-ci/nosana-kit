@@ -18,11 +18,12 @@ A requirement set maps a metric key to a value:
 
 - **A number is a minimum.** `ram_gb: 64` means at least 64 GB of RAM.
 - **A string or boolean must match exactly.** `country: "NL"` means hosts in the Netherlands.
+- **A list is any of its values.** `name: ["NVIDIA GeForce RTX 4090", "NVIDIA GeForce RTX 5090"]` means hosts with either GPU.
 - **The GPU model is the `name` key.** For example, `name: "NVIDIA GeForce RTX 4090"`.
 
 ```ts
 const requirements = {
-  name: 'NVIDIA GeForce RTX 4090',
+  name: ['NVIDIA GeForce RTX 4090', 'NVIDIA GeForce RTX 5090'],
   ram_gb: 64,
   country: 'NL',
 };

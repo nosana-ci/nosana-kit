@@ -1,14 +1,15 @@
 ---
 name: nosana
-description: Deploy and monitor GPU workloads on the Nosana network with @nosana/kit. Use when creating, starting, monitoring, debugging, or tearing down a Nosana deployment; writing or validating a job definition; picking a GPU market; reaching a deployed service's endpoint; reading deployment logs; or handling credits, vaults, and Nosana API errors.
+description: Deploy and monitor GPU workloads on the Nosana network with @nosana/kit. Use when creating, starting, monitoring, debugging, or tearing down a Nosana deployment; writing or validating a job definition; picking a GPU and setting node requirements, or pinning a market; reaching a deployed service's endpoint; reading deployment logs; or handling credits, vaults, and Nosana API errors.
 license: MIT
 ---
 
 # Nosana
 
 Nosana runs containerized GPU workloads on a decentralized network. You describe
-the container as a **job definition**, pick a **GPU market**, and create a
-**deployment** that schedules it onto hosts.
+the container as a **job definition**, say which **GPU** (and any other node
+**requirements**) it needs, and create a **deployment** that schedules it onto
+matching hosts.
 
 **Use deployments, not one-shot jobs.** Deployments own the lifecycle: replicas,
 revisions, restarts, scheduling, streaming, and endpoint URLs. One-shot jobs are
@@ -57,7 +58,7 @@ See [reference/funding.md](reference/funding.md) for credits and vaults.
 ```ts
 const deployment = await client.api.deployments.create({
   name: 'my-service',
-  market: '97G9NnvBDQ2WpKu6fasoMsAKmfj63C9rhysJnkeWodAf', // NVIDIA 4090
+  requirements: { name: 'NVIDIA GeForce RTX 4090' }, // a GPU from reservations.listGpus()
   replicas: 1,
   timeout: 60,          // MINUTES (jobs API uses seconds — see Gotchas)
   strategy: 'SIMPLE',
@@ -82,11 +83,31 @@ console.log(deployment.id, deployment.status);
 Without `autostart`, a deployment is created as `DRAFT` and does nothing until
 you call `await deployment.start()`.
 
+### Pick a GPU
+
+GPU names and the other requirements come from the host-manager's reservation
+lookups, not from memory:
+
+```ts
+const { gpus } = await client.api.reservations.listGpus();          // every model, VRAM, free hosts
+const options  = await client.api.reservations.getRequirementOptions(); // settable metrics and their values
+const free     = await client.api.reservations.findAvailable({        // who meets a set right now, and the price
+  requirements: { name: ['NVIDIA GeForce RTX 4090', 'NVIDIA GeForce RTX 5090'], ram_gb: 32 },
+});
+console.log(gpus.length, options.metrics.length, free.total, free.price?.minUsdPerHour);
+```
+
+With no `market`, each job goes to the cheapest `PREMIUM` market with a free
+host that meets `requirements`. Pass a `market` to pin every job to one. See
+[reference/requirements.md](reference/requirements.md).
+
 ### Create options
 
 | Field | Notes |
 |---|---|
-| `name`, `market`, `replicas` | Required. Market is a Solana address — see [reference/markets.md](reference/markets.md) |
+| `name`, `replicas` | Required |
+| `market` | Solana address of the market to post every job in — see [reference/markets.md](reference/markets.md). Omit it to post across markets: each job goes to the cheapest `PREMIUM` market with a node that meets `requirements` |
+| `requirements` | Node requirements, e.g. `{ name: ['NVIDIA GeForce RTX 4090'], ram_gb: 64 }`: a number is a minimum, a string or boolean an exact match, a list any of its values — see [reference/requirements.md](reference/requirements.md) |
 | `timeout` | **Minutes**. Schema min is 1, but **credit-paid (API key) deployments require ≥ 60** — below that the create succeeds and every job listing fails. `INFINITE` requires ≥ 60 too |
 | `strategy` | `SIMPLE`, `SIMPLE-EXTEND`, `SCHEDULED` (needs `schedule` cron), `INFINITE` (optional `rotation_time` seconds, ≥10 min under `timeout`) |
 | `job_definition` | See [reference/job-definition.md](reference/job-definition.md) |
@@ -121,6 +142,7 @@ await deployment.updateReplicaCount(3);
 await deployment.updateTimeout(120); // minutes
 await deployment.updateSchedule('0 0 * * *');
 await deployment.updateName('new-name');
+await deployment.updateRequirements({ name: ['NVIDIA GeForce RTX 5090'], ram_gb: 64 }); // new jobs only; add a market as 2nd arg to pin one
 await deployment.updateMarket('MARKET_ADDRESS'); // running jobs are relisted on the new market
 await deployment.createRevision(newJobDefinition);
 await deployment.updateActiveRevision(2);
@@ -268,7 +290,7 @@ Full frame and status tables: [reference/monitoring.md](reference/monitoring.md)
 
 | Symptom | Look here |
 |---|---|
-| Stuck in `STARTING` | Image pull / model download. `getEvents()`, then host logs via `getJob()` |
+| Stuck in `STARTING` | Image pull / model download. `getEvents()`, then host logs via `getJob()`. `active_jobs: 0` for long: no free host meets `requirements` — `reservations.findAvailable()` |
 | `INSUFFICIENT_FUNDS` | [reference/funding.md](reference/funding.md) |
 | Endpoint 404s/503s | **`getEvents()` first** — a repeating `JOB_LIST_ERROR` means nothing was ever scheduled. Otherwise still booting, or `expose` missing. [reference/endpoints.md](reference/endpoints.md) |
 | `RUNNING` but `active_jobs: 0` | Job listing is failing. `getEvents()` |
@@ -293,7 +315,7 @@ where they do, these were checked against the shipped types and the live API.
    OpenAPI spec (see below). The SDK instead calls the four services behind it
    directly — `client-manager` (auth, credits, templates, job writes),
    `blockchain-indexer` (job reads, stats), `deployment-manager` (deployments,
-   vaults), `host-manager` (markets, hosts) — because its types are generated
+   vaults), `host-manager` (markets, hosts, GPU and requirement lookups) — because its types are generated
    per service. Both work; the gateway is the simpler target for anything that
    isn't the SDK.
 4. **Live market fields** are `usd_reward_per_hour`, `nos_job_price_per_second`,
@@ -321,7 +343,8 @@ Load only what the task needs.
 |---|---|
 | [reference/monitoring.md](reference/monitoring.md) | Stream frames, status transitions, logs, events, tasks, pagination |
 | [reference/job-definition.md](reference/job-definition.md) | Full schema, ops, `cmd` forms, global defaults, literal interpolation |
-| [reference/markets.md](reference/markets.md) | Choosing a GPU, live field names, current market addresses |
+| [reference/requirements.md](reference/requirements.md) | GPU catalogue, settable requirements, who is free now and the price, changing them on a deployment |
+| [reference/markets.md](reference/markets.md) | Pinning a market, live field names, current market addresses |
 | [reference/endpoints.md](reference/endpoints.md) | Exposing ports, health checks, service URLs, multi-service containers |
 | [reference/resources.md](reference/resources.md) | HuggingFace and S3 resources, caching, private registries |
 | [reference/funding.md](reference/funding.md) | Credits (API key) and vaults (wallet) |

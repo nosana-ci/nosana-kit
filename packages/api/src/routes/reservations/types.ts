@@ -6,10 +6,15 @@ type Json<T> = T extends { content: { 'application/json': infer Body } }
 
 /**
  * Metric key → required value. A number is a minimum (`ram_gb: 64` means at
- * least 64 GB); a string or boolean must match exactly (`country: "NL"`).
- * The GPU model is the `name` key, e.g. `{ name: "NVIDIA GeForce RTX 4090" }`.
+ * least 64 GB); a string or boolean must match exactly (`country: "NL"`); a
+ * list is any of its values. The GPU model is the `name` key, e.g.
+ * `{ name: ["NVIDIA GeForce RTX 4090", "NVIDIA GeForce RTX 5090"] }`.
  */
-export type NosanaRequirements = Record<string, number | string | boolean>;
+export type NosanaRequirements = NonNullable<
+  NosanaAvailableNodesRequest['requirements']
+>;
+/** One requirement's value: a scalar, or a list of them meaning any of. */
+export type NosanaRequirementValue = NosanaRequirements[string];
 
 /** GPU models on the network: VRAM, host counts and the markets they serve. */
 export type NosanaGpuModels = Json<

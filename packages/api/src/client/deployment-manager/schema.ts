@@ -1332,6 +1332,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/deployments/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Check a job definition before creating a deployment with it: runs the Nosana Kit's validator, the same check /deployments/create applies to job_definition, and reports every problem without creating anything. Fix what it reports and validate again before creating. */
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    "x-user-id": string;
+                    /** @description Signed authentication message, */
+                    authorization: string;
+                    /** @description Nosana API key */
+                    "x-nosana-api"?: string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        job_definition: components["schemas"]["JobDefinition"];
+                    };
+                };
+            };
+            responses: {
+                /** @description Whether the job definition would be accepted, and why not. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            valid: boolean;
+                            /** @description Why the job definition would be rejected, one entry per problem; empty when valid. */
+                            errors: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/deployments/{deployment}/create-revision": {
         parameters: {
             query?: never;
@@ -2073,7 +2125,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** @description Replace the node requirements of a deployment, or clear them with null, together with the market that serves them: the market follows the GPU, as on create. Every job listed from now on is reserved on nodes that meet the new requirements. On the same market running jobs keep their hosts; on a new one, a RUNNING deployment's jobs are stopped and relisted on it, as with update-market. */
+        /** @description Replace the node requirements of a deployment, or clear them with null, together with the market that serves them, as on create. Every job listed from now on is reserved on nodes that meet the new requirements. Omit the market (or send null) to post across markets: each job goes to the cheapest PREMIUM market with a node that meets them. Running jobs keep their hosts, unless the market changes to another one: then a RUNNING deployment's jobs are stopped and relisted on it, as with update-market. */
         patch: {
             parameters: {
                 query?: never;
@@ -2093,9 +2145,9 @@ export interface paths {
                 content: {
                     "application/json": {
                         requirements: {
-                            [key: string]: number | string | boolean;
+                            [key: string]: (number | string | boolean) | (number | string | boolean)[];
                         } | null;
-                        market: string;
+                        market?: string | null;
                     };
                 };
             };
@@ -2108,9 +2160,9 @@ export interface paths {
                     content: {
                         "application/json": {
                             requirements: {
-                                [key: string]: number | string | boolean;
+                                [key: string]: (number | string | boolean) | (number | string | boolean)[];
                             } | null;
-                            market: string;
+                            market: string | null;
                             /** Format: date-time */
                             updated_at: string;
                         };
@@ -2636,9 +2688,9 @@ export interface components {
             id: string;
             name: string;
             vault: string;
-            market: string;
+            market: string | null;
             requirements: {
-                [key: string]: number | string | boolean;
+                [key: string]: (number | string | boolean) | (number | string | boolean)[];
             } | null;
             owner: string;
             status: "DRAFT" | "ERROR" | "STARTING" | "RUNNING" | "STOPPING" | "STOPPED" | "INSUFFICIENT_FUNDS" | "ARCHIVED";
@@ -2740,10 +2792,11 @@ export interface components {
             /** @description Optional owner-scoped create key. A duplicate returns 409; omit for independent creates. Deleting the deployment releases the key. */
             idempotency_key?: string;
             name: string;
-            market: string;
-            /** @description Node requirements as a map of metric key to value: a number is a minimum, a string or boolean an exact match. Keys are validated by the host manager when nodes are reserved. */
+            /** @description Market to post every job in. Omit to post across markets: each job goes to the cheapest PREMIUM market with a node that meets `requirements`. */
+            market?: string;
+            /** @description Node requirements as a map of metric key to value: a number is a minimum, a string or boolean an exact match, and a list is any of its values (e.g. `"name": ["NVIDIA GeForce RTX 4090", "NVIDIA GeForce RTX 5090"]`). Keys are validated by the host manager when nodes are reserved. */
             requirements?: {
-                [key: string]: number | string | boolean;
+                [key: string]: (number | string | boolean) | (number | string | boolean)[];
             };
             replicas: number;
             /** @description Timeout in minutes, must be at least 1 minute. */
