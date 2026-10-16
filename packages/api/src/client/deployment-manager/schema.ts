@@ -160,6 +160,10 @@ export interface paths {
                     strategy?: ("SIMPLE" | "SIMPLE-EXTEND" | "SCHEDULED" | "INFINITE") | string;
                     /** @description Filter by vault public key */
                     vault?: string;
+                    /** @description Filter by pinned market address. Can be single value or comma-separated list; `none` selects deployments that post across markets */
+                    market?: string;
+                    /** @description Filter by GPU model in the node requirements (`requirements.name`, exact as hosts report it). Can be single value or comma-separated list */
+                    gpu?: string;
                     /** @description Filter deployments created after this date (ISO 8601 format) */
                     created_after?: string;
                     /** @description Filter deployments created before this date (ISO 8601 format) */

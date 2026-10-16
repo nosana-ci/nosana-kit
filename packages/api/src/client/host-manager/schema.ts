@@ -1439,7 +1439,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Dry run: queued nodes across all markets that satisfy the requirements */
+        /** Dry run: queued nodes a deployment without a market could get for the requirements, across the markets it may post to */
         post: operations["postReservationsAvailable"];
         delete?: never;
         options?: never;
@@ -10284,6 +10284,8 @@ export interface operations {
                     };
                     count: string | number;
                     ttlSeconds?: string | number;
+                    maxUsdPerHour?: number;
+                    maxJobPrice?: string | number;
                 };
                 "multipart/form-data": {
                     key: string;
@@ -10293,6 +10295,8 @@ export interface operations {
                     };
                     count: string | number;
                     ttlSeconds?: string | number;
+                    maxUsdPerHour?: number;
+                    maxJobPrice?: string | number;
                 };
                 "text/plain": {
                     key: string;
@@ -10302,6 +10306,8 @@ export interface operations {
                     };
                     count: string | number;
                     ttlSeconds?: string | number;
+                    maxUsdPerHour?: number;
+                    maxJobPrice?: string | number;
                 };
             };
         };
@@ -10359,6 +10365,22 @@ export interface operations {
                 };
             };
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+            402: {
                 headers: {
                     [name: string]: unknown;
                 };
