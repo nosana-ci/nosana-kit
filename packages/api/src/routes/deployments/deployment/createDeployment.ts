@@ -189,14 +189,15 @@ export function createDeployment(
 
   /**
    * @param requirements The node requirements to replace the deployment's with, or null to clear them
-   * @param market The market that serves them; it follows the GPU, as on create
+   * @param market The market to post every job in; omit it (or pass null) to post across
+   * markets: each job goes to the cheapest PREMIUM market with a node that meets the requirements
    * @throws Error if there is an error updating the requirements
    * @returns Promise<void>
    * @description Replaces the node requirements of the deployment together with
-   * its market. Running jobs keep their hosts unless the market changes; jobs
-   * listed from now on meet the new requirements.
+   * its market, as on create. Running jobs keep their hosts unless the market changes;
+   * jobs listed from now on meet the new requirements.
    */
-  const updateRequirements = async (requirements: DeploymentState['requirements'], market: string) => {
+  const updateRequirements = async (requirements: DeploymentState['requirements'], market: string | null = null) => {
     await deploymentUpdateRequirements(requirements, market, client, state);
   };
 

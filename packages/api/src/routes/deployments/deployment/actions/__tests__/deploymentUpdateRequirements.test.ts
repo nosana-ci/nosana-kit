@@ -61,6 +61,26 @@ describe('deploymentUpdateRequirements', () => {
     expect(mockState.market).toBe(market);
   });
 
+  it('should post across markets when no market is given', async () => {
+    const requirements = { name: ['NVIDIA GeForce RTX 4090', 'NVIDIA GeForce RTX 5090'] };
+    (mockClient.PATCH as Mock).mockResolvedValue({
+      data: { requirements, market: null, updated_at: '2025-01-01T12:00:00.000Z' },
+      error: null,
+    });
+
+    await deploymentUpdateRequirements(requirements, undefined, mockClient, mockState);
+
+    expect(mockClient.PATCH).toHaveBeenCalledWith(
+      '/deployments/{deployment}/update-requirements',
+      {
+        params: { path: { deployment: mockState.id } },
+        body: { requirements, market: null },
+      },
+    );
+    expect(mockState.requirements).toEqual(requirements);
+    expect(mockState.market).toBeNull();
+  });
+
   it('should clear the requirements with null', async () => {
     (mockClient.PATCH as Mock).mockResolvedValue({
       data: { requirements: null, market: mockState.market, updated_at: '2025-01-01T12:00:00.000Z' },

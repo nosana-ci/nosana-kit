@@ -1,7 +1,9 @@
 # Markets
 
-A market is a pool of hosts with a given GPU type and price. Every deployment
-targets exactly one, by Solana address.
+A market is a pool of hosts with a given GPU type and price. A deployment may
+pin one by Solana address; without one it posts across every `PREMIUM` market
+whose hosts meet its `requirements`, cheapest first — see
+[requirements.md](requirements.md).
 
 ## Listing
 

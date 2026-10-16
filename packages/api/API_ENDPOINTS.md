@@ -134,6 +134,7 @@ All groups are wired into `createNosanaApi()`.
 | `deployments.pipe().stop()` | POST | `/deployments/{deployment}/stop` | Stop a deployment |
 | `deployments.pipe().updateActiveRevision()` | PATCH | `/deployments/{deployment}/update-active-revision` | Update deployment active revision. |
 | `deployments.pipe().updateMarket()` | PATCH | `/deployments/{deployment}/update-market` | Update the market of a deployment; running jobs are relisted on the new market. |
+| `deployments.pipe().updateRequirements()` | PATCH | `/deployments/{deployment}/update-requirements` | Replace the node requirements, and the market or none, as on create. |
 | `deployments.pipe().updateName()` | PATCH | `/deployments/{deployment}/update-name` | Update the name of a deployment |
 | `deployments.pipe().updateReplicaCount()` | PATCH | `/deployments/{deployment}/update-replica-count` | Update the replica count of a deployment |
 | `deployments.pipe().updateSchedule()` | PATCH | `/deployments/{deployment}/update-schedule` | Update deployment schedule. |
@@ -321,6 +322,7 @@ Legend: a method name = exposed as a curated SDK method; **—** = reachable onl
 | POST | `/deployments/{deployment}/duplicate` | Duplicate a deployment into a new DRAFT (or autostarted) deployment. | `deployments.pipe().duplicate()` |
 | GET | `/deployments/{deployment}/events` | Get events for a specific deployment. | `deployments.pipe().getEvents()` |
 | GET | `/deployments/{deployment}/header` | Get header for a specific deployment. | `deployments.pipe().generateAuthHeader()` |
+| GET | `/deployments/{deployment}/headers` | A timestamped authorization header for each running job. | `deployments.pipe().generateAllJobAuthHeaders()` |
 | GET | `/deployments/{deployment}/jobs` | Get jobs for a specific deployment. | `deployments.pipe().getJobs()` |
 | GET | `/deployments/{deployment}/jobs/{job}` | Get a specific deployment job by ID. | `deployments.pipe().getJob()` |
 | GET | `/deployments/{deployment}/revisions` | Get revisions for a specific deployment. | `deployments.pipe().getRevisions()` |
@@ -329,11 +331,13 @@ Legend: a method name = exposed as a curated SDK method; **—** = reachable onl
 | GET | `/deployments/{deployment}/tasks` | Get scheduled tasks for a specific deployment. | `deployments.pipe().getTasks()` |
 | PATCH | `/deployments/{deployment}/update-active-revision` | Update deployment active revision. | `deployments.pipe().updateActiveRevision()` |
 | PATCH | `/deployments/{deployment}/update-market` | Update the market of a deployment; running jobs are relisted on the new market. | `deployments.pipe().updateMarket()` |
+| PATCH | `/deployments/{deployment}/update-requirements` | Replace the node requirements, and the market or none, as on create. | `deployments.pipe().updateRequirements()` |
 | PATCH | `/deployments/{deployment}/update-name` | Update the name of a deployment | `deployments.pipe().updateName()` |
 | PATCH | `/deployments/{deployment}/update-replica-count` | Update the replica count of a deployment | `deployments.pipe().updateReplicaCount()` |
 | PATCH | `/deployments/{deployment}/update-schedule` | Update deployment schedule. | `deployments.pipe().updateSchedule()` |
 | PATCH | `/deployments/{deployment}/update-timeout` | Update deployment timeout | `deployments.pipe().updateTimeout()` |
 | POST | `/deployments/create` | Create a new deployment. | `deployments.create()` |
+| POST | `/deployments/validate` | Check a job definition without creating anything. | — |
 | GET | `/deployments/jobs/{job}/job-definition` | Returns the job definition for a job. | `deployments.getJobDefinition()` |
 | POST | `/deployments/jobs/{job}/results` | Post results for your running job. | `deployments.submitJobResults()` |
 | GET | `/deployments/vaults` | List all user vaults. | `deployments.vaults.list()` |
@@ -357,6 +361,7 @@ Legend: a method name = exposed as a curated SDK method; **—** = reachable onl
 | POST | `/benchmarks/market-thresholds/create` |  | — |
 | DELETE | `/benchmarks/market-thresholds/delete` |  | — |
 | POST | `/benchmarks/market-thresholds/describe` |  | — |
+| POST | `/benchmarks/market-thresholds/simulate-impact` |  | — |
 | POST | `/benchmarks/market-thresholds/update` |  | — |
 | GET | `/benchmarks/metric-processors` |  | `benchmarks.getMetricProcessors()` |
 | GET | `/benchmarks/metrics` |  | `benchmarks.getMetrics()` |
@@ -437,11 +442,12 @@ Legend: a method name = exposed as a curated SDK method; **—** = reachable onl
 | POST | `/nodes/sync-node` |  | `hosts.syncNode()` |
 | POST | `/nodes/unban` |  | — |
 | GET | `/nodes/with-access` |  | `hosts.getWithAccess()` |
-| POST | `/reservations/` | Reserve queued nodes for a deployment (deployment manager only) | — |
 | POST | `/reservations/available` | Queued hosts meeting a requirement set, with the price range | `reservations.findAvailable()` |
 | GET | `/reservations/gpus` | GPU models with host counts and markets | `reservations.listGpus()` |
 | GET | `/reservations/requirements` | Requirement metrics and their values | — |
 | POST | `/reservations/requirements` | Requirement metrics and their values, scoped by requirements | `reservations.getRequirementOptions()` |
+| POST | `/reservations/requests` | Create, renew or replay a queued reservation request (deployment manager only) | — |
+| DELETE | `/reservations/requests/{key}` | Cancel a reservation request and release its holds (deployment manager only) | — |
 | GET | `/rpc` |  | — |
 | GET | `/stats/nodes-country` |  | `hosts.getByCountry()` |
 

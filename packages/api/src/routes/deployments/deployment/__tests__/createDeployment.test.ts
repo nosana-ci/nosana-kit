@@ -330,6 +330,20 @@ describe('createDeployment', () => {
       );
     });
 
+    test('when updateRequirements is invoked without a market, it should pass null to post across markets', async () => {
+      const deployment = createDeployment(global.TEST_MOCK_DEPLOYMENT, global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER, true);
+      const requirements = { name: ['NVIDIA GeForce RTX 4090', 'NVIDIA GeForce RTX 5090'] };
+
+      await deployment.updateRequirements(requirements);
+
+      expect(actions.deploymentUpdateRequirements).toHaveBeenCalledWith(
+        requirements,
+        null,
+        global.TEST_DEPLOYMENT_ROUTE_CLIENTS_WITH_SIGNER.deploymentManager,
+        expect.objectContaining({ id: global.TEST_MOCK_DEPLOYMENT.id }),
+      );
+    });
+
     describe('duplicate', () => {
       const copy = {
         ...global.TEST_MOCK_DEPLOYMENT,

@@ -149,7 +149,7 @@ await vault.topup({ NOS: 100 });
 | `updateActiveRevision` | `active_revision: number` | `Promise<void>` |
 | `updateSchedule` | `schedule: string` | `Promise<void>` |
 | `updateMarket` | `market: string` | `Promise<void>` |
-| `updateRequirements` | `requirements: Record<string, number \| string \| boolean> \| null, market: string` | `Promise<void>` |
+| `updateRequirements` | `requirements: DeploymentRequirements \| null, market?: string \| null` | `Promise<void>` |
 | `duplicate` | `options?: DeploymentDuplicateOptions` | `Promise<Deployment>` |
 | `generateAuthHeader` | — | `Promise<unknown>` |
 | `ssh.keys` | — | `Promise<string[]>` |
@@ -186,8 +186,8 @@ await vault.topup({ NOS: 100 });
 ### `api.reservations` — GPU Models & Requirement Lookups
 
 Read-only and unauthenticated. A requirement set maps a metric key to a value:
-a number is a minimum, a string or boolean must match exactly, and the GPU
-model is the `name` key.
+a number is a minimum, a string or boolean must match exactly, a list is any of
+its values, and the GPU model is the `name` key.
 
 | Method | Parameters | Returns |
 |--------|-----------|---------|

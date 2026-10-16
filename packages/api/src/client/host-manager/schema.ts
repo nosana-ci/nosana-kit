@@ -489,6 +489,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/benchmarks/market-thresholds/simulate-impact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postBenchmarksMarket-thresholdsSimulate-impact"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/benchmarks/market-thresholds/describe": {
         parameters: {
             query?: never;
@@ -1345,7 +1361,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/reservations/": {
+    "/reservations/requests": {
         parameters: {
             query?: never;
             header?: never;
@@ -1354,9 +1370,26 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Reserve queued nodes from a market for direct job assignment */
-        post: operations["postReservations"];
+        /** Create, renew or replay a queued reservation request (filled now, or later by signed webhook) */
+        post: operations["postReservationsRequests"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/requests/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Cancel a reservation request and release the holds under its key */
+        delete: operations["deleteReservationsRequestsByKey"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2956,6 +2989,89 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    "postBenchmarksMarket-thresholdsSimulate-impact": {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                    isGating?: boolean;
+                };
+                "multipart/form-data": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                    isGating?: boolean;
+                };
+                "text/plain": {
+                    thresholdId: number;
+                    marketAddresses: (string | null)[];
+                    jsonLogic: {
+                        [key: string]: unknown;
+                    };
+                    interval?: (string | null) | null;
+                    isOptional?: boolean;
+                    isGating?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        evaluatedNodes: number;
+                        nodes: {
+                            nodeAddress: string;
+                            marketAddress: string;
+                            assignedMarket: (string | null) | null;
+                            reason: "missingMetric" | "noRecentData" | "expired" | "belowRequirement";
+                            measured: ((number | string | boolean) | null) | null;
+                        }[];
+                    };
+                    "multipart/form-data": {
+                        evaluatedNodes: number;
+                        nodes: {
+                            nodeAddress: string;
+                            marketAddress: string;
+                            assignedMarket: (string | null) | null;
+                            reason: "missingMetric" | "noRecentData" | "expired" | "belowRequirement";
+                            measured: ((number | string | boolean) | null) | null;
+                        }[];
+                    };
+                    "text/plain": {
+                        evaluatedNodes: number;
+                        nodes: {
+                            nodeAddress: string;
+                            marketAddress: string;
+                            assignedMarket: (string | null) | null;
+                            reason: "missingMetric" | "noRecentData" | "expired" | "belowRequirement";
+                            measured: ((number | string | boolean) | null) | null;
+                        }[];
+                    };
+                };
             };
         };
     };
@@ -10149,7 +10265,7 @@ export interface operations {
             };
         };
     };
-    postReservations: {
+    postReservationsRequests: {
         parameters: {
             query?: never;
             header?: {
@@ -10161,28 +10277,31 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    market: string;
-                    count?: string | number;
-                    idempotencyKey?: string;
+                    key: string;
+                    market?: string;
                     requirements?: {
-                        [key: string]: number | string | boolean;
+                        [key: string]: (number | string | boolean) | (number | string | boolean)[];
                     };
+                    count: string | number;
+                    ttlSeconds?: string | number;
                 };
                 "multipart/form-data": {
-                    market: string;
-                    count?: string | number;
-                    idempotencyKey?: string;
+                    key: string;
+                    market?: string;
                     requirements?: {
-                        [key: string]: number | string | boolean;
+                        [key: string]: (number | string | boolean) | (number | string | boolean)[];
                     };
+                    count: string | number;
+                    ttlSeconds?: string | number;
                 };
                 "text/plain": {
-                    market: string;
-                    count?: string | number;
-                    idempotencyKey?: string;
+                    key: string;
+                    market?: string;
                     requirements?: {
-                        [key: string]: number | string | boolean;
+                        [key: string]: (number | string | boolean) | (number | string | boolean)[];
                     };
+                    count: string | number;
+                    ttlSeconds?: string | number;
                 };
             };
         };
@@ -10193,31 +10312,49 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        key: string;
+                        /**
+                         * @default waiting
+                         * @enum {string}
+                         */
+                        status: "waiting" | "fulfilled" | "cancelled" | "expired";
                         requested: number;
-                        reserved: number;
-                        expiresAt: ((Record<string, never> | string | number) | null) | null;
                         nodes: {
                             nodeAddress: string;
                             market: string;
                         }[];
+                        holdExpiresAt: ((Record<string, never> | string | number) | null) | null;
+                        expiresAt: Record<string, never> | string | number;
                     };
                     "multipart/form-data": {
+                        key: string;
+                        /**
+                         * @default waiting
+                         * @enum {string}
+                         */
+                        status: "waiting" | "fulfilled" | "cancelled" | "expired";
                         requested: number;
-                        reserved: number;
-                        expiresAt: ((Record<string, never> | string | number) | null) | null;
                         nodes: {
                             nodeAddress: string;
                             market: string;
                         }[];
+                        holdExpiresAt: ((Record<string, never> | string | number) | null) | null;
+                        expiresAt: Record<string, never> | string | number;
                     };
                     "text/plain": {
+                        key: string;
+                        /**
+                         * @default waiting
+                         * @enum {string}
+                         */
+                        status: "waiting" | "fulfilled" | "cancelled" | "expired";
                         requested: number;
-                        reserved: number;
-                        expiresAt: ((Record<string, never> | string | number) | null) | null;
                         nodes: {
                             nodeAddress: string;
                             market: string;
                         }[];
+                        holdExpiresAt: ((Record<string, never> | string | number) | null) | null;
+                        expiresAt: Record<string, never> | string | number;
                     };
                 };
             };
@@ -10286,6 +10423,71 @@ export interface operations {
                 };
             };
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                    "multipart/form-data": {
+                        message: string;
+                    };
+                    "text/plain": {
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    deleteReservationsRequestsByKey: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        /**
+                         * @default cancelled
+                         * @enum {string}
+                         */
+                        status: "cancelled" | "fulfilled" | "expired";
+                        released: number;
+                    };
+                    "multipart/form-data": {
+                        key: string;
+                        /**
+                         * @default cancelled
+                         * @enum {string}
+                         */
+                        status: "cancelled" | "fulfilled" | "expired";
+                        released: number;
+                    };
+                    "text/plain": {
+                        key: string;
+                        /**
+                         * @default cancelled
+                         * @enum {string}
+                         */
+                        status: "cancelled" | "fulfilled" | "expired";
+                        released: number;
+                    };
+                };
+            };
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -10423,19 +10625,19 @@ export interface operations {
                 "application/json": {
                     metrics?: string[];
                     requirements?: {
-                        [key: string]: number | string | boolean;
+                        [key: string]: (number | string | boolean) | (number | string | boolean)[];
                     };
                 };
                 "multipart/form-data": {
                     metrics?: string[];
                     requirements?: {
-                        [key: string]: number | string | boolean;
+                        [key: string]: (number | string | boolean) | (number | string | boolean)[];
                     };
                 };
                 "text/plain": {
                     metrics?: string[];
                     requirements?: {
-                        [key: string]: number | string | boolean;
+                        [key: string]: (number | string | boolean) | (number | string | boolean)[];
                     };
                 };
             };
@@ -10613,17 +10815,17 @@ export interface operations {
             content: {
                 "application/json": {
                     requirements?: {
-                        [key: string]: number | string | boolean;
+                        [key: string]: (number | string | boolean) | (number | string | boolean)[];
                     };
                 };
                 "multipart/form-data": {
                     requirements?: {
-                        [key: string]: number | string | boolean;
+                        [key: string]: (number | string | boolean) | (number | string | boolean)[];
                     };
                 };
                 "text/plain": {
                     requirements?: {
-                        [key: string]: number | string | boolean;
+                        [key: string]: (number | string | boolean) | (number | string | boolean)[];
                     };
                 };
             };

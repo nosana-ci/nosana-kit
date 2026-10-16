@@ -6,8 +6,8 @@ coding agents to deploy and monitor GPU workloads on the
 [`@nosana/kit`](https://www.npmjs.com/package/@nosana/kit).
 
 Nosana is a decentralized GPU compute network on Solana. You describe a
-container as a job definition, pick a GPU market, and create a deployment that
-schedules it onto hosts. This plugin gives an agent the working knowledge to do
+container as a job definition, say which GPU and node requirements it needs, and
+create a deployment that schedules it onto matching hosts. This plugin gives an agent the working knowledge to do
 that correctly — including the parts the public documentation gets wrong.
 
 ## Install
@@ -37,7 +37,7 @@ Deploying and monitoring is the focus; everything else supports it.
 - Monitoring: the SSE stream, the status machine, container logs, events and
   tasks — including why `RUNNING` does not mean your service is up
 - Writing and validating job definitions
-- Choosing a GPU market
+- Choosing a GPU and node requirements from the live catalogue, or pinning a market
 - Reaching a deployed service's endpoint, with health checks
 - Loading models and data via HuggingFace and S3 resources
 - Paying with credits (API key) or a vault (wallet)
@@ -57,7 +57,8 @@ skills/nosana/
 └── reference/
     ├── monitoring.md     # stream frames, statuses, logs, events, pagination
     ├── job-definition.md # schema, ops, cmd forms, literal interpolation
-    ├── markets.md        # choosing a GPU, live field names, addresses
+    ├── requirements.md   # GPU catalogue, settable requirements, availability and price
+    ├── markets.md        # pinning a market, live field names, addresses
     ├── endpoints.md      # exposing ports, health checks, service URLs
     ├── resources.md      # HuggingFace and S3 resources, caching, registries
     ├── funding.md        # credits (API key) and vaults (wallet)

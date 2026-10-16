@@ -307,9 +307,9 @@ curl -s \
 
 ## Update Requirements
 
-Replace the node requirements a deployment's jobs are reserved on, or pass `null` to clear them, together with the market that serves them. A number is a minimum and a string or boolean must match exactly; see [GPUs & Requirements](./reservations.md) for the metrics you can set. Every job listed from now on is reserved on a node that meets the new requirements.
+Replace the node requirements a deployment's jobs are reserved on, or pass `null` to clear them, together with the market that serves them. A number is a minimum, a string or boolean must match exactly, and a list is any of its values; see [GPUs & Requirements](./reservations.md) for the metrics you can set. Every job listed from now on is reserved on a node that meets the new requirements.
 
-The market follows the GPU (`name`), as when creating a deployment. Pass the deployment's current market to keep it: running jobs then keep their hosts. A different GPU means a different market: both change in one update, and a `RUNNING` deployment's jobs move to the new market as they do with [Update Market](#update-market).
+The market works as when creating a deployment. Leave it out to post across markets: each job goes to the cheapest `PREMIUM` market with a node that meets the requirements. Pass a market to pin every job to it. Running jobs keep their hosts unless the market changes to another one: then a `RUNNING` deployment's jobs move to it as they do with [Update Market](#update-market).
 
 :::tabs
 
@@ -323,14 +323,15 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 });
 // ---cut---
 const deployment = await client.api.deployments.get('YOUR_DEPLOYMENT_ID');
-// the same GPU, so the same market
-await deployment.updateRequirements(
-  { name: 'NVIDIA GeForce RTX 4090', ram_gb: 64, country: 'NL' },
-  deployment.market,
-);
+// either GPU, in whichever premium market has a matching host, cheapest first
+await deployment.updateRequirements({
+  name: ['NVIDIA GeForce RTX 4090', 'NVIDIA GeForce RTX 5090'],
+  ram_gb: 64,
+  country: 'NL',
+});
 
-// a different GPU: the market that serves it
-await deployment.updateRequirements({ name: 'NVIDIA GeForce RTX 5090' }, 'NEW_MARKET_ADDRESS');
+// pinned to one market
+await deployment.updateRequirements({ name: 'NVIDIA GeForce RTX 5090' }, 'MARKET_ADDRESS');
 ```
 
 == HTTP API
@@ -340,7 +341,7 @@ curl -s \
   -X PATCH \
   -H "Authorization: Bearer $NOSANA_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"requirements": {"name": "NVIDIA GeForce RTX 4090", "ram_gb": 64, "country": "NL"}, "market": "MARKET_ADDRESS"}' \
+  -d '{"requirements": {"name": ["NVIDIA GeForce RTX 4090", "NVIDIA GeForce RTX 5090"], "ram_gb": 64, "country": "NL"}}' \
   https://api.nosana.com/deployments/YOUR_DEPLOYMENT_ID/update-requirements | jq .
 ```
 

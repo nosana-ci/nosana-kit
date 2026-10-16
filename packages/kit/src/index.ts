@@ -582,6 +582,7 @@ export type {
   // Reservations API types (host-manager GPU and requirement lookups)
   NosanaReservationsApi,
   NosanaRequirements,
+  NosanaRequirementValue,
   NosanaGpuModels,
   NosanaGpuModel,
   NosanaRequirementOptionsRequest,
@@ -595,6 +596,7 @@ export type {
   CreateDeployment,
   DeploymentCreateBody,
   DeploymentState,
+  DeploymentRequirements,
   DeploymentJob,
   DeploymentDuplicateOptions,
   DeploymentSsh,
