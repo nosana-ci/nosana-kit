@@ -1,7 +1,7 @@
 import { vi, type Mock } from 'vitest';
 
 import { createNosanaApi, NosanaNetwork } from '../index.js';
-import { createBlockchainIndexerClient } from '../client/index.js';
+import { createBlockchainIndexerClient, createHostManagerClient } from '../client/index.js';
 import { createDeploymentsApi } from '../routes/deployments/index.js';
 import { createNosanaNodeApi } from '../routes/node/index.js';
 
@@ -70,6 +70,22 @@ describe('createNosanaApi', () => {
     expect(createBlockchainIndexerClient).toHaveBeenCalledWith(
       NosanaNetwork.MAINNET,
       testSignerAuth,
+      global.TEST_NOSANA_API_OPTIONS
+    );
+  });
+
+  test('the reservations lookups use a host-manager client without a credential, whatever the auth', () => {
+    createNosanaApi(NosanaNetwork.MAINNET, testSignerAuth, global.TEST_NOSANA_API_OPTIONS);
+
+    // Once with the signer for the authenticated groups, once bare for reservations.
+    expect(createHostManagerClient).toHaveBeenCalledWith(
+      NosanaNetwork.MAINNET,
+      testSignerAuth,
+      global.TEST_NOSANA_API_OPTIONS
+    );
+    expect(createHostManagerClient).toHaveBeenCalledWith(
+      NosanaNetwork.MAINNET,
+      undefined,
       global.TEST_NOSANA_API_OPTIONS
     );
   });

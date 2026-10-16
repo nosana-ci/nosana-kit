@@ -31,9 +31,12 @@ const requirements = {
 
 ## List GPU models
 
-Every GPU model on the network, with its VRAM, how many hosts have one, how
-many of those are queued and free right now, how many are running a job, and
-the markets they serve.
+Every GPU model a deployment without a market can run on, with its VRAM, how
+many hosts have one, how many of those are queued and free right now, how many
+are running a job, the open markets they are in, and `price`: the hourly USD
+range across those markets (base reward, before the network fee; null when none
+is priced). Hosts in community or client-private markets do not count, so the
+catalogue needs no markets lookup to go with it.
 
 ::: tabs
 == @nosana/kit
@@ -46,7 +49,8 @@ const client = createNosanaClient(NosanaNetwork.MAINNET);
 const { gpus } = await client.api.reservations.listGpus();
 
 for (const gpu of gpus) {
-  console.log(gpu.name, `${gpu.vramGb} GB`, `${gpu.available} available`);
+  const price = gpu.price ? `from $${gpu.price.minUsdPerHour}/h` : 'unpriced';
+  console.log(gpu.name, `${gpu.vramGb} GB`, `${gpu.available} available`, price);
 }
 ```
 
@@ -133,7 +137,7 @@ curl -X POST https://api.nosana.com/reservations/available \
 
 | Method | HTTP | Path | Description |
 |---|---|---|---|
-| `reservations.listGpus()` | GET | `/reservations/gpus` | GPU models with host counts and markets |
+| `reservations.listGpus()` | GET | `/reservations/gpus` | GPU models in the open markets, with host counts and the hourly price range |
 | `reservations.getRequirementOptions(request?)` | POST | `/reservations/requirements` | Requirement metrics and their values, scoped by requirements |
 | `reservations.findAvailable(request?)` | POST | `/reservations/available` | Queued hosts meeting requirements, with the price range |
 

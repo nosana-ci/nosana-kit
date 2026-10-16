@@ -206,8 +206,10 @@ export function createNosanaApi(
       clientManager: clients.clientManager,
     }),
     benchmarks: createNosanaBenchmarksApi({ hostManager: clients.hostManager }),
+    // Public, read-only lookups: made without a credential, so a connected
+    // wallet is never asked to sign for a GPU list or an availability check.
     reservations: createNosanaReservationsApi({
-      hostManager: clients.hostManager,
+      hostManager: createHostManagerClient(environment, undefined, options),
     }),
     node: (address: string) => node(address).info(),
     clients,

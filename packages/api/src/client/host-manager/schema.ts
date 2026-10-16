@@ -1420,7 +1420,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List GPU models (name, VRAM) with how many hosts have them and how many are queued */
+        /** List GPU models (name, VRAM) in the open markets, with host counts and the hourly price range there */
         get: operations["getReservationsGpus"];
         put?: never;
         post?: never;
@@ -10800,6 +10800,10 @@ export interface operations {
                             available: number;
                             working: number;
                             markets: string[];
+                            price: ({
+                                minUsdPerHour: number;
+                                maxUsdPerHour: number;
+                            } | null) | null;
                         }[];
                     };
                     "multipart/form-data": {
@@ -10810,6 +10814,10 @@ export interface operations {
                             available: number;
                             working: number;
                             markets: string[];
+                            price: ({
+                                minUsdPerHour: number;
+                                maxUsdPerHour: number;
+                            } | null) | null;
                         }[];
                     };
                     "text/plain": {
@@ -10820,6 +10828,10 @@ export interface operations {
                             available: number;
                             working: number;
                             markets: string[];
+                            price: ({
+                                minUsdPerHour: number;
+                                maxUsdPerHour: number;
+                            } | null) | null;
                         }[];
                     };
                 };

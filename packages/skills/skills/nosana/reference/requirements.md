@@ -37,12 +37,16 @@ const { gpus } = await client.api.reservations.listGpus();
 
 for (const gpu of gpus) {
   // `available` hosts are queued now; `working` ones come back as jobs finish
-  console.log(gpu.name, `${gpu.vramGb} GB`, gpu.available, 'free of', gpu.nodes, gpu.markets);
+  console.log(gpu.name, `${gpu.vramGb} GB`, gpu.available, 'free of', gpu.nodes);
+  // hourly USD across its open markets, before the network fee; null when unpriced
+  if (gpu.price) console.log(`  $${gpu.price.minUsdPerHour}–$${gpu.price.maxUsdPerHour}/h`);
 }
 ```
 
-One entry per model and VRAM size, with the markets its hosts are in. Use the
-`name` verbatim as the `name` requirement.
+One entry per model and VRAM size, as a deployment without a market sees the
+network: only hosts in open markets count, and `price` is what an hour there
+costs, so there is no need to read the markets list. Use the `name` verbatim as
+the `name` requirement.
 
 ## Which requirements you can set
 

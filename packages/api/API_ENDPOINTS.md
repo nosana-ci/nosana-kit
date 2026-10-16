@@ -238,7 +238,7 @@ All groups are wired into `createNosanaApi()`.
 |---|---|---|---|
 | `reservations.findAvailable()` | POST | `/reservations/available` | Queued hosts meeting a requirement set, with the price range |
 | `reservations.getRequirementOptions()` | POST | `/reservations/requirements` | Requirement metrics and their values, scoped by requirements |
-| `reservations.listGpus()` | GET | `/reservations/gpus` | GPU models with host counts and markets |
+| `reservations.listGpus()` | GET | `/reservations/gpus` | GPU models in the open markets, with host counts and the hourly price range |
 
 ---
 
@@ -443,7 +443,7 @@ Legend: a method name = exposed as a curated SDK method; **—** = reachable onl
 | POST | `/nodes/unban` |  | — |
 | GET | `/nodes/with-access` |  | `hosts.getWithAccess()` |
 | POST | `/reservations/available` | Queued hosts meeting a requirement set, with the price range | `reservations.findAvailable()` |
-| GET | `/reservations/gpus` | GPU models with host counts and markets | `reservations.listGpus()` |
+| GET | `/reservations/gpus` | GPU models in the open markets, with host counts and the hourly price range | `reservations.listGpus()` |
 | GET | `/reservations/requirements` | Requirement metrics and their values | — |
 | POST | `/reservations/requirements` | Requirement metrics and their values, scoped by requirements | `reservations.getRequirementOptions()` |
 | POST | `/reservations/requests` | Create, renew or replay a queued reservation request (deployment manager only) | — |
