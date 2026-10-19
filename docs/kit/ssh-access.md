@@ -86,7 +86,9 @@ await job.terminal({
 
 Every request carries `Authorization: message:base58-signature` from
 `@nosana/authorization`; the node checks it against the job owner. Headers are
-credentials: do not log them or forward them through redirects.
+credentials: do not log them or forward them through redirects. These calls go
+to the job's runtime sidecar at `https://<job>.<node domain>` when its node runs
+one, and to the node otherwise; both serve the same paths and checks.
 
 | Operation | Method and path | Body |
 | --- | --- | --- |

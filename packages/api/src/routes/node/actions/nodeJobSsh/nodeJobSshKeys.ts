@@ -4,10 +4,11 @@ import type { NodeClient } from '../../../../client/node/index.js';
 import type { NodeSshAuthorizedKey, NodeSshKeyOptions } from '../../types.js';
 
 export async function nodeJobSshKeys(
-  client: NodeClient,
+  runtimeClient: () => Promise<NodeClient>,
   job: string,
   { signal }: NodeSshKeyOptions = {},
 ): Promise<NodeSshAuthorizedKey[]> {
+  const client = await runtimeClient();
   const { data, error, response } = await client.GET('/job/{job}/ssh/keys', {
     params: { path: { job } },
     signal,

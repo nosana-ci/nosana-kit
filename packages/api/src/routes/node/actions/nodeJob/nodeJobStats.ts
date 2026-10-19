@@ -4,10 +4,11 @@ import type { NodeClient } from '../../../../client/node/index.js';
 import type { NodeStatsQuery, NodeTaskStat } from '../../types.js';
 
 export async function nodeJobStats(
-  client: NodeClient,
+  runtimeClient: () => Promise<NodeClient>,
   job: string,
   query: NodeStatsQuery = {},
 ): Promise<NodeTaskStat[]> {
+  const client = await runtimeClient();
   const { data, error, response } = await client.GET('/job/{job}/stats', { params: { path: { job }, query } });
   if ((error !== undefined && error !== null) || data === undefined) {
     throw errorFormatter('Failed to get stats', error, response);

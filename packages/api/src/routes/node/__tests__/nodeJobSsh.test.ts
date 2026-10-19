@@ -1,5 +1,13 @@
 import { Mock } from 'vitest';
-import { JOB, KEY, NODE, nodeApi, ok } from './fixtures.js';
+import { JOB, KEY, NODE, nodeApi, ok, stubSidecar } from './fixtures.js';
+
+beforeEach(() => {
+  stubSidecar(false);
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 const ssh = () => nodeApi().job(JOB).ssh;
 

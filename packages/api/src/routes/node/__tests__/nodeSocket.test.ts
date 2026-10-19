@@ -1,6 +1,14 @@
-import { FakeWebSocket, JOB, NODE, nodeApi } from './fixtures.js';
+import { FakeWebSocket, JOB, NODE, nodeApi, settle, stubSidecar } from './fixtures.js';
 
 import type { SignerAuth } from '../../../types.js';
+
+beforeEach(() => {
+  stubSidecar(false);
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 function fixture(auth?: SignerAuth | null) {
   const socket = new FakeWebSocket();
@@ -23,6 +31,7 @@ describe('node job sockets', () => {
     const onOpen = vi.fn();
 
     const subscription = job.logs({ onData: (log) => logs.push(log), onOpen }, { group: 'setup' }, options);
+    await settle();
     expect(urls).toEqual([`wss://${NODE}.node.k8s.dev.nos.ci`]);
 
     await socket.onopen?.(new Event('open'));
@@ -48,6 +57,7 @@ describe('node job sockets', () => {
     const onClose = vi.fn();
 
     job.logs({ onData: vi.fn(), onClose }, undefined, options);
+    await settle();
     await socket.onopen?.(new Event('open'));
     expect(onClose).not.toHaveBeenCalled();
 
@@ -81,6 +91,7 @@ describe('node job sockets', () => {
       ...options,
       authorizationProvider: async (message) => `${message}:by-deployment`,
     });
+    await settle();
     await socket.onopen?.(new Event('open'));
 
     expect(JSON.parse(socket.sent[0]).header).toBe(`${JOB}:by-deployment`);

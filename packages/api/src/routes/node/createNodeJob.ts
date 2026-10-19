@@ -19,11 +19,12 @@ import { nodeJobSshAdd, nodeJobSshKeys, nodeJobSshRemove } from './actions/nodeJ
 import { nodeJobInfoStream, nodeJobStatsStream } from './actions/nodeJobStreams/index.js';
 import { nodeJobLogs, nodeJobStatus } from './actions/nodeSocket/index.js';
 import { openNodeJobTerminal } from './actions/terminal/openTerminal.js';
+import { openOnJobRuntime } from './jobRuntime.js';
 
 import type { NodeJobApi, NodeJobContext } from './types.js';
 
 export function createNodeJob(context: NodeJobContext): NodeJobApi {
-  const { client, job, node } = context;
+  const { client, runtimeClient, job, node } = context;
   const target = { job, node, nodeDomain: context.domain };
 
   return {
@@ -41,15 +42,16 @@ export function createNodeJob(context: NodeJobContext): NodeJobApi {
     stopOperation: (group, op) => stopNodeJobOperation(client, job, group, op),
     stop: () => stopNodeJob(client, job),
     endpoints: () => nodeJobEndpoints(client, job),
-    stats: (query) => nodeJobStats(client, job, query),
+    stats: (query) => nodeJobStats(runtimeClient, job, query),
     streamInfo: (handlers) => nodeJobInfoStream(client, job, handlers),
-    streamStats: (handlers, query) => nodeJobStatsStream(client, job, handlers, query),
+    streamStats: (handlers, query) =>
+      openOnJobRuntime(runtimeClient, (runtime) => nodeJobStatsStream(runtime, job, handlers, query)),
     logs: (handlers, filter, options) => nodeJobLogs(context, handlers, filter, options),
     status: (handlers, options) => nodeJobStatus(context, handlers, options),
     ssh: {
-      keys: (options) => nodeJobSshKeys(client, job, options),
-      add: (publicKey, options) => nodeJobSshAdd(client, job, publicKey, options),
-      remove: (publicKey, options) => nodeJobSshRemove(client, job, publicKey, options),
+      keys: (options) => nodeJobSshKeys(runtimeClient, job, options),
+      add: (publicKey, options) => nodeJobSshAdd(runtimeClient, job, publicKey, options),
+      remove: (publicKey, options) => nodeJobSshRemove(runtimeClient, job, publicKey, options),
       command: (options) => createSshCommand(target, options),
     },
     terminal: (options) => openNodeJobTerminal(context, options),

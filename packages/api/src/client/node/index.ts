@@ -43,3 +43,30 @@ export function createNodeClient(
 ): NodeClient {
   return createAuthenticatedClient<paths>(nodeUrl(environment, address, options), authParams);
 }
+
+/**
+ * Where a job's runtime sidecar answers, when its node started one: the job
+ * address as a subdomain of the same node domain.
+ */
+export function jobRuntimeUrl(
+  environment: NosanaNetwork,
+  job: string,
+  options?: CreateNosanaApiOptions,
+): string {
+  if (!isSolanaAddress(job)) throw new Error(`Invalid job address: ${job}`);
+  return `https://${job}.${nodeDomain(environment, options)}`;
+}
+
+/**
+ * A job's runtime sidecar serves the node's runtime routes (stats, logs,
+ * terminal, SSH keys) at the same paths and checks the same signature, so it
+ * takes the node's client shape.
+ */
+export function createJobRuntimeClient(
+  environment: NosanaNetwork,
+  job: string,
+  authParams: SignedHeaderAuth | undefined,
+  options?: CreateNosanaApiOptions,
+): NodeClient {
+  return createAuthenticatedClient<paths>(jobRuntimeUrl(environment, job, options), authParams);
+}
