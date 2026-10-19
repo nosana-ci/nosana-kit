@@ -7,13 +7,14 @@ import type { NodeSshAddKeyOptions, NodeSshAuthorization } from '../../types.js'
 
 /** Grants one key, permanently unless `expiresAt` is set. Validated before anything is sent. */
 export async function nodeJobSshAdd(
-  client: NodeClient,
+  runtimeClient: () => Promise<NodeClient>,
   job: string,
   publicKey: string,
   { expiresAt, signal }: NodeSshAddKeyOptions = {},
 ): Promise<NodeSshAuthorization> {
   const sshPublicKey = requireSshPublicKey(publicKey);
   const expiry = toExpiry(expiresAt);
+  const client = await runtimeClient();
   const { data, error, response } = await client.POST('/job/{job}/ssh/authorize', {
     params: { path: { job } },
     signal,

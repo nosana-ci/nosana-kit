@@ -6,10 +6,18 @@ import {
   createTerminalAuthorizationGrant,
   TERMINAL_AUTHORIZATION_MAX_TTL_MS,
 } from '../actions/terminal/grant.js';
-import { FakeWebSocket, JOB, NODE, nodeApi } from './fixtures.js';
+import { FakeWebSocket, JOB, NODE, nodeApi, stubSidecar } from './fixtures.js';
 
 import type { SignerAuth } from '../../../types.js';
 import type { NodeTerminalOptions, TerminalStatus } from '../types.js';
+
+beforeEach(() => {
+  stubSidecar(false);
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 const owner = nacl.sign.keyPair();
 const sign = async (message: string) =>

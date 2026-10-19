@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import { createNosanaNodeApi } from '../index.js';
 
 import type { SignerAuth } from '../../../types.js';
@@ -25,6 +27,22 @@ export const signer: SignerAuth = {
 export function nodeApi(auth: SignerAuth | null = signer) {
   return createNosanaNodeApi({ environment: 'devnet', authParams: auth ?? undefined })(NODE);
 }
+
+/**
+ * Answers the job's sidecar check (a plain `fetch` of `GET /`): a sidecar up
+ * for `JOB`, or the 404 frps gives for a job without one. Undo with
+ * `vi.unstubAllGlobals()`.
+ */
+export function stubSidecar(present: boolean) {
+  const check = vi.fn(async () =>
+    present ? new Response(JSON.stringify(JOB)) : new Response('Not Found', { status: 404 }),
+  );
+  vi.stubGlobal('fetch', check);
+  return check;
+}
+
+/** Lets a stream that opens once the sidecar check is done open. */
+export const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 export class FakeWebSocket {
   binaryType = '';

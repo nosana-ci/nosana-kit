@@ -106,7 +106,11 @@ export interface NodeTerminalOptions extends NodeSocketOptions {
   onExit?: (code: number | null) => void;
 }
 
-/** Everything the node knows about one job it runs. */
+/**
+ * Everything the node knows about one job it runs. Stats, logs, the terminal
+ * and SSH keys go to the job's own sidecar when its node started one, and to
+ * the node otherwise; everything else always goes to the node.
+ */
 export interface NodeJobApi {
   readonly address: string;
   readonly node: string;
@@ -169,6 +173,8 @@ export interface NodeRouteDeps {
 /** What every action on one job needs, resolved once when the node is addressed. */
 export interface NodeJobContext {
   client: NodeClient;
+  /** The client for the runtime routes: the job's sidecar when it has one, else the node. */
+  runtimeClient: () => Promise<NodeClient>;
   environment: NosanaNetwork;
   /** The domain the node answers under; also where its SSH proxy lives. */
   domain: string;

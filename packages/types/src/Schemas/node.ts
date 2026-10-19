@@ -461,15 +461,15 @@ export interface components {
             aliases?: string | components["schemas"]["Aliases"];
             cmd?: string | components["schemas"]["CMDArray"];
             volumes?: components["schemas"]["Volume"][];
-            expose?: number | components["schemas"]["ExposedPort"] | components["schemas"]["LiteralString"] | {
+            expose?: number | components["schemas"]["LiteralString"] | {
                 __spread__: components["schemas"]["LiteralString"];
                 chunked?: boolean;
-            } | components["schemas"]["UniqueExposedPorts"];
+            } | components["schemas"]["ExposedPort"] | components["schemas"]["UniqueExposedPorts"];
             gpu?: boolean;
             work_dir?: string;
             entrypoint?: string | components["schemas"]["CMDArray"];
             env?: components["schemas"]["Env"];
-            restart_policy?: "no" | "always" | "unless-stopped" | "on-failure" | {
+            restart_policy?: "on-failure" | "no" | "always" | "unless-stopped" | {
                 /** @constant */
                 policy: "on-failure";
                 restart_tries?: number;
@@ -483,9 +483,10 @@ export interface components {
             name: string;
             dest: string;
         };
+        LiteralString: string;
         ExposedPort: {
             port: number;
-            type?: "api" | "web" | "webapi" | "websocket" | "none";
+            type?: "api" | "web" | "websocket" | "webapi" | "none";
             health_checks?: components["schemas"]["HealthCheck"][];
         };
         HealthCheck: components["schemas"]["HttpHealthCheck"] | components["schemas"]["WebSocketHealthCheck"];
@@ -509,12 +510,11 @@ export interface components {
             expected_response: string;
             continuous: boolean;
         };
-        LiteralString: string;
         UniqueExposedPorts: components["schemas"]["ExposeBase"][];
-        ExposeBase: number | components["schemas"]["ExposedPort"] | components["schemas"]["LiteralString"] | {
+        ExposeBase: number | components["schemas"]["LiteralString"] | {
             __spread__: components["schemas"]["LiteralString"];
             chunked?: boolean;
-        };
+        } | components["schemas"]["ExposedPort"];
         Resources: ("__remove-if-empty__" | {
             __spread__: components["schemas"]["LiteralString"];
             chunked?: boolean;
@@ -655,9 +655,9 @@ export interface components {
             RestartCount: number;
         };
         FlowSecrets: {
-            urlmode?: "public" | "private";
+            urlmode?: "private" | "public";
         } & {
-            [key: string]: "public" | "private" | components["schemas"]["JobExposeSecrets"];
+            [key: string]: "private" | "public" | components["schemas"]["JobExposeSecrets"];
         };
         JobExposeSecrets: {
             [key: string]: components["schemas"]["EndpointSecret"];
@@ -770,6 +770,23 @@ export interface components {
                 received: number;
                 sent: number;
             };
+            /** @description The container's share of the node's GPUs, attributed by the processes it owns. Only on GPU operations, absent when the reading is unavailable, and only from the job's runtime sidecar: the node's own stats never carry it. */
+            gpu?: components["schemas"]["TaskGpuStat"];
+        };
+        /** @description GPU load and VRAM in total and per device. Memory is in MiB (usage) and GiB (limit), like `memory`. */
+        TaskGpuStat: {
+            gpu_percent: number;
+            memory_usage: number;
+            memory_limit: number;
+            memory_percent: number;
+            devices: {
+                /** @description The device's index on the node. */
+                index: number;
+                gpu_percent: number;
+                memory_usage: number;
+                memory_limit: number;
+                memory_percent: number;
+            }[];
         };
         TaskLog: {
             opId: string;

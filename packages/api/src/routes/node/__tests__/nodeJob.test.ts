@@ -1,6 +1,14 @@
 import { Mock } from 'vitest';
 import { createNosanaNodeApi } from '../index.js';
-import { JOB, NODE, failed, nodeApi, ok } from './fixtures.js';
+import { JOB, NODE, failed, nodeApi, ok, stubSidecar } from './fixtures.js';
+
+beforeEach(() => {
+  stubSidecar(false);
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 const job = () => nodeApi().job(JOB);
 

@@ -1,5 +1,5 @@
 import { Mock } from 'vitest';
-import { JOB, NODE, nodeApi } from './fixtures.js';
+import { JOB, NODE, nodeApi, settle, stubSidecar } from './fixtures.js';
 
 const opened: Array<{ url: string; options: { fetch: typeof fetch } }> = [];
 let source: {
@@ -25,6 +25,11 @@ const job = () => nodeApi().job(JOB);
 describe('node job streams', () => {
   beforeEach(() => {
     opened.length = 0;
+    stubSidecar(false);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('opens the info stream on the node with the signed headers', async () => {
@@ -51,8 +56,9 @@ describe('node job streams', () => {
     expect(source.close).toHaveBeenCalled();
   });
 
-  it('opens the stats stream with the sampling interval', () => {
+  it('opens the stats stream with the sampling interval', async () => {
     job().streamStats({ onData: vi.fn() }, { interval: 2 });
+    await settle();
     expect(opened[0].url).toBe(`https://${NODE}.node.k8s.dev.nos.ci/job/${JOB}/stats/stream?interval=2`);
   });
 

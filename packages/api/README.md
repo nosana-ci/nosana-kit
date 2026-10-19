@@ -227,6 +227,12 @@ node methods are present but fail saying so.
 | `ssh.command` | `options?: SshCommandOptions` | `SshConnectionDescriptor` |
 | `terminal` | `options: NodeTerminalOptions` | `Promise<TerminalSession>` |
 
+`stats`, `streamStats`, `logs`, `terminal` and `ssh.keys` / `ssh.add` /
+`ssh.remove` go to the job's own runtime sidecar at `https://<job>.<node domain>`
+when its node runs one. The first such call checks for it (`GET /` answers the
+job address), and a job without one is served by its node, which has the same
+routes, and checked again after 30 s. Everything else always goes to the node.
+
 ### `api.stats` — Platform Statistics
 
 | Method | Parameters | Returns |

@@ -22,8 +22,9 @@ export async function openNodeJobTerminal(
     ttlMs: options.ttlMs,
     authorize,
   });
+  const client = await context.runtimeClient();
   options.signal?.throwIfAborted();
 
-  const socket = openNodeWebSocket(context.client, '/terminal', options.webSocketFactory);
+  const socket = openNodeWebSocket(client, '/terminal', options.webSocketFactory);
   return openTerminalSession(socket, context.job, authorization, options);
 }

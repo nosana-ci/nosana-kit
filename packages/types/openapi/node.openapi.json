@@ -1797,9 +1797,6 @@
                 "type": "number"
               },
               {
-                "$ref": "#/components/schemas/ExposedPort"
-              },
-              {
                 "$ref": "#/components/schemas/LiteralString"
               },
               {
@@ -1815,6 +1812,9 @@
                 "required": [
                   "__spread__"
                 ]
+              },
+              {
+                "$ref": "#/components/schemas/ExposedPort"
               },
               {
                 "$ref": "#/components/schemas/UniqueExposedPorts"
@@ -1843,6 +1843,9 @@
           "restart_policy": {
             "oneOf": [
               {
+                "const": "on-failure"
+              },
+              {
                 "const": "no"
               },
               {
@@ -1850,9 +1853,6 @@
               },
               {
                 "const": "unless-stopped"
-              },
-              {
-                "const": "on-failure"
               },
               {
                 "type": "object",
@@ -1905,6 +1905,9 @@
           "dest"
         ]
       },
+      "LiteralString": {
+        "type": "string"
+      },
       "ExposedPort": {
         "type": "object",
         "properties": {
@@ -1920,10 +1923,10 @@
                 "const": "web"
               },
               {
-                "const": "webapi"
+                "const": "websocket"
               },
               {
-                "const": "websocket"
+                "const": "webapi"
               },
               {
                 "const": "none"
@@ -2023,9 +2026,6 @@
           "continuous"
         ]
       },
-      "LiteralString": {
-        "type": "string"
-      },
       "UniqueExposedPorts": {
         "type": "array",
         "items": {
@@ -2036,9 +2036,6 @@
         "oneOf": [
           {
             "type": "number"
-          },
-          {
-            "$ref": "#/components/schemas/ExposedPort"
           },
           {
             "$ref": "#/components/schemas/LiteralString"
@@ -2056,6 +2053,9 @@
             "required": [
               "__spread__"
             ]
+          },
+          {
+            "$ref": "#/components/schemas/ExposedPort"
           }
         ]
       },
@@ -2712,10 +2712,10 @@
           "urlmode": {
             "oneOf": [
               {
-                "const": "public"
+                "const": "private"
               },
               {
-                "const": "private"
+                "const": "public"
               }
             ]
           }
@@ -2724,10 +2724,10 @@
         "additionalProperties": {
           "oneOf": [
             {
-              "const": "public"
+              "const": "private"
             },
             {
-              "const": "private"
+              "const": "public"
             },
             {
               "$ref": "#/components/schemas/JobExposeSecrets"
@@ -3187,6 +3187,66 @@
               },
               "sent": {
                 "type": "number"
+              }
+            }
+          },
+          "gpu": {
+            "$ref": "#/components/schemas/TaskGpuStat",
+            "description": "The container's share of the node's GPUs, attributed by the processes it owns. Only on GPU operations, absent when the reading is unavailable, and only from the job's runtime sidecar: the node's own stats never carry it."
+          }
+        }
+      },
+      "TaskGpuStat": {
+        "type": "object",
+        "description": "GPU load and VRAM in total and per device. Memory is in MiB (usage) and GiB (limit), like `memory`.",
+        "required": [
+          "gpu_percent",
+          "memory_usage",
+          "memory_limit",
+          "memory_percent",
+          "devices"
+        ],
+        "properties": {
+          "gpu_percent": {
+            "type": "number"
+          },
+          "memory_usage": {
+            "type": "number"
+          },
+          "memory_limit": {
+            "type": "number"
+          },
+          "memory_percent": {
+            "type": "number"
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "index",
+                "gpu_percent",
+                "memory_usage",
+                "memory_limit",
+                "memory_percent"
+              ],
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "description": "The device's index on the node."
+                },
+                "gpu_percent": {
+                  "type": "number"
+                },
+                "memory_usage": {
+                  "type": "number"
+                },
+                "memory_limit": {
+                  "type": "number"
+                },
+                "memory_percent": {
+                  "type": "number"
+                }
               }
             }
           }

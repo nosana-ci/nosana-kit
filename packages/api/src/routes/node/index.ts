@@ -1,6 +1,7 @@
 import { createNodeClient, nodeDomain } from '../../client/node/index.js';
 import { nodeInfo } from './actions/nodeInfo.js';
 import { createNodeJob } from './createNodeJob.js';
+import { createJobRuntimeResolver } from './jobRuntime.js';
 
 import type { SignedHeaderAuth } from '../../types.js';
 import type { NodeApi, NodeRouteDeps, NosanaNodeApi } from './types.js';
@@ -31,8 +32,10 @@ export function createNosanaNodeApi({ environment, authParams, options }: NodeRo
           ...authParams,
           generate: () => authParams.generate(job, { skipCache: true }),
         };
+        const client = createNodeClient(environment, address, jobAuth, options);
         return createNodeJob({
-          client: createNodeClient(environment, address, jobAuth, options),
+          client,
+          runtimeClient: createJobRuntimeResolver({ environment, job, authParams: jobAuth, options }, client),
           environment,
           domain,
           authorize,

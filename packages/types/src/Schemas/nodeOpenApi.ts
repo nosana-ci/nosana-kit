@@ -83,6 +83,14 @@ function operation(
 }
 
 /** What the node itself defines; everything a job definition or flow contains comes from typia below. */
+/** GPU load and VRAM, in the same units as a container's `memory` stat: usage in MiB, limit in GiB. */
+const gpuFigures: Schema = {
+  gpu_percent: { type: "number" },
+  memory_usage: { type: "number" },
+  memory_limit: { type: "number" },
+  memory_percent: { type: "number" },
+};
+
 const ownSchemas: Record<string, Schema> = {
   Address: { type: "string", pattern: SOLANA_ADDRESS_PATTERN, description: "A Solana address in base58." },
   NodeError: {
@@ -185,6 +193,28 @@ const ownSchemas: Record<string, Schema> = {
       },
       disk: { type: "object", required: ["read", "write"], properties: { read: { type: "number" }, write: { type: "number" } } },
       network: { type: "object", required: ["received", "sent"], properties: { received: { type: "number" }, sent: { type: "number" } } },
+      gpu: {
+        ...ref("TaskGpuStat"),
+        description:
+          "The container's share of the node's GPUs, attributed by the processes it owns. Only on GPU operations, " +
+          "absent when the reading is unavailable, and only from the job's runtime sidecar: the node's own stats never carry it.",
+      },
+    },
+  },
+  TaskGpuStat: {
+    type: "object",
+    description: "GPU load and VRAM in total and per device. Memory is in MiB (usage) and GiB (limit), like `memory`.",
+    required: [...Object.keys(gpuFigures), "devices"],
+    properties: {
+      ...gpuFigures,
+      devices: {
+        type: "array",
+        items: {
+          type: "object",
+          required: ["index", ...Object.keys(gpuFigures)],
+          properties: { index: { type: "integer", description: "The device's index on the node." }, ...gpuFigures },
+        },
+      },
     },
   },
   TaskLog: {

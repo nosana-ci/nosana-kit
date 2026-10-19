@@ -1,4 +1,6 @@
 import { tryParseJson } from '../../../../utils/json.js';
+import { requireNodeAuthorization } from '../authorization.js';
+import { openOnJobRuntime } from '../../jobRuntime.js';
 import { openNodeSocket } from './socket.js';
 
 import type {
@@ -21,11 +23,16 @@ export function nodeJobLogs(
   filter: NodeLogsFilter = {},
   options?: NodeSocketOptions,
 ): NodeStreamSubscription {
-  return openNodeSocket(
-    context,
-    { path: '/flog', body: { jobAddress: context.job, ...filter } },
-    handlers,
-    parseTaskLog,
-    options,
+  // Checked now rather than once the runtime client is known, so a missing
+  // signer still throws before anything opens.
+  requireNodeAuthorization(context, options?.authorizationProvider);
+  return openOnJobRuntime(context.runtimeClient, (client) =>
+    openNodeSocket(
+      { ...context, client },
+      { path: '/flog', body: { jobAddress: context.job, ...filter } },
+      handlers,
+      parseTaskLog,
+      options,
+    ),
   );
 }
