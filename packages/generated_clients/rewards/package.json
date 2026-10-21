@@ -1,6 +1,6 @@
 {
   "name": "@nosana/rewards-program",
-  "version": "2.21.0",
+  "version": "2.22.0",
   "description": "Nosana Rewards program generated client",
   "repository": {
     "type": "git",
