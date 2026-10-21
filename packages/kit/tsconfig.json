@@ -14,7 +14,9 @@
     { "path": "../ssh" },
     { "path": "../generated_clients/jobs" },
     { "path": "../generated_clients/stake" },
-    { "path": "../generated_clients/merkle_distributor" }
+    { "path": "../generated_clients/merkle_distributor" },
+    { "path": "../generated_clients/rewards" },
+    { "path": "../generated_clients/pools" }
   ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "tests", "dist", "**/*.test.ts", "**/*.spec.ts"]

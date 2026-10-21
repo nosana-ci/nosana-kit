@@ -14,12 +14,15 @@ export * from "./operations/index.js";
 export * from "./results/index.js";
 export * from "./ssh/index.js";
 
-type Version = "0.1"
-type JobType = "container";
-
 export type JobDefinition = {
-  version: Version;
-  type: JobType;
+  version: string;
+  /**
+   * @deprecated The execution environment is no longer derived from the job
+   * definition — it is the node operator's `--vm`/`--cvm` choice. Retained as
+   * an optional, unvalidated field so type-less jobs and legacy jobs still
+   * carrying `'container' | 'vm' | 'cvm'` continue to validate. Do not read it.
+   */
+  type?: string;
   logistics?: Logistics;
   deployment_id?: DeploymentId;
   ssh?: SSH,

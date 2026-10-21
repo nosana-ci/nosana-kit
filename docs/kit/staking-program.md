@@ -54,6 +54,33 @@ const allStakes: Stake[] = await client.stake.all();
 console.log(`Found ${allStakes.length} stake accounts`);
 ```
 
+## Top Up a Stake
+
+Add NOS to the wallet's existing stake account. `topup` returns the instructions to send together in one transaction, in this order:
+
+1. rewards `enter`, only when the wallet has no rewards account yet
+2. pools `claimFee`, which moves the pool's accrued emission into the rewards vault
+3. stake `topup(amount)`
+4. rewards `sync`, which updates the rewards account to the new stake
+
+`amount` is in NOS base units (6 decimals), as a `number` or `bigint`. `pool` is the pools-program pool that pays emission into the rewards vault (claim type `AddFee`). It is optional and defaults to `programs.rewardsPoolAddress` in the client config (set for mainnet and devnet, unset on localnet). That pool has rotated in the past, so it is config, not a constant: override it in the config or pass `pool` per call. The wallet is the authority and signer of every instruction; the stake account must already exist and must not be unstaking.
+
+```ts twoslash
+import { createNosanaClient } from '@nosana/kit';
+const client = createNosanaClient();
+// ---cut---
+import { address, type TopupInstructions } from '@nosana/kit';
+// Uses programs.rewardsPoolAddress from the client config
+const instructions: TopupInstructions = await client.stake.topup({ amount: 1_000_000_000 }); // 1,000 NOS
+
+const signature = await client.solana.buildSignAndSend(instructions);
+
+// Or name the pool for this call
+await client.stake.topup({ amount: 1_000_000_000, pool: address('pool-address') });
+```
+
+Low-level builders and account decoders for these programs are exported as the `StakingClient`, `RewardsClient` and `PoolsClient` namespaces.
+
 ## Type Definitions
 
 ```ts

@@ -1482,10 +1482,11 @@
         "type": "object",
         "properties": {
           "version": {
-            "const": "0.1"
+            "type": "string"
           },
           "type": {
-            "const": "container"
+            "type": "string",
+            "deprecated": true
           },
           "logistics": {
             "$ref": "#/components/schemas/Logistics"
@@ -1508,7 +1509,6 @@
         },
         "required": [
           "version",
-          "type",
           "ops"
         ]
       },
@@ -1522,10 +1522,7 @@
             "$ref": "#/components/schemas/Logistic"
           }
         },
-        "required": [
-          "send",
-          "receive"
-        ]
+        "required": []
       },
       "Logistic": {
         "type": "object",
@@ -1586,32 +1583,7 @@
           }
         },
         "required": [],
-        "additionalProperties": {
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "number"
-            },
-            {
-              "type": "array",
-              "items": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              }
-            },
-            {
-              "$ref": "#/components/schemas/Recordstringstringnumber_stringnumber_"
-            }
-          ]
-        }
+        "additionalProperties": {}
       },
       "Recordstringstringnumber": {
         "type": "object",
@@ -1625,35 +1597,6 @@
             },
             {
               "type": "number"
-            }
-          ]
-        }
-      },
-      "Recordstringstringnumber_stringnumber_": {
-        "type": "object",
-        "properties": {},
-        "required": [],
-        "description": "Construct a type with a set of properties K of type T",
-        "additionalProperties": {
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "number"
-            },
-            {
-              "type": "array",
-              "items": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              }
             }
           ]
         }
@@ -1727,6 +1670,12 @@
               },
               {
                 "const": "container/create-volume"
+              },
+              {
+                "const": "vm/run"
+              },
+              {
+                "const": "cvm/run"
               }
             ]
           },
@@ -1737,6 +1686,9 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ContainerRun"
+              },
+              {
+                "$ref": "#/components/schemas/VmRunArgs"
               },
               {
                 "$ref": "#/components/schemas/ContainerCreateVolume"
@@ -1814,6 +1766,9 @@
                 ]
               },
               {
+                "$ref": "#/components/schemas/PortRangeString"
+              },
+              {
                 "$ref": "#/components/schemas/ExposedPort"
               },
               {
@@ -1825,6 +1780,9 @@
             "type": "boolean"
           },
           "work_dir": {
+            "type": "string"
+          },
+          "output": {
             "type": "string"
           },
           "entrypoint": {
@@ -1870,6 +1828,9 @@
               }
             ]
           },
+          "required_vram": {
+            "type": "number"
+          },
           "private": {
             "type": "boolean"
           },
@@ -1878,6 +1839,16 @@
           },
           "authentication": {
             "$ref": "#/components/schemas/Authentication"
+          },
+          "trusted_execution_env": {
+            "oneOf": [
+              {
+                "const": "SEV-SNP"
+              },
+              {
+                "const": "SEV-GUEST"
+              }
+            ]
           }
         },
         "required": [
@@ -1908,11 +1879,21 @@
       "LiteralString": {
         "type": "string"
       },
+      "PortRangeString": {
+        "type": "string"
+      },
       "ExposedPort": {
         "type": "object",
         "properties": {
           "port": {
-            "type": "number"
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "$ref": "#/components/schemas/PortRangeString"
+              }
+            ]
           },
           "type": {
             "oneOf": [
@@ -2053,6 +2034,9 @@
             "required": [
               "__spread__"
             ]
+          },
+          {
+            "$ref": "#/components/schemas/PortRangeString"
           },
           {
             "$ref": "#/components/schemas/ExposedPort"
@@ -2296,6 +2280,136 @@
         },
         "required": []
       },
+      "VmRunArgs": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "description": "Disk image to fetch and boot (OCI artifact, URL, or IPFS CID). Required."
+          },
+          "cpu": {
+            "type": "number",
+            "description": "vCPU count."
+          },
+          "memory": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "description": "Memory — MiB as a number, or a human string like \"4G\"."
+          },
+          "disk": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "description": "Root disk size — MiB as a number, or a human string like \"20G\"."
+          },
+          "gpu": {
+            "type": "boolean",
+            "description": "Pass a GPU through to the guest (VFIO)."
+          },
+          "cmd": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "description": "Command to run on boot (delivered via cloud-init / the guest agent)."
+          },
+          "env": {
+            "$ref": "#/components/schemas/Env",
+            "description": "Environment variables injected into the guest."
+          },
+          "expose": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "$ref": "#/components/schemas/LiteralString"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "__spread__": {
+                    "$ref": "#/components/schemas/LiteralString"
+                  },
+                  "chunked": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "__spread__"
+                ]
+              },
+              {
+                "$ref": "#/components/schemas/PortRangeString"
+              },
+              {
+                "$ref": "#/components/schemas/ExposedPort"
+              },
+              {
+                "$ref": "#/components/schemas/UniqueExposedPorts"
+              }
+            ],
+            "description": "Ports to expose — same grammar as `container/run`."
+          },
+          "private": {
+            "type": "boolean",
+            "description": "Publish exposed URLs privately (auth-gated) rather than publicly."
+          },
+          "restart_policy": {
+            "oneOf": [
+              {
+                "const": "on-failure"
+              },
+              {
+                "const": "no"
+              },
+              {
+                "const": "always"
+              },
+              {
+                "const": "unless-stopped"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "policy": {
+                    "const": "on-failure"
+                  },
+                  "restart_tries": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "policy"
+                ]
+              }
+            ],
+            "description": "Restart policy — same grammar as `container/run`."
+          }
+        },
+        "required": [
+          "image"
+        ],
+        "description": "Arguments for a `vm/run` / `cvm/run` hypervisor operation — a declarative\nfaçade over the VM orchestrator that mirrors `container/run` (the QEMU knobs\nare hidden). `cvm/run` is the confidential (SEV-SNP) variant and shares this\nexact arg shape: the operation *key* selects confidentiality, not an argument."
+      },
       "ContainerCreateVolume": {
         "type": "object",
         "properties": {
@@ -2517,23 +2631,16 @@
               ]
             }
           },
-          "error": {
-            "type": "object",
-            "properties": {
-              "event": {
-                "type": "string"
-              },
-              "message": {
-                "type": "string"
-              },
-              "code": {
-                "type": "number"
-              }
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OpStateError"
             },
-            "required": [
-              "event",
-              "message"
-            ]
+            "description": "Every error the operation hit, in order."
+          },
+          "error": {
+            "$ref": "#/components/schemas/OpStateError",
+            "description": "Single-error form; the node records each error in `errors`."
           },
           "diagnostics": {
             "type": "object",
@@ -2559,6 +2666,7 @@
           "endTime",
           "exitCode",
           "logs",
+          "errors",
           "diagnostics"
         ]
       },
@@ -2578,6 +2686,24 @@
         "required": [
           "type",
           "timestamp"
+        ]
+      },
+      "OpStateError": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "event",
+          "message"
         ]
       },
       "DiagnosticsReason": {
@@ -2979,6 +3105,12 @@
               "code": {
                 "type": "integer"
               }
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OpStateError"
             }
           },
           "diagnostics": {

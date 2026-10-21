@@ -1,0 +1,397 @@
+{
+  "address": "nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD",
+  "metadata": {
+    "name": "nosana_pools",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Nosana Pools."
+  },
+  "instructions": [
+    {
+      "name": "claim_fee",
+      "docs": [
+        "Add fees from a [PoolAccount](#pool-account) with claim type [`1`](#claim-type)"
+      ],
+      "discriminator": [
+        169,
+        32,
+        79,
+        137,
+        136,
+        232,
+        70,
+        137
+      ],
+      "accounts": [
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "rewards_reflection",
+          "writable": true
+        },
+        {
+          "name": "rewards_vault",
+          "writable": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "rewards_program",
+          "address": "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_transfer",
+      "docs": [
+        "Claim emission from a [PoolAccount](#pool-account) with claim type [`0`](#claim-type)"
+      ],
+      "discriminator": [
+        202,
+        178,
+        58,
+        190,
+        230,
+        234,
+        229,
+        17
+      ],
+      "accounts": [
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "beneficiary",
+          "writable": true,
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close",
+      "docs": [
+        "Close a [PoolAccount](#pool-account) and [VaultAccount](#vault-account)."
+      ],
+      "discriminator": [
+        98,
+        165,
+        201,
+        177,
+        108,
+        65,
+        206,
+        96
+      ],
+      "accounts": [
+        {
+          "name": "vault",
+          "writable": true,
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "user",
+          "writable": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "open",
+      "docs": [
+        "Open a [PoolAccount](#pool-account) and [VaultAccount](#vault-account)."
+      ],
+      "discriminator": [
+        228,
+        220,
+        155,
+        71,
+        199,
+        189,
+        60,
+        45
+      ],
+      "accounts": [
+        {
+          "name": "pool",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "beneficiary"
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "emission",
+          "type": "u64"
+        },
+        {
+          "name": "start_time",
+          "type": "i64"
+        },
+        {
+          "name": "claim_type",
+          "type": "u8"
+        },
+        {
+          "name": "closeable",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "update_beneficiary",
+      "docs": [
+        "Update the beneficiary in a [PoolAccount](#pool-account)."
+      ],
+      "discriminator": [
+        126,
+        122,
+        219,
+        70,
+        188,
+        126,
+        243,
+        126
+      ],
+      "accounts": [
+        {
+          "name": "beneficiary",
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "new_beneficiary"
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "PoolAccount",
+      "discriminator": [
+        116,
+        210,
+        187,
+        119,
+        196,
+        196,
+        52,
+        137
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "NotStarted",
+      "msg": "This pool has not started yet."
+    },
+    {
+      "code": 6001,
+      "name": "Underfunded",
+      "msg": "This pool does not have enough funds."
+    },
+    {
+      "code": 6002,
+      "name": "NotCloseable",
+      "msg": "This pool is not closeable."
+    },
+    {
+      "code": 6003,
+      "name": "WrongClaimType",
+      "msg": "This pool has a different claim type."
+    },
+    {
+      "code": 6004,
+      "name": "WrongBeneficiary",
+      "msg": "This pool does not match the beneficiary."
+    }
+  ],
+  "types": [
+    {
+      "name": "PoolAccount",
+      "docs": [
+        "The `PoolAccount` struct holds all the information for any given pool."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "beneficiary",
+            "type": "pubkey"
+          },
+          {
+            "name": "claim_type",
+            "type": "u8"
+          },
+          {
+            "name": "claimed_tokens",
+            "type": "u64"
+          },
+          {
+            "name": "closeable",
+            "type": "bool"
+          },
+          {
+            "name": "emission",
+            "type": "u64"
+          },
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReflectionAccount",
+      "docs": [
+        "The `ReflectionAccount` struct holds all the information on the reflection pool."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rate",
+            "type": "u128"
+          },
+          {
+            "name": "total_reflection",
+            "type": "u128"
+          },
+          {
+            "name": "total_xnos",
+            "type": "u128"
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

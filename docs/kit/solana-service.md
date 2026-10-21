@@ -60,6 +60,14 @@ getBalanceInfo(address?: Address | string): Promise<SolBalanceInfo>
 pda(seeds: Array<Address | string>, programId: Address): Promise<Address>
 ```
 
+### Get NFT From Collection
+
+```ts
+getNftFromCollection(owner: Address, collection: Address): Promise<Address | undefined>
+```
+
+Returns the mint of the first NFT `owner` holds (at least one token, classic SPL token program) whose Metaplex metadata has `collection` as its **verified** collection, or `undefined` if there is none. Metadata accounts that are missing or cannot be decoded are skipped. Use it to find a market's access-key NFT before calling `jobs.work({ market, nft })`.
+
 ### Transfer SOL
 
 ```ts
@@ -107,6 +115,12 @@ console.log(`Balance: ${balanceInfo.uiAmount} SOL`);
 
 // Derive PDA
 const pda: Address = await client.solana.pda(['seed1', 'seed2'], programAddress);
+
+// Find the owner's NFT from a verified collection (e.g. a market access key)
+const nft: Address | undefined = await client.solana.getNftFromCollection(
+  address('owner-address'),
+  address('collection-address')
+);
 
 // Get instruction to transfer SOL
 const transferSolIx: Instruction = await client.solana.transfer({

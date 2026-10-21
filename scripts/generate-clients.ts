@@ -24,6 +24,8 @@ async function main() {
   const idlJobsPath = path.join(idlDir, 'nosana_jobs.json');
   const idlStakingPath = path.join(idlDir, 'nosana_stake.json');
   const idlMerkleDistributorPath = path.join(idlDir, 'merkle_distributor.json');
+  const idlRewardsPath = path.join(idlDir, 'nosana_rewards.json');
+  const idlPoolsPath = path.join(idlDir, 'nosana_pools.json');
 
   if (!existsSync(idlJobsPath)) {
     throw new Error(`IDL file not found: ${idlJobsPath}`);
@@ -34,10 +36,18 @@ async function main() {
   if (!existsSync(idlMerkleDistributorPath)) {
     throw new Error(`IDL file not found: ${idlMerkleDistributorPath}`);
   }
+  if (!existsSync(idlRewardsPath)) {
+    throw new Error(`IDL file not found: ${idlRewardsPath}`);
+  }
+  if (!existsSync(idlPoolsPath)) {
+    throw new Error(`IDL file not found: ${idlPoolsPath}`);
+  }
 
   const anchorJobsIdl = JSON.parse(readFileSync(idlJobsPath, 'utf-8'));
   const anchorStakingIdl = JSON.parse(readFileSync(idlStakingPath, 'utf-8'));
   const merkleDistributorIdl = JSON.parse(readFileSync(idlMerkleDistributorPath, 'utf-8'));
+  const anchorRewardsIdl = JSON.parse(readFileSync(idlRewardsPath, 'utf-8'));
+  const anchorPoolsIdl = JSON.parse(readFileSync(idlPoolsPath, 'utf-8'));
 
   // Generate into package/src/ so we don't overwrite package.json, tsconfig.json, etc.
   const codamaJobs = createFromRoot(rootNodeFromAnchor(anchorJobsIdl as AnchorIdl));
@@ -78,6 +88,26 @@ async function main() {
   processEnumsInDirectory(merkleDistributorPath);
   const merkleAccountIndices = codamaMerkleDistributor.accept(createAccountIndicesVisitor());
   injectAccountIndicesIntoFiles(merkleDistributorPath, merkleAccountIndices);
+
+  const codamaRewards = createFromRoot(rootNodeFromAnchor(anchorRewardsIdl as AnchorIdl));
+
+  const rewardsPath = path.join(__dirname, '..', 'packages', 'generated_clients', 'rewards', 'src');
+  ensureDir(rewardsPath);
+  await codamaRewards.accept(renderJavaScriptVisitor(rewardsPath));
+  console.log('Processing enums in rewards...');
+  processEnumsInDirectory(rewardsPath);
+  const rewardsAccountIndices = codamaRewards.accept(createAccountIndicesVisitor());
+  injectAccountIndicesIntoFiles(rewardsPath, rewardsAccountIndices);
+
+  const codamaPools = createFromRoot(rootNodeFromAnchor(anchorPoolsIdl as AnchorIdl));
+
+  const poolsPath = path.join(__dirname, '..', 'packages', 'generated_clients', 'pools', 'src');
+  ensureDir(poolsPath);
+  await codamaPools.accept(renderJavaScriptVisitor(poolsPath));
+  console.log('Processing enums in pools...');
+  processEnumsInDirectory(poolsPath);
+  const poolsAccountIndices = codamaPools.accept(createAccountIndicesVisitor());
+  injectAccountIndicesIntoFiles(poolsPath, poolsAccountIndices);
 
   console.log('✅ Client generation, enum conversion, and account indices complete!');
 }
