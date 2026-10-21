@@ -20,23 +20,19 @@ export const NOS_MINT_ADDRESSES: Record<NosanaNetwork, string> = {
 /**
  * Nosana program addresses per network. Single source of truth for all
  * packages; localnet runs the devnet programs (pre-baked in @nosana/localnet).
+ *
+ * `rewardsPool` is not a program but the AddFee pool that pays the rewards
+ * vault, which a stake topup claims first. It has rotated before, so it is
+ * kept here beside the programs rather than in code. Localnet has none.
  */
-export const NOSANA_PROGRAM_ADDRESSES: Record<
-  NosanaNetwork,
-  {
-    jobs: string;
-    rewards: string;
-    stake: string;
-    pools: string;
-    merkleDistributor: string;
-  }
-> = {
+export const NOSANA_PROGRAM_ADDRESSES = {
   [NosanaNetwork.MAINNET]: {
     jobs: 'nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM',
     rewards: 'nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp',
     stake: 'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE',
     pools: 'nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD',
     merkleDistributor: 'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425',
+    rewardsPool: '5SdnB8ZMqqfVKPUHFqx3KVfx4Aj4y352uCe8C71GHUqU',
   },
   [NosanaNetwork.DEVNET]: {
     jobs: 'nosJTmGQxvwXy23vng5UjkTbfv91Bzf9jEuro78dAGR',
@@ -44,6 +40,7 @@ export const NOSANA_PROGRAM_ADDRESSES: Record<
     stake: 'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE',
     pools: 'nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD',
     merkleDistributor: 'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425',
+    rewardsPool: 'miF9saGY5WS747oia48WR3CMFZMAGG8xt6ajB7rdV3e',
   },
   [NosanaNetwork.LOCALNET]: {
     jobs: 'nosJTmGQxvwXy23vng5UjkTbfv91Bzf9jEuro78dAGR',
@@ -52,7 +49,17 @@ export const NOSANA_PROGRAM_ADDRESSES: Record<
     pools: 'nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD',
     merkleDistributor: 'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425',
   },
-} as const;
+} as const satisfies Record<
+  NosanaNetwork,
+  {
+    jobs: string;
+    rewards: string;
+    stake: string;
+    pools: string;
+    merkleDistributor: string;
+    rewardsPool?: string;
+  }
+>;
 
 /** A Solana address: base58 without the ambiguous characters, 32 to 44 characters long. */
 export const SOLANA_ADDRESS_PATTERN = '^[1-9A-HJ-NP-Za-km-z]{32,44}$';

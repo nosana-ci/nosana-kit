@@ -20,3 +20,7 @@ export const OPS_UNIQUE_BY_ID_VALIDATE = `Array.isArray($input) && (()=>{
     }
     return true;
   })()` as const;
+
+export const GPU_TEE_CONFLICT_VALIDATE = `Array.isArray($input) && $input.every((op) =>
+    !(op?.args?.gpu === true && op?.args?.trusted_execution_env !== undefined)
+  )` as const;

@@ -143,6 +143,7 @@ const ownSchemas: Record<string, Schema> = {
       exitCode: nullable("integer"),
       results: { type: "object", additionalProperties: { oneOf: [{ type: "string" }, { type: "array", items: { type: "string" } }] } },
       error: { type: "object", required: ["event", "message"], properties: { event: { type: "string" }, message: { type: "string" }, code: { type: "integer" } } },
+      errors: { type: "array", items: ref("OpStateError") },
       diagnostics: { type: "object", required: ["reason"], properties: { reason: ref("DiagnosticsReason"), state: ref("DiagnosticsState") } },
     },
   },

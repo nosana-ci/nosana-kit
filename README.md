@@ -17,6 +17,8 @@ Monorepo for the [Nosana](https://nosana.com) developer toolkit: TypeScript pack
 | [@nosana/jobs-program](./packages/generated_clients/jobs)                             | Generated Solana jobs program client.                                                                    |
 | [@nosana/stake-program](./packages/generated_clients/stake)                           | Generated Solana stake program client.                                                                   |
 | [@nosana/merkle-distributor-program](./packages/generated_clients/merkle_distributor) | Generated Solana merkle distributor program client.                                                      |
+| [@nosana/rewards-program](./packages/generated_clients/rewards)                       | Generated Solana rewards program client.                                                                 |
+| [@nosana/pools-program](./packages/generated_clients/pools)                           | Generated Solana pools program client.                                                                   |
 | [**@nosana/localnet**](./packages/localnet)                                           | Docker-based Solana test validator with pre-baked Nosana programs.                                       |
 | [**@nosana/scenario**](./packages/scenario)                                           | Network-aware scenario test helpers (localnet / devnet / mainnet).                                       |
 | [**@nosana/docs**](./docs)                                                            | Documentation site (VitePress).                                                                          |

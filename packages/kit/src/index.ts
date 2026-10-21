@@ -184,6 +184,15 @@ export type { StakeProgram, Stake } from './services/programs/stake/index.js';
 /**
  * @group @nosana/kit
  */
+export type {
+  TopupParams,
+  TopupInstructions,
+  CreateTopup,
+} from './services/programs/stake/instructions/topup.js';
+
+/**
+ * @group @nosana/kit
+ */
 export {
   createMerkleDistributorProgram,
   ClaimTarget,
@@ -344,6 +353,16 @@ export * as StakingClient from '@nosana/stake-program';
  */
 export * as MerkleDistributorClient from '@nosana/merkle-distributor-program';
 
+/**
+ * @group @nosana/kit
+ */
+export * as RewardsClient from '@nosana/rewards-program';
+
+/**
+ * @group @nosana/kit
+ */
+export * as PoolsClient from '@nosana/pools-program';
+
 // ============================================================================
 // @nosana/authorization - Authentication & Authorization
 // ============================================================================
@@ -409,6 +428,7 @@ export {
   ResourceTypeEnum,
   ServiceType,
   StdOptions,
+  TrustedExecutionEnv,
 } from '@nosana/types';
 
 import { LogisticType as NosanaLogisticType } from '@nosana/types';
@@ -424,7 +444,7 @@ export const LogisticType = NosanaLogisticType;
 /**
  * @group @nosana/types
  */
-export { validateJobDefinition, jobSchemas } from '@nosana/types';
+export { validateJobDefinition, validateVmRunArgs, jobSchemas } from '@nosana/types';
 
 /**
  * Job definition types for creating Nosana jobs
@@ -440,8 +460,13 @@ export type {
   OperationArgsMap,
   Ops,
   OpState,
+  OpStateError,
   OperationResult,
   OperationResults,
+  ContainerRun,
+  VmRunArgs,
+  RestartPolicy,
+  Output,
   // Resources
   GPU,
   Resource,
@@ -449,6 +474,7 @@ export type {
   ResourceType,
   Resources,
   RequiredResource,
+  RequiredVRAM,
   HFResource,
   OllamaResource,
   S3Resource,
@@ -473,6 +499,7 @@ export type {
   ExposedPort,
   UniqueExposedPorts,
   Port,
+  PortRangeString,
   // Health Checks
   HealthCheck,
   HttpHealthCheck,

@@ -1,0 +1,45 @@
+{
+  "name": "@nosana/rewards-program",
+  "version": "2.20.1",
+  "description": "Nosana Rewards program generated client",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nosana-ci/nosana-kit.git",
+    "directory": "packages/generated_clients/rewards"
+  },
+  "license": "MIT",
+  "author": "Nosana",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "build:with-deps": "pnpm --filter $npm_package_name... run build",
+    "dev": "tsc --watch",
+    "dev:with-deps": "pnpm --filter $npm_package_name... --parallel run dev",
+    "test": "echo 'No tests' && exit 0",
+    "lint": "echo 'No lint' && exit 0",
+    "format": "echo 'No format' && exit 0",
+    "format:fix": "echo 'No format:fix' && exit 0"
+  },
+  "dependencies": {
+    "@solana/kit": "8.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20.18.0"
+  },
+  "files": [
+    "dist",
+    "package.json"
+  ]
+}

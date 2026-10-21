@@ -399,8 +399,8 @@ export interface components {
     schemas: {
         JobDefinition: JobDefinition;
         Logistics: {
-            send: components["schemas"]["Logistic"];
-            receive: components["schemas"]["Logistic"];
+            send?: components["schemas"]["Logistic"];
+            receive?: components["schemas"]["Logistic"];
         };
         Logistic: {
             type: components["schemas"]["LogisticType"];
@@ -422,15 +422,11 @@ export interface components {
             trigger?: string;
             system_resources?: components["schemas"]["Recordstringstringnumber"];
         } & {
-            [key: string]: string | number | (string | number)[] | components["schemas"]["Recordstringstringnumber_stringnumber_"];
+            [key: string]: unknown;
         };
         /** @description Construct a type with a set of properties K of type T */
         Recordstringstringnumber: {
             [key: string]: string | number;
-        };
-        /** @description Construct a type with a set of properties K of type T */
-        Recordstringstringnumber_stringnumber_: {
-            [key: string]: string | number | (string | number)[];
         };
         Global: {
             image?: string;
@@ -449,9 +445,9 @@ export interface components {
         };
         Ops: components["schemas"]["OperationkeyofOperationArgsMap"][];
         OperationkeyofOperationArgsMap: {
-            type: "container/run" | "container/create-volume";
+            type: "container/run" | "container/create-volume" | "vm/run" | "cvm/run";
             id: components["schemas"]["OperationId"];
-            args: components["schemas"]["ContainerRun"] | components["schemas"]["ContainerCreateVolume"];
+            args: components["schemas"]["ContainerRun"] | components["schemas"]["VmRunArgs"] | components["schemas"]["ContainerCreateVolume"];
             results?: components["schemas"]["OperationResults"];
             execution?: components["schemas"]["Execution"];
         };
@@ -464,9 +460,10 @@ export interface components {
             expose?: number | components["schemas"]["LiteralString"] | {
                 __spread__: components["schemas"]["LiteralString"];
                 chunked?: boolean;
-            } | components["schemas"]["ExposedPort"] | components["schemas"]["UniqueExposedPorts"];
+            } | components["schemas"]["PortRangeString"] | components["schemas"]["ExposedPort"] | components["schemas"]["UniqueExposedPorts"];
             gpu?: boolean;
             work_dir?: string;
+            output?: string;
             entrypoint?: string | components["schemas"]["CMDArray"];
             env?: components["schemas"]["Env"];
             restart_policy?: "on-failure" | "no" | "always" | "unless-stopped" | {
@@ -474,9 +471,11 @@ export interface components {
                 policy: "on-failure";
                 restart_tries?: number;
             };
+            required_vram?: number;
             private?: boolean;
             resources?: components["schemas"]["Resources"];
             authentication?: components["schemas"]["Authentication"];
+            trusted_execution_env?: "SEV-SNP" | "SEV-GUEST";
         };
         Aliases: string[];
         Volume: {
@@ -484,8 +483,9 @@ export interface components {
             dest: string;
         };
         LiteralString: string;
+        PortRangeString: string;
         ExposedPort: {
-            port: number;
+            port: number | components["schemas"]["PortRangeString"];
             type?: "api" | "web" | "websocket" | "webapi" | "none";
             health_checks?: components["schemas"]["HealthCheck"][];
         };
@@ -514,7 +514,7 @@ export interface components {
         ExposeBase: number | components["schemas"]["LiteralString"] | {
             __spread__: components["schemas"]["LiteralString"];
             chunked?: boolean;
-        } | components["schemas"]["ExposedPort"];
+        } | components["schemas"]["PortRangeString"] | components["schemas"]["ExposedPort"];
         Resources: ("__remove-if-empty__" | {
             __spread__: components["schemas"]["LiteralString"];
             chunked?: boolean;
@@ -578,6 +578,41 @@ export interface components {
             email?: string;
             server?: string;
         };
+        /**
+         * @description Arguments for a `vm/run` / `cvm/run` hypervisor operation — a declarative
+         *     façade over the VM orchestrator that mirrors `container/run` (the QEMU knobs
+         *     are hidden). `cvm/run` is the confidential (SEV-SNP) variant and shares this
+         *     exact arg shape: the operation *key* selects confidentiality, not an argument.
+         */
+        VmRunArgs: {
+            /** @description Disk image to fetch and boot (OCI artifact, URL, or IPFS CID). Required. */
+            image: string;
+            /** @description vCPU count. */
+            cpu?: number;
+            /** @description Memory — MiB as a number, or a human string like "4G". */
+            memory?: string | number;
+            /** @description Root disk size — MiB as a number, or a human string like "20G". */
+            disk?: string | number;
+            /** @description Pass a GPU through to the guest (VFIO). */
+            gpu?: boolean;
+            /** @description Command to run on boot (delivered via cloud-init / the guest agent). */
+            cmd?: string | string[];
+            /** @description Environment variables injected into the guest. */
+            env?: components["schemas"]["Env"];
+            /** @description Ports to expose — same grammar as `container/run`. */
+            expose?: number | components["schemas"]["LiteralString"] | {
+                __spread__: components["schemas"]["LiteralString"];
+                chunked?: boolean;
+            } | components["schemas"]["PortRangeString"] | components["schemas"]["ExposedPort"] | components["schemas"]["UniqueExposedPorts"];
+            /** @description Publish exposed URLs privately (auth-gated) rather than publicly. */
+            private?: boolean;
+            /** @description Restart policy — same grammar as `container/run`. */
+            restart_policy?: "on-failure" | "no" | "always" | "unless-stopped" | {
+                /** @constant */
+                policy: "on-failure";
+                restart_tries?: number;
+            };
+        };
         ContainerCreateVolume: {
             name: string;
         };
@@ -609,11 +644,10 @@ export interface components {
             results?: {
                 [key: string]: string | string[];
             };
-            error?: {
-                event: string;
-                message: string;
-                code?: number;
-            };
+            /** @description Every error the operation hit, in order. */
+            errors: components["schemas"]["OpStateError"][];
+            /** @description Single-error form; the node records each error in `errors`. */
+            error?: components["schemas"]["OpStateError"];
             diagnostics: {
                 reason: components["schemas"]["DiagnosticsReason"];
                 state?: components["schemas"]["DiagnosticsState"];
@@ -623,6 +657,11 @@ export interface components {
             type: components["schemas"]["StdOption"];
             log?: string;
             timestamp: string;
+        };
+        OpStateError: {
+            event: string;
+            message: string;
+            code?: number;
         };
         DiagnosticsReason: {
             hostShutDown: boolean;
@@ -722,6 +761,7 @@ export interface components {
                 message: string;
                 code?: number;
             };
+            errors?: components["schemas"]["OpStateError"][];
             diagnostics?: {
                 reason: components["schemas"]["DiagnosticsReason"];
                 state?: components["schemas"]["DiagnosticsState"];

@@ -47,6 +47,8 @@ describe('StakeProgram', () => {
       expect(typeof stake.get).toBe('function');
       expect(typeof stake.multiple).toBe('function');
       expect(typeof stake.all).toBe('function');
+      expect(typeof stake.stake).toBe('function');
+      expect(typeof stake.topup).toBe('function');
     });
 
     it('should use program ID from config when fetching all stakes', async () => {

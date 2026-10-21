@@ -19,8 +19,8 @@ export type Logistic = {
 }
 
 export interface Logistics {
-  send: Logistic;
-  receive: Logistic;
+  send?: Logistic;
+  receive?: Logistic;
 }
 
 export const validateLogistics: (input: unknown) => IValidation<Logistics> =

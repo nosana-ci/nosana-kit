@@ -1,6 +1,24 @@
 import type { tags } from "typia";
 import type { LiteralString, SpreadMarker } from "./literals.js";
 
+// Concrete port range like "8000-8010", with start < end
+export type PortRangeString = string &
+  tags.TagBase<{
+    kind: 'portRange';
+    target: 'string';
+    value: 'portRange';
+    validate: `
+      typeof $input === "string" &&
+      (() => {
+        const match = /^([0-9]+)-([0-9]+)$/.exec($input);
+        if (!match) return false;
+        const a = Number(match[1]), b = Number(match[2]);
+        return a < b;
+      })()
+    `;
+    message: "Port range must be in the format 'start-end' with start < end";
+  }>;
+
 export type UniqueExposedPorts = Array<ExposeBase> &
   tags.TagBase<{
     kind: 'uniqueExposedPorts';
@@ -82,9 +100,9 @@ export type HealthCheck = HttpHealthCheck | WebSocketHealthCheck;
 
 export type Port = number;
 export type ExposedPort = {
-  port: number;
+  port: Port | PortRangeString;
   type?: ServiceType;
   health_checks?: HealthCheck[];
 };
-export type ExposeBase = Port | ExposedPort | LiteralString | SpreadMarker;
+export type ExposeBase = Port | PortRangeString | ExposedPort | LiteralString | SpreadMarker;
 export type Expose = ExposeBase | UniqueExposedPorts;

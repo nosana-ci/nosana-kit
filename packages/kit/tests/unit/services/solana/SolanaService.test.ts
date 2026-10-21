@@ -1,9 +1,23 @@
 import { describe, it, expect, vi } from 'vitest';
-import { type Instruction, AccountRole, generateKeyPairSigner } from '@solana/kit';
+import {
+  type Address,
+  type Instruction,
+  AccountRole,
+  generateKeyPairSigner,
+  getBase64Decoder,
+  none,
+  some,
+} from '@solana/kit';
 import { getTransferSolInstructionDataDecoder } from '@solana-program/system';
 import { getSetComputeUnitLimitInstruction } from '@solana-program/compute-budget';
+import { TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 
 import { createSolanaService } from '../../../../src/services/solana/index.js';
+import {
+  TOKEN_METADATA_PROGRAM_ADDRESS,
+  findNftMetadataPda,
+  getNftMetadataPrefixCodec,
+} from '../../../../src/services/solana/nftMetadata.js';
 import { PROTOCOL } from '../../../../src/utils/convertHttpToWebSocketUrl.js';
 import { AddressFactory, MockClientFactory, SignerFactory } from '../../setup/index.js';
 import type { Wallet } from '../../../../src/types.js';
@@ -717,6 +731,240 @@ describe('SolanaService', () => {
 
       expect(pda).toBeTypeOf('string');
       expect(pda.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('getNftFromCollection', () => {
+    const owner = AddressFactory.create(1001);
+    const collection = AddressFactory.create(1002);
+    const otherCollection = AddressFactory.create(1003);
+    // Full-size Metaplex metadata accounts are 679 bytes; resized ones are 607.
+    const FULL_METADATA_SIZE = 679;
+    const RESIZED_METADATA_SIZE = 607;
+
+    function metadataBytes(
+      mint: Address,
+      options: {
+        collection?: { verified: boolean; key: Address } | null;
+        size?: number;
+      } = {}
+    ): Uint8Array {
+      const prefix = getNftMetadataPrefixCodec().encode({
+        key: 4,
+        updateAuthority: AddressFactory.create(1004),
+        mint,
+        data: {
+          // Metaplex pads name/symbol/uri with NUL bytes to their max lengths.
+          name: 'Nosana Access Key'.padEnd(32, '\0'),
+          symbol: 'NOS'.padEnd(10, '\0'),
+          uri: 'https://example.com/nft.json'.padEnd(200, '\0'),
+          sellerFeeBasisPoints: 0,
+          creators: some([{ address: AddressFactory.create(1005), verified: true, share: 100 }]),
+        },
+        primarySaleHappened: false,
+        isMutable: true,
+        editionNonce: some(254),
+        tokenStandard: some(0),
+        collection:
+          options.collection === undefined
+            ? some({ verified: true, key: collection })
+            : options.collection === null
+              ? none()
+              : some(options.collection),
+      });
+      // Trailing fields (uses, collection details, ...) and padding: zeros.
+      const bytes = new Uint8Array(options.size ?? FULL_METADATA_SIZE);
+      bytes.set(prefix);
+      return bytes;
+    }
+
+    function tokenAccount(mint: Address, amount = '1', decimals = 0) {
+      return {
+        pubkey: AddressFactory.create(),
+        account: {
+          data: {
+            parsed: {
+              info: { mint, owner, tokenAmount: { amount, decimals } },
+              type: 'account',
+            },
+            program: 'spl-token',
+          },
+          owner: TOKEN_PROGRAM_ADDRESS,
+        },
+      };
+    }
+
+    async function serviceWith(
+      tokens: ReturnType<typeof tokenAccount>[],
+      metadataByMint: Map<Address, Uint8Array>
+    ) {
+      const service = createService(() => undefined);
+      const accounts = new Map<Address, unknown>();
+      for (const [mint, data] of metadataByMint) {
+        accounts.set(await findNftMetadataPda(mint), {
+          data: [getBase64Decoder().decode(data), 'base64'],
+          owner: TOKEN_METADATA_PROGRAM_ADDRESS,
+        });
+      }
+      service.rpc.getTokenAccountsByOwner = vi.fn(() => ({
+        send: vi.fn().mockResolvedValue({ value: tokens }),
+      })) as any;
+      service.rpc.getMultipleAccounts = vi.fn((addresses: Address[]) => ({
+        send: vi.fn().mockResolvedValue({ value: addresses.map((a) => accounts.get(a) ?? null) }),
+      })) as any;
+      return service;
+    }
+
+    it('derives the same metadata PDA as the work instruction', async () => {
+      const service = createService(() => undefined);
+      const mint = AddressFactory.create(1010);
+
+      expect(await findNftMetadataPda(mint)).toBe(
+        await service.pda(
+          ['metadata', TOKEN_METADATA_PROGRAM_ADDRESS, mint],
+          TOKEN_METADATA_PROGRAM_ADDRESS
+        )
+      );
+    });
+
+    it('returns the mint of a verified NFT in the collection', async () => {
+      const mint = AddressFactory.create(1011);
+      const service = await serviceWith(
+        [tokenAccount(mint)],
+        new Map([[mint, metadataBytes(mint)]])
+      );
+
+      await expect(service.getNftFromCollection(owner, collection)).resolves.toBe(mint);
+      expect(service.rpc.getTokenAccountsByOwner).toHaveBeenCalledWith(
+        owner,
+        { programId: TOKEN_PROGRAM_ADDRESS },
+        { encoding: 'jsonParsed' }
+      );
+    });
+
+    it('decodes a resized 607-byte metadata account', async () => {
+      const mint = AddressFactory.create(1012);
+      const service = await serviceWith(
+        [tokenAccount(mint)],
+        new Map([[mint, metadataBytes(mint, { size: RESIZED_METADATA_SIZE })]])
+      );
+
+      await expect(service.getNftFromCollection(owner, collection)).resolves.toBe(mint);
+    });
+
+    it('skips non-matching accounts and returns the first match', async () => {
+      const unverified = AddressFactory.create(1013);
+      const other = AddressFactory.create(1014);
+      const noCollection = AddressFactory.create(1015);
+      const empty = AddressFactory.create(1016);
+      const missing = AddressFactory.create(1017);
+      const undecodable = AddressFactory.create(1018);
+      const match = AddressFactory.create(1019);
+      const laterMatch = AddressFactory.create(1020);
+      const service = await serviceWith(
+        [
+          tokenAccount(unverified),
+          tokenAccount(other),
+          tokenAccount(noCollection),
+          tokenAccount(empty, '0'),
+          tokenAccount(missing),
+          tokenAccount(undecodable),
+          tokenAccount(match),
+          tokenAccount(laterMatch),
+        ],
+        new Map([
+          [
+            unverified,
+            metadataBytes(unverified, { collection: { verified: false, key: collection } }),
+          ],
+          [other, metadataBytes(other, { collection: { verified: true, key: otherCollection } })],
+          [noCollection, metadataBytes(noCollection, { collection: null })],
+          [empty, metadataBytes(empty)],
+          [undecodable, new Uint8Array([4, 1, 2, 3])],
+          [match, metadataBytes(match)],
+          [laterMatch, metadataBytes(laterMatch)],
+        ])
+      );
+
+      await expect(service.getNftFromCollection(owner, collection)).resolves.toBe(match);
+      // The zero-balance mint is never looked up.
+      const [requested] = (service.rpc.getMultipleAccounts as any).mock.calls[0];
+      expect(requested).toHaveLength(7);
+      expect(requested).not.toContain(await findNftMetadataPda(empty));
+    });
+
+    it.each([
+      ['an unverified collection', { collection: { verified: false, key: collection } }],
+      ['another collection', { collection: { verified: true, key: otherCollection } }],
+      ['no collection', { collection: null }],
+    ])('returns undefined for %s', async (_, options) => {
+      const mint = AddressFactory.create(1021);
+      const service = await serviceWith(
+        [tokenAccount(mint)],
+        new Map([[mint, metadataBytes(mint, options)]])
+      );
+
+      await expect(service.getNftFromCollection(owner, collection)).resolves.toBeUndefined();
+    });
+
+    it('returns undefined for a zero or fractional balance', async () => {
+      const zero = AddressFactory.create(1022);
+      const fraction = AddressFactory.create(1023);
+      const service = await serviceWith(
+        [tokenAccount(zero, '0'), tokenAccount(fraction, '999999', 6)],
+        new Map([
+          [zero, metadataBytes(zero)],
+          [fraction, metadataBytes(fraction)],
+        ])
+      );
+
+      await expect(service.getNftFromCollection(owner, collection)).resolves.toBeUndefined();
+      expect(service.rpc.getMultipleAccounts).not.toHaveBeenCalled();
+    });
+
+    it('returns undefined for a missing or undecodable metadata account', async () => {
+      const missing = AddressFactory.create(1024);
+      const undecodable = AddressFactory.create(1025);
+      const service = await serviceWith(
+        [tokenAccount(missing), tokenAccount(undecodable)],
+        new Map([[undecodable, metadataBytes(undecodable).slice(0, 100)]])
+      );
+
+      await expect(service.getNftFromCollection(owner, collection)).resolves.toBeUndefined();
+    });
+
+    it('returns undefined when the metadata is for a different mint', async () => {
+      const mint = AddressFactory.create(1026);
+      const service = await serviceWith(
+        [tokenAccount(mint)],
+        new Map([[mint, metadataBytes(AddressFactory.create(1027))]])
+      );
+
+      await expect(service.getNftFromCollection(owner, collection)).resolves.toBeUndefined();
+    });
+
+    it('looks up metadata in batches of 100', async () => {
+      const mints = Array.from({ length: 150 }, (_, i) => AddressFactory.create(2000 + i));
+      const match = mints[120];
+      const service = await serviceWith(
+        mints.map((mint) => tokenAccount(mint)),
+        new Map([[match, metadataBytes(match)]])
+      );
+
+      await expect(service.getNftFromCollection(owner, collection)).resolves.toBe(match);
+      const calls = (service.rpc.getMultipleAccounts as any).mock.calls;
+      expect(calls.map(([addresses]: [Address[]]) => addresses.length)).toEqual([100, 50]);
+    });
+
+    it('throws NosanaError on RPC failure', async () => {
+      const service = createService(() => undefined);
+      service.rpc.getTokenAccountsByOwner = vi.fn(() => ({
+        send: vi.fn().mockRejectedValue(new Error('rpc error')),
+      })) as any;
+
+      await expect(service.getNftFromCollection(owner, collection)).rejects.toMatchObject({
+        code: 'RPC_ERROR',
+      });
     });
   });
 

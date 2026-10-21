@@ -76,6 +76,15 @@ export interface ProgramConfig {
   stakeAddress: Address;
   poolsAddress: Address;
   merkleDistributorAddress: Address;
+  /**
+   * The pools-program pool that pays emission into the rewards vault (claim type
+   * `AddFee`, beneficiary = rewards vault). `stake.topup` claims it before topping up.
+   *
+   * This pool has rotated in the past (the legacy SDK switched between pools on a
+   * schedule), so it is config rather than a constant: override it here, or per call
+   * with `topup({ pool })`, when a new pool takes over. Unset on localnet.
+   */
+  rewardsPoolAddress?: Address;
 }
 
 export interface APIConfig extends ApiConfig {

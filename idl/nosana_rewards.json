@@ -1,0 +1,440 @@
+{
+  "address": "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp",
+  "metadata": {
+    "name": "nosana_rewards",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Reflection rewards for Nosana"
+  },
+  "instructions": [
+    {
+      "name": "add_fee",
+      "docs": [
+        "Send [NOS](/tokens/token) to the [VaultAccount](#vault-account)."
+      ],
+      "discriminator": [
+        67,
+        225,
+        189,
+        212,
+        253,
+        123,
+        76,
+        112
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true
+        },
+        {
+          "name": "reflection",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "relations": [
+            "reflection"
+          ]
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "claim",
+      "docs": [
+        "Claim rewards from a [RewardsAccount](#rewards-account) and [VaultAccount](#vault-account)."
+      ],
+      "discriminator": [
+        62,
+        198,
+        214,
+        193,
+        213,
+        159,
+        108,
+        210
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "relations": [
+            "reflection"
+          ]
+        },
+        {
+          "name": "reflection",
+          "writable": true
+        },
+        {
+          "name": "reward",
+          "writable": true
+        },
+        {
+          "name": "stake"
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "reward",
+            "stake"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close",
+      "docs": [
+        "Close a [RewardsAccount](#rewards-account)."
+      ],
+      "discriminator": [
+        98,
+        165,
+        201,
+        177,
+        108,
+        65,
+        206,
+        96
+      ],
+      "accounts": [
+        {
+          "name": "reflection",
+          "writable": true
+        },
+        {
+          "name": "reward",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "reward"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "enter",
+      "docs": [
+        "Initialize a [RewardsAccount](#rewards-account)."
+      ],
+      "discriminator": [
+        139,
+        49,
+        209,
+        114,
+        88,
+        91,
+        77,
+        134
+      ],
+      "accounts": [
+        {
+          "name": "reflection",
+          "writable": true
+        },
+        {
+          "name": "stake"
+        },
+        {
+          "name": "reward",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "stake"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "init",
+      "docs": [
+        "Initialize the [ReflectionAccount](#reflection-account) and [VaultAccount](#vault-account)."
+      ],
+      "discriminator": [
+        220,
+        59,
+        207,
+        236,
+        108,
+        250,
+        47,
+        100
+      ],
+      "accounts": [
+        {
+          "name": "mint",
+          "address": "devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP"
+        },
+        {
+          "name": "reflection",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  102,
+                  108,
+                  101,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "sync",
+      "docs": [
+        "Re-calculate reflection points."
+      ],
+      "discriminator": [
+        4,
+        219,
+        40,
+        164,
+        21,
+        157,
+        189,
+        88
+      ],
+      "accounts": [
+        {
+          "name": "reward",
+          "writable": true
+        },
+        {
+          "name": "stake"
+        },
+        {
+          "name": "reflection",
+          "writable": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ReflectionAccount",
+      "discriminator": [
+        205,
+        153,
+        160,
+        54,
+        239,
+        26,
+        219,
+        188
+      ]
+    },
+    {
+      "name": "RewardAccount",
+      "discriminator": [
+        225,
+        81,
+        31,
+        253,
+        84,
+        234,
+        171,
+        129
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "ReflectionAccount",
+      "docs": [
+        "The `ReflectionAccount` struct holds all the information on the reflection pool."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rate",
+            "type": "u128"
+          },
+          {
+            "name": "total_reflection",
+            "type": "u128"
+          },
+          {
+            "name": "total_xnos",
+            "type": "u128"
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RewardAccount",
+      "docs": [
+        "The `RewardAccount` struct holds all the information for any given user account."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "reflection",
+            "type": "u128"
+          },
+          {
+            "name": "xnos",
+            "type": "u128"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeAccount",
+      "docs": [
+        "The `StakeAccount` struct holds all the information for any given stake."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "duration",
+            "type": "u64"
+          },
+          {
+            "name": "time_unstake",
+            "type": "i64"
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_bump",
+            "type": "u8"
+          },
+          {
+            "name": "xnos",
+            "type": "u128"
+          }
+        ]
+      }
+    }
+  ]
+}

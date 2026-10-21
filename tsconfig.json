@@ -11,6 +11,8 @@
     { "path": "./packages/generated_clients/jobs" },
     { "path": "./packages/generated_clients/stake" },
     { "path": "./packages/generated_clients/merkle_distributor" },
+    { "path": "./packages/generated_clients/rewards" },
+    { "path": "./packages/generated_clients/pools" },
     { "path": "./packages/kit" },
     { "path": "./packages/localnet" },
     { "path": "./packages/scenario" }

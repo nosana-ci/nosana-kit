@@ -37,6 +37,7 @@ import {
   decompileTransactionMessage,
   getCompiledTransactionMessageDecoder,
   assertIsTransactionWithinSizeLimit,
+  isSome,
 } from '@solana/kit';
 import {
   estimateComputeUnitLimitFactory,
@@ -56,6 +57,12 @@ import { convertHttpToWebSocketUrl } from '../../utils/convertHttpToWebSocketUrl
 import { resolveAddressOrWallet } from '../../utils/resolveAddressOrWallet.js';
 import { packInstructions, MAX_COMPUTE_UNITS } from '../../utils/packInstructions.js';
 import { resolvePriorityFeeMicroLamports } from './priorityFees.js';
+import {
+  METADATA_V1_KEY,
+  TOKEN_METADATA_PROGRAM_ADDRESS,
+  findNftMetadataPda,
+  getNftMetadataPrefixCodec,
+} from './nftMetadata.js';
 
 const SOL_DECIMALS = 9;
 
@@ -202,6 +209,22 @@ export interface SolanaService {
    * @throws {NosanaError} If neither address nor wallet is provided
    */
   getBalanceInfo(addressStr?: string | Address): Promise<SolBalanceInfo>;
+  /**
+   * Find the first NFT of a verified Metaplex collection held by `owner`, e.g. a
+   * market's access key to pass as `nft` to `jobs.work`.
+   *
+   * Looks at the owner's SPL token accounts (classic token program) holding at
+   * least one token, decodes each mint's Metaplex metadata account, and returns
+   * the first mint whose metadata has `collection` set to the given address with
+   * `verified: true`. Metadata accounts that are missing or cannot be decoded are
+   * skipped.
+   *
+   * @param owner The address holding the NFT.
+   * @param collection The collection address (the collection NFT's mint).
+   * @returns The NFT mint, or `undefined` if the owner holds none from the collection.
+   * @throws {NosanaError} If the RPC requests fail.
+   */
+  getNftFromCollection(owner: Address, collection: Address): Promise<Address | undefined>;
   /**
    * Build a transaction message from instructions.
    * This function creates a transaction message with fee payer, blockhash, and instructions.
@@ -654,6 +677,60 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
     getBalance,
 
     getBalanceInfo,
+
+    async getNftFromCollection(owner: Address, collection: Address): Promise<Address | undefined> {
+      try {
+        deps.logger.debug(`Looking for an NFT of collection ${collection} held by ${owner}`);
+        const { value: tokenAccounts } = await rpc
+          .getTokenAccountsByOwner(
+            owner,
+            { programId: TOKEN_PROGRAM_ADDRESS },
+            { encoding: 'jsonParsed' }
+          )
+          .send();
+
+        // Only mints the owner holds at least one whole token of.
+        const mints = tokenAccounts
+          .map(({ account }) => account.data.parsed.info)
+          .filter(
+            ({ tokenAmount }) => BigInt(tokenAmount.amount) >= 10n ** BigInt(tokenAmount.decimals)
+          )
+          .map(({ mint }) => mint);
+
+        const metadataCodec = getNftMetadataPrefixCodec();
+        const base64 = getBase64Encoder();
+        // getMultipleAccounts takes at most 100 addresses per request.
+        for (let start = 0; start < mints.length; start += 100) {
+          const chunk = mints.slice(start, start + 100);
+          const metadataAddresses = await Promise.all(chunk.map(findNftMetadataPda));
+          const { value: metadataAccounts } = await rpc
+            .getMultipleAccounts(metadataAddresses, { encoding: 'base64' })
+            .send();
+
+          for (let i = 0; i < chunk.length; i++) {
+            const account = metadataAccounts[i];
+            if (!account || account.owner !== TOKEN_METADATA_PROGRAM_ADDRESS) continue;
+            try {
+              const metadata = metadataCodec.decode(base64.encode(account.data[0]));
+              if (metadata.key !== METADATA_V1_KEY || metadata.mint !== chunk[i]) continue;
+              if (
+                isSome(metadata.collection) &&
+                metadata.collection.value.verified &&
+                metadata.collection.value.key === collection
+              ) {
+                return chunk[i];
+              }
+            } catch (error) {
+              deps.logger.debug(`Skipping undecodable metadata for mint ${chunk[i]}: ${error}`);
+            }
+          }
+        }
+        return undefined;
+      } catch (error) {
+        deps.logger.error(`Failed to get NFT from collection: ${error}`);
+        throw new NosanaError('Failed to get NFT from collection', ErrorCodes.RPC_ERROR, error);
+      }
+    },
 
     /**
      * Build a transaction message from instructions

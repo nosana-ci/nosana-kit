@@ -22,6 +22,15 @@ export interface StakeProgram {
   stake: Instructions.CreateStake;
 
   /**
+   * Create the instructions that top up the wallet's existing stake account by `amount`
+   * (NOS base units) and keep its staking rewards in step. In order:
+   * rewards `enter` (only when the wallet has no rewards account yet), pools `claimFee`
+   * for `pool` (default: `programs.rewardsPoolAddress`), stake `topup`, rewards `sync`.
+   * Send them together in one transaction.
+   */
+  topup: Instructions.CreateTopup;
+
+  /**
    * Derive the stake account PDA address for a given owner (defaults to wallet address)
    */
   getAddress(owner?: Address): Promise<Address>;
@@ -105,6 +114,10 @@ export function createStakeProgram(deps: ProgramDeps, config: ProgramConfig): St
   return {
     async stake(params) {
       return Instructions.stake(params, createInstructionsHelper());
+    },
+
+    async topup(params) {
+      return Instructions.topup(params, createInstructionsHelper());
     },
 
     async getAddress(owner?: Address): Promise<Address> {

@@ -37,6 +37,12 @@ export type FlowSecrets = {
   [jobId: string]: JobExposeSecrets | 'private' | 'public' | undefined;
 };
 
+export type OpStateError = {
+  event: string;
+  message: string;
+  code?: number;
+};
+
 export type OpState = {
   providerId: string | null;
   operationId: string | null;
@@ -49,11 +55,10 @@ export type OpState = {
   results?: {
     [key: string]: string | string[];
   };
-  error?: {
-    event: string;
-    message: string;
-    code?: number;
-  }
+  /** Every error the operation hit, in order. */
+  errors: Array<OpStateError>;
+  /** Single-error form; the node records each error in `errors`. */
+  error?: OpStateError;
   diagnostics: {
     reason: DiagnosticsReason;
     state?: DiagnosticsState;
