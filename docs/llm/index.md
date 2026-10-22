@@ -13,6 +13,8 @@ OpenAI-compatible, so an existing client works once you change the base URL and 
 | Authentication | `Authorization: Bearer nos_...` — the same key you use for deployments |
 | Billing | Per token, against your credits |
 
+No API key yet? See [Get API Key](/api/get-api-key) to create one.
+
 ## List models
 
 A model appears here only while a GPU is actually serving it, so this is the list you can

@@ -32,6 +32,7 @@ export default withMermaid(
         { text: 'About', link: '/about/introduction' },
         { text: 'Deployments', link: '/deployments/intro' },
         { text: 'API', link: '/api/intro' },
+        { text: 'LLM Inference', link: '/llm/' },
         {
           text: 'Agents',
           items: [
@@ -136,7 +137,7 @@ export default withMermaid(
               { text: 'Jobs', link: '/api/jobs' },
               { text: 'Markets', link: '/api/markets' },
               { text: 'Credits', link: '/api/credits' },
-              { text: 'LLM Inference', link: '/api/llm' },
+              { text: 'LLM Inference', link: '/llm/' },
               { text: 'Templates', link: '/api/templates' },
               { text: 'Hosts', link: '/api/hosts' },
               { text: 'Stats', link: '/api/stats' },
@@ -252,6 +253,12 @@ export default withMermaid(
               { text: 'Running the Host', link: '/hosts/grid-run' },
               { text: 'Troubleshooting', link: '/hosts/troubleshoot' },
             ],
+          },
+        ],
+        '/llm/': [
+          {
+            text: 'LLM Inference',
+            items: [{ text: 'Overview', link: '/llm/' }],
           },
         ],
         '/inference/': [
