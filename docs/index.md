@@ -23,9 +23,9 @@ features:
   - title: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Nosana API'
     details: REST API and TypeScript SDK for creating and managing deployments programmatically.
     link: /api/intro
-  - title: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><path d="m6 18 7-4 7 4"></path><path d="m12 2 7 4v12c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2V6z"></path><path d="M6 8h12"></path><path d="M6 12h12"></path><path d="M6 16h12"></path></svg> Nosana CLI'
-    details: Command-line interface for running inference jobs and managing deployments on Nosana.
-    link: /inference/quick_start
+  - title: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><rect width="16" height="16" x="4" y="4" rx="2"></rect><rect width="6" height="6" x="9" y="9" rx="1"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M2 9h2"></path><path d="M20 15h2"></path><path d="M20 9h2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path></svg> LLM Inference'
+    details: OpenAI-compatible API for open models on Nosana GPUs, billed per token against your credits.
+    link: /llm/
   - title: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg> Host GPUs'
     details: Earn $NOS by joining the Nosana Grid and hosting your GPUs on the marketplace.
     link: /hosts/grid
@@ -50,6 +50,7 @@ Explore our documentation organized by what you want to accomplish:
 - **[Getting Started](/about/getting-started)** - Choose your deployment method
 - **[Deployments Guide](/deployments/intro)** - Create and manage deployments
 - **[API Documentation](/api/intro)** - REST API and TypeScript SDK
+- **[LLM Inference](/llm/)** - OpenAI-compatible inference API
 - **[Job Definitions](/deployments/jobs/job-definition/intro)** - Define container workloads
 - **[My First Deployment](/deployments/my-first-deployment)** - Step-by-step tutorial
 

@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import type { SiteConfig } from 'vitepress';
 
-const HOSTNAME = 'https://docs.nosana.com';
+const HOSTNAME = 'https://learn.nosana.com';
 
 type SidebarItem = {
   text?: string;
@@ -71,18 +71,20 @@ export function writeLlmsTxt(config: SiteConfig): void {
     '',
     '## When to use these docs',
     '',
-    '- **Deploying a GPU workload** — start at [Deployments](https://docs.nosana.com/deployments/intro).',
+    '- **Deploying a GPU workload** — start at [Deployments](https://learn.nosana.com/deployments/intro).',
     '  A deployment runs one or more replicas of a container on a GPU market and',
     '  keeps them running.',
-    '- **Calling the API directly** — start at [API](https://docs.nosana.com/api/intro).',
+    '- **Calling the API directly** — start at [API](https://learn.nosana.com/api/intro).',
     '  Every endpoint is described by an OpenAPI document at',
     '  <https://api.nosana.com/api/openapi.json>.',
-    '- **Writing TypeScript** — use [@nosana/kit](https://docs.nosana.com/kit/), the',
+    '- **Calling an LLM** — start at [LLM Inference](https://learn.nosana.com/llm/).',
+    '  An OpenAI-compatible API for open models, billed per token against your credits.',
+    '- **Writing TypeScript** — use [@nosana/kit](https://learn.nosana.com/kit/), the',
     '  typed SDK, rather than hand-rolling HTTP calls.',
     '- **Getting credentials** — see',
-    '  [Get an API key](https://docs.nosana.com/api/get-api-key) and',
+    '  [Get an API key](https://learn.nosana.com/api/get-api-key) and',
     '  <https://nosana.com/auth.md>.',
-    '- **Hosting GPUs** — see [Host GPUs](https://docs.nosana.com/hosts/grid).',
+    '- **Hosting GPUs** — see [Host GPUs](https://learn.nosana.com/hosts/grid).',
     '',
     'Prices are per-second and set per GPU market. The live source is',
     '`GET https://api.nosana.com/api/markets/`, which needs no authentication.',

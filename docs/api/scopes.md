@@ -27,7 +27,7 @@ limited: your own session always has every permission.
 
 Three permissions are for API keys only:
 
-- `inference:use`: the [inference endpoints](/api/llm) only accept API keys.
+- `inference:use`: the [inference endpoints](/llm/) only accept API keys.
 - `api-keys:manage` and `oauth-apps:manage`: an app that could create API keys could keep
   access to your account after you disconnect it.
 
