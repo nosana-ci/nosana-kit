@@ -82,10 +82,6 @@
         },
         {
           "name": "market_settings",
-          "docs": [
-            "Clients built before market settings existed do not pass it, they are treated as posting to an open market."
-          ],
-          "optional": true,
           "pda": {
             "seeds": [
               {
@@ -726,10 +722,6 @@
         },
         {
           "name": "market_settings",
-          "docs": [
-            "Clients built before market settings existed do not pass it, they are treated as posting to an open market."
-          ],
-          "optional": true,
           "pda": {
             "seeds": [
               {

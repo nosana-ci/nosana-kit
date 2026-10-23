@@ -214,7 +214,6 @@ export type ListAsyncInput<
   rewardsProgram?: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
-  /** Clients built before market settings existed do not pass it, they are treated as posting to an open market. */
   marketSettings?: Address<TAccountMarketSettings>;
   /** Only required when the market settings have a project access key */
   projectNft?: Address<TAccountProjectNft>;
@@ -411,8 +410,7 @@ export type ListInput<
   rewardsProgram?: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
-  /** Clients built before market settings existed do not pass it, they are treated as posting to an open market. */
-  marketSettings?: Address<TAccountMarketSettings>;
+  marketSettings: Address<TAccountMarketSettings>;
   /** Only required when the market settings have a project access key */
   projectNft?: Address<TAccountProjectNft>;
   projectMetadata?: Address<TAccountProjectMetadata>;
@@ -584,8 +582,7 @@ export type ParsedListInstruction<
     rewardsProgram: TAccountMetas[9];
     tokenProgram: TAccountMetas[10];
     systemProgram: TAccountMetas[11];
-    /** Clients built before market settings existed do not pass it, they are treated as posting to an open market. */
-    marketSettings?: TAccountMetas[12] | undefined;
+    marketSettings: TAccountMetas[12];
     /** Only required when the market settings have a project access key */
     projectNft?: TAccountMetas[13] | undefined;
     projectMetadata?: TAccountMetas[14] | undefined;
@@ -632,7 +629,7 @@ export function parseListInstruction<
       rewardsProgram: getNextAccount(),
       tokenProgram: getNextAccount(),
       systemProgram: getNextAccount(),
-      marketSettings: getNextOptionalAccount(),
+      marketSettings: getNextAccount(),
       projectNft: getNextOptionalAccount(),
       projectMetadata: getNextOptionalAccount(),
     },
