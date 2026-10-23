@@ -3,6 +3,7 @@ import { type Address, type TransactionSigner, generateKeyPairSigner } from '@so
 
 import type { getListInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
+import { resolveProjectAccess } from './projectAccess.js';
 
 export type ListParams = {
   market: Address;
@@ -39,7 +40,11 @@ export async function list(
         getNosATA(nosPayer.address),
         getStaticAccounts(),
       ]);
-    const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
+    const [vault, projectAccess] = await Promise.all([
+      deps.solana.pda([market, config.nosTokenAddress], jobsProgram),
+      // the market settings, plus the wallet's access key NFT when the market is protected
+      resolveProjectAccess({ deps, client }, wallet.address, market, jobsProgram),
+    ]);
 
     // Convert IPFS hash to Solana bytes array
     const ipfsJobBytes = ipfsHashToSolBytesArray(ipfsHash);
@@ -56,6 +61,7 @@ export async function list(
         vault: vault,
         payer: nosPayer,
         authority: wallet,
+        ...projectAccess,
         ...staticAccounts,
       },
       {

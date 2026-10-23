@@ -47,7 +47,6 @@ export function getRunAccountDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(RUN_ACCOUNT_DISCRIMINATOR);
 }
 
-/** The `RunAccount` struct holds temporary information that matches nodes to jobs. */
 export type RunAccount = {
   discriminator: ReadonlyUint8Array;
   job: Address;

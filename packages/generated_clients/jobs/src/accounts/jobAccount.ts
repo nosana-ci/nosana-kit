@@ -49,7 +49,6 @@ export function getJobAccountDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(JOB_ACCOUNT_DISCRIMINATOR);
 }
 
-/** The `JobAccount` struct holds all the information about any individual jobs. */
 export type JobAccount = {
   discriminator: ReadonlyUint8Array;
   ipfsJob: ReadonlyUint8Array;

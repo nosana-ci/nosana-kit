@@ -52,6 +52,11 @@ export type Market = Omit<ConvertTypesForDb<programClient.MarketAccountArgs>, 'q
 };
 
 export type Run = ConvertTypesForDb<programClient.RunAccountArgs> & { address: Address };
+/** The settings of a protected market: only holders of the `projectAccessKey` NFT collection may post jobs */
+export type MarketSettings = programClient.MarketSettingsAccountArgs & {
+  address: Address;
+  market: Address;
+};
 
 // Re-export monitor types for convenience
 export { MonitorEventType } from './monitor/index.js';
@@ -187,6 +192,11 @@ export interface JobsProgram {
   markets(): Promise<Market[]>;
 
   /**
+   * Fetch the settings of a market, `null` when the market has none and is open to all projects
+   */
+  marketSettings(market: Address): Promise<MarketSettings | null>;
+
+  /**
    * List a new job to the marketplace
    */
   list: Instructions.List;
@@ -268,6 +278,15 @@ export interface JobsProgram {
    * Close a market (synonym for close)
    */
   closeMarket: Instructions.Close;
+  /**
+   * Protect a market with a project access key: only holders of that NFT collection may post
+   * jobs. Creates the market settings account when needed, only the market authority may call it.
+   */
+  setMarketSettings: Instructions.SetMarketSettings;
+  /**
+   * Close the settings account of a market, opening it to all projects again
+   */
+  closeMarketSettings: Instructions.CloseMarketSettings;
   /**
    * Stop a running job
    */
@@ -656,6 +675,30 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     },
 
     /**
+     * Fetch the settings of a market, `null` when the settings account does not exist
+     */
+    async marketSettings(market: Address): Promise<MarketSettings | null> {
+      try {
+        const settingsAddress = await Instructions.getMarketSettingsPda(deps, market, programId);
+        const account = await client.fetchMaybeMarketSettingsAccount(
+          deps.solana.rpc,
+          settingsAddress
+        );
+        if (!account.exists) {
+          return null;
+        }
+        return {
+          address: account.address,
+          market,
+          projectAccessKey: account.data.projectAccessKey,
+        };
+      } catch (err) {
+        deps.logger.error(`Failed to fetch market settings ${err}`);
+        throw err;
+      }
+    },
+
+    /**
      * Fetch multiple job accounts by address
      */
     async multiple(addresses: Address[], checkRuns: boolean = false): Promise<Job[]> {
@@ -976,6 +1019,15 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     },
     async closeMarket(params) {
       return this.close(params);
+    },
+    async setMarketSettings(params) {
+      return Instructions.setMarketSettings(params, createInstructionsHelper(this.get, this.runs));
+    },
+    async closeMarketSettings(params) {
+      return Instructions.closeMarketSettings(
+        params,
+        createInstructionsHelper(this.get, this.runs)
+      );
     },
     async end(params) {
       return Instructions.end(params, createInstructionsHelper(this.get, this.runs));

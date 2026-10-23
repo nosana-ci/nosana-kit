@@ -669,6 +669,47 @@ const instruction = await client.jobs.createMarket({
 await client.solana.buildSignAndSend(instruction);
 ```
 
+#### Market Settings
+
+```typescript
+async setMarketSettings(params: {
+  market: Address,
+  projectAccessKey: Address
+}): Promise<Instruction>
+
+async closeMarketSettings(params: { market: Address }): Promise<Instruction>
+
+async marketSettings(market: Address): Promise<MarketSettings | null>
+```
+
+Protect a market so that only projects holding an NFT of the `projectAccessKey` collection can post jobs to it. The settings live in a separate account that is created on the first call and can be updated by calling `setMarketSettings` again. Closing the settings opens the market to all projects. Only the market authority can set or close them. `marketSettings` returns `null` for an open market.
+
+Posting needs no extra parameters: `list`, `assign` and `post` read the market settings and, on a protected market, look up the wallet's NFT from the access key collection themselves. They throw when the wallet holds none.
+
+```typescript
+// Set wallet first (must be market authority)
+client.wallet = yourWallet;
+
+// Protect the market with a project access key collection
+const instruction = await client.jobs.setMarketSettings({
+  market: address('market-address'),
+  projectAccessKey: address('collection-address'),
+});
+await client.solana.buildSignAndSend(instruction);
+
+// Projects holding an NFT of the collection post as usual, the NFT is looked up from the wallet
+const listInstruction = await client.jobs.list({
+  market: address('market-address'),
+  timeout: 3600,
+  ipfsHash: 'QmXxx...',
+});
+
+// Open the market to all projects again
+const closeInstruction = await client.jobs.closeMarketSettings({
+  market: address('market-address'),
+});
+```
+
 #### Close a Market
 
 ```typescript
@@ -737,7 +778,7 @@ for await (const event of eventStream) {
   if (event.type === MonitorEventType.JOB) {
     console.log('Job update:', event.data.address, event.data.state);
     // event.data will have state, node, and timeStart from run account if it exists
-    
+
     // Process updates - save to database, trigger workflows, etc.
     if (event.data.state === JobState.COMPLETED) {
       await processCompletedJob(event.data);
@@ -1056,9 +1097,9 @@ const client = createNosanaClient(NosanaNetwork.MAINNET, {
 The API service provides access to three main APIs:
 
 ```typescript
-client.api?.jobs    // Jobs API
-client.api?.credits // Credits API
-client.api?.markets // Markets API
+client.api?.jobs; // Jobs API
+client.api?.credits; // Credits API
+client.api?.markets; // Markets API
 ```
 
 ### Examples
@@ -1542,6 +1583,7 @@ await client.solana.buildSignAndSend(instructions);
 ```
 
 The function automatically:
+
 - Finds the sender's associated token account
 - Finds the recipient's associated token account
 - Creates the recipient's ATA if it doesn't exist (returns 2 instructions: create ATA + transfer)
@@ -1742,10 +1784,10 @@ pnpm --filter @nosana/scenario run test:scenario
 
 #### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `NOSANA_NETWORK` | `localnet` | Target network: `localnet`, `devnet`, or `mainnet` |
-| `NOSANA_WALLET` | — | Path to a Solana keypair JSON file (required for devnet/mainnet) |
+| Variable         | Default    | Description                                                      |
+| ---------------- | ---------- | ---------------------------------------------------------------- |
+| `NOSANA_NETWORK` | `localnet` | Target network: `localnet`, `devnet`, or `mainnet`               |
+| `NOSANA_WALLET`  | —          | Path to a Solana keypair JSON file (required for devnet/mainnet) |
 
 For monorepo setup, build, and development, see the [root README](../../README.md).
 

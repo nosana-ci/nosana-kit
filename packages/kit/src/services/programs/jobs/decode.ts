@@ -2,6 +2,7 @@ import type { Address, Instruction } from '@solana/kit';
 import {
   parseAssignInstruction,
   parseCloseInstruction,
+  parseCloseSettingsInstruction,
   parseCompleteInstruction,
   parseDelistInstruction,
   parseEndInstruction,
@@ -10,6 +11,7 @@ import {
   parseListInstruction,
   parseOpenInstruction,
   parseQuitInstruction,
+  parseSetSettingsInstruction,
   parseStopInstruction,
   parseWorkInstruction,
 } from '@nosana/jobs-program';
@@ -31,7 +33,7 @@ export interface DecodedJobsInstruction {
 
 // The subset of each generated `parseXInstruction` result we rely on.
 type ParsedInstruction = {
-  accounts: Record<string, { address: Address }>;
+  accounts: Record<string, { address: Address } | undefined>;
   data: Record<string, unknown>;
 };
 type InstructionParser = (instruction: Instruction) => ParsedInstruction;
@@ -50,6 +52,8 @@ const PARSERS: Record<JobsInstructionName, InstructionParser> = {
   extend: parseExtendInstruction as unknown as InstructionParser,
   delist: parseDelistInstruction as unknown as InstructionParser,
   close: parseCloseInstruction as unknown as InstructionParser,
+  setSettings: parseSetSettingsInstruction as unknown as InstructionParser,
+  closeSettings: parseCloseSettingsInstruction as unknown as InstructionParser,
   end: parseEndInstruction as unknown as InstructionParser,
 };
 
@@ -75,6 +79,8 @@ export function decodeJobsInstruction(
     const parsed = PARSERS[name](instruction);
     const accounts: Record<string, Address> = {};
     for (const [role, meta] of Object.entries(parsed.accounts)) {
+      // an optional account that was not passed is encoded as the program id
+      if (!meta || meta.address === instruction.programAddress) continue;
       accounts[role] = meta.address;
     }
     return { name, accounts, data: parsed.data };

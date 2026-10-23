@@ -52,8 +52,20 @@ export const NOSANA_JOBS_ERROR__NODE_NFT_WRONG_OWNER = 0x1780; // 6016
 export const NOSANA_JOBS_ERROR__NODE_NFT_INVALID_AMOUNT = 0x1781; // 6017
 /** NodeKeyInvalidCollection: This access key does not belong to a verified collection. */
 export const NOSANA_JOBS_ERROR__NODE_KEY_INVALID_COLLECTION = 0x1782; // 6018
+/** AccessKeyMissing: This market requires an access key NFT. */
+export const NOSANA_JOBS_ERROR__ACCESS_KEY_MISSING = 0x1783; // 6019
+/** AccessNftWrongOwner: This access key NFT is not owned by the signer. */
+export const NOSANA_JOBS_ERROR__ACCESS_NFT_WRONG_OWNER = 0x1784; // 6020
+/** AccessNftInvalidAmount: Access key NFT amount cannot be 0. */
+export const NOSANA_JOBS_ERROR__ACCESS_NFT_INVALID_AMOUNT = 0x1785; // 6021
+/** AccessKeyInvalidCollection: This access key NFT does not belong to the verified collection. */
+export const NOSANA_JOBS_ERROR__ACCESS_KEY_INVALID_COLLECTION = 0x1786; // 6022
 
 export type NosanaJobsError =
+  | typeof NOSANA_JOBS_ERROR__ACCESS_KEY_INVALID_COLLECTION
+  | typeof NOSANA_JOBS_ERROR__ACCESS_KEY_MISSING
+  | typeof NOSANA_JOBS_ERROR__ACCESS_NFT_INVALID_AMOUNT
+  | typeof NOSANA_JOBS_ERROR__ACCESS_NFT_WRONG_OWNER
   | typeof NOSANA_JOBS_ERROR__INVALID_JOB_ACCOUNT
   | typeof NOSANA_JOBS_ERROR__INVALID_MARKET_ACCOUNT
   | typeof NOSANA_JOBS_ERROR__JOB_INVALID_PROJECT
@@ -77,6 +89,10 @@ export type NosanaJobsError =
 let nosanaJobsErrorMessages: Record<NosanaJobsError, string> | undefined;
 if (process.env.NODE_ENV !== "production") {
   nosanaJobsErrorMessages = {
+    [NOSANA_JOBS_ERROR__ACCESS_KEY_INVALID_COLLECTION]: `This access key NFT does not belong to the verified collection.`,
+    [NOSANA_JOBS_ERROR__ACCESS_KEY_MISSING]: `This market requires an access key NFT.`,
+    [NOSANA_JOBS_ERROR__ACCESS_NFT_INVALID_AMOUNT]: `Access key NFT amount cannot be 0.`,
+    [NOSANA_JOBS_ERROR__ACCESS_NFT_WRONG_OWNER]: `This access key NFT is not owned by the signer.`,
     [NOSANA_JOBS_ERROR__INVALID_JOB_ACCOUNT]: `This job account is not valid.`,
     [NOSANA_JOBS_ERROR__INVALID_MARKET_ACCOUNT]: `This market account is not valid.`,
     [NOSANA_JOBS_ERROR__JOB_INVALID_PROJECT]: `The job has a different project owner.`,

@@ -1,5 +1,6 @@
 export * from './assign.js';
 export * from './close.js';
+export * from './closeSettings.js';
 export * from './complete.js';
 export * from './delist.js';
 export * from './end.js';
@@ -9,5 +10,7 @@ export * from './complete.js';
 export * from './finish.js';
 export * from './open.js';
 export * from './quit.js';
+export * from './setSettings.js';
+export { getMarketSettingsPda } from './projectAccess.js';
 export * from './work.js';
 export * from './stop.js';

@@ -7,11 +7,11 @@
  */
 
 export * from "./assign.js";
-export * from "./claim.js";
 export * from "./clean.js";
 export * from "./cleanAdmin.js";
 export * from "./close.js";
 export * from "./closeAdmin.js";
+export * from "./closeSettings.js";
 export * from "./complete.js";
 export * from "./delist.js";
 export * from "./end.js";
@@ -22,6 +22,7 @@ export * from "./open.js";
 export * from "./quit.js";
 export * from "./quitAdmin.js";
 export * from "./recover.js";
+export * from "./setSettings.js";
 export * from "./stop.js";
 export * from "./update.js";
 export * from "./work.js";

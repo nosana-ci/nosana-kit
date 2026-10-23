@@ -46,6 +46,12 @@ describe('assign instruction', () => {
     };
   });
 
+  beforeEach(() => {
+    vi.spyOn(programClient, 'fetchMaybeMarketSettingsAccount' as any).mockResolvedValue({
+      exists: false,
+    });
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -91,5 +97,85 @@ describe('assign instruction', () => {
     expect(Array.from(args.ipfsJob)).toEqual(ipfsBytes);
     expect(args.node).toBe(nodeAddr);
     expect(instr).toBeDefined();
+  });
+
+  describe('project access', () => {
+    const walletAddr = AddressFactory.create(70);
+    const pda = AddressFactory.create(81);
+    const marketAddr = AddressFactory.create(74);
+    const nodeAddr = AddressFactory.create(75);
+    const accessKey = AddressFactory.create(76);
+    const ipfsCid = solBytesArrayToIpfsHash(Array.from({ length: IPFS_BYTES_LENGTH }, (_, i) => i));
+    let spy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      (helperParams.deps.getWallet as any) = () => ({ address: walletAddr });
+      (helperParams.deps.solana.pda as any) = vi.fn(async () => pda);
+      (helperParams.deps.solana.getNftFromCollection as any) = vi.fn(async () => undefined);
+      spy = vi.spyOn(programClient, 'getAssignInstruction' as any).mockReturnValue({
+        programAddress: AddressFactory.create(73),
+        accounts: [],
+        data: new Uint8Array([1]),
+      });
+    });
+
+    it('passes the market settings PDA and no access key accounts on an open market', async () => {
+      vi.spyOn(programClient, 'fetchMaybeMarketSettingsAccount' as any).mockResolvedValue({
+        exists: false,
+      });
+
+      await assign(
+        { market: marketAddr, timeout: 1000, ipfsHash: ipfsCid, node: nodeAddr },
+        helperParams
+      );
+
+      const args = spy.mock.calls[0][0] as any;
+      expect(helperParams.deps.solana.pda).toHaveBeenCalledWith(
+        ['settings', marketAddr],
+        config.programs.jobsAddress
+      );
+      expect(args.marketSettings).toBe(pda);
+      expect(args.projectNft).toBeUndefined();
+      expect(args.projectMetadata).toBeUndefined();
+      expect(helperParams.deps.solana.getNftFromCollection).not.toHaveBeenCalled();
+    });
+
+    it('looks up the wallet NFT of the access key collection on a protected market', async () => {
+      const nft = AddressFactory.create(90);
+      vi.spyOn(programClient, 'fetchMaybeMarketSettingsAccount' as any).mockResolvedValue({
+        exists: true,
+        data: { projectAccessKey: accessKey },
+      });
+      (helperParams.deps.solana.getNftFromCollection as any) = vi.fn(async () => nft);
+
+      await assign(
+        { market: marketAddr, timeout: 1000, ipfsHash: ipfsCid, node: nodeAddr },
+        helperParams
+      );
+
+      expect(helperParams.deps.solana.getNftFromCollection).toHaveBeenCalledWith(
+        walletAddr,
+        accessKey
+      );
+      const args = spy.mock.calls[0][0] as any;
+      expect(args.marketSettings).toBe(pda);
+      expect(args.projectNft).toBeDefined();
+      expect(args.projectMetadata).toBeDefined();
+    });
+
+    it('throws when the wallet holds no NFT of a protected market', async () => {
+      vi.spyOn(programClient, 'fetchMaybeMarketSettingsAccount' as any).mockResolvedValue({
+        exists: true,
+        data: { projectAccessKey: accessKey },
+      });
+
+      await expect(
+        assign(
+          { market: marketAddr, timeout: 1000, ipfsHash: ipfsCid, node: nodeAddr },
+          helperParams
+        )
+      ).rejects.toThrow('holds no access key NFT');
+      expect(spy).not.toHaveBeenCalled();
+    });
   });
 });

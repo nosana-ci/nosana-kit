@@ -55,7 +55,8 @@ export type CloseAdminInstruction<
   TAccountMarket extends string | AccountMeta<string> = string,
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountUser extends string | AccountMeta<string> = string,
-  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> =
+    "XXXxddiNnmoD2h2LbQYaL76Swi21MaQbtBbRynAdQL8",
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
@@ -120,7 +121,7 @@ export type CloseAdminInput<
   market: Address<TAccountMarket>;
   vault: Address<TAccountVault>;
   user: Address<TAccountUser>;
-  authority: TransactionSigner<TAccountAuthority>;
+  authority?: TransactionSigner<TAccountAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
 };
 
@@ -165,6 +166,10 @@ export function getCloseAdminInstruction<
   >;
 
   // Resolve default values.
+  if (!accounts.authority.value) {
+    accounts.authority.value =
+      "XXXxddiNnmoD2h2LbQYaL76Swi21MaQbtBbRynAdQL8" as Address<"XXXxddiNnmoD2h2LbQYaL76Swi21MaQbtBbRynAdQL8">;
+  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;

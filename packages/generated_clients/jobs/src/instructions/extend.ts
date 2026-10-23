@@ -67,7 +67,8 @@ export type ExtendInstruction<
   TAccountRewardsVault extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
-  TAccountRewardsProgram extends string | AccountMeta<string> = string,
+  TAccountRewardsProgram extends string | AccountMeta<string> =
+    "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp",
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
@@ -163,7 +164,7 @@ export type ExtendInput<
   rewardsVault: Address<TAccountRewardsVault>;
   authority: TransactionSigner<TAccountAuthority>;
   payer: TransactionSigner<TAccountPayer>;
-  rewardsProgram: Address<TAccountRewardsProgram>;
+  rewardsProgram?: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   timeout: ExtendInstructionDataArgs["timeout"];
 };
@@ -235,6 +236,10 @@ export function getExtendInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.rewardsProgram.value) {
+    accounts.rewardsProgram.value =
+      "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp" as Address<"nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp">;
+  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;

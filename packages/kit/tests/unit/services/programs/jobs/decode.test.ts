@@ -32,6 +32,9 @@ const LIST_ACCOUNT_ORDER = [
   'rewardsProgram',
   'tokenProgram',
   'systemProgram',
+  'marketSettings',
+  'projectNft',
+  'projectMetadata',
 ] as const;
 
 function makeListInstruction(): Instruction {
@@ -122,5 +125,24 @@ describe('decodeJobsInstruction', () => {
     });
     const ix: Instruction = { programAddress: JOBS_PROGRAM, accounts: [], data };
     expect(decodeJobsInstruction(ix)).toBeUndefined();
+  });
+});
+
+describe('decodeJobsInstruction optional accounts', () => {
+  it('leaves out optional accounts that were encoded as the program id', () => {
+    const instruction = makeListInstruction();
+    const accounts = instruction.accounts!.map((account, i) =>
+      i >= LIST_ACCOUNT_ORDER.indexOf('projectNft')
+        ? { ...account, address: JOBS_PROGRAM }
+        : account
+    );
+    const decoded = decodeJobsInstruction({ ...instruction, accounts });
+
+    expect(decoded?.name).toBe('list');
+    expect(decoded?.accounts.marketSettings).toBe(
+      addr(LIST_ACCOUNT_ORDER.indexOf('marketSettings') + 1)
+    );
+    expect(decoded?.accounts.projectNft).toBeUndefined();
+    expect(decoded?.accounts.projectMetadata).toBeUndefined();
   });
 });

@@ -153,6 +153,17 @@ async function main(): Promise<void> {
   const emptyOpenIx = await client.jobs.createMarket();
   const emptyMarket: Address = JobsClient.parseOpenInstruction(emptyOpenIx).accounts.market.address;
   await client.solana.buildSignAndSend(emptyOpenIx);
+
+  // setSettings / closeSettings: the market authority protects the market with a project
+  // access key and opens it again. Any address serves as the key here.
+  const settingsParams = { market: emptyMarket, projectAccessKey: client.wallet!.address };
+  await record('setSettings', () => client.jobs.setMarketSettings(settingsParams));
+  await client.solana.buildSignAndSend(await client.jobs.setMarketSettings(settingsParams));
+  await record('closeSettings', () => client.jobs.closeMarketSettings({ market: emptyMarket }));
+  await client.solana.buildSignAndSend(
+    await client.jobs.closeMarketSettings({ market: emptyMarket })
+  );
+
   await record('close', () => client.jobs.closeMarket({ market: emptyMarket }));
 
   // --- Node lifecycle: stake → work → assign → end / quit / finish -----------

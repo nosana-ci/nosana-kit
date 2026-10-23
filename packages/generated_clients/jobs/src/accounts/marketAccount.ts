@@ -55,7 +55,6 @@ export function getMarketAccountDiscriminatorBytes() {
   );
 }
 
-/** The `MarketAccount` struct holds all the information about jobs and the nodes queue. */
 export type MarketAccount = {
   discriminator: ReadonlyUint8Array;
   authority: Address;
