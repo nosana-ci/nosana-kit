@@ -2,7 +2,9 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { getScenarioClient, type Address } from '../../src/index.js';
 import { JobsClient } from '@nosana/kit';
 
-describe('scenario: market settings', () => {
+// Skipped until the market protection program is deployed to devnet, which the CI localnet image
+// is built from. The fee branch, released together with its program, enables this scenario.
+describe.skip('scenario: market settings', () => {
   let marketAddress: Address;
 
   beforeEach(async () => {
