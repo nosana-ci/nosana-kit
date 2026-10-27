@@ -20,46 +20,48 @@ export const NOSANA_JOBS_ERROR__INVALID_MARKET_ACCOUNT = 0x1770; // 6000
 export const NOSANA_JOBS_ERROR__MARKET_IN_WRONG_STATE = 0x1771; // 6001
 /** NotInMarketQueue: Account cannot be find account in market queue. */
 export const NOSANA_JOBS_ERROR__NOT_IN_MARKET_QUEUE = 0x1772; // 6002
+/** MarketSettingsMissing: This market has settings that must be closed with it. */
+export const NOSANA_JOBS_ERROR__MARKET_SETTINGS_MISSING = 0x1773; // 6003
 /** InvalidJobAccount: This job account is not valid. */
-export const NOSANA_JOBS_ERROR__INVALID_JOB_ACCOUNT = 0x1773; // 6003
+export const NOSANA_JOBS_ERROR__INVALID_JOB_ACCOUNT = 0x1774; // 6004
 /** JobInWrongState: This job does not have the right status. */
-export const NOSANA_JOBS_ERROR__JOB_IN_WRONG_STATE = 0x1774; // 6004
+export const NOSANA_JOBS_ERROR__JOB_IN_WRONG_STATE = 0x1775; // 6005
 /** JobNotExpired: The job has not yet expired. */
-export const NOSANA_JOBS_ERROR__JOB_NOT_EXPIRED = 0x1775; // 6005
+export const NOSANA_JOBS_ERROR__JOB_NOT_EXPIRED = 0x1776; // 6006
 /** JobResultNull: The job result can not be null. */
-export const NOSANA_JOBS_ERROR__JOB_RESULT_NULL = 0x1776; // 6006
+export const NOSANA_JOBS_ERROR__JOB_RESULT_NULL = 0x1777; // 6007
 /** JobInvalidProject: The job has a different project owner. */
-export const NOSANA_JOBS_ERROR__JOB_INVALID_PROJECT = 0x1777; // 6007
+export const NOSANA_JOBS_ERROR__JOB_INVALID_PROJECT = 0x1778; // 6008
 /** JobTimeoutNotGreater: The new job timeout should be larger than the current one. */
-export const NOSANA_JOBS_ERROR__JOB_TIMEOUT_NOT_GREATER = 0x1778; // 6008
+export const NOSANA_JOBS_ERROR__JOB_TIMEOUT_NOT_GREATER = 0x1779; // 6009
 /** JobInvalidRunAccount: The run account does not match the job. */
-export const NOSANA_JOBS_ERROR__JOB_INVALID_RUN_ACCOUNT = 0x1779; // 6009
+export const NOSANA_JOBS_ERROR__JOB_INVALID_RUN_ACCOUNT = 0x177a; // 6010
 /** JobResultsAlreadySet: The job results are already set. */
-export const NOSANA_JOBS_ERROR__JOB_RESULTS_ALREADY_SET = 0x177a; // 6010
+export const NOSANA_JOBS_ERROR__JOB_RESULTS_ALREADY_SET = 0x177b; // 6011
 /** NodeQueueDoesNotMatch: This node queue does not match. */
-export const NOSANA_JOBS_ERROR__NODE_QUEUE_DOES_NOT_MATCH = 0x177b; // 6011
+export const NOSANA_JOBS_ERROR__NODE_QUEUE_DOES_NOT_MATCH = 0x177c; // 6012
 /** NodeStakeUnauthorized: This node is not authorizing this stake. */
-export const NOSANA_JOBS_ERROR__NODE_STAKE_UNAUTHORIZED = 0x177c; // 6012
+export const NOSANA_JOBS_ERROR__NODE_STAKE_UNAUTHORIZED = 0x177d; // 6013
 /** NodeNotEnoughStake: This node has not staked enough tokens. */
-export const NOSANA_JOBS_ERROR__NODE_NOT_ENOUGH_STAKE = 0x177d; // 6013
+export const NOSANA_JOBS_ERROR__NODE_NOT_ENOUGH_STAKE = 0x177e; // 6014
 /** NodeAlreadyQueued: This node is already present in the queue. */
-export const NOSANA_JOBS_ERROR__NODE_ALREADY_QUEUED = 0x177e; // 6014
+export const NOSANA_JOBS_ERROR__NODE_ALREADY_QUEUED = 0x177f; // 6015
 /** NodeNftWrongMetadata: This metadata does not have the correct address. */
-export const NOSANA_JOBS_ERROR__NODE_NFT_WRONG_METADATA = 0x177f; // 6015
+export const NOSANA_JOBS_ERROR__NODE_NFT_WRONG_METADATA = 0x1780; // 6016
 /** NodeNftWrongOwner: This NFT is not owned by this node. */
-export const NOSANA_JOBS_ERROR__NODE_NFT_WRONG_OWNER = 0x1780; // 6016
+export const NOSANA_JOBS_ERROR__NODE_NFT_WRONG_OWNER = 0x1781; // 6017
 /** NodeNftInvalidAmount: Access NFT amount cannot be 0. */
-export const NOSANA_JOBS_ERROR__NODE_NFT_INVALID_AMOUNT = 0x1781; // 6017
+export const NOSANA_JOBS_ERROR__NODE_NFT_INVALID_AMOUNT = 0x1782; // 6018
 /** NodeKeyInvalidCollection: This access key does not belong to a verified collection. */
-export const NOSANA_JOBS_ERROR__NODE_KEY_INVALID_COLLECTION = 0x1782; // 6018
+export const NOSANA_JOBS_ERROR__NODE_KEY_INVALID_COLLECTION = 0x1783; // 6019
 /** AccessKeyMissing: This market requires an access key NFT. */
-export const NOSANA_JOBS_ERROR__ACCESS_KEY_MISSING = 0x1783; // 6019
+export const NOSANA_JOBS_ERROR__ACCESS_KEY_MISSING = 0x1784; // 6020
 /** AccessNftWrongOwner: This access key NFT is not owned by the signer. */
-export const NOSANA_JOBS_ERROR__ACCESS_NFT_WRONG_OWNER = 0x1784; // 6020
+export const NOSANA_JOBS_ERROR__ACCESS_NFT_WRONG_OWNER = 0x1785; // 6021
 /** AccessNftInvalidAmount: Access key NFT amount cannot be 0. */
-export const NOSANA_JOBS_ERROR__ACCESS_NFT_INVALID_AMOUNT = 0x1785; // 6021
+export const NOSANA_JOBS_ERROR__ACCESS_NFT_INVALID_AMOUNT = 0x1786; // 6022
 /** AccessKeyInvalidCollection: This access key NFT does not belong to the verified collection. */
-export const NOSANA_JOBS_ERROR__ACCESS_KEY_INVALID_COLLECTION = 0x1786; // 6022
+export const NOSANA_JOBS_ERROR__ACCESS_KEY_INVALID_COLLECTION = 0x1787; // 6023
 
 export type NosanaJobsError =
   | typeof NOSANA_JOBS_ERROR__ACCESS_KEY_INVALID_COLLECTION
@@ -76,6 +78,7 @@ export type NosanaJobsError =
   | typeof NOSANA_JOBS_ERROR__JOB_RESULTS_ALREADY_SET
   | typeof NOSANA_JOBS_ERROR__JOB_TIMEOUT_NOT_GREATER
   | typeof NOSANA_JOBS_ERROR__MARKET_IN_WRONG_STATE
+  | typeof NOSANA_JOBS_ERROR__MARKET_SETTINGS_MISSING
   | typeof NOSANA_JOBS_ERROR__NODE_ALREADY_QUEUED
   | typeof NOSANA_JOBS_ERROR__NODE_KEY_INVALID_COLLECTION
   | typeof NOSANA_JOBS_ERROR__NODE_NFT_INVALID_AMOUNT
@@ -103,6 +106,7 @@ if (process.env.NODE_ENV !== "production") {
     [NOSANA_JOBS_ERROR__JOB_RESULTS_ALREADY_SET]: `The job results are already set.`,
     [NOSANA_JOBS_ERROR__JOB_TIMEOUT_NOT_GREATER]: `The new job timeout should be larger than the current one.`,
     [NOSANA_JOBS_ERROR__MARKET_IN_WRONG_STATE]: `This market does not have the right status.`,
+    [NOSANA_JOBS_ERROR__MARKET_SETTINGS_MISSING]: `This market has settings that must be closed with it.`,
     [NOSANA_JOBS_ERROR__NODE_ALREADY_QUEUED]: `This node is already present in the queue.`,
     [NOSANA_JOBS_ERROR__NODE_KEY_INVALID_COLLECTION]: `This access key does not belong to a verified collection.`,
     [NOSANA_JOBS_ERROR__NODE_NFT_INVALID_AMOUNT]: `Access NFT amount cannot be 0.`,

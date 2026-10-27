@@ -26,7 +26,6 @@ import {
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
-  type ReadonlyAccount,
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
@@ -67,7 +66,7 @@ export type CloseSettingsInstruction<
   InstructionWithAccounts<
     [
       TAccountMarket extends string
-        ? ReadonlyAccount<TAccountMarket>
+        ? WritableAccount<TAccountMarket>
         : TAccountMarket,
       TAccountMarketSettings extends string
         ? WritableAccount<TAccountMarketSettings>
@@ -144,7 +143,7 @@ export async function getCloseSettingsInstructionAsync<
 
   // Original accounts.
   const originalAccounts = {
-    market: { value: input.market ?? null, isWritable: false },
+    market: { value: input.market ?? null, isWritable: true },
     marketSettings: { value: input.marketSettings ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: true },
   };
@@ -216,7 +215,7 @@ export function getCloseSettingsInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    market: { value: input.market ?? null, isWritable: false },
+    market: { value: input.market ?? null, isWritable: true },
     marketSettings: { value: input.marketSettings ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: true },
   };

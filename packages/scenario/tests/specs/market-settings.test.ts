@@ -16,10 +16,9 @@ describe.skip('scenario: market settings', () => {
 
   afterEach(async () => {
     const client = await getScenarioClient();
-    if (await client.jobs.marketSettings(marketAddress)) {
-      const closeSettingsIx = await client.jobs.closeMarketSettings({ market: marketAddress });
-      await client.solana.buildSignAndSend(closeSettingsIx);
-    }
+    // closing the market also closes its settings, a test may have closed it already
+    const market = await client.jobs.market(marketAddress).catch(() => null);
+    if (!market) return;
     const closeIx = await client.jobs.closeMarket({ market: marketAddress });
     await client.solana.buildSignAndSend(closeIx);
   });
@@ -65,6 +64,21 @@ describe.skip('scenario: market settings', () => {
     const job = JobsClient.parseListInstruction(openListIx).accounts.job.address;
     const delistIx = await client.jobs.delist({ job });
     await client.solana.buildSignAndSend(delistIx);
+  });
+
+  it('closes the settings together with the market', async () => {
+    const client = await getScenarioClient();
+    const setIx = await client.jobs.setMarketSettings({
+      market: marketAddress,
+      projectAccessKey: client.wallet!.address,
+    });
+    await client.solana.buildSignAndSend(setIx);
+    expect(await client.jobs.marketSettings(marketAddress)).not.toBeNull();
+
+    const closeIx = await client.jobs.closeMarket({ market: marketAddress });
+    await client.solana.buildSignAndSend(closeIx);
+    expect(await client.jobs.marketSettings(marketAddress)).toBeNull();
+    await expect(client.jobs.market(marketAddress)).rejects.toThrow();
   });
 
   it('only lets the market authority set the settings', async () => {

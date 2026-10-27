@@ -72,7 +72,7 @@ export type SetSettingsInstruction<
   InstructionWithAccounts<
     [
       TAccountMarket extends string
-        ? ReadonlyAccount<TAccountMarket>
+        ? WritableAccount<TAccountMarket>
         : TAccountMarket,
       TAccountMarketSettings extends string
         ? WritableAccount<TAccountMarketSettings>
@@ -163,7 +163,7 @@ export async function getSetSettingsInstructionAsync<
 
   // Original accounts.
   const originalAccounts = {
-    market: { value: input.market ?? null, isWritable: false },
+    market: { value: input.market ?? null, isWritable: true },
     marketSettings: { value: input.marketSettings ?? null, isWritable: true },
     projectAccessKey: {
       value: input.projectAccessKey ?? null,
@@ -258,7 +258,7 @@ export function getSetSettingsInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    market: { value: input.market ?? null, isWritable: false },
+    market: { value: input.market ?? null, isWritable: true },
     marketSettings: { value: input.marketSettings ?? null, isWritable: true },
     projectAccessKey: {
       value: input.projectAccessKey ?? null,

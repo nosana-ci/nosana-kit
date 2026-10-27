@@ -215,7 +215,7 @@ export type ListAsyncInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   marketSettings?: Address<TAccountMarketSettings>;
-  /** Only required when the market settings have a project access key */
+  /** Only required when the market is restricted */
   projectNft?: Address<TAccountProjectNft>;
   projectMetadata?: Address<TAccountProjectMetadata>;
   ipfsJob: ListInstructionDataArgs["ipfsJob"];
@@ -410,8 +410,8 @@ export type ListInput<
   rewardsProgram?: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
-  marketSettings: Address<TAccountMarketSettings>;
-  /** Only required when the market settings have a project access key */
+  marketSettings?: Address<TAccountMarketSettings>;
+  /** Only required when the market is restricted */
   projectNft?: Address<TAccountProjectNft>;
   projectMetadata?: Address<TAccountProjectMetadata>;
   ipfsJob: ListInstructionDataArgs["ipfsJob"];
@@ -582,8 +582,8 @@ export type ParsedListInstruction<
     rewardsProgram: TAccountMetas[9];
     tokenProgram: TAccountMetas[10];
     systemProgram: TAccountMetas[11];
-    marketSettings: TAccountMetas[12];
-    /** Only required when the market settings have a project access key */
+    marketSettings?: TAccountMetas[12] | undefined;
+    /** Only required when the market is restricted */
     projectNft?: TAccountMetas[13] | undefined;
     projectMetadata?: TAccountMetas[14] | undefined;
   };
@@ -629,7 +629,7 @@ export function parseListInstruction<
       rewardsProgram: getNextAccount(),
       tokenProgram: getNextAccount(),
       systemProgram: getNextAccount(),
-      marketSettings: getNextAccount(),
+      marketSettings: getNextOptionalAccount(),
       projectNft: getNextOptionalAccount(),
       projectMetadata: getNextOptionalAccount(),
     },

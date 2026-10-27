@@ -82,6 +82,7 @@
         },
         {
           "name": "market_settings",
+          "optional": true,
           "pda": {
             "seeds": [
               {
@@ -107,7 +108,7 @@
         {
           "name": "project_nft",
           "docs": [
-            "Only required when the market settings have a project access key"
+            "Only required when the market is restricted"
           ],
           "optional": true
         },
@@ -203,7 +204,8 @@
     {
       "name": "close",
       "docs": [
-        "Close a [MarketAccount](#market-account) and the associated [VaultAccount](#vault-account)."
+        "Close a [MarketAccount](#market-account), the associated [VaultAccount](#vault-account)",
+        "and the [MarketSettingsAccount](#market-settings-account) when the market has one."
       ],
       "discriminator": [
         98,
@@ -241,6 +243,32 @@
         {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "market_settings",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  116,
+                  116,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
         }
       ],
       "args": []
@@ -248,7 +276,8 @@
     {
       "name": "close_admin",
       "docs": [
-        "Close a [MarketAccount](#market-account) and the associated [VaultAccount](#vault-account)."
+        "Close a [MarketAccount](#market-account), the associated [VaultAccount](#vault-account)",
+        "and the [MarketSettingsAccount](#market-settings-account) when the market has one."
       ],
       "discriminator": [
         202,
@@ -284,6 +313,32 @@
         {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "market_settings",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  116,
+                  116,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
         }
       ],
       "args": []
@@ -305,7 +360,8 @@
       ],
       "accounts": [
         {
-          "name": "market"
+          "name": "market",
+          "writable": true
         },
         {
           "name": "market_settings",
@@ -722,6 +778,7 @@
         },
         {
           "name": "market_settings",
+          "optional": true,
           "pda": {
             "seeds": [
               {
@@ -747,7 +804,7 @@
         {
           "name": "project_nft",
           "docs": [
-            "Only required when the market settings have a project access key"
+            "Only required when the market is restricted"
           ],
           "optional": true
         },
@@ -1005,7 +1062,8 @@
       ],
       "accounts": [
         {
-          "name": "market"
+          "name": "market",
+          "writable": true
         },
         {
           "name": "market_settings",
@@ -1260,101 +1318,106 @@
     },
     {
       "code": 6003,
+      "name": "MarketSettingsMissing",
+      "msg": "This market has settings that must be closed with it."
+    },
+    {
+      "code": 6004,
       "name": "InvalidJobAccount",
       "msg": "This job account is not valid."
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "JobInWrongState",
       "msg": "This job does not have the right status."
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "JobNotExpired",
       "msg": "The job has not yet expired."
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "JobResultNull",
       "msg": "The job result can not be null."
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "JobInvalidProject",
       "msg": "The job has a different project owner."
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "JobTimeoutNotGreater",
       "msg": "The new job timeout should be larger than the current one."
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "JobInvalidRunAccount",
       "msg": "The run account does not match the job."
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "JobResultsAlreadySet",
       "msg": "The job results are already set."
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "NodeQueueDoesNotMatch",
       "msg": "This node queue does not match."
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "NodeStakeUnauthorized",
       "msg": "This node is not authorizing this stake."
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "NodeNotEnoughStake",
       "msg": "This node has not staked enough tokens."
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "NodeAlreadyQueued",
       "msg": "This node is already present in the queue."
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "NodeNftWrongMetadata",
       "msg": "This metadata does not have the correct address."
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "NodeNftWrongOwner",
       "msg": "This NFT is not owned by this node."
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "NodeNftInvalidAmount",
       "msg": "Access NFT amount cannot be 0."
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "NodeKeyInvalidCollection",
       "msg": "This access key does not belong to a verified collection."
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "AccessKeyMissing",
       "msg": "This market requires an access key NFT."
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "AccessNftWrongOwner",
       "msg": "This access key NFT is not owned by the signer."
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "AccessNftInvalidAmount",
       "msg": "Access key NFT amount cannot be 0."
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "AccessKeyInvalidCollection",
       "msg": "This access key NFT does not belong to the verified collection."
     }

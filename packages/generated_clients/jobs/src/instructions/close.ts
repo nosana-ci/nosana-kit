@@ -10,8 +10,10 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
@@ -31,17 +33,22 @@ import {
   type WritableAccount,
 } from "@solana/kit";
 import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
-
 export const CLOSE_INSTRUCTION_ACCOUNTS = {
   market: 0,
   vault: 1,
   user: 2,
   authority: 3,
   tokenProgram: 4,
+  marketSettings: 5,
 } as const;
 
 export type CloseInstructionAccountName = keyof typeof CLOSE_INSTRUCTION_ACCOUNTS;
+import {
+  expectAddress,
+  getAccountMetaFactory,
+  type ResolvedAccount,
+} from "../shared/index.js";
+
 export const CLOSE_DISCRIMINATOR = new Uint8Array([
   98, 165, 201, 177, 108, 65, 206, 96,
 ]);
@@ -58,6 +65,7 @@ export type CloseInstruction<
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountMarketSettings extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -79,6 +87,9 @@ export type CloseInstruction<
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
+      TAccountMarketSettings extends string
+        ? WritableAccount<TAccountMarketSettings>
+        : TAccountMarketSettings,
       ...TRemainingAccounts,
     ]
   >;
@@ -110,43 +121,50 @@ export function getCloseInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type CloseInput<
+export type CloseAsyncInput<
   TAccountMarket extends string = string,
   TAccountVault extends string = string,
   TAccountUser extends string = string,
   TAccountAuthority extends string = string,
   TAccountTokenProgram extends string = string,
+  TAccountMarketSettings extends string = string,
 > = {
   market: Address<TAccountMarket>;
   vault: Address<TAccountVault>;
   user: Address<TAccountUser>;
   authority: TransactionSigner<TAccountAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
+  marketSettings?: Address<TAccountMarketSettings>;
 };
 
-export function getCloseInstruction<
+export async function getCloseInstructionAsync<
   TAccountMarket extends string,
   TAccountVault extends string,
   TAccountUser extends string,
   TAccountAuthority extends string,
   TAccountTokenProgram extends string,
+  TAccountMarketSettings extends string,
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
-  input: CloseInput<
+  input: CloseAsyncInput<
     TAccountMarket,
     TAccountVault,
     TAccountUser,
     TAccountAuthority,
-    TAccountTokenProgram
+    TAccountTokenProgram,
+    TAccountMarketSettings
   >,
   config?: { programAddress?: TProgramAddress },
-): CloseInstruction<
-  TProgramAddress,
-  TAccountMarket,
-  TAccountVault,
-  TAccountUser,
-  TAccountAuthority,
-  TAccountTokenProgram
+): Promise<
+  CloseInstruction<
+    TProgramAddress,
+    TAccountMarket,
+    TAccountVault,
+    TAccountUser,
+    TAccountAuthority,
+    TAccountTokenProgram,
+    TAccountMarketSettings
+  >
 > {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
@@ -158,6 +176,107 @@ export function getCloseInstruction<
     user: { value: input.user ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    marketSettings: { value: input.marketSettings ?? null, isWritable: true },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.marketSettings.value) {
+    accounts.marketSettings.value = await getProgramDerivedAddress({
+      programAddress,
+      seeds: [
+        getBytesEncoder().encode(
+          new Uint8Array([115, 101, 116, 116, 105, 110, 103, 115]),
+        ),
+        getAddressEncoder().encode(expectAddress(accounts.market.value)),
+      ],
+    });
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.market),
+      getAccountMeta(accounts.vault),
+      getAccountMeta(accounts.user),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.marketSettings),
+    ],
+    data: getCloseInstructionDataEncoder().encode({}),
+    programAddress,
+  } as CloseInstruction<
+    TProgramAddress,
+    TAccountMarket,
+    TAccountVault,
+    TAccountUser,
+    TAccountAuthority,
+    TAccountTokenProgram,
+    TAccountMarketSettings
+  >);
+}
+
+export type CloseInput<
+  TAccountMarket extends string = string,
+  TAccountVault extends string = string,
+  TAccountUser extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountMarketSettings extends string = string,
+> = {
+  market: Address<TAccountMarket>;
+  vault: Address<TAccountVault>;
+  user: Address<TAccountUser>;
+  authority: TransactionSigner<TAccountAuthority>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  marketSettings?: Address<TAccountMarketSettings>;
+};
+
+export function getCloseInstruction<
+  TAccountMarket extends string,
+  TAccountVault extends string,
+  TAccountUser extends string,
+  TAccountAuthority extends string,
+  TAccountTokenProgram extends string,
+  TAccountMarketSettings extends string,
+  TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
+>(
+  input: CloseInput<
+    TAccountMarket,
+    TAccountVault,
+    TAccountUser,
+    TAccountAuthority,
+    TAccountTokenProgram,
+    TAccountMarketSettings
+  >,
+  config?: { programAddress?: TProgramAddress },
+): CloseInstruction<
+  TProgramAddress,
+  TAccountMarket,
+  TAccountVault,
+  TAccountUser,
+  TAccountAuthority,
+  TAccountTokenProgram,
+  TAccountMarketSettings
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    market: { value: input.market ?? null, isWritable: true },
+    vault: { value: input.vault ?? null, isWritable: true },
+    user: { value: input.user ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    marketSettings: { value: input.marketSettings ?? null, isWritable: true },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -178,6 +297,7 @@ export function getCloseInstruction<
       getAccountMeta(accounts.user),
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.marketSettings),
     ],
     data: getCloseInstructionDataEncoder().encode({}),
     programAddress,
@@ -187,7 +307,8 @@ export function getCloseInstruction<
     TAccountVault,
     TAccountUser,
     TAccountAuthority,
-    TAccountTokenProgram
+    TAccountTokenProgram,
+    TAccountMarketSettings
   >);
 }
 
@@ -202,6 +323,7 @@ export type ParsedCloseInstruction<
     user: TAccountMetas[2];
     authority: TAccountMetas[3];
     tokenProgram: TAccountMetas[4];
+    marketSettings?: TAccountMetas[5] | undefined;
   };
   data: CloseInstructionData;
 };
@@ -214,7 +336,7 @@ export function parseCloseInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCloseInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 5) {
+  if (instruction.accounts.length < 6) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -224,6 +346,12 @@ export function parseCloseInstruction<
     accountIndex += 1;
     return accountMeta;
   };
+  const getNextOptionalAccount = () => {
+    const accountMeta = getNextAccount();
+    return accountMeta.address === NOSANA_JOBS_PROGRAM_ADDRESS
+      ? undefined
+      : accountMeta;
+  };
   return {
     programAddress: instruction.programAddress,
     accounts: {
@@ -232,6 +360,7 @@ export function parseCloseInstruction<
       user: getNextAccount(),
       authority: getNextAccount(),
       tokenProgram: getNextAccount(),
+      marketSettings: getNextOptionalAccount(),
     },
     data: getCloseInstructionDataDecoder().decode(instruction.data),
   };
