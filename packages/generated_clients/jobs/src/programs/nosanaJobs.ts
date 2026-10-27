@@ -15,11 +15,11 @@ import {
 } from "@solana/kit";
 import {
   type ParsedAssignInstruction,
-  type ParsedClaimInstruction,
   type ParsedCleanAdminInstruction,
   type ParsedCleanInstruction,
   type ParsedCloseAdminInstruction,
   type ParsedCloseInstruction,
+  type ParsedCloseSettingsInstruction,
   type ParsedCompleteInstruction,
   type ParsedDelistInstruction,
   type ParsedEndInstruction,
@@ -30,6 +30,7 @@ import {
   type ParsedQuitAdminInstruction,
   type ParsedQuitInstruction,
   type ParsedRecoverInstruction,
+  type ParsedSetSettingsInstruction,
   type ParsedStopInstruction,
   type ParsedUpdateInstruction,
   type ParsedWorkInstruction,
@@ -39,8 +40,9 @@ export const NOSANA_JOBS_PROGRAM_ADDRESS =
   "nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM" as Address<"nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM">;
 
 export const NosanaJobsAccount = {
-  MarketAccount: "MarketAccount",
   JobAccount: "JobAccount",
+  MarketAccount: "MarketAccount",
+  MarketSettingsAccount: "MarketSettingsAccount",
   RunAccount: "RunAccount",
 } as const;
 export type NosanaJobsAccount = (typeof NosanaJobsAccount)[keyof typeof NosanaJobsAccount];
@@ -49,6 +51,17 @@ export function identifyNosanaJobsAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
 ): NosanaJobsAccount {
   const data = "data" in account ? account.data : account;
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([91, 16, 162, 5, 45, 210, 125, 65]),
+      ),
+      0,
+    )
+  ) {
+    return NosanaJobsAccount.JobAccount;
+  }
   if (
     containsBytes(
       data,
@@ -64,12 +77,12 @@ export function identifyNosanaJobsAccount(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([91, 16, 162, 5, 45, 210, 125, 65]),
+        new Uint8Array([93, 239, 237, 124, 189, 185, 255, 195]),
       ),
       0,
     )
   ) {
-    return NosanaJobsAccount.JobAccount;
+    return NosanaJobsAccount.MarketSettingsAccount;
   }
   if (
     containsBytes(
@@ -88,25 +101,26 @@ export function identifyNosanaJobsAccount(
 }
 
 export const NosanaJobsInstruction = {
-  Open: "Open",
-  Update: "Update",
-  Close: "Close",
-  CloseAdmin: "CloseAdmin",
   Assign: "Assign",
-  List: "List",
-  Delist: "Delist",
-  Recover: "Recover",
-  Extend: "Extend",
-  End: "End",
-  Work: "Work",
-  Stop: "Stop",
-  Claim: "Claim",
-  Complete: "Complete",
-  Finish: "Finish",
-  Quit: "Quit",
-  QuitAdmin: "QuitAdmin",
   Clean: "Clean",
   CleanAdmin: "CleanAdmin",
+  Close: "Close",
+  CloseAdmin: "CloseAdmin",
+  CloseSettings: "CloseSettings",
+  Complete: "Complete",
+  Delist: "Delist",
+  End: "End",
+  Extend: "Extend",
+  Finish: "Finish",
+  List: "List",
+  Open: "Open",
+  Quit: "Quit",
+  QuitAdmin: "QuitAdmin",
+  Recover: "Recover",
+  SetSettings: "SetSettings",
+  Stop: "Stop",
+  Update: "Update",
+  Work: "Work",
 } as const;
 export type NosanaJobsInstruction = (typeof NosanaJobsInstruction)[keyof typeof NosanaJobsInstruction];
 
@@ -118,23 +132,34 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([228, 220, 155, 71, 199, 189, 60, 45]),
+        new Uint8Array([73, 66, 125, 203, 81, 41, 64, 135]),
       ),
       0,
     )
   ) {
-    return NosanaJobsInstruction.Open;
+    return NosanaJobsInstruction.Assign;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([219, 200, 88, 176, 158, 63, 253, 127]),
+        new Uint8Array([250, 191, 56, 128, 150, 251, 1, 103]),
       ),
       0,
     )
   ) {
-    return NosanaJobsInstruction.Update;
+    return NosanaJobsInstruction.Clean;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([245, 90, 188, 68, 253, 235, 171, 105]),
+      ),
+      0,
+    )
+  ) {
+    return NosanaJobsInstruction.CleanAdmin;
   }
   if (
     containsBytes(
@@ -162,100 +187,12 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([73, 66, 125, 203, 81, 41, 64, 135]),
+        new Uint8Array([228, 148, 106, 225, 101, 49, 44, 129]),
       ),
       0,
     )
   ) {
-    return NosanaJobsInstruction.Assign;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([54, 174, 193, 67, 17, 41, 132, 38]),
-      ),
-      0,
-    )
-  ) {
-    return NosanaJobsInstruction.List;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([55, 136, 205, 107, 107, 173, 4, 31]),
-      ),
-      0,
-    )
-  ) {
-    return NosanaJobsInstruction.Delist;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([108, 216, 38, 58, 109, 146, 116, 17]),
-      ),
-      0,
-    )
-  ) {
-    return NosanaJobsInstruction.Recover;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([228, 127, 0, 1, 227, 154, 54, 168]),
-      ),
-      0,
-    )
-  ) {
-    return NosanaJobsInstruction.Extend;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([180, 160, 249, 217, 194, 121, 70, 16]),
-      ),
-      0,
-    )
-  ) {
-    return NosanaJobsInstruction.End;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([15, 67, 45, 195, 215, 137, 229, 47]),
-      ),
-      0,
-    )
-  ) {
-    return NosanaJobsInstruction.Work;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([42, 133, 32, 60, 171, 253, 184, 155]),
-      ),
-      0,
-    )
-  ) {
-    return NosanaJobsInstruction.Stop;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([62, 198, 214, 193, 213, 159, 108, 210]),
-      ),
-      0,
-    )
-  ) {
-    return NosanaJobsInstruction.Claim;
+    return NosanaJobsInstruction.CloseSettings;
   }
   if (
     containsBytes(
@@ -272,12 +209,67 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([55, 136, 205, 107, 107, 173, 4, 31]),
+      ),
+      0,
+    )
+  ) {
+    return NosanaJobsInstruction.Delist;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([180, 160, 249, 217, 194, 121, 70, 16]),
+      ),
+      0,
+    )
+  ) {
+    return NosanaJobsInstruction.End;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([228, 127, 0, 1, 227, 154, 54, 168]),
+      ),
+      0,
+    )
+  ) {
+    return NosanaJobsInstruction.Extend;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
         new Uint8Array([67, 74, 170, 132, 125, 233, 182, 37]),
       ),
       0,
     )
   ) {
     return NosanaJobsInstruction.Finish;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([54, 174, 193, 67, 17, 41, 132, 38]),
+      ),
+      0,
+    )
+  ) {
+    return NosanaJobsInstruction.List;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([228, 220, 155, 71, 199, 189, 60, 45]),
+      ),
+      0,
+    )
+  ) {
+    return NosanaJobsInstruction.Open;
   }
   if (
     containsBytes(
@@ -305,23 +297,56 @@ export function identifyNosanaJobsInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([250, 191, 56, 128, 150, 251, 1, 103]),
+        new Uint8Array([108, 216, 38, 58, 109, 146, 116, 17]),
       ),
       0,
     )
   ) {
-    return NosanaJobsInstruction.Clean;
+    return NosanaJobsInstruction.Recover;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([245, 90, 188, 68, 253, 235, 171, 105]),
+        new Uint8Array([123, 181, 85, 122, 226, 162, 130, 249]),
       ),
       0,
     )
   ) {
-    return NosanaJobsInstruction.CleanAdmin;
+    return NosanaJobsInstruction.SetSettings;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([42, 133, 32, 60, 171, 253, 184, 155]),
+      ),
+      0,
+    )
+  ) {
+    return NosanaJobsInstruction.Stop;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([219, 200, 88, 176, 158, 63, 253, 127]),
+      ),
+      0,
+    )
+  ) {
+    return NosanaJobsInstruction.Update;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([15, 67, 45, 195, 215, 137, 229, 47]),
+      ),
+      0,
+    )
+  ) {
+    return NosanaJobsInstruction.Work;
   }
   throw new Error(
     "The provided instruction could not be identified as a nosanaJobs instruction.",
@@ -332,11 +357,14 @@ export type ParsedNosanaJobsInstruction<
   TProgram extends string = "nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM",
 > =
   | ({
-      instructionType: typeof NosanaJobsInstruction.Open;
-    } & ParsedOpenInstruction<TProgram>)
+      instructionType: typeof NosanaJobsInstruction.Assign;
+    } & ParsedAssignInstruction<TProgram>)
   | ({
-      instructionType: typeof NosanaJobsInstruction.Update;
-    } & ParsedUpdateInstruction<TProgram>)
+      instructionType: typeof NosanaJobsInstruction.Clean;
+    } & ParsedCleanInstruction<TProgram>)
+  | ({
+      instructionType: typeof NosanaJobsInstruction.CleanAdmin;
+    } & ParsedCleanAdminInstruction<TProgram>)
   | ({
       instructionType: typeof NosanaJobsInstruction.Close;
     } & ParsedCloseInstruction<TProgram>)
@@ -344,38 +372,29 @@ export type ParsedNosanaJobsInstruction<
       instructionType: typeof NosanaJobsInstruction.CloseAdmin;
     } & ParsedCloseAdminInstruction<TProgram>)
   | ({
-      instructionType: typeof NosanaJobsInstruction.Assign;
-    } & ParsedAssignInstruction<TProgram>)
-  | ({
-      instructionType: typeof NosanaJobsInstruction.List;
-    } & ParsedListInstruction<TProgram>)
-  | ({
-      instructionType: typeof NosanaJobsInstruction.Delist;
-    } & ParsedDelistInstruction<TProgram>)
-  | ({
-      instructionType: typeof NosanaJobsInstruction.Recover;
-    } & ParsedRecoverInstruction<TProgram>)
-  | ({
-      instructionType: typeof NosanaJobsInstruction.Extend;
-    } & ParsedExtendInstruction<TProgram>)
-  | ({
-      instructionType: typeof NosanaJobsInstruction.End;
-    } & ParsedEndInstruction<TProgram>)
-  | ({
-      instructionType: typeof NosanaJobsInstruction.Work;
-    } & ParsedWorkInstruction<TProgram>)
-  | ({
-      instructionType: typeof NosanaJobsInstruction.Stop;
-    } & ParsedStopInstruction<TProgram>)
-  | ({
-      instructionType: typeof NosanaJobsInstruction.Claim;
-    } & ParsedClaimInstruction<TProgram>)
+      instructionType: typeof NosanaJobsInstruction.CloseSettings;
+    } & ParsedCloseSettingsInstruction<TProgram>)
   | ({
       instructionType: typeof NosanaJobsInstruction.Complete;
     } & ParsedCompleteInstruction<TProgram>)
   | ({
+      instructionType: typeof NosanaJobsInstruction.Delist;
+    } & ParsedDelistInstruction<TProgram>)
+  | ({
+      instructionType: typeof NosanaJobsInstruction.End;
+    } & ParsedEndInstruction<TProgram>)
+  | ({
+      instructionType: typeof NosanaJobsInstruction.Extend;
+    } & ParsedExtendInstruction<TProgram>)
+  | ({
       instructionType: typeof NosanaJobsInstruction.Finish;
     } & ParsedFinishInstruction<TProgram>)
+  | ({
+      instructionType: typeof NosanaJobsInstruction.List;
+    } & ParsedListInstruction<TProgram>)
+  | ({
+      instructionType: typeof NosanaJobsInstruction.Open;
+    } & ParsedOpenInstruction<TProgram>)
   | ({
       instructionType: typeof NosanaJobsInstruction.Quit;
     } & ParsedQuitInstruction<TProgram>)
@@ -383,8 +402,17 @@ export type ParsedNosanaJobsInstruction<
       instructionType: typeof NosanaJobsInstruction.QuitAdmin;
     } & ParsedQuitAdminInstruction<TProgram>)
   | ({
-      instructionType: typeof NosanaJobsInstruction.Clean;
-    } & ParsedCleanInstruction<TProgram>)
+      instructionType: typeof NosanaJobsInstruction.Recover;
+    } & ParsedRecoverInstruction<TProgram>)
   | ({
-      instructionType: typeof NosanaJobsInstruction.CleanAdmin;
-    } & ParsedCleanAdminInstruction<TProgram>);
+      instructionType: typeof NosanaJobsInstruction.SetSettings;
+    } & ParsedSetSettingsInstruction<TProgram>)
+  | ({
+      instructionType: typeof NosanaJobsInstruction.Stop;
+    } & ParsedStopInstruction<TProgram>)
+  | ({
+      instructionType: typeof NosanaJobsInstruction.Update;
+    } & ParsedUpdateInstruction<TProgram>)
+  | ({
+      instructionType: typeof NosanaJobsInstruction.Work;
+    } & ParsedWorkInstruction<TProgram>);

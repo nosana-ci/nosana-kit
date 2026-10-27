@@ -20,7 +20,7 @@ function addr(seed: number) {
 
 // Build a real, decodable list instruction whose `job` account is `jobAddr`.
 function makeListInstruction(jobAddr: ReturnType<typeof addr>): Instruction {
-  const accounts = Array.from({ length: 12 }, (_, i) => ({
+  const accounts = Array.from({ length: 15 }, (_, i) => ({
     address: i === 0 ? jobAddr : addr(200 + i),
     role: AccountRole.READONLY,
   }));

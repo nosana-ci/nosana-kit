@@ -34,7 +34,13 @@ export {
 /**
  * @group @nosana/kit
  */
-export type { JobsProgram, Job, Market, Run } from './services/programs/jobs/index.js';
+export type {
+  JobsProgram,
+  Job,
+  Market,
+  MarketSettings,
+  Run,
+} from './services/programs/jobs/index.js';
 
 /**
  * @group @nosana/kit
@@ -91,6 +97,24 @@ export type {
   CloseParams,
   CloseInstruction,
 } from './services/programs/jobs/instructions/close.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
+  SetMarketSettings,
+  SetMarketSettingsParams,
+  SetMarketSettingsInstruction,
+} from './services/programs/jobs/instructions/setSettings.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
+  CloseMarketSettings,
+  CloseMarketSettingsParams,
+  CloseMarketSettingsInstruction,
+} from './services/programs/jobs/instructions/closeSettings.js';
 
 /**
  * @group @nosana/kit

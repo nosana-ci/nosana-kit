@@ -51,7 +51,8 @@ export type QuitAdminInstruction<
   TProgram extends string = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
   TAccountRun extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
-  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> =
+    "XXXxddiNnmoD2h2LbQYaL76Swi21MaQbtBbRynAdQL8",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -103,7 +104,7 @@ export type QuitAdminInput<
 > = {
   run: Address<TAccountRun>;
   payer: Address<TAccountPayer>;
-  authority: TransactionSigner<TAccountAuthority>;
+  authority?: TransactionSigner<TAccountAuthority>;
 };
 
 export function getQuitAdminInstruction<
@@ -133,6 +134,12 @@ export function getQuitAdminInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.authority.value) {
+    accounts.authority.value =
+      "XXXxddiNnmoD2h2LbQYaL76Swi21MaQbtBbRynAdQL8" as Address<"XXXxddiNnmoD2h2LbQYaL76Swi21MaQbtBbRynAdQL8">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

@@ -1,690 +1,400 @@
 {
-  "version": "2.2.1",
-  "name": "nosana_jobs",
+  "address": "nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM",
   "metadata": {
-    "address": "nosJhNRqr2bc9g1nfGDcXXTXvYUmxD4cVwy2pMWhrYM"
+    "name": "nosana_jobs",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Nosana Jobs for decentralized computation."
   },
   "instructions": [
     {
-      "name": "open",
+      "name": "assign",
       "docs": [
-        "Initialize a [MarketAccount](#market-account) and [VaultAccount](#vault-account)."
+        "Create a [JobAccount](#job-account) and optional [RunAccount](#run-account) with node assigned."
+      ],
+      "discriminator": [
+        73,
+        66,
+        125,
+        203,
+        81,
+        41,
+        64,
+        135
       ],
       "accounts": [
         {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
+          "name": "job",
+          "writable": true,
+          "signer": true
         },
         {
           "name": "market",
-          "isMut": true,
-          "isSigner": true
+          "writable": true
+        },
+        {
+          "name": "run",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "node"
+        },
+        {
+          "name": "user",
+          "writable": true
         },
         {
           "name": "vault",
-          "isMut": true,
-          "isSigner": false
+          "writable": true,
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "rewards_reflection",
+          "writable": true
+        },
+        {
+          "name": "rewards_vault",
+          "writable": true
         },
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "signer": true
         },
         {
-          "name": "accessKey",
-          "isMut": false,
-          "isSigner": false
+          "name": "rewards_program",
+          "address": "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp"
         },
         {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
+          "name": "market_settings",
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  116,
+                  116,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "project_nft",
+          "docs": [
+            "Only required when the market is restricted"
+          ],
+          "optional": true
+        },
+        {
+          "name": "project_metadata",
+          "optional": true
         }
       ],
       "args": [
         {
-          "name": "jobExpiration",
+          "name": "ipfs_job",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "timeout",
           "type": "i64"
-        },
-        {
-          "name": "jobPrice",
-          "type": "u64"
-        },
-        {
-          "name": "jobTimeout",
-          "type": "i64"
-        },
-        {
-          "name": "jobType",
-          "type": "u8"
-        },
-        {
-          "name": "nodeXnosMinimum",
-          "type": "u128"
         }
       ]
     },
     {
-      "name": "update",
+      "name": "clean",
       "docs": [
-        "Update a [MarketAccount](#market-account)'s configurations."
+        "Close an [JobAccount](#job-account)."
+      ],
+      "discriminator": [
+        250,
+        191,
+        56,
+        128,
+        150,
+        251,
+        1,
+        103
       ],
       "accounts": [
         {
-          "name": "market",
-          "isMut": true,
-          "isSigner": false
+          "name": "job",
+          "writable": true
         },
         {
-          "name": "accessKey",
-          "isMut": false,
-          "isSigner": false
+          "name": "market"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "relations": [
+            "job"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "clean_admin",
+      "docs": [
+        "Close an [JobAccount](#job-account) as an admin."
+      ],
+      "discriminator": [
+        245,
+        90,
+        188,
+        68,
+        253,
+        235,
+        171,
+        105
+      ],
+      "accounts": [
+        {
+          "name": "job",
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "relations": [
+            "job"
+          ]
         },
         {
           "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          "signer": true,
+          "address": "XXXxddiNnmoD2h2LbQYaL76Swi21MaQbtBbRynAdQL8"
         }
       ],
-      "args": [
-        {
-          "name": "jobExpiration",
-          "type": "i64"
-        },
-        {
-          "name": "jobPrice",
-          "type": "u64"
-        },
-        {
-          "name": "jobType",
-          "type": "u8"
-        },
-        {
-          "name": "nodeStakeMinimum",
-          "type": "u128"
-        },
-        {
-          "name": "jobTimeout",
-          "type": "i64"
-        }
-      ]
+      "args": []
     },
     {
       "name": "close",
       "docs": [
-        "Close a [MarketAccount](#market-account) and the associated [VaultAccount](#vault-account)."
+        "Close a [MarketAccount](#market-account), the associated [VaultAccount](#vault-account)",
+        "and the [MarketSettingsAccount](#market-settings-account) when the market has one."
+      ],
+      "discriminator": [
+        98,
+        165,
+        201,
+        177,
+        108,
+        65,
+        206,
+        96
       ],
       "accounts": [
         {
           "name": "market",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
           "name": "vault",
-          "isMut": true,
-          "isSigner": false
+          "writable": true,
+          "relations": [
+            "market"
+          ]
         },
         {
           "name": "user",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
           "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          "signer": true,
+          "relations": [
+            "market"
+          ]
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "market_settings",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  116,
+                  116,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
         }
       ],
       "args": []
     },
     {
-      "name": "closeAdmin",
+      "name": "close_admin",
       "docs": [
-        "Close a [MarketAccount](#market-account) and the associated [VaultAccount](#vault-account)."
+        "Close a [MarketAccount](#market-account), the associated [VaultAccount](#vault-account)",
+        "and the [MarketSettingsAccount](#market-settings-account) when the market has one."
+      ],
+      "discriminator": [
+        202,
+        182,
+        185,
+        142,
+        208,
+        161,
+        145,
+        189
       ],
       "accounts": [
         {
           "name": "market",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
           "name": "vault",
-          "isMut": true,
-          "isSigner": false
+          "writable": true,
+          "relations": [
+            "market"
+          ]
         },
         {
           "name": "user",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
           "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          "signer": true,
+          "address": "XXXxddiNnmoD2h2LbQYaL76Swi21MaQbtBbRynAdQL8"
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "market_settings",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  116,
+                  116,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
         }
       ],
       "args": []
     },
     {
-      "name": "assign",
+      "name": "close_settings",
+      "docs": [
+        "Close the [MarketSettingsAccount](#market-settings-account) of a market."
+      ],
+      "discriminator": [
+        228,
+        148,
+        106,
+        225,
+        101,
+        49,
+        44,
+        129
+      ],
       "accounts": [
         {
-          "name": "job",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "market",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
-          "name": "run",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "node",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "rewardsReflection",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rewardsVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "rewardsProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "ipfsJob",
-          "type": {
-            "array": [
-              "u8",
-              32
+          "name": "market_settings",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  116,
+                  116,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
             ]
           }
         },
         {
-          "name": "timeout",
-          "type": "i64"
-        }
-      ]
-    },
-    {
-      "name": "list",
-      "docs": [
-        "Create a [JobAccount](#job-account) and optional [RunAccount](#run-account)."
-      ],
-      "accounts": [
-        {
-          "name": "job",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "run",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "rewardsReflection",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rewardsVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "rewardsProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "ipfsJob",
-          "type": {
-            "array": [
-              "u8",
-              32
-            ]
-          }
-        },
-        {
-          "name": "timeout",
-          "type": "i64"
-        }
-      ]
-    },
-    {
-      "name": "delist",
-      "docs": [
-        "Remove a [JobAccount](#job-account) from market job queue."
-      ],
-      "accounts": [
-        {
-          "name": "job",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "market",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "deposit",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "recover",
-      "docs": [
-        "Recover funds from a [JobAccount](#job-account) that has been [quit](#quit)."
-      ],
-      "accounts": [
-        {
-          "name": "job",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "extend",
-      "docs": [
-        "Extend a job timeout"
-      ],
-      "accounts": [
-        {
-          "name": "job",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rewardsReflection",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rewardsVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "rewardsProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "timeout",
-          "type": "i64"
-        }
-      ]
-    },
-    {
-      "name": "end",
-      "docs": [
-        "End a running [JobAccount](#job-account) and close [RunAccount](#run-account)."
-      ],
-      "accounts": [
-        {
-          "name": "job",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "run",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "deposit",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "work",
-      "docs": [
-        "Enters the [MarketAccount](#market-account) queue, or create  a [RunAccount](#run-account)."
-      ],
-      "accounts": [
-        {
-          "name": "run",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "stake",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "nft",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadata",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "stop",
-      "docs": [
-        "Exit the node queue from [MarketAccount](#market-account)."
-      ],
-      "accounts": [
-        {
-          "name": "market",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "node",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "claim",
-      "docs": [
-        "Claim a job that is [stopped](#stop)."
-      ],
-      "accounts": [
-        {
-          "name": "job",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "run",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "stake",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "nft",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadata",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "market"
+          ]
         }
       ],
       "args": []
@@ -694,21 +404,29 @@
       "docs": [
         "Complete a job that has been [stopped](#stop)."
       ],
+      "discriminator": [
+        0,
+        77,
+        224,
+        147,
+        136,
+        25,
+        88,
+        76
+      ],
       "accounts": [
         {
           "name": "job",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
           "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          "signer": true
         }
       ],
       "args": [
         {
-          "name": "ipfsResult",
+          "name": "ipfs_result",
           "type": {
             "array": [
               "u8",
@@ -719,71 +437,480 @@
       ]
     },
     {
-      "name": "finish",
+      "name": "delist",
       "docs": [
-        "Post the result for a  [JobAccount](#job-account) to finish it and get paid."
+        "Remove a [JobAccount](#job-account) from the market job queue."
+      ],
+      "discriminator": [
+        55,
+        136,
+        205,
+        107,
+        107,
+        173,
+        4,
+        31
       ],
       "accounts": [
         {
           "name": "job",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "run",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
           "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
+          "writable": true,
+          "relations": [
+            "job"
+          ]
         },
         {
           "name": "deposit",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
-          "name": "user",
-          "isMut": true,
-          "isSigner": false
+          "name": "payer",
+          "writable": true,
+          "relations": [
+            "job"
+          ]
         },
         {
-          "name": "payerRun",
-          "isMut": true,
-          "isSigner": false
+          "name": "vault",
+          "writable": true,
+          "relations": [
+            "market"
+          ]
         },
         {
-          "name": "payerJob",
-          "isMut": true,
-          "isSigner": false
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
           "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "end",
+      "docs": [
+        "End a running [JobAccount](#job-account) and close [RunAccount](#run-account)."
+      ],
+      "discriminator": [
+        180,
+        160,
+        249,
+        217,
+        194,
+        121,
+        70,
+        16
+      ],
+      "accounts": [
+        {
+          "name": "job",
+          "writable": true,
+          "relations": [
+            "run"
+          ]
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
+          "name": "market",
+          "relations": [
+            "job"
+          ]
+        },
+        {
+          "name": "run",
+          "writable": true
+        },
+        {
+          "name": "deposit",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "relations": [
+            "run"
+          ]
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "extend",
+      "docs": [
+        "Extend a job timeout"
+      ],
+      "discriminator": [
+        228,
+        127,
+        0,
+        1,
+        227,
+        154,
+        54,
+        168
+      ],
+      "accounts": [
+        {
+          "name": "job",
+          "writable": true
+        },
+        {
+          "name": "market",
+          "relations": [
+            "job"
+          ]
+        },
+        {
+          "name": "user",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "rewards_reflection",
+          "writable": true
+        },
+        {
+          "name": "rewards_vault",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "rewards_program",
+          "address": "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
       ],
       "args": [
         {
-          "name": "ipfsResult",
+          "name": "timeout",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "finish",
+      "docs": [
+        "Post the result for a [JobAccount](#job-account) to finish it and get paid."
+      ],
+      "discriminator": [
+        67,
+        74,
+        170,
+        132,
+        125,
+        233,
+        182,
+        37
+      ],
+      "accounts": [
+        {
+          "name": "job",
+          "writable": true,
+          "relations": [
+            "run"
+          ]
+        },
+        {
+          "name": "run",
+          "writable": true
+        },
+        {
+          "name": "market",
+          "relations": [
+            "job"
+          ]
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "deposit",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "writable": true
+        },
+        {
+          "name": "payer_run",
+          "writable": true
+        },
+        {
+          "name": "payer_job",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "ipfs_result",
           "type": {
             "array": [
               "u8",
               32
             ]
           }
+        }
+      ]
+    },
+    {
+      "name": "list",
+      "docs": [
+        "Create a [JobAccount](#job-account) and optional [RunAccount](#run-account)."
+      ],
+      "discriminator": [
+        54,
+        174,
+        193,
+        67,
+        17,
+        41,
+        132,
+        38
+      ],
+      "accounts": [
+        {
+          "name": "job",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "run",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "rewards_reflection",
+          "writable": true
+        },
+        {
+          "name": "rewards_vault",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "rewards_program",
+          "address": "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "market_settings",
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  116,
+                  116,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "project_nft",
+          "docs": [
+            "Only required when the market is restricted"
+          ],
+          "optional": true
+        },
+        {
+          "name": "project_metadata",
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "ipfs_job",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "timeout",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "open",
+      "docs": [
+        "Initialize a [MarketAccount](#market-account) and [VaultAccount](#vault-account)."
+      ],
+      "discriminator": [
+        228,
+        220,
+        155,
+        71,
+        199,
+        189,
+        60,
+        45
+      ],
+      "accounts": [
+        {
+          "name": "mint",
+          "address": "devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP"
+        },
+        {
+          "name": "market",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "market"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "access_key"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "job_expiration",
+          "type": "i64"
+        },
+        {
+          "name": "job_price",
+          "type": "u64"
+        },
+        {
+          "name": "job_timeout",
+          "type": "i64"
+        },
+        {
+          "name": "job_type",
+          "type": "u8"
+        },
+        {
+          "name": "node_xnos_minimum",
+          "type": "u128"
         }
       ]
     },
@@ -792,98 +919,328 @@
       "docs": [
         "Quit a [JobAccount](#job-account) that you have started."
       ],
+      "discriminator": [
+        191,
+        103,
+        141,
+        240,
+        80,
+        129,
+        103,
+        153
+      ],
       "accounts": [
         {
           "name": "job",
-          "isMut": true,
-          "isSigner": false
+          "writable": true,
+          "relations": [
+            "run"
+          ]
         },
         {
           "name": "run",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
           "name": "payer",
-          "isMut": true,
-          "isSigner": false
+          "writable": true,
+          "relations": [
+            "run"
+          ]
         },
         {
           "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          "signer": true
         }
       ],
       "args": []
     },
     {
-      "name": "quitAdmin",
+      "name": "quit_admin",
       "docs": [
         "Quit a [JobAccount](#job-account) that you have started."
       ],
+      "discriminator": [
+        103,
+        238,
+        110,
+        8,
+        182,
+        20,
+        56,
+        196
+      ],
       "accounts": [
         {
           "name": "run",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
           "name": "payer",
-          "isMut": true,
-          "isSigner": false
+          "writable": true,
+          "relations": [
+            "run"
+          ]
         },
         {
           "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          "signer": true,
+          "address": "XXXxddiNnmoD2h2LbQYaL76Swi21MaQbtBbRynAdQL8"
         }
       ],
       "args": []
     },
     {
-      "name": "clean",
+      "name": "recover",
       "docs": [
-        "Close an [JobAccount](#job-account)."
+        "Recover funds from a [JobAccount](#job-account) that has been [quit](#quit)."
+      ],
+      "discriminator": [
+        108,
+        216,
+        38,
+        58,
+        109,
+        146,
+        116,
+        17
       ],
       "accounts": [
         {
           "name": "job",
-          "isMut": true,
-          "isSigner": false
+          "writable": true
         },
         {
           "name": "market",
-          "isMut": false,
-          "isSigner": false
+          "relations": [
+            "job"
+          ]
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "user",
+          "writable": true
         },
         {
           "name": "payer",
-          "isMut": true,
-          "isSigner": false
+          "writable": true,
+          "relations": [
+            "job"
+          ]
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
       ],
       "args": []
     },
     {
-      "name": "cleanAdmin",
+      "name": "set_settings",
       "docs": [
-        "Close an [JobAccount](#job-account) as an admin."
+        "Create or update the [MarketSettingsAccount](#market-settings-account) of a market."
+      ],
+      "discriminator": [
+        123,
+        181,
+        85,
+        122,
+        226,
+        162,
+        130,
+        249
       ],
       "accounts": [
         {
-          "name": "job",
-          "isMut": true,
-          "isSigner": false
+          "name": "market",
+          "writable": true
         },
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": false
+          "name": "market_settings",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  116,
+                  116,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "project_access_key"
         },
         {
           "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "stop",
+      "docs": [
+        "Exit the node queue from [MarketAccount](#market-account)."
+      ],
+      "discriminator": [
+        42,
+        133,
+        32,
+        60,
+        171,
+        253,
+        184,
+        155
+      ],
+      "accounts": [
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "node"
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update",
+      "docs": [
+        "Update a [MarketAccount](#market-account)'s configurations."
+      ],
+      "discriminator": [
+        219,
+        200,
+        88,
+        176,
+        158,
+        63,
+        253,
+        127
+      ],
+      "accounts": [
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "access_key"
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "market"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "job_expiration",
+          "type": "i64"
+        },
+        {
+          "name": "job_price",
+          "type": "u64"
+        },
+        {
+          "name": "job_type",
+          "type": "u8"
+        },
+        {
+          "name": "node_stake_minimum",
+          "type": "u128"
+        },
+        {
+          "name": "job_timeout",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "work",
+      "docs": [
+        "Enters the [MarketAccount](#market-account) queue, or create a [RunAccount](#run-account)."
+      ],
+      "discriminator": [
+        15,
+        67,
+        45,
+        195,
+        215,
+        137,
+        229,
+        47
+      ],
+      "accounts": [
+        {
+          "name": "run",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake"
+        },
+        {
+          "name": "nft"
+        },
+        {
+          "name": "metadata"
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "stake"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": []
@@ -891,228 +1248,56 @@
   ],
   "accounts": [
     {
-      "name": "marketAccount",
-      "docs": [
-        "The `MarketAccount` struct holds all the information about jobs and the nodes queue."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "publicKey"
-          },
-          {
-            "name": "jobExpiration",
-            "type": "i64"
-          },
-          {
-            "name": "jobPrice",
-            "type": "u64"
-          },
-          {
-            "name": "jobTimeout",
-            "type": "i64"
-          },
-          {
-            "name": "jobType",
-            "type": "u8"
-          },
-          {
-            "name": "vault",
-            "type": "publicKey"
-          },
-          {
-            "name": "vaultBump",
-            "type": "u8"
-          },
-          {
-            "name": "nodeAccessKey",
-            "type": "publicKey"
-          },
-          {
-            "name": "nodeXnosMinimum",
-            "type": "u128"
-          },
-          {
-            "name": "queueType",
-            "type": "u8"
-          },
-          {
-            "name": "queue",
-            "type": {
-              "vec": "publicKey"
-            }
-          }
-        ]
-      }
+      "name": "JobAccount",
+      "discriminator": [
+        91,
+        16,
+        162,
+        5,
+        45,
+        210,
+        125,
+        65
+      ]
     },
     {
-      "name": "jobAccount",
-      "docs": [
-        "The `JobAccount` struct holds all the information about any individual jobs."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "ipfsJob",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "ipfsResult",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "market",
-            "type": "publicKey"
-          },
-          {
-            "name": "node",
-            "type": "publicKey"
-          },
-          {
-            "name": "payer",
-            "type": "publicKey"
-          },
-          {
-            "name": "price",
-            "type": "u64"
-          },
-          {
-            "name": "project",
-            "type": "publicKey"
-          },
-          {
-            "name": "state",
-            "type": "u8"
-          },
-          {
-            "name": "timeEnd",
-            "type": "i64"
-          },
-          {
-            "name": "timeStart",
-            "type": "i64"
-          },
-          {
-            "name": "timeout",
-            "type": "i64"
-          }
-        ]
-      }
+      "name": "MarketAccount",
+      "discriminator": [
+        201,
+        78,
+        187,
+        225,
+        240,
+        198,
+        201,
+        251
+      ]
     },
     {
-      "name": "runAccount",
-      "docs": [
-        "The `RunAccount` struct holds temporary information that matches nodes to jobs."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "job",
-            "type": "publicKey"
-          },
-          {
-            "name": "node",
-            "type": "publicKey"
-          },
-          {
-            "name": "payer",
-            "type": "publicKey"
-          },
-          {
-            "name": "state",
-            "type": "u8"
-          },
-          {
-            "name": "time",
-            "type": "i64"
-          }
-        ]
-      }
-    }
-  ],
-  "types": [
-    {
-      "name": "QueueType",
-      "docs": [
-        "The `QueueType` describes the type of queue"
-      ],
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Job"
-          },
-          {
-            "name": "Node"
-          },
-          {
-            "name": "Empty"
-          }
-        ]
-      }
+      "name": "MarketSettingsAccount",
+      "discriminator": [
+        93,
+        239,
+        237,
+        124,
+        189,
+        185,
+        255,
+        195
+      ]
     },
     {
-      "name": "JobState",
-      "docs": [
-        "The `JobState` describes the status of a job."
-      ],
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Queued"
-          },
-          {
-            "name": "Done"
-          },
-          {
-            "name": "Stopped"
-          }
-        ]
-      }
-    },
-    {
-      "name": "JobType",
-      "docs": [
-        "The `JobType` describes the type of any job."
-      ],
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Default"
-          },
-          {
-            "name": "Small"
-          },
-          {
-            "name": "Medium"
-          },
-          {
-            "name": "Large"
-          },
-          {
-            "name": "Gpu"
-          },
-          {
-            "name": "Unknown"
-          }
-        ]
-      }
+      "name": "RunAccount",
+      "discriminator": [
+        194,
+        169,
+        110,
+        230,
+        235,
+        11,
+        225,
+        22
+      ]
     }
   ],
   "errors": [
@@ -1133,83 +1318,349 @@
     },
     {
       "code": 6003,
+      "name": "MarketSettingsMissing",
+      "msg": "This market has settings that must be closed with it."
+    },
+    {
+      "code": 6004,
       "name": "InvalidJobAccount",
       "msg": "This job account is not valid."
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "JobInWrongState",
       "msg": "This job does not have the right status."
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "JobNotExpired",
       "msg": "The job has not yet expired."
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "JobResultNull",
       "msg": "The job result can not be null."
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "JobInvalidProject",
       "msg": "The job has a different project owner."
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "JobTimeoutNotGreater",
       "msg": "The new job timeout should be larger than the current one."
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "JobInvalidRunAccount",
       "msg": "The run account does not match the job."
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "JobResultsAlreadySet",
       "msg": "The job results are already set."
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "NodeQueueDoesNotMatch",
       "msg": "This node queue does not match."
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "NodeStakeUnauthorized",
       "msg": "This node is not authorizing this stake."
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "NodeNotEnoughStake",
       "msg": "This node has not staked enough tokens."
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "NodeAlreadyQueued",
       "msg": "This node is already present in the queue."
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "NodeNftWrongMetadata",
       "msg": "This metadata does not have the correct address."
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "NodeNftWrongOwner",
       "msg": "This NFT is not owned by this node."
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "NodeNftInvalidAmount",
       "msg": "Access NFT amount cannot be 0."
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "NodeKeyInvalidCollection",
       "msg": "This access key does not belong to a verified collection."
+    },
+    {
+      "code": 6020,
+      "name": "AccessKeyMissing",
+      "msg": "This market requires an access key NFT."
+    },
+    {
+      "code": 6021,
+      "name": "AccessNftWrongOwner",
+      "msg": "This access key NFT is not owned by the signer."
+    },
+    {
+      "code": 6022,
+      "name": "AccessNftInvalidAmount",
+      "msg": "Access key NFT amount cannot be 0."
+    },
+    {
+      "code": 6023,
+      "name": "AccessKeyInvalidCollection",
+      "msg": "This access key NFT does not belong to the verified collection."
+    }
+  ],
+  "types": [
+    {
+      "name": "JobAccount",
+      "docs": [
+        "The `JobAccount` struct holds all the information about any individual jobs."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ipfs_job",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "ipfs_result",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "node",
+            "type": "pubkey"
+          },
+          {
+            "name": "payer",
+            "type": "pubkey"
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "state",
+            "type": "u8"
+          },
+          {
+            "name": "time_end",
+            "type": "i64"
+          },
+          {
+            "name": "time_start",
+            "type": "i64"
+          },
+          {
+            "name": "timeout",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MarketAccount",
+      "docs": [
+        "The `MarketAccount` struct holds all the information about jobs and the nodes queue."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "job_expiration",
+            "type": "i64"
+          },
+          {
+            "name": "job_price",
+            "type": "u64"
+          },
+          {
+            "name": "job_timeout",
+            "type": "i64"
+          },
+          {
+            "name": "job_type",
+            "type": "u8"
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_bump",
+            "type": "u8"
+          },
+          {
+            "name": "node_access_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "node_xnos_minimum",
+            "type": "u128"
+          },
+          {
+            "name": "queue_type",
+            "type": "u8"
+          },
+          {
+            "name": "queue",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MarketSettingsAccount",
+      "docs": [
+        "The `MarketSettingsAccount` struct holds optional settings of a `MarketAccount`.",
+        "It lives at a PDA derived from the market, a market without one is open to all projects."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project_access_key",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReflectionAccount",
+      "docs": [
+        "The `ReflectionAccount` struct holds all the information on the reflection pool."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rate",
+            "type": "u128"
+          },
+          {
+            "name": "total_reflection",
+            "type": "u128"
+          },
+          {
+            "name": "total_xnos",
+            "type": "u128"
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RunAccount",
+      "docs": [
+        "The `RunAccount` struct holds temporary information that matches nodes to jobs."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "job",
+            "type": "pubkey"
+          },
+          {
+            "name": "node",
+            "type": "pubkey"
+          },
+          {
+            "name": "payer",
+            "type": "pubkey"
+          },
+          {
+            "name": "state",
+            "type": "u8"
+          },
+          {
+            "name": "time",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeAccount",
+      "docs": [
+        "The `StakeAccount` struct holds all the information for any given stake."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "duration",
+            "type": "u64"
+          },
+          {
+            "name": "time_unstake",
+            "type": "i64"
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_bump",
+            "type": "u8"
+          },
+          {
+            "name": "xnos",
+            "type": "u128"
+          }
+        ]
+      }
     }
   ]
 }

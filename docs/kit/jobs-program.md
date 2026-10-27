@@ -74,7 +74,10 @@ import { createNosanaClient } from '@nosana/kit';
 const client = createNosanaClient();
 // ---cut---
 import { address, Job } from '@nosana/kit';
-const jobs: Job[] = await client.jobs.multiple([address('job-address-1'), address('job-address-2'), address('job-address-3')], true);
+const jobs: Job[] = await client.jobs.multiple(
+  [address('job-address-1'), address('job-address-2'), address('job-address-3')],
+  true
+);
 ```
 
 ## Querying with Filters
@@ -192,6 +195,18 @@ const instruction: Instruction = await client.jobs.post({
 await client.solana.buildSignAndSend(instruction);
 ```
 
+## Market Settings
+
+A market can be protected with a project access key: an NFT collection whose holders are the only projects allowed to post jobs. The settings are a separate account next to the market, so an open market has no settings account and `marketSettings` returns `null`.
+
+```ts
+async setMarketSettings(params: { market: Address, projectAccessKey: Address }): Promise<Instruction>
+async closeMarketSettings(params: { market: Address }): Promise<Instruction>
+async marketSettings(market: Address): Promise<MarketSettings | null>
+```
+
+Only the market authority can set or close the settings. Posting to a protected market needs no extra parameters: `post`, `list` and `assign` look up the wallet's NFT from the access key collection and throw when the wallet holds none.
+
 ## Real-time Monitoring
 
 The SDK provides monitoring methods using async iterators for real-time account updates via WebSocket. See the [Examples](/kit/examples/jobs) section for detailed monitoring examples.
@@ -254,4 +269,3 @@ enum MarketQueueType {
   NODE_QUEUE = 1,
 }
 ```
-

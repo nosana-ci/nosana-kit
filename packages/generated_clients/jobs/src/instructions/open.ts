@@ -10,10 +10,12 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
   getI64Decoder,
   getI64Encoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU128Decoder,
@@ -39,8 +41,6 @@ import {
   type WritableSignerAccount,
 } from "@solana/kit";
 import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
-
 export const OPEN_INSTRUCTION_ACCOUNTS = {
   mint: 0,
   market: 1,
@@ -53,6 +53,12 @@ export const OPEN_INSTRUCTION_ACCOUNTS = {
 } as const;
 
 export type OpenInstructionAccountName = keyof typeof OPEN_INSTRUCTION_ACCOUNTS;
+import {
+  expectAddress,
+  getAccountMetaFactory,
+  type ResolvedAccount,
+} from "../shared/index.js";
+
 export const OPEN_DISCRIMINATOR = new Uint8Array([
   228, 220, 155, 71, 199, 189, 60, 45,
 ]);
@@ -63,7 +69,8 @@ export function getOpenDiscriminatorBytes() {
 
 export type OpenInstruction<
   TProgram extends string = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
-  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> =
+    "devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP",
   TAccountMarket extends string | AccountMeta<string> = string,
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
@@ -161,6 +168,144 @@ export function getOpenInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
+export type OpenAsyncInput<
+  TAccountMint extends string = string,
+  TAccountMarket extends string = string,
+  TAccountVault extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountAccessKey extends string = string,
+  TAccountRent extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountTokenProgram extends string = string,
+> = {
+  mint?: Address<TAccountMint>;
+  market: TransactionSigner<TAccountMarket>;
+  vault?: Address<TAccountVault>;
+  authority: TransactionSigner<TAccountAuthority>;
+  accessKey: Address<TAccountAccessKey>;
+  rent?: Address<TAccountRent>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  jobExpiration: OpenInstructionDataArgs["jobExpiration"];
+  jobPrice: OpenInstructionDataArgs["jobPrice"];
+  jobTimeout: OpenInstructionDataArgs["jobTimeout"];
+  jobType: OpenInstructionDataArgs["jobType"];
+  nodeXnosMinimum: OpenInstructionDataArgs["nodeXnosMinimum"];
+};
+
+export async function getOpenInstructionAsync<
+  TAccountMint extends string,
+  TAccountMarket extends string,
+  TAccountVault extends string,
+  TAccountAuthority extends string,
+  TAccountAccessKey extends string,
+  TAccountRent extends string,
+  TAccountSystemProgram extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
+>(
+  input: OpenAsyncInput<
+    TAccountMint,
+    TAccountMarket,
+    TAccountVault,
+    TAccountAuthority,
+    TAccountAccessKey,
+    TAccountRent,
+    TAccountSystemProgram,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  OpenInstruction<
+    TProgramAddress,
+    TAccountMint,
+    TAccountMarket,
+    TAccountVault,
+    TAccountAuthority,
+    TAccountAccessKey,
+    TAccountRent,
+    TAccountSystemProgram,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    mint: { value: input.mint ?? null, isWritable: false },
+    market: { value: input.market ?? null, isWritable: true },
+    vault: { value: input.vault ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: true },
+    accessKey: { value: input.accessKey ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.mint.value) {
+    accounts.mint.value =
+      "devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP" as Address<"devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP">;
+  }
+  if (!accounts.vault.value) {
+    accounts.vault.value = await getProgramDerivedAddress({
+      programAddress,
+      seeds: [
+        getAddressEncoder().encode(expectAddress(accounts.market.value)),
+        getAddressEncoder().encode(expectAddress(accounts.mint.value)),
+      ],
+    });
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.market),
+      getAccountMeta(accounts.vault),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.accessKey),
+      getAccountMeta(accounts.rent),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getOpenInstructionDataEncoder().encode(
+      args as OpenInstructionDataArgs,
+    ),
+    programAddress,
+  } as OpenInstruction<
+    TProgramAddress,
+    TAccountMint,
+    TAccountMarket,
+    TAccountVault,
+    TAccountAuthority,
+    TAccountAccessKey,
+    TAccountRent,
+    TAccountSystemProgram,
+    TAccountTokenProgram
+  >);
+}
+
 export type OpenInput<
   TAccountMint extends string = string,
   TAccountMarket extends string = string,
@@ -171,7 +316,7 @@ export type OpenInput<
   TAccountSystemProgram extends string = string,
   TAccountTokenProgram extends string = string,
 > = {
-  mint: Address<TAccountMint>;
+  mint?: Address<TAccountMint>;
   market: TransactionSigner<TAccountMarket>;
   vault: Address<TAccountVault>;
   authority: TransactionSigner<TAccountAuthority>;
@@ -242,6 +387,10 @@ export function getOpenInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.mint.value) {
+    accounts.mint.value =
+      "devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP" as Address<"devr1BGQndEW5k5zfvG5FsLyZv1Ap73vNgAHcQ9sUVP">;
+  }
   if (!accounts.rent.value) {
     accounts.rent.value =
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;

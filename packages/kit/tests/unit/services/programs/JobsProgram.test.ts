@@ -293,6 +293,9 @@ describe('JobsProgram', () => {
         (sdk as any).wallet = wallet;
         // Mock PDA helper used for vault
         (sdk as any).solana.pda = vi.fn(async () => vaultPda);
+        vi.spyOn(programClient, 'fetchMaybeMarketSettingsAccount' as any).mockResolvedValue({
+          exists: false,
+        });
         // Mock client.getListInstruction (generated client - acceptable to mock)
         const listSpy = vi.spyOn(programClient, 'getListInstruction' as any).mockReturnValue({
           programAddress: programAddr,
@@ -332,6 +335,9 @@ describe('JobsProgram', () => {
         (sdk as any).wallet = wallet;
         // Mock PDA helper used for vault
         (sdk as any).solana.pda = vi.fn(async () => vaultPda);
+        vi.spyOn(programClient, 'fetchMaybeMarketSettingsAccount' as any).mockResolvedValue({
+          exists: false,
+        });
         // Mock client.getAssignInstruction (generated client - acceptable to mock)
         const assignSpy = vi.spyOn(programClient, 'getAssignInstruction' as any).mockReturnValue({
           programAddress: programAddr,

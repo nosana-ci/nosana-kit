@@ -56,6 +56,19 @@ stopLocalnet();
 }
 ```
 
+## Run With a Locally Built Program
+
+The image bakes in the programs dumped from devnet at build time. To test a program build that is not deployed yet, mount its `.so` over the baked one. Any `*.so` in `/data/fixtures` is loaded as `--bpf-program <file name>`, so the file must be named after the program id:
+
+```bash
+docker run -d --name nosana-localnet \
+  -p 8899:8899 -p 8900:8900 -p 8001:8001 \
+  -v /path/to/target/deploy/nosana_jobs.so:/data/fixtures/nosJTmGQxvwXy23vng5UjkTbfv91Bzf9jEuro78dAGR.so:ro \
+  nosana/localnet:latest
+```
+
+The same works with Docker Compose through a `volumes` override. Regenerate the clients from the matching IDL (`pnpm generate-clients`) so the SDK speaks the same instruction layout.
+
 ## API Reference
 
 ### `startLocalnet(options?): void`

@@ -8,4 +8,5 @@
 
 export * from "./jobAccount.js";
 export * from "./marketAccount.js";
+export * from "./marketSettingsAccount.js";
 export * from "./runAccount.js";

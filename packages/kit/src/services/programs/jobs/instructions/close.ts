@@ -1,6 +1,7 @@
 import type { Address, TransactionSigner } from '@solana/kit';
 import type { getCloseInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
+import { getMarketSettingsPda } from './projectAccess.js';
 
 export type CloseParams = {
   market: Address;
@@ -27,20 +28,24 @@ export async function close(
     // Use provided payer or fall back to wallet
     const nosPayer = payer ?? wallet;
 
-    // Get jobs program address, user ATA, and derive vault PDA
+    // Get jobs program address, user ATA, and derive the vault and settings PDAs
     const [{ jobsProgram }, userATA] = await Promise.all([
       getStaticAccounts(),
       getNosATA(nosPayer.address),
     ]);
-    const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
+    const [vault, marketSettings] = await Promise.all([
+      deps.solana.pda([market, config.nosTokenAddress], jobsProgram),
+      getMarketSettingsPda(deps, market, jobsProgram),
+    ]);
 
-    // Create the close instruction
+    // Create the close instruction, the settings account is closed with the market when it exists
     return client.getCloseInstruction(
       {
         market,
         vault,
         user: userATA,
         authority: nosPayer,
+        marketSettings,
       },
       {
         programAddress: jobsProgram,

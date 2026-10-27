@@ -142,6 +142,37 @@ describe('close instruction', () => {
     expect(pdaCall[1]).toBe(jobsProgram);
   });
 
+  it('passes the market settings PDA so it is closed with the market', async () => {
+    const walletAddr = AddressFactory.create(17);
+    const marketAddr = AddressFactory.create(18);
+    const vaultPda = AddressFactory.create(19);
+    const settingsPda = AddressFactory.create(20);
+    const userATA = AddressFactory.create(21);
+    const jobsProgram = config.programs.jobsAddress;
+
+    const wallet = {
+      address: walletAddr,
+      signMessages: async () => [],
+      signTransactions: async () => [],
+    } as any;
+    (helperParams.deps.getWallet as any) = () => wallet;
+    const pdaSpy = ((helperParams.deps.solana.pda as any) = vi.fn(async (seeds: unknown[]) =>
+      seeds[0] === 'settings' ? settingsPda : vaultPda
+    ));
+    (helperParams.getNosATA as any) = vi.fn(async () => userATA);
+
+    const closeSpy = vi
+      .spyOn(programClient, 'getCloseInstruction' as any)
+      .mockReturnValue(mockInstruction);
+
+    await close({ market: marketAddr }, helperParams);
+
+    expect(pdaSpy).toHaveBeenCalledWith(['settings', marketAddr], jobsProgram);
+    const args = closeSpy.mock.calls[0][0] as any;
+    expect(args.vault).toBe(vaultPda);
+    expect(args.marketSettings).toBe(settingsPda);
+  });
+
   it('gets user ATA for wallet address', async () => {
     const walletAddr = AddressFactory.create(13);
     const marketAddr = AddressFactory.create(14);

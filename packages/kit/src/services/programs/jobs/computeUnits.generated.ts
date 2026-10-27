@@ -31,6 +31,8 @@ export const JOBS_COMPUTE_UNITS = {
   delist: 13000, // measured
   close: 26000, // measured
   end: 16000, // measured
+  setSettings: 11000, // measured
+  closeSettings: 6000, // measured
 } as const;
 
 /**

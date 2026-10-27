@@ -10,10 +10,12 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
   getI64Decoder,
   getI64Encoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
@@ -34,8 +36,6 @@ import {
   type WritableSignerAccount,
 } from "@solana/kit";
 import { NOSANA_JOBS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory, type ResolvedAccount } from "../shared/index.js";
-
 export const LIST_INSTRUCTION_ACCOUNTS = {
   job: 0,
   market: 1,
@@ -49,9 +49,18 @@ export const LIST_INSTRUCTION_ACCOUNTS = {
   rewardsProgram: 9,
   tokenProgram: 10,
   systemProgram: 11,
+  marketSettings: 12,
+  projectNft: 13,
+  projectMetadata: 14,
 } as const;
 
 export type ListInstructionAccountName = keyof typeof LIST_INSTRUCTION_ACCOUNTS;
+import {
+  expectAddress,
+  getAccountMetaFactory,
+  type ResolvedAccount,
+} from "../shared/index.js";
+
 export const LIST_DISCRIMINATOR = new Uint8Array([
   54, 174, 193, 67, 17, 41, 132, 38,
 ]);
@@ -71,11 +80,15 @@ export type ListInstruction<
   TAccountRewardsReflection extends string | AccountMeta<string> = string,
   TAccountRewardsVault extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
-  TAccountRewardsProgram extends string | AccountMeta<string> = string,
+  TAccountRewardsProgram extends string | AccountMeta<string> =
+    "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp",
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
+  TAccountMarketSettings extends string | AccountMeta<string> = string,
+  TAccountProjectNft extends string | AccountMeta<string> = string,
+  TAccountProjectMetadata extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -119,6 +132,15 @@ export type ListInstruction<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
+      TAccountMarketSettings extends string
+        ? ReadonlyAccount<TAccountMarketSettings>
+        : TAccountMarketSettings,
+      TAccountProjectNft extends string
+        ? ReadonlyAccount<TAccountProjectNft>
+        : TAccountProjectNft,
+      TAccountProjectMetadata extends string
+        ? ReadonlyAccount<TAccountProjectMetadata>
+        : TAccountProjectMetadata,
       ...TRemainingAccounts,
     ]
   >;
@@ -163,7 +185,7 @@ export function getListInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type ListInput<
+export type ListAsyncInput<
   TAccountJob extends string = string,
   TAccountMarket extends string = string,
   TAccountRun extends string = string,
@@ -176,6 +198,9 @@ export type ListInput<
   TAccountRewardsProgram extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
+  TAccountMarketSettings extends string = string,
+  TAccountProjectNft extends string = string,
+  TAccountProjectMetadata extends string = string,
 > = {
   job: TransactionSigner<TAccountJob>;
   market: Address<TAccountMarket>;
@@ -186,14 +211,18 @@ export type ListInput<
   rewardsReflection: Address<TAccountRewardsReflection>;
   rewardsVault: Address<TAccountRewardsVault>;
   authority: TransactionSigner<TAccountAuthority>;
-  rewardsProgram: Address<TAccountRewardsProgram>;
+  rewardsProgram?: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
+  marketSettings?: Address<TAccountMarketSettings>;
+  /** Only required when the market is restricted */
+  projectNft?: Address<TAccountProjectNft>;
+  projectMetadata?: Address<TAccountProjectMetadata>;
   ipfsJob: ListInstructionDataArgs["ipfsJob"];
   timeout: ListInstructionDataArgs["timeout"];
 };
 
-export function getListInstruction<
+export async function getListInstructionAsync<
   TAccountJob extends string,
   TAccountMarket extends string,
   TAccountRun extends string,
@@ -206,9 +235,12 @@ export function getListInstruction<
   TAccountRewardsProgram extends string,
   TAccountTokenProgram extends string,
   TAccountSystemProgram extends string,
+  TAccountMarketSettings extends string,
+  TAccountProjectNft extends string,
+  TAccountProjectMetadata extends string,
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
-  input: ListInput<
+  input: ListAsyncInput<
     TAccountJob,
     TAccountMarket,
     TAccountRun,
@@ -220,23 +252,31 @@ export function getListInstruction<
     TAccountAuthority,
     TAccountRewardsProgram,
     TAccountTokenProgram,
-    TAccountSystemProgram
+    TAccountSystemProgram,
+    TAccountMarketSettings,
+    TAccountProjectNft,
+    TAccountProjectMetadata
   >,
   config?: { programAddress?: TProgramAddress },
-): ListInstruction<
-  TProgramAddress,
-  TAccountJob,
-  TAccountMarket,
-  TAccountRun,
-  TAccountUser,
-  TAccountVault,
-  TAccountPayer,
-  TAccountRewardsReflection,
-  TAccountRewardsVault,
-  TAccountAuthority,
-  TAccountRewardsProgram,
-  TAccountTokenProgram,
-  TAccountSystemProgram
+): Promise<
+  ListInstruction<
+    TProgramAddress,
+    TAccountJob,
+    TAccountMarket,
+    TAccountRun,
+    TAccountUser,
+    TAccountVault,
+    TAccountPayer,
+    TAccountRewardsReflection,
+    TAccountRewardsVault,
+    TAccountAuthority,
+    TAccountRewardsProgram,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountMarketSettings,
+    TAccountProjectNft,
+    TAccountProjectMetadata
+  >
 > {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
@@ -258,6 +298,12 @@ export function getListInstruction<
     rewardsProgram: { value: input.rewardsProgram ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    marketSettings: { value: input.marketSettings ?? null, isWritable: false },
+    projectNft: { value: input.projectNft ?? null, isWritable: false },
+    projectMetadata: {
+      value: input.projectMetadata ?? null,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -268,6 +314,204 @@ export function getListInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.rewardsProgram.value) {
+    accounts.rewardsProgram.value =
+      "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp" as Address<"nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp">;
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.marketSettings.value) {
+    accounts.marketSettings.value = await getProgramDerivedAddress({
+      programAddress,
+      seeds: [
+        getBytesEncoder().encode(
+          new Uint8Array([115, 101, 116, 116, 105, 110, 103, 115]),
+        ),
+        getAddressEncoder().encode(expectAddress(accounts.market.value)),
+      ],
+    });
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.job),
+      getAccountMeta(accounts.market),
+      getAccountMeta(accounts.run),
+      getAccountMeta(accounts.user),
+      getAccountMeta(accounts.vault),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.rewardsReflection),
+      getAccountMeta(accounts.rewardsVault),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.rewardsProgram),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.marketSettings),
+      getAccountMeta(accounts.projectNft),
+      getAccountMeta(accounts.projectMetadata),
+    ],
+    data: getListInstructionDataEncoder().encode(
+      args as ListInstructionDataArgs,
+    ),
+    programAddress,
+  } as ListInstruction<
+    TProgramAddress,
+    TAccountJob,
+    TAccountMarket,
+    TAccountRun,
+    TAccountUser,
+    TAccountVault,
+    TAccountPayer,
+    TAccountRewardsReflection,
+    TAccountRewardsVault,
+    TAccountAuthority,
+    TAccountRewardsProgram,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountMarketSettings,
+    TAccountProjectNft,
+    TAccountProjectMetadata
+  >);
+}
+
+export type ListInput<
+  TAccountJob extends string = string,
+  TAccountMarket extends string = string,
+  TAccountRun extends string = string,
+  TAccountUser extends string = string,
+  TAccountVault extends string = string,
+  TAccountPayer extends string = string,
+  TAccountRewardsReflection extends string = string,
+  TAccountRewardsVault extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountRewardsProgram extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountMarketSettings extends string = string,
+  TAccountProjectNft extends string = string,
+  TAccountProjectMetadata extends string = string,
+> = {
+  job: TransactionSigner<TAccountJob>;
+  market: Address<TAccountMarket>;
+  run: TransactionSigner<TAccountRun>;
+  user: Address<TAccountUser>;
+  vault: Address<TAccountVault>;
+  payer: TransactionSigner<TAccountPayer>;
+  rewardsReflection: Address<TAccountRewardsReflection>;
+  rewardsVault: Address<TAccountRewardsVault>;
+  authority: TransactionSigner<TAccountAuthority>;
+  rewardsProgram?: Address<TAccountRewardsProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  marketSettings?: Address<TAccountMarketSettings>;
+  /** Only required when the market is restricted */
+  projectNft?: Address<TAccountProjectNft>;
+  projectMetadata?: Address<TAccountProjectMetadata>;
+  ipfsJob: ListInstructionDataArgs["ipfsJob"];
+  timeout: ListInstructionDataArgs["timeout"];
+};
+
+export function getListInstruction<
+  TAccountJob extends string,
+  TAccountMarket extends string,
+  TAccountRun extends string,
+  TAccountUser extends string,
+  TAccountVault extends string,
+  TAccountPayer extends string,
+  TAccountRewardsReflection extends string,
+  TAccountRewardsVault extends string,
+  TAccountAuthority extends string,
+  TAccountRewardsProgram extends string,
+  TAccountTokenProgram extends string,
+  TAccountSystemProgram extends string,
+  TAccountMarketSettings extends string,
+  TAccountProjectNft extends string,
+  TAccountProjectMetadata extends string,
+  TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
+>(
+  input: ListInput<
+    TAccountJob,
+    TAccountMarket,
+    TAccountRun,
+    TAccountUser,
+    TAccountVault,
+    TAccountPayer,
+    TAccountRewardsReflection,
+    TAccountRewardsVault,
+    TAccountAuthority,
+    TAccountRewardsProgram,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountMarketSettings,
+    TAccountProjectNft,
+    TAccountProjectMetadata
+  >,
+  config?: { programAddress?: TProgramAddress },
+): ListInstruction<
+  TProgramAddress,
+  TAccountJob,
+  TAccountMarket,
+  TAccountRun,
+  TAccountUser,
+  TAccountVault,
+  TAccountPayer,
+  TAccountRewardsReflection,
+  TAccountRewardsVault,
+  TAccountAuthority,
+  TAccountRewardsProgram,
+  TAccountTokenProgram,
+  TAccountSystemProgram,
+  TAccountMarketSettings,
+  TAccountProjectNft,
+  TAccountProjectMetadata
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    job: { value: input.job ?? null, isWritable: true },
+    market: { value: input.market ?? null, isWritable: true },
+    run: { value: input.run ?? null, isWritable: true },
+    user: { value: input.user ?? null, isWritable: true },
+    vault: { value: input.vault ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    rewardsReflection: {
+      value: input.rewardsReflection ?? null,
+      isWritable: true,
+    },
+    rewardsVault: { value: input.rewardsVault ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    rewardsProgram: { value: input.rewardsProgram ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    marketSettings: { value: input.marketSettings ?? null, isWritable: false },
+    projectNft: { value: input.projectNft ?? null, isWritable: false },
+    projectMetadata: {
+      value: input.projectMetadata ?? null,
+      isWritable: false,
+    },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.rewardsProgram.value) {
+    accounts.rewardsProgram.value =
+      "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp" as Address<"nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp">;
+  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
@@ -292,6 +536,9 @@ export function getListInstruction<
       getAccountMeta(accounts.rewardsProgram),
       getAccountMeta(accounts.tokenProgram),
       getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.marketSettings),
+      getAccountMeta(accounts.projectNft),
+      getAccountMeta(accounts.projectMetadata),
     ],
     data: getListInstructionDataEncoder().encode(
       args as ListInstructionDataArgs,
@@ -310,7 +557,10 @@ export function getListInstruction<
     TAccountAuthority,
     TAccountRewardsProgram,
     TAccountTokenProgram,
-    TAccountSystemProgram
+    TAccountSystemProgram,
+    TAccountMarketSettings,
+    TAccountProjectNft,
+    TAccountProjectMetadata
   >);
 }
 
@@ -332,6 +582,10 @@ export type ParsedListInstruction<
     rewardsProgram: TAccountMetas[9];
     tokenProgram: TAccountMetas[10];
     systemProgram: TAccountMetas[11];
+    marketSettings?: TAccountMetas[12] | undefined;
+    /** Only required when the market is restricted */
+    projectNft?: TAccountMetas[13] | undefined;
+    projectMetadata?: TAccountMetas[14] | undefined;
   };
   data: ListInstructionData;
 };
@@ -344,7 +598,7 @@ export function parseListInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedListInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 12) {
+  if (instruction.accounts.length < 15) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -353,6 +607,12 @@ export function parseListInstruction<
     const accountMeta = (instruction.accounts as TAccountMetas)[accountIndex]!;
     accountIndex += 1;
     return accountMeta;
+  };
+  const getNextOptionalAccount = () => {
+    const accountMeta = getNextAccount();
+    return accountMeta.address === NOSANA_JOBS_PROGRAM_ADDRESS
+      ? undefined
+      : accountMeta;
   };
   return {
     programAddress: instruction.programAddress,
@@ -369,6 +629,9 @@ export function parseListInstruction<
       rewardsProgram: getNextAccount(),
       tokenProgram: getNextAccount(),
       systemProgram: getNextAccount(),
+      marketSettings: getNextOptionalAccount(),
+      projectNft: getNextOptionalAccount(),
+      projectMetadata: getNextOptionalAccount(),
     },
     data: getListInstructionDataDecoder().decode(instruction.data),
   };
