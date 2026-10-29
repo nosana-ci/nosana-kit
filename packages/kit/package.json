@@ -1,6 +1,6 @@
 {
   "name": "@nosana/kit",
-  "version": "2.24.1",
+  "version": "2.24.2",
   "description": "Nosana KIT",
   "type": "module",
   "main": "dist/index.js",
