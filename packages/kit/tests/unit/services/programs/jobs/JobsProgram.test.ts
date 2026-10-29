@@ -6,6 +6,7 @@ import {
   getJobAccountEncoder,
   getListInstructionDataEncoder,
   getRunAccountEncoder,
+  JOB_ACCOUNT_DISCRIMINATOR,
   RUN_ACCOUNT_DISCRIMINATOR,
 } from '@nosana/jobs-program';
 
@@ -300,6 +301,67 @@ describe('JobsProgram', () => {
         .mockRejectedValue(new Error('sign failed'));
 
       await expect(jobs.signBatch([makeListInstruction(addr(1))])).rejects.toThrow('sign failed');
+    });
+  });
+
+  /**
+   * Listing: the program account filters `all` and `runs` ask the RPC for,
+   * which must match the job and run account layouts respectively.
+   */
+  describe('all and runs', () => {
+    const memcmp = (offset: bigint, bytes: string) => ({
+      memcmp: { offset, bytes, encoding: 'base58' },
+    });
+
+    function listing() {
+      const { sdk, sentArgs } = MockClientFactory.createMockWithRpc();
+      return { jobs: createJobsProgram(sdkToProgramDeps(sdk), sdk.config.programs), sentArgs };
+    }
+
+    it('all lists job accounts, filtered by state, project, node and market', async () => {
+      const { jobs, sentArgs } = listing();
+
+      await jobs.all({ state: JobState.RUNNING, project: addr(1), node: addr(2), market: addr(3) });
+
+      expect(sentArgs).toEqual([
+        {
+          encoding: 'base64',
+          filters: [
+            memcmp(0n, bs58.encode(Buffer.from(JOB_ACCOUNT_DISCRIMINATOR))),
+            memcmp(208n, bs58.encode(Buffer.from([JobState.RUNNING]))),
+            memcmp(176n, addr(1)),
+            memcmp(104n, addr(2)),
+            memcmp(72n, addr(3)),
+          ],
+        },
+      ]);
+    });
+
+    it('all lists every job account when given no filters', async () => {
+      const { jobs, sentArgs } = listing();
+
+      await jobs.all();
+
+      expect(sentArgs[0].filters).toEqual([
+        memcmp(0n, bs58.encode(Buffer.from(JOB_ACCOUNT_DISCRIMINATOR))),
+      ]);
+    });
+
+    it('runs lists run accounts, filtered by node and job', async () => {
+      const { jobs, sentArgs } = listing();
+
+      await jobs.runs({ node: addr(1), job: addr(2) });
+
+      expect(sentArgs).toEqual([
+        {
+          encoding: 'base64',
+          filters: [
+            memcmp(0n, bs58.encode(Buffer.from(RUN_ACCOUNT_DISCRIMINATOR))),
+            memcmp(40n, addr(1)),
+            memcmp(8n, addr(2)),
+          ],
+        },
+      ]);
     });
   });
 

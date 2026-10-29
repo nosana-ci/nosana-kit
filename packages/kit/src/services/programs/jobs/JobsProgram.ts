@@ -830,10 +830,60 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       checkRuns: boolean = false
     ): Promise<Job[]> {
       try {
+        const extraGPAFilters: GetProgramAccountsMemcmpFilter[] = [];
+        if (filters) {
+          if (typeof filters.state === 'number') {
+            extraGPAFilters.push({
+              memcmp: {
+                offset: BigInt(208),
+                bytes: bs58.encode(Buffer.from([filters.state])) as Base58EncodedBytes,
+                encoding: 'base58',
+              },
+            });
+          }
+          if (filters.project) {
+            extraGPAFilters.push({
+              memcmp: {
+                offset: BigInt(176),
+                bytes: filters.project.toString() as Base58EncodedBytes,
+                encoding: 'base58',
+              },
+            });
+          }
+          if (filters.node) {
+            extraGPAFilters.push({
+              memcmp: {
+                offset: BigInt(104),
+                bytes: filters.node.toString() as Base58EncodedBytes,
+                encoding: 'base58',
+              },
+            });
+          }
+          if (filters.market) {
+            extraGPAFilters.push({
+              memcmp: {
+                offset: BigInt(72),
+                bytes: filters.market.toString() as Base58EncodedBytes,
+                encoding: 'base58',
+              },
+            });
+          }
+        }
         const getProgramAccountsResponse = await deps.solana.rpc
           .getProgramAccounts(programId, {
             encoding: 'base64',
-            filters: runAccountFilters(filters),
+            filters: [
+              {
+                memcmp: {
+                  offset: BigInt(0),
+                  bytes: bs58.encode(
+                    Buffer.from(client.JOB_ACCOUNT_DISCRIMINATOR)
+                  ) as Base58EncodedBytes,
+                  encoding: 'base58',
+                },
+              },
+              ...extraGPAFilters,
+            ],
           })
           .send();
 
@@ -875,42 +925,10 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
      */
     async runs(filters?: { node?: Address; job?: Address }): Promise<Run[]> {
       try {
-        const extraGPAFilters: GetProgramAccountsMemcmpFilter[] = [];
-        if (filters) {
-          if (filters.node) {
-            extraGPAFilters.push({
-              memcmp: {
-                offset: BigInt(40),
-                bytes: filters.node.toString() as Base58EncodedBytes,
-                encoding: 'base58',
-              },
-            });
-          }
-          if (filters.job) {
-            extraGPAFilters.push({
-              memcmp: {
-                offset: BigInt(8),
-                bytes: filters.job.toString() as Base58EncodedBytes,
-                encoding: 'base58',
-              },
-            });
-          }
-        }
         const getProgramAccountsResponse = await deps.solana.rpc
           .getProgramAccounts(programId, {
             encoding: 'base64',
-            filters: [
-              {
-                memcmp: {
-                  offset: BigInt(0),
-                  bytes: bs58.encode(
-                    Buffer.from(client.RUN_ACCOUNT_DISCRIMINATOR)
-                  ) as Base58EncodedBytes,
-                  encoding: 'base58',
-                },
-              },
-              ...extraGPAFilters,
-            ],
+            filters: runAccountFilters(filters),
           })
           .send();
 
