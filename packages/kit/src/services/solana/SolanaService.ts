@@ -39,6 +39,7 @@ import {
   assertIsTransactionWithinSizeLimit,
   isSome,
 } from '@solana/kit';
+import { createRpcSubscriptions } from './rpcSubscriptions.js';
 import {
   estimateComputeUnitLimitFactory,
   getSetComputeUnitLimitInstruction,
@@ -457,7 +458,7 @@ export function createSolanaService(deps: SolanaServiceDeps, config: SolanaConfi
   const rpc = createSolanaRpc(config.rpcEndpoint);
   // Use wsEndpoint if provided, otherwise convert rpcEndpoint from http(s) to ws(s)
   const wsUrl = config.wsEndpoint ?? convertHttpToWebSocketUrl(config.rpcEndpoint);
-  const rpcSubscriptions = createSolanaRpcSubscriptions(wsUrl);
+  const rpcSubscriptions = createRpcSubscriptions(wsUrl);
   const sendAndConfirmTransaction = sendAndConfirmTransactionFactory({
     rpc,
     rpcSubscriptions,

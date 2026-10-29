@@ -5,7 +5,7 @@ import type { GenerateHeaderOptions, ValidateOptions } from '../types.js';
 
 export function validateHeaders(
   headers: IncomingHttpHeaders,
-  publicKey: Uint8Array<ArrayBufferLike>,
+  publicKey: Uint8Array<ArrayBufferLike> | string,
   options?: Partial<Pick<GenerateHeaderOptions, 'key'>> &
     Partial<ValidateOptions>,
 ): boolean {

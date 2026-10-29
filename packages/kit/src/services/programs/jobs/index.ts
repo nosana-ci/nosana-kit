@@ -1,4 +1,5 @@
 export * from './JobsProgram.js';
+export { isRunClosedError } from './errors.js';
 export { getJobsInstructionComputeUnits } from './computeUnits.js';
 export { getJobsInstructionName } from './discriminators.js';
 export { decodeJobsInstruction, type DecodedJobsInstruction } from './decode.js';

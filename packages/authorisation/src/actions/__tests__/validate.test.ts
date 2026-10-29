@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import base58 from 'bs58';
 
 import { validate } from "../validate.js";
 
@@ -53,5 +54,20 @@ describe('validate', () => {
         ),
       ).toBeFalsy();
     });
+  });
+
+  it('takes the public key as a base58 address', () => {
+    expect(
+      validate(
+        'validationString:4hEXBxCVbFm6uPYScs5k24UcqpqHpTh4XrxrArg7uW57LW3i5e7WPJdZyYgL5nzacxYEHjywpbrL4Dq1ryHaC2ot',
+        base58.encode(global.TEST_WALLET_PUBLIC_KEY),
+      ),
+    ).toBeTruthy();
+    expect(
+      validate(
+        'validationString:4hEXBxCVbFm6uPYScs5k24UcqpqHpTh4XrxrArg7uW57LW3i5e7WPJdZyYgL5nzacxYEHjywpbrL4Dq1ryHaC2ot',
+        base58.encode(global.TEST_WRONG_WALLET_PUBLIC_KEY),
+      ),
+    ).toBeFalsy();
   });
 });

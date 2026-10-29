@@ -193,6 +193,11 @@ export { MonitorEventType } from './services/programs/jobs/monitor/types.js';
 /**
  * @group @nosana/kit
  */
+export { isRunClosedError } from './services/programs/jobs/index.js';
+
+/**
+ * @group @nosana/kit
+ */
 export type { SimpleMonitorEvent, MonitorEvent } from './services/programs/jobs/monitor/types.js';
 
 /**
@@ -213,6 +218,20 @@ export type {
   TopupInstructions,
   CreateTopup,
 } from './services/programs/stake/instructions/topup.js';
+
+/**
+ * @group @nosana/kit
+ */
+export { createRewardsProgram } from './services/programs/rewards/index.js';
+
+/**
+ * @group @nosana/kit
+ */
+export type {
+  RewardsProgram,
+  Reward,
+  EnterInstruction,
+} from './services/programs/rewards/index.js';
 
 /**
  * @group @nosana/kit
@@ -353,6 +372,7 @@ export {
  */
 export {
   generateWallet,
+  generateWalletToFile,
   createWalletFromBytes,
   createWalletFromBase58,
   loadWalletFromFile,
@@ -422,6 +442,7 @@ export {
   createKeyPairSignerFromBytes,
   createKeyPairFromBytes,
   createSignerFromKeyPair,
+  isTransactionPartialSigner,
 } from '@solana/kit';
 
 import type { Address as SolanaAddress } from '@solana/kit';

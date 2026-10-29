@@ -4,6 +4,7 @@ import {
   createSignerFromKeyPair,
   generateKeyPairSigner,
   getBase58Encoder,
+  writeKeyPairSigner,
 } from '@solana/kit';
 
 import type { Wallet } from '../types.js';
@@ -110,6 +111,34 @@ export async function loadWalletFromFile(filePath?: string): Promise<Wallet> {
   const fileContent = await readFile(resolvedPath, 'utf8');
   const keyArray: number[] = JSON.parse(fileContent);
   return await createWalletFromBytes(keyArray);
+}
+
+/**
+ * Generate a new random wallet and write it to a Solana CLI keypair JSON
+ * file, the inverse of {@link loadWalletFromFile}. The file is written with
+ * mode `0600` and any missing directories are created; an existing file is
+ * never overwritten.
+ *
+ * @param filePath - Path to write the keypair JSON file to
+ * @returns The new wallet
+ *
+ * @throws If a file already exists at `filePath`.
+ *
+ * @example
+ * ```ts
+ * import { generateWalletToFile } from '@nosana/kit';
+ *
+ * const wallet = await generateWalletToFile('/path/to/keypair.json');
+ * console.log(wallet.address);
+ * ```
+ *
+ * @group @nosana/kit
+ */
+export async function generateWalletToFile(filePath: string): Promise<Wallet> {
+  // Only an extractable keypair can be written out.
+  const wallet = await generateKeyPairSigner(true);
+  await writeKeyPairSigner(wallet, filePath);
+  return wallet;
 }
 
 function getDefaultKeypairPath(): string {
