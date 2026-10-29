@@ -107,7 +107,10 @@ deploy-force:
   variables:
     LERNA_FORCE: "--force-publish"
 
-# When a tag is pushed (by deploy): publish those packages to npm.
+# When a tag is pushed (by deploy): publish every package whose version is not
+# on npm yet (from-package). from-git only published the packages bumped by that
+# one tag, so after a failed tag pipeline the next release shipped a kit whose
+# dependencies were never published (v2.24.2 needed api and authorization 2.24.1).
 # Build all packages from root first so dist/ exists before Lerna packs.
 lerna-publish:
   stage: deploy
