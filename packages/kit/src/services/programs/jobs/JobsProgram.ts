@@ -8,6 +8,7 @@ import type {
   Address,
   Account,
   Base58EncodedBytes,
+  Commitment,
   GetProgramAccountsMemcmpFilter,
   Instruction,
   ReadonlyUint8Array,
@@ -144,6 +145,16 @@ export function getNetworkFee(): number {
 }
 
 /**
+ * How a subscription is held: until `abortSignal` aborts, at `commitment`.
+ * @group @nosana/kit
+ */
+export interface SubscriptionOptions {
+  abortSignal: AbortSignal;
+  /** The commitment changes are reported at; `confirmed` unless given. */
+  commitment?: Commitment;
+}
+
+/**
  * Jobs program interface
  * @group @nosana/kit
  */
@@ -185,6 +196,28 @@ export interface JobsProgram {
    * Fetch all run accounts
    */
   runs(filters?: { node?: Address; job?: Address }): Promise<Run[]>;
+
+  /**
+   * Each change to a job's account as it happens, decoded as {@link get} answers
+   * it (its run not looked up), until `options.abortSignal` aborts. A connection
+   * that drops ends it with an error: subscribe again to go on watching.
+   * @param addr The job's address
+   * @param options The subscription's abort signal and, optionally, commitment
+   */
+  watch(addr: Address, options: SubscriptionOptions): Promise<AsyncIterable<Job>>;
+
+  /**
+   * Each run account made or changed for a node and/or a job as it happens,
+   * decoded as {@link runs} answers them, until `options.abortSignal` aborts.
+   * A connection that drops ends it with an error: subscribe again to go on
+   * watching.
+   * @param filters The node and/or job whose runs to watch; every run with neither
+   * @param options The subscription's abort signal and, optionally, commitment
+   */
+  watchRuns(
+    filters: { node?: Address; job?: Address },
+    options: SubscriptionOptions
+  ): Promise<AsyncIterable<Run>>;
 
   /**
    * Fetch all market accounts
@@ -564,6 +597,65 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
   }
 
   /**
+   * The filters that pick out run accounts: every run, or those of a node
+   * and/or a job.
+   */
+  function runAccountFilters(filters?: {
+    node?: Address;
+    job?: Address;
+  }): GetProgramAccountsMemcmpFilter[] {
+    const runFilters: GetProgramAccountsMemcmpFilter[] = [
+      {
+        memcmp: {
+          offset: BigInt(0),
+          bytes: bs58.encode(Buffer.from(client.RUN_ACCOUNT_DISCRIMINATOR)) as Base58EncodedBytes,
+          encoding: 'base58',
+        },
+      },
+    ];
+    if (filters?.node) {
+      runFilters.push({
+        memcmp: {
+          offset: BigInt(40),
+          bytes: filters.node.toString() as Base58EncodedBytes,
+          encoding: 'base58',
+        },
+      });
+    }
+    if (filters?.job) {
+      runFilters.push({
+        memcmp: {
+          offset: BigInt(8),
+          bytes: filters.job.toString() as Base58EncodedBytes,
+          encoding: 'base58',
+        },
+      });
+    }
+    return runFilters;
+  }
+
+  /**
+   * Each notification decoded; one that can't be is logged and passed over,
+   * as {@link JobsProgram.runs} does with an account it can't decode.
+   */
+  async function* decoded<T, U>(
+    notifications: AsyncIterable<T>,
+    decode: (notification: T) => U,
+    what: string
+  ): AsyncGenerator<U> {
+    for await (const notification of notifications) {
+      let value: U;
+      try {
+        value = decode(notification);
+      } catch (err) {
+        deps.logger.error(`Failed to decode ${what} ${err}`);
+        continue;
+      }
+      yield value;
+    }
+  }
+
+  /**
    * Merge run account data into a job account.
    * Updates the job state to RUNNING and sets node and timeStart from the run account.
    */
@@ -738,60 +830,10 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       checkRuns: boolean = false
     ): Promise<Job[]> {
       try {
-        const extraGPAFilters: GetProgramAccountsMemcmpFilter[] = [];
-        if (filters) {
-          if (typeof filters.state === 'number') {
-            extraGPAFilters.push({
-              memcmp: {
-                offset: BigInt(208),
-                bytes: bs58.encode(Buffer.from([filters.state])) as Base58EncodedBytes,
-                encoding: 'base58',
-              },
-            });
-          }
-          if (filters.project) {
-            extraGPAFilters.push({
-              memcmp: {
-                offset: BigInt(176),
-                bytes: filters.project.toString() as Base58EncodedBytes,
-                encoding: 'base58',
-              },
-            });
-          }
-          if (filters.node) {
-            extraGPAFilters.push({
-              memcmp: {
-                offset: BigInt(104),
-                bytes: filters.node.toString() as Base58EncodedBytes,
-                encoding: 'base58',
-              },
-            });
-          }
-          if (filters.market) {
-            extraGPAFilters.push({
-              memcmp: {
-                offset: BigInt(72),
-                bytes: filters.market.toString() as Base58EncodedBytes,
-                encoding: 'base58',
-              },
-            });
-          }
-        }
         const getProgramAccountsResponse = await deps.solana.rpc
           .getProgramAccounts(programId, {
             encoding: 'base64',
-            filters: [
-              {
-                memcmp: {
-                  offset: BigInt(0),
-                  bytes: bs58.encode(
-                    Buffer.from(client.JOB_ACCOUNT_DISCRIMINATOR)
-                  ) as Base58EncodedBytes,
-                  encoding: 'base58',
-                },
-              },
-              ...extraGPAFilters,
-            ],
+            filters: runAccountFilters(filters),
           })
           .send();
 
@@ -890,6 +932,39 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
         deps.logger.error(`Failed to fetch all runs ${err}`);
         throw err;
       }
+    },
+
+    async watch(addr: Address, { abortSignal, commitment = 'confirmed' }: SubscriptionOptions) {
+      const notifications = await deps.solana.rpcSubscriptions
+        .accountNotifications(addr, { commitment, encoding: 'base64' })
+        .subscribe({ abortSignal });
+      return decoded(
+        notifications,
+        ({ value }) =>
+          transformJobAccount(client.decodeJobAccount(parseBase64RpcAccount(addr, value))),
+        `job ${addr}`
+      );
+    },
+
+    async watchRuns(
+      filters: { node?: Address; job?: Address },
+      { abortSignal, commitment = 'confirmed' }: SubscriptionOptions
+    ) {
+      const notifications = await deps.solana.rpcSubscriptions
+        .programNotifications(programId, {
+          commitment,
+          encoding: 'base64',
+          filters: runAccountFilters(filters),
+        })
+        .subscribe({ abortSignal });
+      return decoded(
+        notifications,
+        ({ value }) =>
+          transformRunAccount(
+            client.decodeRunAccount(parseBase64RpcAccount(value.pubkey, value.account))
+          ),
+        'run'
+      );
     },
 
     /**

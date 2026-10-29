@@ -1,13 +1,21 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { type Instruction, AccountRole, address } from '@solana/kit';
+import { type Instruction, AccountRole, address, getBase64Decoder } from '@solana/kit';
 import bs58 from 'bs58';
 import {
   getDelistInstructionDataEncoder,
+  getJobAccountEncoder,
   getListInstructionDataEncoder,
+  getRunAccountEncoder,
+  RUN_ACCOUNT_DISCRIMINATOR,
 } from '@nosana/jobs-program';
 
-import { createJobsProgram } from '../../../../../src/services/programs/jobs/index.js';
-import { MockClientFactory, sdkToProgramDeps } from '../../../setup/index.js';
+import { createJobsProgram, JobState } from '../../../../../src/services/programs/jobs/index.js';
+import {
+  JobAccountFactory,
+  MockClientFactory,
+  RunAccountFactory,
+  sdkToProgramDeps,
+} from '../../../setup/index.js';
 import type { ProgramDeps } from '../../../../../src/types.js';
 
 // A valid 32-byte address derived from a seed.
@@ -292,6 +300,128 @@ describe('JobsProgram', () => {
         .mockRejectedValue(new Error('sign failed'));
 
       await expect(jobs.signBatch([makeListInstruction(addr(1))])).rejects.toThrow('sign failed');
+    });
+  });
+
+  /**
+   * Watching: the subscriptions `watch` and `watchRuns` hold, and what they
+   * hand over, fed by a fake RPC subscription of the given notifications.
+   */
+  describe('watch and watchRuns', () => {
+    const base64 = getBase64Decoder();
+    const encoded = (data: Uint8Array) => ({
+      data: [base64.decode(data), 'base64'] as const,
+      executable: false,
+      lamports: 1n,
+      owner: config.programs.jobsAddress,
+      space: BigInt(data.length),
+    });
+    const jobNotification = (account: ReturnType<typeof JobAccountFactory.create>) => ({
+      value: encoded(getJobAccountEncoder().encode(account.data)),
+    });
+    const runNotification = (account: ReturnType<typeof RunAccountFactory.create>) => ({
+      value: {
+        pubkey: account.address,
+        account: encoded(getRunAccountEncoder().encode(account.data)),
+      },
+    });
+
+    function subscriptionOf(notifications: unknown[]) {
+      const subscribe = vi.fn(async () =>
+        (async function* () {
+          yield* notifications;
+        })()
+      );
+      const accountNotifications = vi.fn(() => ({ subscribe }));
+      const programNotifications = vi.fn(() => ({ subscribe }));
+      (deps.solana as unknown as { rpcSubscriptions: unknown }).rpcSubscriptions = {
+        accountNotifications,
+        programNotifications,
+      };
+      return { subscribe, accountNotifications, programNotifications };
+    }
+
+    async function all<T>(iterable: AsyncIterable<T>): Promise<T[]> {
+      const items: T[] = [];
+      for await (const item of iterable) items.push(item);
+      return items;
+    }
+
+    it('watches the job account at confirmed commitment, decoding each change as get does', async () => {
+      const account = JobAccountFactory.create({ state: JobState.RUNNING });
+      const { accountNotifications, subscribe } = subscriptionOf([jobNotification(account)]);
+      const controller = new AbortController();
+
+      const changes = await jobs.watch(account.address, { abortSignal: controller.signal });
+
+      expect(accountNotifications).toHaveBeenCalledWith(account.address, {
+        commitment: 'confirmed',
+        encoding: 'base64',
+      });
+      expect(subscribe).toHaveBeenCalledWith({ abortSignal: controller.signal });
+      expect(await all(changes)).toEqual([
+        expect.objectContaining({
+          address: account.address,
+          state: JobState.RUNNING,
+          node: account.data.node,
+          timeout: Number(account.data.timeout),
+        }),
+      ]);
+    });
+
+    it('watches at the commitment given', async () => {
+      const { accountNotifications } = subscriptionOf([]);
+
+      await jobs.watch(addr(1), {
+        abortSignal: new AbortController().signal,
+        commitment: 'finalized',
+      });
+
+      expect(accountNotifications).toHaveBeenCalledWith(addr(1), {
+        commitment: 'finalized',
+        encoding: 'base64',
+      });
+    });
+
+    it('watches the run accounts of a node, filtered as runs filters them', async () => {
+      const node = addr(7);
+      const account = RunAccountFactory.create({ node, time: 1_700_000_000n });
+      const { programNotifications } = subscriptionOf([runNotification(account)]);
+
+      const changes = await jobs.watchRuns({ node }, { abortSignal: new AbortController().signal });
+
+      expect(programNotifications).toHaveBeenCalledWith(config.programs.jobsAddress, {
+        commitment: 'confirmed',
+        encoding: 'base64',
+        filters: [
+          {
+            memcmp: {
+              offset: 0n,
+              bytes: bs58.encode(Buffer.from(RUN_ACCOUNT_DISCRIMINATOR)),
+              encoding: 'base58',
+            },
+          },
+          { memcmp: { offset: 40n, bytes: node, encoding: 'base58' } },
+        ],
+      });
+      expect(await all(changes)).toEqual([
+        expect.objectContaining({ address: account.address, job: account.data.job, node }),
+      ]);
+    });
+
+    it('passes over a notification it can’t decode, and logs it', async () => {
+      const account = RunAccountFactory.create({ time: 1_700_000_000n });
+      const garbage = { value: { pubkey: account.address, account: encoded(new Uint8Array(3)) } };
+      subscriptionOf([garbage, runNotification(account)]);
+
+      const runs = await all(
+        await jobs.watchRuns({}, { abortSignal: new AbortController().signal })
+      );
+
+      expect(runs).toEqual([expect.objectContaining({ address: account.address })]);
+      expect(deps.logger.error).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to decode run')
+      );
     });
   });
 });

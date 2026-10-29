@@ -4,7 +4,7 @@ import {
   type StakeProgram,
 } from '../../../../src/services/programs/stake/index.js';
 import * as stakingClient from '@nosana/stake-program';
-import { type Address } from '@solana/kit';
+import { getBase64Decoder, type Address } from '@solana/kit';
 import {
   AddressFactory,
   MockClientFactory,
@@ -456,6 +456,49 @@ describe('StakeProgram', () => {
       expect(transformed.xnos).toBe(1_500_000_000);
       expect(typeof transformed.amount).toBe('number');
       expect(typeof transformed.xnos).toBe('number');
+    });
+  });
+
+  describe('find', () => {
+    /** The RPC's answer to the stake account lookup: none, or the account given. */
+    function stakeAccountOnChain(
+      sdk: ReturnType<typeof baseSdk>,
+      data?: Parameters<ReturnType<typeof stakingClient.getStakeAccountEncoder>['encode']>[0]
+    ) {
+      const bytes = data && stakingClient.getStakeAccountEncoder().encode(data);
+      const value = bytes && {
+        data: [getBase64Decoder().decode(bytes), 'base64'],
+        executable: false,
+        lamports: 1n,
+        owner: sdk.config.programs.stakeAddress,
+        rentEpoch: 0n,
+        space: BigInt(bytes.length),
+      };
+      sdk.solana.rpc.getAccountInfo = vi.fn(() => ({
+        send: async () => ({ context: { slot: 1n }, value: value ?? null }),
+      })) as any;
+    }
+
+    it('answers nothing for an owner without a stake account', async () => {
+      const sdk = MockClientFactory.createMockWithWallet();
+      stakeAccountOnChain(sdk);
+      const stake = createStakeProgram(sdkToProgramDeps(sdk), sdk.config.programs);
+
+      expect(await stake.find()).toBeUndefined();
+    });
+
+    it('answers the owner’s stake account, as get does', async () => {
+      const sdk = MockClientFactory.createMockWithWallet();
+      const account = makeStakeAccount(CUSTOM_STAKE_AMOUNT);
+      const { discriminator: _, ...data } = account.data as any;
+      stakeAccountOnChain(sdk, data);
+      const stake = createStakeProgram(sdkToProgramDeps(sdk), sdk.config.programs);
+
+      expect(await stake.find(newAddr(3))).toMatchObject({ amount: CUSTOM_STAKE_AMOUNT });
+      expect(sdk.solana.pda).toHaveBeenCalledWith(
+        ['stake', sdk.config.programs.nosTokenAddress, newAddr(3)],
+        sdk.config.programs.stakeAddress
+      );
     });
   });
 });

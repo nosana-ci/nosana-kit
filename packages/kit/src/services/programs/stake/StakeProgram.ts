@@ -46,6 +46,12 @@ export interface StakeProgram {
   getByOwner(owner?: Address): Promise<Stake>;
 
   /**
+   * Fetch a stake account by owner address (defaults to wallet address);
+   * undefined when the owner has none
+   */
+  find(owner?: Address): Promise<Stake | undefined>;
+
+  /**
    * Fetch multiple stake accounts by address
    */
   multiple(addresses: Address[]): Promise<Stake[]>;
@@ -128,6 +134,12 @@ export function createStakeProgram(deps: ProgramDeps, config: ProgramConfig): St
     async getByOwner(owner?: Address): Promise<Stake> {
       const addr = await this.getAddress(owner);
       return this.get(addr);
+    },
+
+    async find(owner?: Address): Promise<Stake | undefined> {
+      const addr = await this.getAddress(owner);
+      const account = await client.fetchMaybeStakeAccount(deps.solana.rpc, addr);
+      return account.exists ? transformStakeAccount(account) : undefined;
     },
 
     /**

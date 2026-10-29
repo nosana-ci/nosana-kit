@@ -420,6 +420,9 @@ importers:
       '@solana/kit':
         specifier: 8.3.0
         version: 8.3.0(typescript@5.9.3)
+      '@solana/rpc-subscriptions-channel-websocket':
+        specifier: 8.3.0
+        version: 8.3.0(typescript@5.9.3)
       bs58:
         specifier: ^6.0.0
         version: 6.0.0
@@ -433,6 +436,9 @@ importers:
       '@types/node':
         specifier: ^20.19.27
         version: 20.19.30
+      '@types/ws':
+        specifier: ^8.18.1
+        version: 8.18.1
       '@vitest/coverage-v8':
         specifier: ^4.0.16
         version: 4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@20.19.30)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2))
@@ -460,6 +466,9 @@ importers:
       vitest:
         specifier: ^4.0.16
         version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@20.19.30)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2)
+      ws:
+        specifier: 8.21.3
+        version: 8.21.3
 
   packages/localnet:
     dependencies:
@@ -2436,6 +2445,9 @@ packages:
 
   '@types/web-bluetooth@0.0.21':
     resolution: {integrity: sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==}
+
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
   '@typescript-eslint/eslint-plugin@8.53.1':
     resolution: {integrity: sha512-cFYYFZ+oQFi6hUnBTbLRXfTJiaQtYE3t4O692agbBl+2Zy+eqSKWtPjhPXJu1G7j4RLjKgeJPDdq3EqOwmX5Ag==}
@@ -7068,6 +7080,7 @@ snapshots:
       '@solana-program/system': 0.14.1(@solana/kit@8.3.0(typescript@5.9.3))
       '@solana-program/token': 0.16.1(@solana/kit@8.3.0(typescript@5.9.3))
       '@solana/kit': 8.3.0(typescript@5.9.3)
+      '@solana/rpc-subscriptions-channel-websocket': 8.3.0(typescript@5.9.3)
       bs58: 6.0.0
     transitivePeerDependencies:
       - '@types/node'
@@ -8408,6 +8421,10 @@ snapshots:
   '@types/unist@3.0.3': {}
 
   '@types/web-bluetooth@0.0.21': {}
+
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 24.10.13
 
   '@typescript-eslint/eslint-plugin@8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(typescript@5.9.3)':
     dependencies:

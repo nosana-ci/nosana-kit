@@ -3,8 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import bs58 from 'bs58';
 
+import * as os from 'os';
+
 import {
   generateWallet,
+  generateWalletToFile,
   createWalletFromBytes,
   createWalletFromBase58,
   loadWalletFromFile,
@@ -35,6 +38,28 @@ describe('keypair helpers', () => {
       const wallet2 = await generateWallet();
 
       expect(wallet1.address).not.toBe(wallet2.address);
+    });
+  });
+
+  describe('generateWalletToFile', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nosana-kit-keypair-'));
+    const file = path.join(dir, 'nested', 'keypair.json');
+
+    it('writes a Solana CLI keypair file the wallet loads back from', async () => {
+      const wallet = await generateWalletToFile(file);
+
+      const bytes: number[] = JSON.parse(fs.readFileSync(file, 'utf8'));
+      expect(bytes).toHaveLength(64);
+      expect((await loadWalletFromFile(file)).address).toBe(wallet.address);
+      expect((await createWalletFromBytes(bytes)).address).toBe(wallet.address);
+    });
+
+    it('never overwrites an existing file', async () => {
+      const before = fs.readFileSync(file, 'utf8');
+
+      await expect(generateWalletToFile(file)).rejects.toThrow();
+
+      expect(fs.readFileSync(file, 'utf8')).toBe(before);
     });
   });
 

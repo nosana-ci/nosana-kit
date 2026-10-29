@@ -24,7 +24,8 @@ import type { Wallet } from '../../../../src/types.js';
 
 // Mock @solana/kit module
 // We mock:
-// 1. Network-calling functions (createSolanaRpc, createSolanaRpcSubscriptions, sendAndConfirmTransactionFactory)
+// 1. Network-calling functions (createSolanaRpc, sendAndConfirmTransactionFactory; the kit's
+//    createRpcSubscriptions is mocked in the global setup)
 //    - These make actual HTTP/WebSocket calls to RPC endpoints - MUST be mocked
 // 2. Transaction building/signing functions (wrapped in vi.fn for error testing)
 //    - These don't make network calls but we mock them for:
@@ -64,13 +65,11 @@ vi.mock('@solana/kit', async (importOriginal) => {
     return { getLatestBlockhash, getBalance, simulateTransaction } as any;
   }
 
-  const rpcSubscriptions = {} as any;
   const sendAndConfirmTransaction = vi.fn().mockResolvedValue(undefined);
 
   // Mock network-calling functions (these make actual network calls)
   // Return a new RPC instance each time to prevent test isolation issues
   const createSolanaRpc = vi.fn(() => createMockRpc());
-  const createSolanaRpcSubscriptions = vi.fn(() => rpcSubscriptions);
   const sendAndConfirmTransactionFactory = vi.fn(() => sendAndConfirmTransaction);
 
   // Store the mock so we can access it in tests
@@ -98,7 +97,6 @@ vi.mock('@solana/kit', async (importOriginal) => {
   return {
     ...actual, // Includes all real implementations (pipe, createTransactionMessage, etc.)
     createSolanaRpc,
-    createSolanaRpcSubscriptions,
     sendAndConfirmTransactionFactory,
     signTransactionMessageWithSigners, // Mocked to avoid complex validation
     getSignatureFromTransaction, // Mocked for predictable test signatures
@@ -112,10 +110,11 @@ type SolanaKitMock = {
   signTransactionMessageWithSigners: ReturnType<typeof vi.fn>;
   getSignatureFromTransaction: ReturnType<typeof vi.fn>;
   createSolanaRpc: ReturnType<typeof vi.fn>;
-  createSolanaRpcSubscriptions: ReturnType<typeof vi.fn>;
   sendAndConfirmTransactionFactory: ReturnType<typeof vi.fn>;
 };
 const solanaKitMock = solanaKit as unknown as SolanaKitMock;
+const { createRpcSubscriptions } =
+  await import('../../../../src/services/solana/rpcSubscriptions.js');
 
 // Test constants (defined at module level for use in tests)
 // Note: These must match the values defined inside the vi.mock factory
@@ -187,13 +186,13 @@ describe('SolanaService', () => {
         { rpcEndpoint, cluster, wsEndpoint }
       );
       expect(service.config.wsEndpoint).toBe(wsEndpoint);
-      expect(solanaKitMock.createSolanaRpcSubscriptions).toHaveBeenCalledWith(wsEndpoint);
+      expect(createRpcSubscriptions).toHaveBeenCalledWith(wsEndpoint);
     });
 
     it('falls back to rpcEndpoint when wsEndpoint not provided', () => {
       createSolanaService({ logger, getWallet: () => undefined }, { rpcEndpoint, cluster });
       // When wsEndpoint is not provided, rpcEndpoint is converted from http(s) to ws(s)
-      expect(solanaKitMock.createSolanaRpcSubscriptions).toHaveBeenCalledWith(wsEndpoint);
+      expect(createRpcSubscriptions).toHaveBeenCalledWith(wsEndpoint);
     });
   });
 

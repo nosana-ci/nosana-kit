@@ -22,6 +22,7 @@ import {
 } from './config/index.js';
 import { createJobsProgram, type JobsProgram } from './services/programs/jobs/index.js';
 import { createStakeProgram, type StakeProgram } from './services/programs/stake/index.js';
+import { createRewardsProgram, type RewardsProgram } from './services/programs/rewards/index.js';
 import {
   createMerkleDistributorProgram,
   type MerkleDistributorProgram,
@@ -42,6 +43,7 @@ export interface NosanaClient {
   readonly config: ClientConfig;
   readonly jobs: JobsProgram;
   readonly stake: StakeProgram;
+  readonly rewards: RewardsProgram;
   readonly merkleDistributor: MerkleDistributorProgram;
   readonly solana: SolanaService;
   readonly nos: TokenService;
@@ -145,6 +147,7 @@ const createClientFromConfig = (config: ClientConfig, network: NosanaNetwork): N
   // Initialize programs
   const jobs = createJobsProgram(programDeps, config.programs);
   const stake = createStakeProgram(programDeps, config.programs);
+  const rewards = createRewardsProgram(programDeps, config.programs);
   const merkleDistributor = createMerkleDistributorProgram(programDeps, config.programs);
 
   // Initialize Nosana Modules
@@ -193,6 +196,7 @@ const createClientFromConfig = (config: ClientConfig, network: NosanaNetwork): N
     nos,
     jobs,
     stake,
+    rewards,
     merkleDistributor,
     ipfs,
     connect,

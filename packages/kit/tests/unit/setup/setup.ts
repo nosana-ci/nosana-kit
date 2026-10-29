@@ -24,16 +24,19 @@ vi.mock('@solana/kit', async (importOriginal) => {
       }),
     })),
   } as any;
-  const rpcSubscriptions = {} as any;
   const sendAndConfirmTransaction = vi.fn().mockResolvedValue(undefined);
 
   return {
     ...actual,
     createSolanaRpc: vi.fn(() => rpc),
-    createSolanaRpcSubscriptions: vi.fn(() => rpcSubscriptions),
     sendAndConfirmTransactionFactory: vi.fn(() => sendAndConfirmTransaction),
   };
 });
+
+// The kit's own subscriptions factory, which opens the WebSocket connections.
+vi.mock('../../../src/services/solana/rpcSubscriptions.js', () => ({
+  createRpcSubscriptions: vi.fn(() => ({})),
+}));
 
 // Global test hooks
 beforeEach(() => {
