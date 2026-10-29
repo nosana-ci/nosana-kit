@@ -21,13 +21,13 @@ Generating message signatures (requires wallet).
 
 ```ts
 validate(
-  message: string | Uint8Array,
-  signature: string | Uint8Array,
-  publicKey?: string | Uint8Array
-): Promise<boolean>
+  validationString: string,
+  address: string,
+  options?: Partial<ValidateOptions>
+): boolean
 ```
 
-Validate message signatures.
+Validate a signed message against the signer's address (its public key in base58).
 
 ### Generate HTTP Header Signatures
 
@@ -45,10 +45,14 @@ Signing HTTP headers requires wallet.
 ### Validate HTTP Header Signatures
 
 ```ts
-validateHeaders(headers: Headers | Record<string, string>): Promise<boolean>
+validateHeaders(
+  headers: IncomingHttpHeaders,
+  address: string,
+  options?: Partial<Pick<GenerateHeaderOptions, 'key'>> & Partial<ValidateOptions>
+): boolean
 ```
 
-Validate HTTP header signatures.
+Validate a signed HTTP header against the signer's address.
 
 ## Examples
 
@@ -68,12 +72,10 @@ const messageToSign = 'Hello, Nosana!';
 const messageSignature: string = await client.authorization.generate(messageToSign);
 console.log('Message signature:', messageSignature);
 
-// Validate message signature (requires validationString with message+signature, and publicKey)
+// Validate message signature (requires validationString with message+signature, and the signer's address)
 // Note: validationString typically contains both message and signature separated
 const validationString = `${messageToSign}:${messageSignature}`; // Format may vary
-// Get publicKey from wallet (in real usage, extract from wallet's public key)
-const publicKey = new Uint8Array(32); // Placeholder - extract actual public key from wallet
-const isValid: boolean = client.authorization.validate(validationString, publicKey);
+const isValid: boolean = client.authorization.validate(validationString, myWallet.address);
 console.log('Message is valid:', isValid);
 
 // Generate HTTP header signatures for API requests
@@ -93,10 +95,9 @@ fetch('https://api.nosana.com/jobs', {
   body: JSON.stringify({ data: 'example' }),
 });
 
-// Validate incoming HTTP header signatures (requires headers as IncomingHttpHeaders and publicKey)
-const publicKeyForValidation = new Uint8Array(32); // Placeholder - extract actual public key
+// Validate incoming HTTP header signatures (requires headers as IncomingHttpHeaders and the signer's address)
 // Convert Headers to IncomingHttpHeaders format (Record<string, string | string[] | undefined>)
-const isValidRequest: boolean = client.authorization.validateHeaders(requestHeaders, publicKeyForValidation);
+const isValidRequest: boolean = client.authorization.validateHeaders(requestHeaders, myWallet.address);
 if (!isValidRequest) {
   throw new Error('Invalid authorization');
 }

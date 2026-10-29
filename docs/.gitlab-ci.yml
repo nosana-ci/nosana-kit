@@ -21,6 +21,18 @@ docs:build:
     KUBERNETES_CPU_LIMIT: "4"
     KUBERNETES_MEMORY_REQUEST: "8Gi"
     KUBERNETES_MEMORY_LIMIT: "8Gi"
+  # Twoslash results, scoped to the kit's type surface (see docs/.vitepress/twoslashCache.ts):
+  # a hit skips the type-checking that is most of the build's time and memory.
+  # One cache per branch, starting from main's, so branches never overwrite each
+  # other's results and a release tag (same types as main) starts warm. Saved even
+  # when the job fails, so a timed-out build's partial results count next time.
+  cache:
+    key: docs-twoslash-$CI_COMMIT_REF_SLUG
+    fallback_keys:
+      - docs-twoslash-main
+    paths:
+      - docs/.vitepress/cache/twoslash
+    when: always
   script:
     # Diagnostic: print the pod's real cgroup memory limit + CPU count via Node
     # (the shell cgroup path read returned "unknown" on this image).
@@ -40,6 +52,10 @@ docs:build:
 
 pages:
   stage: deploy
+  # Without this a docs:build failure fails this job and, with it, the child
+  # pipeline and the release's lerna-publish, which docs:build's allow_failure
+  # alone does not prevent (v2.24.0 never reached npm after a docs timeout).
+  allow_failure: true
   needs:
     - job: docs:build
       artifacts: true

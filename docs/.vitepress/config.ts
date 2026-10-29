@@ -1,11 +1,13 @@
 import { defineConfig } from 'vitepress';
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash';
+import { rendererRich } from '@shikijs/twoslash';
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs';
 import { withMermaid } from 'vitepress-plugin-mermaid';
 import { markdownGlossaryPlugin } from 'vitepress-plugin-glossary';
 import chartPlugin from './plugins/chart';
 import glossary from './glossary.json';
 import { writeLlmsTxt } from './llms';
+import { typeScopedTwoslashCache } from './twoslashCache';
 
 // Generate SDK Reference sidebar - simplified to single link
 function getSdkReferenceSidebar() {
@@ -323,6 +325,12 @@ export default withMermaid(
       // Twoslash transformer for type hover information
       codeTransformers: [
         transformerTwoslash({
+          typesCache: typeScopedTwoslashCache(),
+          // CSS-only hover popups. The default floating-vue renderer makes
+          // every hover a Vue component, which the build compiles twice
+          // (client and server) for ~3000 hovers: it needs a 4 GB heap where
+          // this fits in 2 GB, and takes 40% longer.
+          renderer: rendererRich(),
           twoslashOptions: {
             compilerOptions: {
               skipLibCheck: true,

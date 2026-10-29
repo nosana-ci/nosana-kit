@@ -40,6 +40,7 @@ export type {
   Market,
   MarketSettings,
   Run,
+  SubscriptionOptions,
 } from './services/programs/jobs/index.js';
 
 /**

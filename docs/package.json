@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "vitepress dev .",
-    "build": "pnpm run api && NODE_OPTIONS='--max-old-space-size=4096' vitepress build .",
+    "build": "pnpm run api && NODE_OPTIONS='--max-old-space-size=3072' vitepress build .",
     "build:with-deps": "pnpm --filter $npm_package_name... run build",
     "dev:with-deps": "pnpm --filter $npm_package_name... run dev --parallel",
     "api": "cd .. && pnpm --filter @nosana/kit exec typedoc",
@@ -30,7 +30,6 @@
     "cytoscape-cose-bilkent": "^4.1.0",
     "dayjs": "^1.11.19",
     "debug": "^4.4.3",
-    "floating-vue": "^5.2.2",
     "markdown-it-container": "^4.0.0",
     "markdown-it-mathjax3": "^5.0.0",
     "mermaid": "^11.0.0",
