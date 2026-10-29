@@ -1,7 +1,6 @@
 import type { Theme, EnhanceAppContext } from 'vitepress';
 import DefaultTheme from 'vitepress/theme';
-import TwoslashFloatingVue from '@shikijs/vitepress-twoslash/client';
-import '@shikijs/vitepress-twoslash/style.css';
+import '@shikijs/twoslash/style-rich.css';
 import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client';
 import GlossaryTooltip from 'vitepress-plugin-glossary/vue';
 import './custom.css';
@@ -18,8 +17,6 @@ export default {
   extends: DefaultTheme,
   Layout: Layout,
   enhanceApp({ app, router }: EnhanceAppContext) {
-    // Register Twoslash FloatingVue plugin for type hover tooltips
-    app.use(TwoslashFloatingVue);
     // Register tabs plugin
     enhanceAppWithTabs(app);
     // Register glossary tooltip component
