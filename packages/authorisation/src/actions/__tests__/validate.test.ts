@@ -1,6 +1,4 @@
 import { vi } from 'vitest';
-import base58 from 'bs58';
-
 import { validate } from "../validate.js";
 
 describe('validate', () => {
@@ -8,7 +6,7 @@ describe('validate', () => {
     expect(
       validate(
         'validationString:4hEXBxCVbFm6uPYScs5k24UcqpqHpTh4XrxrArg7uW57LW3i5e7WPJdZyYgL5nzacxYEHjywpbrL4Dq1ryHaC2ot',
-        global.TEST_WALLET_PUBLIC_KEY,
+        global.TEST_WALLET_ADDRESS,
       ),
     ).toBeTruthy();
   });
@@ -17,7 +15,7 @@ describe('validate', () => {
     expect(
       validate(
         'validationStringWithOpts+4EsfLjmGevLsN2VRHFMdW5u7xRBGca4Pwe9fwNz6pQf5LDF5AZ8jNeArz46euTEydUyYdcS4FRH6HdwEFzgHxMz+1734307200000',
-        global.TEST_WALLET_PUBLIC_KEY,
+        global.TEST_WALLET_ADDRESS,
         {
           separator: '+',
         },
@@ -33,7 +31,7 @@ describe('validate', () => {
     try {
       validate(
         'validationStringWithOpts+4EsfLjmGevLsN2VRHFMdW5u7xRBGca4Pwe9fwNz6pQf5LDF5AZ8jNeArz46euTEydUyYdcS4FRH6HdwEFzgHxMz+1734307200000',
-        global.TEST_WALLET_PUBLIC_KEY,
+        global.TEST_WALLET_ADDRESS,
         {
           separator: '+',
         },
@@ -50,24 +48,18 @@ describe('validate', () => {
       expect(
         validate(
           'validationString:4hEXBxCVbFm6uPYScs5k24UcqpqHpTh4XrxrArg7uW57LW3i5e7WPJdZyYgL5nzacxYEHjywpbrL4Dq1ryHaC2ot',
-          global.TEST_WRONG_WALLET_PUBLIC_KEY
+          global.TEST_WRONG_WALLET_ADDRESS
         ),
       ).toBeFalsy();
     });
   });
 
-  it('takes the public key as a base58 address', () => {
-    expect(
+  it('throws on an address that is not base58', () => {
+    expect(() =>
       validate(
         'validationString:4hEXBxCVbFm6uPYScs5k24UcqpqHpTh4XrxrArg7uW57LW3i5e7WPJdZyYgL5nzacxYEHjywpbrL4Dq1ryHaC2ot',
-        base58.encode(global.TEST_WALLET_PUBLIC_KEY),
+        'not-an-address!',
       ),
-    ).toBeTruthy();
-    expect(
-      validate(
-        'validationString:4hEXBxCVbFm6uPYScs5k24UcqpqHpTh4XrxrArg7uW57LW3i5e7WPJdZyYgL5nzacxYEHjywpbrL4Dq1ryHaC2ot',
-        base58.encode(global.TEST_WRONG_WALLET_PUBLIC_KEY),
-      ),
-    ).toBeFalsy();
+    ).toThrow();
   });
 });

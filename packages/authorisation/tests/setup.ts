@@ -10,6 +10,8 @@ declare global {
   var TEST_WALLET: Uint8Array;
   var TEST_WALLET_PUBLIC_KEY: Uint8Array;
   var TEST_WRONG_WALLET_PUBLIC_KEY: Uint8Array;
+  var TEST_WALLET_ADDRESS: string;
+  var TEST_WRONG_WALLET_ADDRESS: string;
 }
 
 // Global test hooks
@@ -20,6 +22,8 @@ beforeEach(() => {
   global.TEST_WALLET = base58.decode(process.env.TEST_SOLANA_WALLET as string);
   global.TEST_WALLET_PUBLIC_KEY = base58.decode(process.env.TEST_SOLANA_WALLET_PUBLIC_KEY as string);
   global.TEST_WRONG_WALLET_PUBLIC_KEY = base58.decode(process.env.TEST_WRONG_SOLANA_WALLET_PUBLIC_KEY as string);
+  global.TEST_WALLET_ADDRESS = process.env.TEST_SOLANA_WALLET_PUBLIC_KEY as string;
+  global.TEST_WRONG_WALLET_ADDRESS = process.env.TEST_WRONG_SOLANA_WALLET_PUBLIC_KEY as string;
 });
 
 afterEach(() => {

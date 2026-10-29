@@ -3,12 +3,12 @@ import base58 from 'bs58';
 import { ValidateOptions } from "../types.js";
 
 /**
- * Whether `validationString` was signed by `publicKey`: the signer's 32 key
- * bytes, or its address in base58.
+ * Whether `validationString` was signed by the wallet at `address` (its
+ * public key in base58).
  */
 export function validate(
   validationString: string,
-  publicKey: Uint8Array<ArrayBufferLike> | string,
+  address: string,
   options?: Partial<ValidateOptions>,
 ): boolean {
   const { expiry, separator, expected_message }: ValidateOptions = {
@@ -39,6 +39,6 @@ export function validate(
   return nacl.sign.detached.verify(
     Buffer.from(message),
     base58.decode(signatureB64),
-    typeof publicKey === 'string' ? base58.decode(publicKey) : publicKey,
+    base58.decode(address),
   );
 }
