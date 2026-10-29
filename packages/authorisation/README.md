@@ -40,8 +40,10 @@ console.log(signedMessage);
 
 ```typescript
 import { validate } from '@nosana/authorization';
+import base58 from 'bs58';
 
-const isValid = validate(signedMessage, keypair.publicKey);
+// The signer's address: its public key in base58
+const isValid = validate(signedMessage, base58.encode(keypair.publicKey));
 
 console.log(isValid); // true
 ```
@@ -136,14 +138,14 @@ fetch('https://api.example.com', { headers });
 
 ### Validation Functions
 
-#### `validate(validationString, publicKey, options?)`
+#### `validate(validationString, address, options?)`
 
 Validate a signed message.
 
 **Parameters:**
 
 - `validationString` (string) - The signed message to validate
-- `publicKey` (Uint8Array) - The Ed25519 public key (32 bytes)
+- `address` (string) - The signer's address: its Ed25519 public key in base58
 - `options` (object, optional)
   - `expiry` (number) - Maximum age in seconds (default: `300`)
   - `separator` (string) - Separator character (default: `':'`)
@@ -163,7 +165,7 @@ Validate a signed message.
 import { validate } from '@nosana/authorization';
 
 try {
-  const isValid = validate(signedMessage, publicKey, {
+  const isValid = validate(signedMessage, address, {
     expiry: 600, // 10 minutes
     expected_message: 'my-message',
   });
@@ -176,14 +178,14 @@ try {
 }
 ```
 
-#### `validateHeaders(headers, publicKey, options?)`
+#### `validateHeaders(headers, address, options?)`
 
 Validate HTTP request headers containing authorization signature.
 
 **Parameters:**
 
 - `headers` (IncomingHttpHeaders) - HTTP headers object
-- `publicKey` (Uint8Array) - The Ed25519 public key
+- `address` (string) - The signer's address: its Ed25519 public key in base58
 - `options` (object, optional)
   - `key` (string) - Header key to validate (default: `'authorization'`)
   - `expiry` (number) - Maximum age in seconds
@@ -201,7 +203,7 @@ import { IncomingMessage } from 'http';
 // In your HTTP server
 function handleRequest(req: IncomingMessage) {
   try {
-    const isValid = validateHeaders(req.headers, publicKey, {
+    const isValid = validateHeaders(req.headers, address, {
       key: 'authorization',
       expiry: 300,
     });
@@ -229,7 +231,7 @@ const signed = await generate('api-request', secretKey, {
 });
 
 // Validate with 5-minute expiry
-const isValid = validate(signed, publicKey, {
+const isValid = validate(signed, address, {
   expiry: 300, // 5 minutes in seconds
 });
 ```
@@ -243,7 +245,7 @@ const signed = await generate('message:with:colons', secretKey, {
   separator: '||',
 });
 
-const isValid = validate(signed, publicKey, {
+const isValid = validate(signed, address, {
   separator: '||',
 });
 ```
@@ -255,7 +257,7 @@ Ensure the signed message matches expected content:
 ```typescript
 const signed = await generate('login-request', secretKey);
 
-const isValid = validate(signed, publicKey, {
+const isValid = validate(signed, address, {
   expected_message: 'login-request',
 });
 // Throws error if message doesn't match
