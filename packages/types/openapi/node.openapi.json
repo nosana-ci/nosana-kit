@@ -1828,6 +1828,10 @@
               }
             ]
           },
+          "shm_size": {
+            "$ref": "#/components/schemas/ShmSize",
+            "description": "Size of `/dev/shm`, in Docker's `--shm-size` format (`\"512m\"`, `\"8g\"`)."
+          },
           "required_vram": {
             "type": "number"
           },
@@ -2042,6 +2046,11 @@
             "$ref": "#/components/schemas/ExposedPort"
           }
         ]
+      },
+      "ShmSize": {
+        "type": "string",
+        "pattern": "^[0-9]+([.][0-9]+)? ?[kKmMgGtTpP]?[iI]?[bB]?$",
+        "description": "Size of the container's `/dev/shm`, in Docker's `--shm-size` format:\n`\"512m\"`, `\"8g\"`, `\"1gb\"`, `\"2GiB\"`, or a bare byte count such as\n`\"67108864\"`. Leave it out for the runtime's default (64 MiB)."
       },
       "Resources": {
         "type": "array",

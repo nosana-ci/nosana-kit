@@ -11,6 +11,7 @@ import type { Private } from "./private.js";
 import type { RequiredVRAM } from "./required_vram.js";
 import type { Resources } from "./resources.js";
 import { RestartPolicy } from "./restart_policy.js";
+import type { ShmSize } from "./shm_size.js";
 import type { TrustedExecutionEnv } from "./trusted_execution_env.js";
 import type { Variables } from "./variables.js";
 import type { Volume } from "./volumes.js";
@@ -29,6 +30,7 @@ export * from "./private.js";
 export * from "./required_vram.js";
 export * from "./resources.js";
 export * from "./restart_policy.js";
+export * from "./shm_size.js";
 export * from "./trusted_execution_env.js";
 export * from "./variables.js"
 export * from "./volumes.js";
@@ -46,6 +48,8 @@ export interface ContainerRun {
   entrypoint?: CMDString | CMDArray;
   env?: Env;
   restart_policy?: RestartPolicy;
+  /** Size of `/dev/shm`, in Docker's `--shm-size` format (`"512m"`, `"8g"`). */
+  shm_size?: ShmSize;
   required_vram?: RequiredVRAM;
   private?: Private;
   resources?: Resources;

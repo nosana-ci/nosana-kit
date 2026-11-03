@@ -98,6 +98,17 @@ Defines tasks within the job:
 | `expose`         | `number \| ExposedPort[]` | ❌        | Ports exposed                                                       |
 | `resources`      | `Resource[]`              | ❌        | External data sources                                               |
 | `authentication` | `{docker: DockerAuth}`    | ❌        | Docker registry authentication                                      |
+| `shm_size`       | `string`                  | ❌        | Size of `/dev/shm` in Docker format, e.g. `"512m"` or `"8g"` (default 64 MiB) |
+
+#### shm_size
+
+Sets the size of the container's shared memory (`/dev/shm`), the same as Docker's `--shm-size`. Containers get 64 MiB by default, which is too small for PyTorch `DataLoader` workers, NCCL and other software that passes data through shared memory.
+
+The value is a string: a number followed by an optional unit `k`, `m`, `g`, `t` or `p` (case-insensitive, optionally with `b` or `ib`). Units are binary (`1g` is 1024 MiB), and a number without a unit is bytes.
+
+```json
+{ "image": "pytorch/pytorch:latest", "gpu": true, "shm_size": "8g" }
+```
 
 #### cmd
 
