@@ -471,6 +471,8 @@ export interface components {
                 policy: "on-failure";
                 restart_tries?: number;
             };
+            /** @description Size of `/dev/shm`, in Docker's `--shm-size` format (`"512m"`, `"8g"`). */
+            shm_size?: components["schemas"]["ShmSize"];
             required_vram?: number;
             private?: boolean;
             resources?: components["schemas"]["Resources"];
@@ -515,6 +517,12 @@ export interface components {
             __spread__: components["schemas"]["LiteralString"];
             chunked?: boolean;
         } | components["schemas"]["PortRangeString"] | components["schemas"]["ExposedPort"];
+        /**
+         * @description Size of the container's `/dev/shm`, in Docker's `--shm-size` format:
+         *     `"512m"`, `"8g"`, `"1gb"`, `"2GiB"`, or a bare byte count such as
+         *     `"67108864"`. Leave it out for the runtime's default (64 MiB).
+         */
+        ShmSize: string;
         Resources: ("__remove-if-empty__" | {
             __spread__: components["schemas"]["LiteralString"];
             chunked?: boolean;

@@ -109,6 +109,14 @@ describe("validateJobDefinition", () => {
     expect(result.success).toBe(true);
   });
 
+  it.each(["512m", "8g", "1gb", "2GiB", "67108864"])("accepts container/run with shm_size %s", (shm_size) => {
+    expect(validateJobDefinition(runWith({ shm_size })).success).toBe(true);
+  });
+
+  it.each([["0"], ["8x"], ["-1g"], [""], [8589934592]])("rejects container/run with shm_size %s", (shm_size) => {
+    expect(validateJobDefinition(runWith({ shm_size })).success).toBe(false);
+  });
+
   it.each(["vm/run", "cvm/run"])("accepts a %s op", (type) => {
     const result = validateJobDefinition(
       definition([

@@ -60,6 +60,7 @@ Prefer `system_resources`, since that is the declared field.
 | `resources` | `Resource[]` | HF/S3 mounts — see resources.md |
 | `authentication` | `{ docker: DockerAuth }` | Private registry credentials |
 | `private` | `boolean` | Suppress public endpoint exposure |
+| `shm_size` | `string` | `/dev/shm` size in Docker format: `"512m"`, `"8g"`. Default 64 MiB; raise it for PyTorch DataLoader workers / NCCL |
 | `results` | `object` | Regexes that extract values from logs |
 
 ### `cmd` — the two forms
