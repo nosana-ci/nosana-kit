@@ -490,12 +490,7 @@ export const LogisticType = NosanaLogisticType;
 /**
  * @group @nosana/types
  */
-export {
-  validateJobDefinition,
-  validateVmRunArgs,
-  jobSchemas,
-  parseShmSize,
-} from '@nosana/types';
+export { validateJobDefinition, validateVmRunArgs, jobSchemas, parseShmSize } from '@nosana/types';
 
 /**
  * Job definition types for creating Nosana jobs
