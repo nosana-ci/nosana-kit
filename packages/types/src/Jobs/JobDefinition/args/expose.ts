@@ -66,6 +66,7 @@ export const ServiceType = {
   WEBAPI: 'webapi',
   WEBSOCKET: 'websocket',
   NONE: 'none',
+  TCP: 'tcp',
 } as const;
 
 // Union type for all service types

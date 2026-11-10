@@ -56,12 +56,17 @@ describe("validateJobDefinition", () => {
     ["a top-level range", "8000-8010"],
     ["a range in an array", ["8000-8010", 9090]],
     ["an ExposedPort with a range", [{ port: "8000-8010", type: "api" }]],
+    ["a tcp ExposedPort", [{ port: 2222, type: "tcp" }]],
   ])("accepts expose with %s", (_, expose) => {
     expect(validateJobDefinition(runWith({ expose })).success).toBe(true);
   });
 
   it.each(["9000-8000", "8000-8000", "8000:8010"])("rejects the port range %s", (expose) => {
     expect(validateJobDefinition(runWith({ expose })).success).toBe(false);
+  });
+
+  it("rejects an unknown service type", () => {
+    expect(validateJobDefinition(runWith({ expose: [{ port: 2222, type: "udp" }] })).success).toBe(false);
   });
 
   it("rejects a number port inside an exposed range", () => {
