@@ -61,11 +61,13 @@ You will need to install the following to get started as a GPU Host:
 
 Follow these guides to become a GPU Host or list your hardware on the Nosana Network:
 
-[Ubuntu](/hosts/grid-run): Follow this guide if you're using Ubuntu, a widely used Linux distribution.
+[Host service](/hosts/host-service): one command installs the node as a system service you control from [host-beta.nosana.com](https://host-beta.nosana.com). Already running a node with `start.sh`? The same page shows how to move it.
+
+[Ubuntu with start.sh](/hosts/grid-run): the previous setup, with Docker.
 
 ## Host Your GPU
 
 After listing your hardware on the Nosana Network, you’re ready to start hosting! Launch your GPU Host to begin contributing compute power and earning rewards.
-- **Run your host**: Follow the [Ubuntu Setup Guide](/hosts/grid-run) to get started
+- **Run your host**: [Install the host service](/hosts/host-service) to get started
 - **Monitor your host & earnings**: Once your host is running, go to [host.nosana.com](https://host.nosana.com) to see status, statistics, and $NOS earnings.
 - **Check markets & queues**: Use [explore.nosana.com](https://explore.nosana.com) to see the current market queue and activity.

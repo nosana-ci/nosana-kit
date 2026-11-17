@@ -1,5 +1,10 @@
 # Running the Host
 
+::: tip
+The [host service](/hosts/host-service) replaces this setup. It runs the node as a system service, and
+a node set up with this guide [moves to it](/hosts/host-service#move-an-existing-node) with its key.
+:::
+
 This guide is for GPU Hosts who have successfully registered their GPUs on the Nosana GPU Marketplace. Congratulations on reaching this milestone! Now it's time to launch your Node and start earning $NOS by contributing GPU power to the Nosana Network.
 
 # Setup for Ubuntu

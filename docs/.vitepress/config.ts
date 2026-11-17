@@ -252,7 +252,8 @@ export default withMermaid(
             text: 'Host GPUs',
             items: [
               { text: 'Getting Started', link: '/hosts/grid' },
-              { text: 'Running the Host', link: '/hosts/grid-run' },
+              { text: 'Install the Host Service', link: '/hosts/host-service' },
+              { text: 'Running the Host (start.sh)', link: '/hosts/grid-run' },
               { text: 'Troubleshooting', link: '/hosts/troubleshoot' },
             ],
           },
