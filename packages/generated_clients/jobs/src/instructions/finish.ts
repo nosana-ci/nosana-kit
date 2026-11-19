@@ -44,6 +44,7 @@ export const FINISH_INSTRUCTION_ACCOUNTS = {
   payerJob: 7,
   authority: 8,
   tokenProgram: 9,
+  feeVault: 10,
 } as const;
 
 export type FinishInstructionAccountName = keyof typeof FINISH_INSTRUCTION_ACCOUNTS;
@@ -68,6 +69,7 @@ export type FinishInstruction<
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountFeeVault extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -100,6 +102,9 @@ export type FinishInstruction<
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
+      TAccountFeeVault extends string
+        ? WritableAccount<TAccountFeeVault>
+        : TAccountFeeVault,
       ...TRemainingAccounts,
     ]
   >;
@@ -149,6 +154,7 @@ export type FinishInput<
   TAccountPayerJob extends string = string,
   TAccountAuthority extends string = string,
   TAccountTokenProgram extends string = string,
+  TAccountFeeVault extends string = string,
 > = {
   job: Address<TAccountJob>;
   run: Address<TAccountRun>;
@@ -160,6 +166,7 @@ export type FinishInput<
   payerJob: Address<TAccountPayerJob>;
   authority: TransactionSigner<TAccountAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
+  feeVault: Address<TAccountFeeVault>;
   ipfsResult: FinishInstructionDataArgs["ipfsResult"];
 };
 
@@ -174,6 +181,7 @@ export function getFinishInstruction<
   TAccountPayerJob extends string,
   TAccountAuthority extends string,
   TAccountTokenProgram extends string,
+  TAccountFeeVault extends string,
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
   input: FinishInput<
@@ -186,7 +194,8 @@ export function getFinishInstruction<
     TAccountPayerRun,
     TAccountPayerJob,
     TAccountAuthority,
-    TAccountTokenProgram
+    TAccountTokenProgram,
+    TAccountFeeVault
   >,
   config?: { programAddress?: TProgramAddress },
 ): FinishInstruction<
@@ -200,7 +209,8 @@ export function getFinishInstruction<
   TAccountPayerRun,
   TAccountPayerJob,
   TAccountAuthority,
-  TAccountTokenProgram
+  TAccountTokenProgram,
+  TAccountFeeVault
 > {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
@@ -217,6 +227,7 @@ export function getFinishInstruction<
     payerJob: { value: input.payerJob ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    feeVault: { value: input.feeVault ?? null, isWritable: true },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -245,6 +256,7 @@ export function getFinishInstruction<
       getAccountMeta(accounts.payerJob),
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.feeVault),
     ],
     data: getFinishInstructionDataEncoder().encode(
       args as FinishInstructionDataArgs,
@@ -261,7 +273,8 @@ export function getFinishInstruction<
     TAccountPayerRun,
     TAccountPayerJob,
     TAccountAuthority,
-    TAccountTokenProgram
+    TAccountTokenProgram,
+    TAccountFeeVault
   >);
 }
 
@@ -281,6 +294,7 @@ export type ParsedFinishInstruction<
     payerJob: TAccountMetas[7];
     authority: TAccountMetas[8];
     tokenProgram: TAccountMetas[9];
+    feeVault: TAccountMetas[10];
   };
   data: FinishInstructionData;
 };
@@ -293,7 +307,7 @@ export function parseFinishInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedFinishInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 10) {
+  if (instruction.accounts.length < 11) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -316,6 +330,7 @@ export function parseFinishInstruction<
       payerJob: getNextAccount(),
       authority: getNextAccount(),
       tokenProgram: getNextAccount(),
+      feeVault: getNextAccount(),
     },
     data: getFinishInstructionDataDecoder().decode(instruction.data),
   };

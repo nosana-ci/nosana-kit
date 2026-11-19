@@ -24,6 +24,10 @@ export const NOS_MINT_ADDRESSES: Record<NosanaNetwork, string> = {
  * `rewardsPool` is not a program but the AddFee pool that pays the rewards
  * vault, which a stake topup claims first. It has rotated before, so it is
  * kept here beside the programs rather than in code. Localnet has none.
+ *
+ * `feeWallet` owns the NOS account that receives the job network fee. It must
+ * equal the jobs program's `FEE_WALLET`, which is still the system program
+ * placeholder.
  */
 export const NOSANA_PROGRAM_ADDRESSES = {
   [NosanaNetwork.MAINNET]: {
@@ -32,6 +36,7 @@ export const NOSANA_PROGRAM_ADDRESSES = {
     stake: 'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE',
     pools: 'nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD',
     merkleDistributor: 'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425',
+    feeWallet: '11111111111111111111111111111111',
     rewardsPool: '5SdnB8ZMqqfVKPUHFqx3KVfx4Aj4y352uCe8C71GHUqU',
   },
   [NosanaNetwork.DEVNET]: {
@@ -40,6 +45,7 @@ export const NOSANA_PROGRAM_ADDRESSES = {
     stake: 'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE',
     pools: 'nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD',
     merkleDistributor: 'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425',
+    feeWallet: '11111111111111111111111111111111',
     rewardsPool: 'miF9saGY5WS747oia48WR3CMFZMAGG8xt6ajB7rdV3e',
   },
   [NosanaNetwork.LOCALNET]: {
@@ -48,6 +54,7 @@ export const NOSANA_PROGRAM_ADDRESSES = {
     stake: 'nosScmHY2uR24Zh751PmGj9ww9QRNHewh9H59AfrTJE',
     pools: 'nosPdZrfDzND1LAR28FLMDEATUPK53K8xbRBXAirevD',
     merkleDistributor: 'merkp8F8f5EgYSYKadk3YiuQQdo3JPdnJWKviaaF425',
+    feeWallet: '11111111111111111111111111111111',
   },
 } as const satisfies Record<
   NosanaNetwork,
@@ -57,6 +64,7 @@ export const NOSANA_PROGRAM_ADDRESSES = {
     stake: string;
     pools: string;
     merkleDistributor: string;
+    feeWallet: string;
     rewardsPool?: string;
   }
 >;

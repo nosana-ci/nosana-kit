@@ -3,6 +3,7 @@ import { type Address, type TransactionSigner, generateKeyPairSigner } from '@so
 
 import type { getListInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
+import type { LegacyLayout } from '../legacyLayout.js';
 import { resolveProjectAccess } from './projectAccess.js';
 
 export type ListParams = {
@@ -12,7 +13,9 @@ export type ListParams = {
   payer?: TransactionSigner;
 };
 
-export type ListInstruction = ReturnType<typeof getListInstruction>;
+export type ListInstruction =
+  | ReturnType<typeof getListInstruction>
+  | LegacyLayout<ReturnType<typeof getListInstruction>>;
 
 export type List = (params: ListParams) => Promise<ListInstruction>;
 
@@ -25,6 +28,7 @@ export async function list(
     getRequiredWallet,
     getStaticAccounts,
     getNosATA,
+    matchDeployedLayout,
   }: InstructionsHelperParams
 ): Promise<ListInstruction> {
   try {
@@ -33,13 +37,12 @@ export async function list(
     const nosPayer = payer ?? wallet;
 
     // Generate new keypairs for job and run
-    const [jobKey, runKey, associatedTokenAddress, { jobsProgram, ...staticAccounts }] =
-      await Promise.all([
-        generateKeyPairSigner(),
-        generateKeyPairSigner(),
-        getNosATA(nosPayer.address),
-        getStaticAccounts(),
-      ]);
+    const [jobKey, runKey, associatedTokenAddress, { jobsProgram }] = await Promise.all([
+      generateKeyPairSigner(),
+      generateKeyPairSigner(),
+      getNosATA(nosPayer.address),
+      getStaticAccounts(),
+    ]);
     const [vault, projectAccess] = await Promise.all([
       deps.solana.pda([market, config.nosTokenAddress], jobsProgram),
       // the market settings, plus the wallet's access key NFT when the market is protected
@@ -50,7 +53,7 @@ export async function list(
     const ipfsJobBytes = ipfsHashToSolBytesArray(ipfsHash);
 
     // Create the list instruction
-    return client.getListInstruction(
+    const instruction = client.getListInstruction(
       {
         job: jobKey,
         run: runKey,
@@ -62,12 +65,12 @@ export async function list(
         payer: nosPayer,
         authority: wallet,
         ...projectAccess,
-        ...staticAccounts,
       },
       {
         programAddress: jobsProgram,
       }
     );
+    return await matchDeployedLayout('list', instruction, nosPayer.address);
   } catch (err) {
     const errorMessage = `Failed to create list instruction: ${err instanceof Error ? err.message : String(err)}`;
     deps.logger.error(errorMessage);

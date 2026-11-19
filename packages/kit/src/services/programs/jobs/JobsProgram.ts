@@ -24,6 +24,7 @@ import {
 } from '../../../utils/getStaticAccounts.js';
 import type { ProgramConfig } from '../../../config/types.js';
 import type { InstructionsHelperParams } from './instructions/types.js';
+import { createMatchDeployedLayout } from './deployedLayout.js';
 
 import * as Instructions from './instructions/index.js';
 import * as programClient from '@nosana/jobs-program';
@@ -697,6 +698,8 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     return getStaticAccountsFn(config, deps.solana, staticAccountsCache);
   }
 
+  const matchDeployedLayout = createMatchDeployedLayout(deps.solana.rpc, getStaticAccounts);
+
   function createInstructionsHelper(
     get: JobsProgram['get'],
     getRuns: JobsProgram['runs']
@@ -710,6 +713,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
       getRequiredWallet,
       getStaticAccounts,
       getNosATA: deps.nos.getATA,
+      matchDeployedLayout,
     };
   }
 

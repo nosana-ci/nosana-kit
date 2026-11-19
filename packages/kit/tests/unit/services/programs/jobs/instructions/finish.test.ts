@@ -15,6 +15,8 @@ import {
 const IPFS_BYTES_LENGTH = 32;
 const RUN_TIME_555 = 555;
 
+const FEE_VAULT = AddressFactory.create(996);
+
 describe('finish instruction', () => {
   let helperParams: Parameters<typeof finish>[1];
   let config: ReturnType<typeof MockClientFactory.createBasic>['config'];
@@ -47,6 +49,7 @@ describe('finish instruction', () => {
           rewardsProgram,
           rewardsReflection: AddressFactory.create(999),
           rewardsVault: AddressFactory.create(998),
+          feeVault: FEE_VAULT,
         };
       },
       getNosATA: sdk.nos.getATA.bind(sdk.nos),
@@ -126,6 +129,7 @@ describe('finish instruction', () => {
     expect(args.market).toBe(marketAddr);
     expect(args.authority).toBe(wallet);
     expect(args.vault).toBe(vaultPda);
+    expect(args.feeVault).toBe(FEE_VAULT);
     expect(instructions).toHaveLength(1);
     expect(instructions[0]).toBeDefined();
   });

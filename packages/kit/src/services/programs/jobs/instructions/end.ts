@@ -26,7 +26,7 @@ export async function end(
   try {
     const wallet = getRequiredWallet();
     // Get Required accounts
-    const [{ market, payer }, [run], { jobsProgram }] = await Promise.all([
+    const [{ market, payer }, [run], { jobsProgram, feeVault }] = await Promise.all([
       get(job, false),
       getRuns({ job }),
       getStaticAccounts(),
@@ -54,6 +54,7 @@ export async function end(
         vault: vault,
         payer: run.payer, // Use payer from the run account
         authority: wallet,
+        feeVault,
       },
       {
         programAddress: jobsProgram,

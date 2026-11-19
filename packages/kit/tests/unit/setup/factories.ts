@@ -181,6 +181,11 @@ export class ClientFactory {
   }
 }
 
+/** A `simulateTransaction` mock that succeeds, as the jobs program before the fee release does for a legacy layout. */
+function simulateOnLegacyProgram() {
+  return vi.fn(() => ({ send: vi.fn().mockResolvedValue({ value: { err: null } }) }));
+}
+
 /**
  * Mock Client Factory
  * Creates mock NosanaClient instances for testing
@@ -206,6 +211,7 @@ export class MockClientFactory {
           stakeAddress: validAddr,
           poolsAddress: validAddr,
           merkleDistributorAddress: validAddr,
+          feeWalletAddress: validAddr,
         },
       },
       logger: {
@@ -215,7 +221,7 @@ export class MockClientFactory {
         warn: vi.fn(),
       },
       solana: {
-        rpc: {},
+        rpc: { simulateTransaction: simulateOnLegacyProgram() },
         pda: vi.fn().mockResolvedValue(validAddr),
       },
       nos: {
@@ -248,6 +254,7 @@ export class MockClientFactory {
           return [];
         }),
       })),
+      simulateTransaction: simulateOnLegacyProgram(),
     };
     const validAddr = AddressFactory.createValid();
     const sdk = MockClientFactory.createBasic({

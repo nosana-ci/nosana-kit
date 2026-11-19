@@ -62,6 +62,11 @@ export type JobAccount = {
   timeEnd: bigint;
   timeStart: bigint;
   timeout: bigint;
+  /**
+   * The `JOB_FEE_FRACTION` the job was created with. It must stay the last field: it takes a
+   * padding byte of the account, so jobs created before it existed read `0` and pay no fee.
+   */
+  feeFraction: number;
 };
 
 export type JobAccountArgs = {
@@ -76,6 +81,11 @@ export type JobAccountArgs = {
   timeEnd: number | bigint;
   timeStart: number | bigint;
   timeout: number | bigint;
+  /**
+   * The `JOB_FEE_FRACTION` the job was created with. It must stay the last field: it takes a
+   * padding byte of the account, so jobs created before it existed read `0` and pay no fee.
+   */
+  feeFraction: number;
 };
 
 /** Gets the encoder for {@link JobAccountArgs} account data. */
@@ -94,6 +104,7 @@ export function getJobAccountEncoder(): FixedSizeEncoder<JobAccountArgs> {
       ["timeEnd", getI64Encoder()],
       ["timeStart", getI64Encoder()],
       ["timeout", getI64Encoder()],
+      ["feeFraction", getU8Encoder()],
     ]),
     (value) => ({ ...value, discriminator: JOB_ACCOUNT_DISCRIMINATOR }),
   );
@@ -114,6 +125,7 @@ export function getJobAccountDecoder(): FixedSizeDecoder<JobAccount> {
     ["timeEnd", getI64Decoder()],
     ["timeStart", getI64Decoder()],
     ["timeout", getI64Decoder()],
+    ["feeFraction", getU8Decoder()],
   ]);
 }
 
@@ -179,5 +191,5 @@ export async function fetchAllMaybeJobAccount(
 }
 
 export function getJobAccountSize(): number {
-  return 233;
+  return 234;
 }

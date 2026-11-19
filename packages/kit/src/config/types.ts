@@ -76,6 +76,8 @@ export interface ProgramConfig {
   stakeAddress: Address;
   poolsAddress: Address;
   merkleDistributorAddress: Address;
+  /** Owner of the NOS account the jobs program pays the network fee into. */
+  feeWalletAddress: Address;
   /**
    * The pools-program pool that pays emission into the rewards vault (claim type
    * `AddFee`, beneficiary = rewards vault). `stake.topup` claims it before topping up.

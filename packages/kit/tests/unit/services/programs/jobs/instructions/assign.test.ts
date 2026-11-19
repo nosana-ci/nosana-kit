@@ -43,6 +43,7 @@ describe('assign instruction', () => {
         };
       },
       getNosATA: sdk.nos.getATA.bind(sdk.nos),
+      matchDeployedLayout: async (_name, instruction) => instruction,
     };
   });
 

@@ -43,6 +43,7 @@ export const END_INSTRUCTION_ACCOUNTS = {
   payer: 6,
   authority: 7,
   tokenProgram: 8,
+  feeVault: 9,
 } as const;
 
 export type EndInstructionAccountName = keyof typeof END_INSTRUCTION_ACCOUNTS;
@@ -66,6 +67,7 @@ export type EndInstruction<
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountFeeVault extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -95,6 +97,9 @@ export type EndInstruction<
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
+      TAccountFeeVault extends string
+        ? WritableAccount<TAccountFeeVault>
+        : TAccountFeeVault,
       ...TRemainingAccounts,
     ]
   >;
@@ -136,6 +141,7 @@ export type EndInput<
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountTokenProgram extends string = string,
+  TAccountFeeVault extends string = string,
 > = {
   job: Address<TAccountJob>;
   market: Address<TAccountMarket>;
@@ -146,6 +152,7 @@ export type EndInput<
   payer: Address<TAccountPayer>;
   authority: TransactionSigner<TAccountAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
+  feeVault: Address<TAccountFeeVault>;
 };
 
 export function getEndInstruction<
@@ -158,6 +165,7 @@ export function getEndInstruction<
   TAccountPayer extends string,
   TAccountAuthority extends string,
   TAccountTokenProgram extends string,
+  TAccountFeeVault extends string,
   TProgramAddress extends Address = typeof NOSANA_JOBS_PROGRAM_ADDRESS,
 >(
   input: EndInput<
@@ -169,7 +177,8 @@ export function getEndInstruction<
     TAccountVault,
     TAccountPayer,
     TAccountAuthority,
-    TAccountTokenProgram
+    TAccountTokenProgram,
+    TAccountFeeVault
   >,
   config?: { programAddress?: TProgramAddress },
 ): EndInstruction<
@@ -182,7 +191,8 @@ export function getEndInstruction<
   TAccountVault,
   TAccountPayer,
   TAccountAuthority,
-  TAccountTokenProgram
+  TAccountTokenProgram,
+  TAccountFeeVault
 > {
   // Program address.
   const programAddress = config?.programAddress ?? NOSANA_JOBS_PROGRAM_ADDRESS;
@@ -198,6 +208,7 @@ export function getEndInstruction<
     payer: { value: input.payer ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: true },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    feeVault: { value: input.feeVault ?? null, isWritable: true },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -222,6 +233,7 @@ export function getEndInstruction<
       getAccountMeta(accounts.payer),
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.feeVault),
     ],
     data: getEndInstructionDataEncoder().encode({}),
     programAddress,
@@ -235,7 +247,8 @@ export function getEndInstruction<
     TAccountVault,
     TAccountPayer,
     TAccountAuthority,
-    TAccountTokenProgram
+    TAccountTokenProgram,
+    TAccountFeeVault
   >);
 }
 
@@ -254,6 +267,7 @@ export type ParsedEndInstruction<
     payer: TAccountMetas[6];
     authority: TAccountMetas[7];
     tokenProgram: TAccountMetas[8];
+    feeVault: TAccountMetas[9];
   };
   data: EndInstructionData;
 };
@@ -266,7 +280,7 @@ export function parseEndInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedEndInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 9) {
+  if (instruction.accounts.length < 10) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -288,6 +302,7 @@ export function parseEndInstruction<
       payer: getNextAccount(),
       authority: getNextAccount(),
       tokenProgram: getNextAccount(),
+      feeVault: getNextAccount(),
     },
     data: getEndInstructionDataDecoder().decode(instruction.data),
   };
