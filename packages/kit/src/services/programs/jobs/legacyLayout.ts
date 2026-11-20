@@ -6,13 +6,10 @@ import {
 } from '@nosana/jobs-program';
 
 /**
- * The account layouts of the jobs program releases. `legacy` routes the network fee through
- * the rewards program and takes its accounts in `list`, `assign` and `extend`; `fee` does not.
- * The instruction data is the same in both.
+ * The jobs instructions whose accounts differ between the program releases. The `legacy` layout
+ * routes the network fee through the rewards program and takes its accounts; the `fee` layout,
+ * which the generated client builds, does not. The instruction data is the same in both.
  */
-export type JobsLayout = 'legacy' | 'fee';
-
-/** The jobs instructions whose accounts differ between the layouts. */
 export type LayoutDependentInstructionName = keyof typeof FEE_LAYOUT_ACCOUNTS;
 
 /** A generated instruction rewritten into the `legacy` layout, which no longer matches its account tuple. */
