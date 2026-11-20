@@ -57,6 +57,9 @@ type Verdict = JobsLayout | 'unknown';
  * `legacy` without the answer being kept. A `fee` answer is kept, since the program is not
  * downgraded. A `legacy` answer is kept for {@link LEGACY_RECHECK_MS}: an instruction built just
  * before the upgrade fails like any transaction that straddles it.
+ *
+ * Builds running at the same time wait for the simulation in flight; when it settles nothing,
+ * each simulates its own instruction.
  */
 export function createMatchDeployedLayout(
   solana: Pick<SolanaService, 'rpc' | 'feePayer'>,
@@ -64,18 +67,33 @@ export function createMatchDeployedLayout(
 ): MatchDeployedLayout {
   let isFeeLayout = false;
   let legacyCheckedAt = -Infinity;
-  let pending: Promise<Verdict> | undefined;
+  let inFlight: Promise<Verdict> | undefined;
 
   async function deployedLayout(legacy: Instruction, feePayer: Address): Promise<JobsLayout> {
     if (Date.now() - legacyCheckedAt < LEGACY_RECHECK_MS) return 'legacy';
 
-    pending ??= simulateLegacy(solana.rpc, legacy, feePayer).finally(() => {
-      pending = undefined;
+    // Checked without awaiting, so builds starting together join one simulation.
+    const shared = inFlight ? await inFlight : undefined;
+    const verdict =
+      shared === 'fee' || shared === 'legacy' ? shared : await simulate(legacy, feePayer);
+    return verdict === 'fee' ? 'fee' : 'legacy';
+  }
+
+  /** Simulates for this build; a failed RPC call fails this build only. */
+  function simulate(legacy: Instruction, feePayer: Address): Promise<Verdict> {
+    const verdict = simulateLegacy(solana.rpc, legacy, feePayer).then(remember);
+    const shared = verdict.catch((): Verdict => 'unknown');
+    inFlight = shared;
+    void shared.finally(() => {
+      if (inFlight === shared) inFlight = undefined;
     });
-    const verdict = await pending;
+    return verdict;
+  }
+
+  function remember(verdict: Verdict): Verdict {
     if (verdict === 'fee') isFeeLayout = true;
     if (verdict === 'legacy') legacyCheckedAt = Date.now();
-    return verdict === 'fee' ? 'fee' : 'legacy';
+    return verdict;
   }
 
   return async (name, instruction, nosPayer) => {

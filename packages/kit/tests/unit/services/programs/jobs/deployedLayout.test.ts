@@ -28,11 +28,18 @@ function feeLayoutList(): Instruction {
   return { programAddress: AddressFactory.create(1), accounts, data: new Uint8Array([7]) };
 }
 
-/** An RPC whose simulations end with the given errors, the last one repeating. */
+/**
+ * An RPC whose simulations end with the given errors, the last one repeating. An `Error`
+ * is thrown by the RPC call itself.
+ */
 function rpcSimulating(...errors: unknown[]) {
   let call = 0;
   const simulateTransaction = vi.fn(() => ({
-    send: async () => ({ value: { err: errors[Math.min(call++, errors.length - 1)] } }),
+    send: async () => {
+      const err = errors[Math.min(call++, errors.length - 1)];
+      if (err instanceof Error) throw err;
+      return { value: { err } };
+    },
   }));
   return { solana: { rpc: { simulateTransaction } } as never, simulateTransaction };
 }
@@ -125,6 +132,35 @@ describe('createMatchDeployedLayout', () => {
     await createMatchDeployedLayout(solana, rewards)('list', feeLayoutList(), FEE_PAYER);
     expect(simulatedWith(simulateTransaction, clientFeePayer)).toBe(true);
     expect(simulatedWith(simulateTransaction, FEE_PAYER)).toBe(false);
+  });
+
+  it('lets each build simulate its own instruction when the shared one settles nothing', async () => {
+    const { solana, simulateTransaction } = rpcSimulating(
+      OTHER_PROGRAM_ERROR,
+      REJECTED_BY_FEE_PROGRAM
+    );
+    const match = createMatchDeployedLayout(solana, rewards);
+
+    const builds = [feeLayoutList(), feeLayoutList(), feeLayoutList()];
+    const [first, ...rest] = await Promise.all(
+      builds.map((instruction) => match('list', instruction, FEE_PAYER))
+    );
+    expect(first.accounts).toHaveLength(LEGACY_ACCOUNT_COUNT);
+    expect(rest).toEqual(builds.slice(1));
+    expect(simulateTransaction).toHaveBeenCalledTimes(3);
+  });
+
+  it('fails only the build whose simulation could not be sent', async () => {
+    const { solana, simulateTransaction } = rpcSimulating(new Error('429'), null);
+    const match = createMatchDeployedLayout(solana, rewards);
+
+    const [failed, built] = await Promise.allSettled([
+      match('list', feeLayoutList(), FEE_PAYER),
+      match('list', feeLayoutList(), FEE_PAYER),
+    ]);
+    expect(failed.status).toBe('rejected');
+    expect(built.status).toBe('fulfilled');
+    expect(simulateTransaction).toHaveBeenCalledTimes(2);
   });
 
   it('simulates without signatures against a recent blockhash', async () => {

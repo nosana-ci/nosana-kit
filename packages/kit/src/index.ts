@@ -75,6 +75,11 @@ export type {
 /**
  * @group @nosana/kit
  */
+export type { LegacyLayout } from './services/programs/jobs/legacyLayout.js';
+
+/**
+ * @group @nosana/kit
+ */
 export type {
   Assign,
   AssignParams,

@@ -28,6 +28,7 @@ import * as stakingClient from '@nosana/stake-program';
 import * as merkleDistributorClient from '@nosana/merkle-distributor-program';
 import { JobState, MarketQueueType } from '../../../src/services/programs/jobs/index.js';
 import { NosanaNetwork } from '@nosana/types';
+import { simulateOnLegacyProgram } from './simulateOnLegacyProgram.js';
 
 /**
  * Signer Factory
@@ -179,11 +180,6 @@ export class ClientFactory {
       solana: { rpcEndpoint },
     });
   }
-}
-
-/** A `simulateTransaction` mock that succeeds, as the jobs program before the fee release does for a legacy layout. */
-function simulateOnLegacyProgram() {
-  return vi.fn(() => ({ send: vi.fn().mockResolvedValue({ value: { err: null } }) }));
 }
 
 /**

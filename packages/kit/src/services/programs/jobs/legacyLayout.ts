@@ -79,5 +79,5 @@ export function toFeeLayout(
 }
 
 export function isLayoutDependent(name: string): name is LayoutDependentInstructionName {
-  return name in FEE_LAYOUT_ACCOUNTS;
+  return Object.prototype.hasOwnProperty.call(FEE_LAYOUT_ACCOUNTS, name);
 }

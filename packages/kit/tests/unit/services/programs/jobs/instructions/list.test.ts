@@ -57,6 +57,32 @@ describe('list instruction', () => {
     vi.restoreAllMocks();
   });
 
+  it('returns the instruction in the deployed layout, matched with the NOS payer', async () => {
+    const payer = { address: AddressFactory.create(110) } as any;
+    (helperParams.deps.getWallet as any) = () => ({ address: AddressFactory.create(111) });
+    const built = {
+      programAddress: AddressFactory.create(1),
+      accounts: [],
+      data: new Uint8Array([3]),
+    };
+    vi.spyOn(programClient, 'getListInstruction' as any).mockReturnValue(built);
+    const deployed = { ...built, accounts: [] };
+    const matchDeployedLayout = vi.fn(async () => deployed);
+
+    const instr = await list(
+      {
+        market: AddressFactory.create(74),
+        timeout: 60,
+        ipfsHash: solBytesArrayToIpfsHash(Array(IPFS_BYTES_LENGTH).fill(1)),
+        payer,
+      },
+      { ...helperParams, matchDeployedLayout: matchDeployedLayout as never }
+    );
+
+    expect(matchDeployedLayout).toHaveBeenCalledWith('list', built, payer.address);
+    expect(instr).toBe(deployed);
+  });
+
   it('creates list instruction with ipfsHashToSolBytesArray and PDAs', async () => {
     const walletAddr = AddressFactory.create(70);
     const vaultPda = AddressFactory.create(80);
