@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { type Instruction, AccountRole } from '@solana/kit';
+import { type Address, type Instruction, AccountRole, getAddressEncoder } from '@solana/kit';
 import { LIST_INSTRUCTION_ACCOUNTS } from '@nosana/jobs-program';
 
 import { createMatchDeployedLayout } from '../../../../../src/services/programs/jobs/deployedLayout.js';
@@ -10,7 +10,8 @@ const LEGACY_RECHECK_MS = 30_000;
 
 // The RPC delivers custom program error codes as bigints.
 const REJECTED_BY_FEE_PROGRAM = { InstructionError: [0, { Custom: 3010n }] };
-const OTHER_PROGRAM_ERROR = { InstructionError: [0, { Custom: 6000 }] };
+const OTHER_PROGRAM_ERROR = { InstructionError: [0, { Custom: 3012n }] };
+const NO_FUNDS_FOR_FEE = 'InsufficientFundsForFee';
 
 const FEE_PAYER = AddressFactory.create(900);
 const rewards = async () => ({
@@ -33,7 +34,13 @@ function rpcSimulating(...errors: unknown[]) {
   const simulateTransaction = vi.fn(() => ({
     send: async () => ({ value: { err: errors[Math.min(call++, errors.length - 1)] } }),
   }));
-  return { rpc: { simulateTransaction } as never, simulateTransaction };
+  return { solana: { rpc: { simulateTransaction } } as never, simulateTransaction };
+}
+
+/** Whether the simulated transaction names `account`, e.g. as its fee payer. */
+function simulatedWith(simulateTransaction: ReturnType<typeof vi.fn>, account: Address) {
+  const wire = Buffer.from(simulateTransaction.mock.calls[0][0] as string, 'base64');
+  return wire.includes(Buffer.from(getAddressEncoder().encode(account)));
 }
 
 describe('createMatchDeployedLayout', () => {
@@ -42,32 +49,39 @@ describe('createMatchDeployedLayout', () => {
   });
 
   it('returns the legacy layout while the program accepts it', async () => {
-    const { rpc } = rpcSimulating(null);
-    const match = createMatchDeployedLayout(rpc, rewards);
+    const { solana } = rpcSimulating(null);
+    const match = createMatchDeployedLayout(solana, rewards);
 
     const instruction = await match('list', feeLayoutList(), FEE_PAYER);
     expect(instruction.accounts).toHaveLength(LEGACY_ACCOUNT_COUNT);
   });
 
-  it('keeps the legacy layout when the program fails it for another reason', async () => {
-    const { rpc } = rpcSimulating(OTHER_PROGRAM_ERROR);
-    const match = createMatchDeployedLayout(rpc, rewards);
+  it.each([
+    ['an instruction error of its own', OTHER_PROGRAM_ERROR],
+    ['a transaction error', NO_FUNDS_FOR_FEE],
+  ])('builds the legacy layout on %s, but asks again next time', async (_, error) => {
+    const { solana, simulateTransaction } = rpcSimulating(error, REJECTED_BY_FEE_PROGRAM);
+    const match = createMatchDeployedLayout(solana, rewards);
 
     const instruction = await match('list', feeLayoutList(), FEE_PAYER);
     expect(instruction.accounts).toHaveLength(LEGACY_ACCOUNT_COUNT);
+
+    const fee = feeLayoutList();
+    expect(await match('list', fee, FEE_PAYER)).toBe(fee);
+    expect(simulateTransaction).toHaveBeenCalledTimes(2);
   });
 
   it('returns the fee layout once the program rejects the legacy one', async () => {
-    const { rpc } = rpcSimulating(REJECTED_BY_FEE_PROGRAM);
-    const match = createMatchDeployedLayout(rpc, rewards);
+    const { solana } = rpcSimulating(REJECTED_BY_FEE_PROGRAM);
+    const match = createMatchDeployedLayout(solana, rewards);
 
     const fee = feeLayoutList();
     expect(await match('list', fee, FEE_PAYER)).toBe(fee);
   });
 
   it('stops simulating after the fee layout is found', async () => {
-    const { rpc, simulateTransaction } = rpcSimulating(REJECTED_BY_FEE_PROGRAM);
-    const match = createMatchDeployedLayout(rpc, rewards);
+    const { solana, simulateTransaction } = rpcSimulating(REJECTED_BY_FEE_PROGRAM);
+    const match = createMatchDeployedLayout(solana, rewards);
 
     await match('list', feeLayoutList(), FEE_PAYER);
     await match('extend', feeLayoutList(), FEE_PAYER);
@@ -76,8 +90,8 @@ describe('createMatchDeployedLayout', () => {
 
   it('reuses a legacy answer, then asks again once it is stale', async () => {
     vi.useFakeTimers();
-    const { rpc, simulateTransaction } = rpcSimulating(null, REJECTED_BY_FEE_PROGRAM);
-    const match = createMatchDeployedLayout(rpc, rewards);
+    const { solana, simulateTransaction } = rpcSimulating(null, REJECTED_BY_FEE_PROGRAM);
+    const match = createMatchDeployedLayout(solana, rewards);
 
     await match('list', feeLayoutList(), FEE_PAYER);
     await match('list', feeLayoutList(), FEE_PAYER);
@@ -90,16 +104,32 @@ describe('createMatchDeployedLayout', () => {
   });
 
   it('shares one simulation between concurrent builds', async () => {
-    const { rpc, simulateTransaction } = rpcSimulating(null);
-    const match = createMatchDeployedLayout(rpc, rewards);
+    const { solana, simulateTransaction } = rpcSimulating(null);
+    const match = createMatchDeployedLayout(solana, rewards);
 
     await Promise.all([1, 2, 3].map(() => match('list', feeLayoutList(), FEE_PAYER)));
     expect(simulateTransaction).toHaveBeenCalledTimes(1);
   });
 
+  it('lets the NOS payer pay for the simulation', async () => {
+    const { solana, simulateTransaction } = rpcSimulating(null);
+    await createMatchDeployedLayout(solana, rewards)('list', feeLayoutList(), FEE_PAYER);
+    expect(simulatedWith(simulateTransaction, FEE_PAYER)).toBe(true);
+  });
+
+  it("lets the client's own fee payer pay for the simulation", async () => {
+    const { simulateTransaction } = rpcSimulating(null);
+    const clientFeePayer = AddressFactory.create(904);
+    const solana = { rpc: { simulateTransaction }, feePayer: { address: clientFeePayer } } as never;
+
+    await createMatchDeployedLayout(solana, rewards)('list', feeLayoutList(), FEE_PAYER);
+    expect(simulatedWith(simulateTransaction, clientFeePayer)).toBe(true);
+    expect(simulatedWith(simulateTransaction, FEE_PAYER)).toBe(false);
+  });
+
   it('simulates without signatures against a recent blockhash', async () => {
-    const { rpc, simulateTransaction } = rpcSimulating(null);
-    const match = createMatchDeployedLayout(rpc, rewards);
+    const { solana, simulateTransaction } = rpcSimulating(null);
+    const match = createMatchDeployedLayout(solana, rewards);
 
     await match('list', feeLayoutList(), FEE_PAYER);
     expect(simulateTransaction).toHaveBeenCalledWith(expect.any(String), {

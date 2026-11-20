@@ -14,6 +14,7 @@ import {
   setTransactionMessageLifetimeUsingBlockhash,
 } from '@solana/kit';
 
+import type { SolanaService } from '../../solana/index.js';
 import {
   type JobsLayout,
   type LayoutDependentInstructionName,
@@ -36,54 +37,60 @@ const PLACEHOLDER_BLOCKHASH = blockhash('11111111111111111111111111111111');
 
 /**
  * Returns the instruction in the layout of the deployed jobs program: `instruction` itself
- * when that is the `fee` program, its `legacy` rewrite otherwise. `feePayer` pays for the
- * simulation; the builders pass the NOS payer, which also funds the job accounts.
+ * when that is the `fee` program, its `legacy` rewrite otherwise. `nosPayer` pays for the
+ * simulation unless the client has a fee payer of its own.
  */
 export type MatchDeployedLayout = <T extends Instruction>(
   name: LayoutDependentInstructionName,
   instruction: T,
-  feePayer: Address
+  nosPayer: Address
 ) => Promise<T | LegacyLayout<T>>;
+
+/** What one simulation of a `legacy` instruction says about the deployed program. */
+type Verdict = JobsLayout | 'unknown';
 
 /**
  * Finds the deployed layout by simulating the `legacy` rewrite of the instruction being built,
- * so callers keep working across the program upgrade without a coordinated release. A `fee`
- * answer is kept, since the program is not downgraded. A `legacy` answer is kept for
- * {@link LEGACY_RECHECK_MS}: an instruction built just before the upgrade fails like any
- * transaction that straddles it.
+ * so callers keep working across the program upgrade without a coordinated release. Only a
+ * rejection on `authority` means `fee`, and only a successful simulation means `legacy`: an
+ * instruction that fails for its own reasons says nothing about the program, so it is built as
+ * `legacy` without the answer being kept. A `fee` answer is kept, since the program is not
+ * downgraded. A `legacy` answer is kept for {@link LEGACY_RECHECK_MS}: an instruction built just
+ * before the upgrade fails like any transaction that straddles it.
  */
 export function createMatchDeployedLayout(
-  rpc: Rpc<SimulateTransactionApi>,
+  solana: Pick<SolanaService, 'rpc' | 'feePayer'>,
   getRewardsAccounts: () => Promise<RewardsAccounts>
 ): MatchDeployedLayout {
   let isFeeLayout = false;
   let legacyCheckedAt = -Infinity;
-  let pending: Promise<JobsLayout> | undefined;
+  let pending: Promise<Verdict> | undefined;
 
   async function deployedLayout(legacy: Instruction, feePayer: Address): Promise<JobsLayout> {
-    if (isFeeLayout) return 'fee';
     if (Date.now() - legacyCheckedAt < LEGACY_RECHECK_MS) return 'legacy';
 
-    pending ??= simulateLayout(rpc, legacy, feePayer).finally(() => {
+    pending ??= simulateLegacy(solana.rpc, legacy, feePayer).finally(() => {
       pending = undefined;
     });
-    const layout = await pending;
-    if (layout === 'fee') isFeeLayout = true;
-    else legacyCheckedAt = Date.now();
-    return layout;
+    const verdict = await pending;
+    if (verdict === 'fee') isFeeLayout = true;
+    if (verdict === 'legacy') legacyCheckedAt = Date.now();
+    return verdict === 'fee' ? 'fee' : 'legacy';
   }
 
-  return async (name, instruction, feePayer) => {
+  return async (name, instruction, nosPayer) => {
+    if (isFeeLayout) return instruction;
     const legacy = toLegacyLayout(name, instruction, await getRewardsAccounts());
+    const feePayer = solana.feePayer?.address ?? nosPayer;
     return (await deployedLayout(legacy, feePayer)) === 'fee' ? instruction : legacy;
   };
 }
 
-async function simulateLayout(
+async function simulateLegacy(
   rpc: Rpc<SimulateTransactionApi>,
   legacy: Instruction,
   feePayer: Address
-): Promise<JobsLayout> {
+): Promise<Verdict> {
   const message = pipe(
     createTransactionMessage({ version: 0 }),
     (m) => setTransactionMessageFeePayer(feePayer, m),
@@ -101,11 +108,12 @@ async function simulateLayout(
       replaceRecentBlockhash: true,
     })
     .send();
-  return isAccountNotSigner(value.err) ? 'fee' : 'legacy';
+  if (value.err === null) return 'legacy';
+  return isAccountNotSigner(value.err) ? 'fee' : 'unknown';
 }
 
-function isAccountNotSigner(error: TransactionError | null): boolean {
-  if (error === null || typeof error !== 'object' || !('InstructionError' in error)) return false;
+function isAccountNotSigner(error: TransactionError): boolean {
+  if (typeof error !== 'object' || !('InstructionError' in error)) return false;
   const [, instructionError] = error.InstructionError;
   return (
     typeof instructionError === 'object' &&

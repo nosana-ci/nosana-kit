@@ -698,7 +698,7 @@ export function createJobsProgram(deps: ProgramDeps, config: ProgramConfig): Job
     return getStaticAccountsFn(config, deps.solana, staticAccountsCache);
   }
 
-  const matchDeployedLayout = createMatchDeployedLayout(deps.solana.rpc, getStaticAccounts);
+  const matchDeployedLayout = createMatchDeployedLayout(deps.solana, getStaticAccounts);
 
   function createInstructionsHelper(
     get: JobsProgram['get'],
