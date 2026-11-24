@@ -25,7 +25,7 @@ As of this release, Windows (including WSL2) is being deprecated as a supported 
 
 To participate as a GPU Host, ensure your setup meets the following criteria:
 
-- **RAM**: 12GB+
+- **RAM**: 12GB+ (we recommend at least your GPU's VRAM)
 - **Storage**: 256GB+ NVMe (SSD)
 
   Large language models storage requirements can be high, especially models geared towards higher end GPU’s. It is recommended that ancillary storage up to 1TB be provided for your host to handle client model requirements.
@@ -38,14 +38,14 @@ To participate as a GPU Host, ensure your setup meets the following criteria:
 
   | RTX 30 Series | RTX 40 Series | RTX 50 Series | RTX A Series (Professional) | RTX A100 & H100 (Data Center) |
   | ------------- | ------------- | ------------- | --------------------------- | ----------------------------- |
-  | RTX 3090Ti     | RTX 4090       | RTX 5090       | RTX A6500                   | RTX A100 40GB                 |
-  | RTX 3090       | RTX 4080       | RTX 5080       | RTX A5500                   | RTX A100 80GB                 |
-  | RTX 3080Ti     | RTX 4070Ti     | RTX 5070       | RTX A5000                   | RTX H100                      |
-  | RTX 3080       | RTX 4070       |                | RTX A4500                   |                               |
-  | RTX 3070Ti     | RTX 4060Ti     |                | RTX A4000                   |                               |
-  | RTX 3070       | RTX 4060       |                | RTX A40                     |                               |
-  | RTX 3060Ti     |                |                |                             |                               |
-  | RTX 3060       |                |                |                             |                               |
+  | RTX 3090Ti    | RTX 4090      | RTX 5090      | RTX PRO 6000                | RTX PRO 6000 Server           |
+  | RTX 3090      | RTX 4080      | RTX 5080      | RTX A6500                   | RTX A100 40GB                 |
+  | RTX 3080Ti    | RTX 4070Ti    | RTX 5070      | RTX A5500                   | RTX A100 80GB                 |
+  | RTX 3080      | RTX 4070      |               | RTX A5000                   | RTX H100                      |
+  | RTX 3070Ti    | RTX 4060Ti    |               | RTX A4500                   |                               |
+  | RTX 3070      | RTX 4060      |               | RTX A4000                   |                               |
+  | RTX 3060Ti    |               |               | RTX A40                     |                               |
+  | RTX 3060      |               |               |                             |                               |
 
 <!-- ## Software Requirements
 You will need to install the following to get started as a GPU Host:
