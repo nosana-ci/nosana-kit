@@ -34,6 +34,10 @@ To participate as a GPU Host, ensure your setup meets the following criteria:
 
   High speed internet speed is required. To increase your chances of your host being hired by a client, we recommend 500 Mb/s download, 250 Mb/s upload, with ping below 100ms.
 
+- **Networking**: All outgoing ports must be open.
+
+  Jobs can connect to any external service (e.g. SSH on port 22), so your network or firewall must not block outgoing traffic on any port.
+
 - **Supported NVIDIA GPUs**:
 
   | RTX 30 Series | RTX 40 Series | RTX 50 Series | RTX A Series (Professional) | RTX A100 & H100 (Data Center) |
