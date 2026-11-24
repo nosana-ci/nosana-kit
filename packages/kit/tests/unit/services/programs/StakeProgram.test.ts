@@ -4,6 +4,7 @@ import {
   type StakeProgram,
 } from '../../../../src/services/programs/stake/index.js';
 import * as stakingClient from '@nosana/stake-program';
+import { ErrorCodes } from '../../../../src/errors/NosanaError.js';
 import { getBase64Decoder, type Address } from '@solana/kit';
 import {
   AddressFactory,
@@ -499,6 +500,38 @@ describe('StakeProgram', () => {
         ['stake', sdk.config.programs.nosTokenAddress, newAddr(3)],
         sdk.config.programs.stakeAddress
       );
+    });
+  });
+
+  describe('staking sunset (NNP-0001)', () => {
+    const stakingDisabled = expect.objectContaining({
+      name: 'NosanaError',
+      code: ErrorCodes.STAKING_DISABLED,
+    });
+
+    it('refuses a stake with an amount', async () => {
+      const sdk = MockClientFactory.createMockWithWallet();
+      const stake = createStakeProgram(sdkToProgramDeps(sdk), sdk.config.programs);
+
+      await expect(stake.stake({ amount: 1, days: 14 })).rejects.toEqual(stakingDisabled);
+      await expect(stake.stake({ amount: 1n, days: 14 })).rejects.toEqual(stakingDisabled);
+    });
+
+    it('still builds an empty stake, as nodes need one', async () => {
+      const sdk = MockClientFactory.createMockWithWallet();
+      const stake = createStakeProgram(sdkToProgramDeps(sdk), sdk.config.programs);
+      const stakeSpy = vi.spyOn(stakingClient, 'getStakeInstruction');
+
+      await stake.stake({ amount: 0, days: 14 });
+      expect(stakeSpy).toHaveBeenCalledWith(expect.objectContaining({ amount: 0 }));
+      stakeSpy.mockRestore();
+    });
+
+    it('refuses every topup', async () => {
+      const sdk = MockClientFactory.createMockWithWallet();
+      const stake = createStakeProgram(sdkToProgramDeps(sdk), sdk.config.programs);
+
+      await expect(stake.topup({ amount: 1 })).rejects.toEqual(stakingDisabled);
     });
   });
 });

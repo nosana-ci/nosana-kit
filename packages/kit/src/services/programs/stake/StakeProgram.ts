@@ -11,22 +11,25 @@ import * as Instructions from './instructions/index.js';
 
 export type Stake = ConvertTypesForDb<programClient.StakeAccountArgs> & { address: Address };
 
+const STAKING_DISABLED_MESSAGE =
+  'New stakes and stake top-ups are disabled: passive staking rewards are sunset (NNP-0001). ' +
+  'Only an empty stake account (amount 0) can still be created. See https://vote.nosana.com/';
+
 /**
  * Stake program interface
  * @group @nosana/kit
  */
 export interface StakeProgram {
   /**
-   * Create a stake instruction for creating/initializing a stake account
+   * Create a stake instruction for creating/initializing a stake account.
+   * Only an empty stake (`amount: 0`) can be created, as nodes need one to work;
+   * any other amount throws `STAKING_DISABLED` (passive staking sunset, NNP-0001).
    */
   stake: Instructions.CreateStake;
 
   /**
-   * Create the instructions that top up the wallet's existing stake account by `amount`
-   * (NOS base units) and keep its staking rewards in step. In order:
-   * rewards `enter` (only when the wallet has no rewards account yet), pools `claimFee`
-   * for `pool` (default: `programs.rewardsPoolAddress`), stake `topup`, rewards `sync`.
-   * Send them together in one transaction.
+   * @deprecated Always throws `STAKING_DISABLED`: stake top-ups are disabled
+   * now passive staking is sunset (NNP-0001).
    */
   topup: Instructions.CreateTopup;
 
@@ -119,11 +122,15 @@ export function createStakeProgram(deps: ProgramDeps, config: ProgramConfig): St
 
   return {
     async stake(params) {
+      // Empty stakes stay allowed: nodes need a stake account to work
+      if (Number(params.amount) !== 0) {
+        throw new NosanaError(STAKING_DISABLED_MESSAGE, ErrorCodes.STAKING_DISABLED);
+      }
       return Instructions.stake(params, createInstructionsHelper());
     },
 
-    async topup(params) {
-      return Instructions.topup(params, createInstructionsHelper());
+    async topup() {
+      throw new NosanaError(STAKING_DISABLED_MESSAGE, ErrorCodes.STAKING_DISABLED);
     },
 
     async getAddress(owner?: Address): Promise<Address> {
