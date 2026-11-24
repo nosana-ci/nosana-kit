@@ -1402,6 +1402,8 @@ enum ClaimTarget {
 
 The StakeProgram provides methods to interact with Nosana staking accounts on-chain.
 
+> **Passive staking is sunset:** following [NNP-0001](https://vote.nosana.com/), passive staking rewards end on 28 November 2026 (12:07 UTC). New stakes and stake top-ups are disabled in the kit. See [Creating and Topping Up Stakes](#creating-and-topping-up-stakes).
+
 ### Get a Single Stake Account
 
 Fetch a stake account by its address:
@@ -1441,25 +1443,27 @@ const allStakes = await client.stake.all();
 console.log(`Found ${allStakes.length} stake accounts`);
 ```
 
-### Top Up a Stake
+### Creating and Topping Up Stakes
 
-Add NOS to the wallet's existing stake account. `topup` returns the instructions to send together in one transaction, in this order:
+Passive staking rewards are sunset ([NNP-0001](https://vote.nosana.com/)), so the kit no longer builds instructions that add NOS to a stake:
 
-1. rewards `enter`, only when the wallet has no rewards account yet
-2. pools `claimFee`, which moves the pool's accrued emission into the rewards vault
-3. stake `topup(amount)`
-4. rewards `sync`, which updates the rewards account to the new stake
+- `client.stake.stake()` only builds an empty stake account (`amount: 0`). Nodes need one to work on jobs. Any other amount throws.
+- `client.stake.topup()` always throws.
 
-`amount` is in NOS base units (6 decimals), as a `number` or `bigint`. `pool` is the pools-program pool that pays emission into the rewards vault (claim type `AddFee`). It is optional and defaults to `programs.rewardsPoolAddress` in the client config (set for mainnet and devnet, unset on localnet). That pool has rotated in the past, so it is config, not a constant: override it in the config or pass `pool` per call. The wallet is the authority and signer of every instruction; the stake account must already exist and must not be unstaking.
+Both throw a `NosanaError` with code `STAKING_DISABLED`. Reading stake accounts still works.
 
 ```typescript
-// Uses programs.rewardsPoolAddress from the client config
-const instructions = await client.stake.topup({ amount: 1_000_000_000 }); // 1,000 NOS
+// Still allowed: an empty stake account for a node
+const instruction = await client.stake.stake({ amount: 0, days: 14 });
+await client.solana.buildSignAndSend(instruction);
 
-const signature = await client.solana.buildSignAndSend(instructions);
-
-// Or name the pool for this call
-await client.stake.topup({ amount: 1_000_000_000, pool: address('pool-address') });
+try {
+  await client.stake.topup({ amount: 1_000_000_000 });
+} catch (error) {
+  if (error instanceof NosanaError && error.code === ErrorCodes.STAKING_DISABLED) {
+    console.log(error.message);
+  }
+}
 ```
 
 Low-level builders and account decoders for these programs are exported as the `StakingClient`, `RewardsClient` and `PoolsClient` namespaces.
@@ -1665,6 +1669,7 @@ enum ErrorCodes {
   NO_WALLET = 'NO_WALLET',
   FILE_ERROR = 'FILE_ERROR',
   WALLET_CONVERSION_ERROR = 'WALLET_CONVERSION_ERROR',
+  STAKING_DISABLED = 'STAKING_DISABLED',
 }
 ```
 
