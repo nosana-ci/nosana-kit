@@ -1,6 +1,7 @@
 import type { Address, TransactionSigner } from '@solana/kit';
 import type { getExtendInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
+import type { LegacyLayout } from '../legacyLayout.js';
 
 export type ExtendParams = {
   job: Address;
@@ -8,7 +9,9 @@ export type ExtendParams = {
   payer?: TransactionSigner;
 };
 
-export type ExtendInstruction = ReturnType<typeof getExtendInstruction>;
+export type ExtendInstruction =
+  | ReturnType<typeof getExtendInstruction>
+  | LegacyLayout<ReturnType<typeof getExtendInstruction>>;
 
 export type Extend = (params: ExtendParams) => Promise<ExtendInstruction>;
 
@@ -22,6 +25,7 @@ export async function extend(
     getRequiredWallet,
     getStaticAccounts,
     getNosATA,
+    matchDeployedLayout,
   }: InstructionsHelperParams
 ): Promise<ExtendInstruction> {
   try {
@@ -30,15 +34,12 @@ export async function extend(
     const nosPayer = payer ?? wallet;
 
     // Get Required accounts
-    const [
-      { market, timeout: currentTimeout },
-      associatedTokenAddress,
-      { jobsProgram, ...staticAccounts },
-    ] = await Promise.all([get(job, false), getNosATA(nosPayer.address), getStaticAccounts()]);
+    const [{ market, timeout: currentTimeout }, associatedTokenAddress, { jobsProgram }] =
+      await Promise.all([get(job, false), getNosATA(nosPayer.address), getStaticAccounts()]);
     const vault = await deps.solana.pda([market, config.nosTokenAddress], jobsProgram);
 
     // Create the extend instruction
-    return client.getExtendInstruction(
+    const instruction = client.getExtendInstruction(
       {
         job,
         timeout: BigInt(currentTimeout) + BigInt(timeout),
@@ -47,12 +48,12 @@ export async function extend(
         payer: nosPayer,
         authority: wallet,
         user: associatedTokenAddress,
-        ...staticAccounts,
       },
       {
         programAddress: jobsProgram,
       }
     );
+    return await matchDeployedLayout('extend', instruction, nosPayer.address);
   } catch (err) {
     const errorMessage = `Failed to create extend instruction: ${err instanceof Error ? err.message : String(err)}`;
     deps.logger.error(errorMessage);

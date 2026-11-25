@@ -12,6 +12,8 @@ import {
   sdkToProgramDeps,
 } from '../../../../setup/index.js';
 
+const FEE_VAULT = AddressFactory.create(996);
+
 describe('end instruction', () => {
   let helperParams: Parameters<typeof end>[1];
   let config: ReturnType<typeof MockClientFactory.createBasic>['config'];
@@ -51,6 +53,7 @@ describe('end instruction', () => {
           rewardsProgram,
           rewardsReflection: AddressFactory.create(998),
           rewardsVault: AddressFactory.create(997),
+          feeVault: FEE_VAULT,
         };
       },
       getNosATA: sdk.nos.getATA.bind(sdk.nos),
@@ -130,6 +133,7 @@ describe('end instruction', () => {
     expect(args.deposit).toBe(payerATA);
     expect(args.user).toBe(nodeATA);
     expect(args.vault).toBe(vaultPda);
+    expect(args.feeVault).toBe(FEE_VAULT);
     expect(args.payer).toBe(payerAddr);
     expect(args.authority).toBe(wallet);
     expect(instruction).toBeDefined();

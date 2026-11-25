@@ -2,6 +2,7 @@ import { ipfsHashToSolBytesArray } from '@nosana/ipfs';
 import { type Address, type TransactionSigner, generateKeyPairSigner } from '@solana/kit';
 import type { getAssignInstruction } from '@nosana/jobs-program';
 import type { InstructionsHelperParams } from './types.js';
+import type { LegacyLayout } from '../legacyLayout.js';
 import { resolveProjectAccess } from './projectAccess.js';
 
 export type AssignParams = {
@@ -12,7 +13,9 @@ export type AssignParams = {
   payer?: TransactionSigner;
 };
 
-export type AssignInstruction = ReturnType<typeof getAssignInstruction>;
+export type AssignInstruction =
+  | ReturnType<typeof getAssignInstruction>
+  | LegacyLayout<ReturnType<typeof getAssignInstruction>>;
 
 export type Assign = (params: AssignParams) => Promise<AssignInstruction>;
 
@@ -25,6 +28,7 @@ export async function assign(
     getRequiredWallet,
     getStaticAccounts,
     getNosATA,
+    matchDeployedLayout,
   }: InstructionsHelperParams
 ): Promise<AssignInstruction> {
   try {
@@ -33,13 +37,12 @@ export async function assign(
     const nosPayer = payer ?? wallet;
 
     // Generate new keypairs for job and run
-    const [jobKey, runKey, associatedTokenAddress, { jobsProgram, ...staticAccounts }] =
-      await Promise.all([
-        generateKeyPairSigner(),
-        generateKeyPairSigner(),
-        getNosATA(nosPayer.address),
-        getStaticAccounts(),
-      ]);
+    const [jobKey, runKey, associatedTokenAddress, { jobsProgram }] = await Promise.all([
+      generateKeyPairSigner(),
+      generateKeyPairSigner(),
+      getNosATA(nosPayer.address),
+      getStaticAccounts(),
+    ]);
     const [vault, projectAccess] = await Promise.all([
       deps.solana.pda([market, config.nosTokenAddress], jobsProgram),
       // the market settings, plus the wallet's access key NFT when the market is protected
@@ -49,7 +52,7 @@ export async function assign(
     // Convert IPFS hash to Solana bytes array
     const ipfsJobBytes = ipfsHashToSolBytesArray(ipfsHash);
 
-    return client.getAssignInstruction(
+    const instruction = client.getAssignInstruction(
       {
         job: jobKey,
         run: runKey,
@@ -62,12 +65,12 @@ export async function assign(
         payer: nosPayer,
         authority: wallet,
         ...projectAccess,
-        ...staticAccounts,
       },
       {
         programAddress: jobsProgram,
       }
     );
+    return await matchDeployedLayout('assign', instruction, nosPayer.address);
   } catch (err) {
     const errorMessage = `Failed to create assign instruction: ${err instanceof Error ? err.message : String(err)}`;
     deps.logger.error(errorMessage);

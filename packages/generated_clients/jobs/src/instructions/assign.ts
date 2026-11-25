@@ -44,15 +44,12 @@ export const ASSIGN_INSTRUCTION_ACCOUNTS = {
   user: 4,
   vault: 5,
   payer: 6,
-  rewardsReflection: 7,
-  rewardsVault: 8,
-  authority: 9,
-  rewardsProgram: 10,
-  tokenProgram: 11,
-  systemProgram: 12,
-  marketSettings: 13,
-  projectNft: 14,
-  projectMetadata: 15,
+  authority: 7,
+  tokenProgram: 8,
+  systemProgram: 9,
+  marketSettings: 10,
+  projectNft: 11,
+  projectMetadata: 12,
 } as const;
 
 export type AssignInstructionAccountName = keyof typeof ASSIGN_INSTRUCTION_ACCOUNTS;
@@ -79,11 +76,7 @@ export type AssignInstruction<
   TAccountUser extends string | AccountMeta<string> = string,
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
-  TAccountRewardsReflection extends string | AccountMeta<string> = string,
-  TAccountRewardsVault extends string | AccountMeta<string> = string,
   TAccountAuthority extends string | AccountMeta<string> = string,
-  TAccountRewardsProgram extends string | AccountMeta<string> =
-    "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp",
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountSystemProgram extends string | AccountMeta<string> =
@@ -118,19 +111,10 @@ export type AssignInstruction<
         ? WritableSignerAccount<TAccountPayer> &
             AccountSignerMeta<TAccountPayer>
         : TAccountPayer,
-      TAccountRewardsReflection extends string
-        ? WritableAccount<TAccountRewardsReflection>
-        : TAccountRewardsReflection,
-      TAccountRewardsVault extends string
-        ? WritableAccount<TAccountRewardsVault>
-        : TAccountRewardsVault,
       TAccountAuthority extends string
         ? ReadonlySignerAccount<TAccountAuthority> &
             AccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
-      TAccountRewardsProgram extends string
-        ? ReadonlyAccount<TAccountRewardsProgram>
-        : TAccountRewardsProgram,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
@@ -198,10 +182,7 @@ export type AssignAsyncInput<
   TAccountUser extends string = string,
   TAccountVault extends string = string,
   TAccountPayer extends string = string,
-  TAccountRewardsReflection extends string = string,
-  TAccountRewardsVault extends string = string,
   TAccountAuthority extends string = string,
-  TAccountRewardsProgram extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountMarketSettings extends string = string,
@@ -215,10 +196,7 @@ export type AssignAsyncInput<
   user: Address<TAccountUser>;
   vault: Address<TAccountVault>;
   payer: TransactionSigner<TAccountPayer>;
-  rewardsReflection: Address<TAccountRewardsReflection>;
-  rewardsVault: Address<TAccountRewardsVault>;
   authority: TransactionSigner<TAccountAuthority>;
-  rewardsProgram?: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   marketSettings?: Address<TAccountMarketSettings>;
@@ -237,10 +215,7 @@ export async function getAssignInstructionAsync<
   TAccountUser extends string,
   TAccountVault extends string,
   TAccountPayer extends string,
-  TAccountRewardsReflection extends string,
-  TAccountRewardsVault extends string,
   TAccountAuthority extends string,
-  TAccountRewardsProgram extends string,
   TAccountTokenProgram extends string,
   TAccountSystemProgram extends string,
   TAccountMarketSettings extends string,
@@ -256,10 +231,7 @@ export async function getAssignInstructionAsync<
     TAccountUser,
     TAccountVault,
     TAccountPayer,
-    TAccountRewardsReflection,
-    TAccountRewardsVault,
     TAccountAuthority,
-    TAccountRewardsProgram,
     TAccountTokenProgram,
     TAccountSystemProgram,
     TAccountMarketSettings,
@@ -277,10 +249,7 @@ export async function getAssignInstructionAsync<
     TAccountUser,
     TAccountVault,
     TAccountPayer,
-    TAccountRewardsReflection,
-    TAccountRewardsVault,
     TAccountAuthority,
-    TAccountRewardsProgram,
     TAccountTokenProgram,
     TAccountSystemProgram,
     TAccountMarketSettings,
@@ -300,13 +269,7 @@ export async function getAssignInstructionAsync<
     user: { value: input.user ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     payer: { value: input.payer ?? null, isWritable: true },
-    rewardsReflection: {
-      value: input.rewardsReflection ?? null,
-      isWritable: true,
-    },
-    rewardsVault: { value: input.rewardsVault ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
-    rewardsProgram: { value: input.rewardsProgram ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
     marketSettings: { value: input.marketSettings ?? null, isWritable: false },
@@ -325,10 +288,6 @@ export async function getAssignInstructionAsync<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.rewardsProgram.value) {
-    accounts.rewardsProgram.value =
-      "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp" as Address<"nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp">;
-  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
@@ -359,10 +318,7 @@ export async function getAssignInstructionAsync<
       getAccountMeta(accounts.user),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.rewardsReflection),
-      getAccountMeta(accounts.rewardsVault),
       getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.rewardsProgram),
       getAccountMeta(accounts.tokenProgram),
       getAccountMeta(accounts.systemProgram),
       getAccountMeta(accounts.marketSettings),
@@ -382,10 +338,7 @@ export async function getAssignInstructionAsync<
     TAccountUser,
     TAccountVault,
     TAccountPayer,
-    TAccountRewardsReflection,
-    TAccountRewardsVault,
     TAccountAuthority,
-    TAccountRewardsProgram,
     TAccountTokenProgram,
     TAccountSystemProgram,
     TAccountMarketSettings,
@@ -402,10 +355,7 @@ export type AssignInput<
   TAccountUser extends string = string,
   TAccountVault extends string = string,
   TAccountPayer extends string = string,
-  TAccountRewardsReflection extends string = string,
-  TAccountRewardsVault extends string = string,
   TAccountAuthority extends string = string,
-  TAccountRewardsProgram extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountMarketSettings extends string = string,
@@ -419,10 +369,7 @@ export type AssignInput<
   user: Address<TAccountUser>;
   vault: Address<TAccountVault>;
   payer: TransactionSigner<TAccountPayer>;
-  rewardsReflection: Address<TAccountRewardsReflection>;
-  rewardsVault: Address<TAccountRewardsVault>;
   authority: TransactionSigner<TAccountAuthority>;
-  rewardsProgram?: Address<TAccountRewardsProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   marketSettings?: Address<TAccountMarketSettings>;
@@ -441,10 +388,7 @@ export function getAssignInstruction<
   TAccountUser extends string,
   TAccountVault extends string,
   TAccountPayer extends string,
-  TAccountRewardsReflection extends string,
-  TAccountRewardsVault extends string,
   TAccountAuthority extends string,
-  TAccountRewardsProgram extends string,
   TAccountTokenProgram extends string,
   TAccountSystemProgram extends string,
   TAccountMarketSettings extends string,
@@ -460,10 +404,7 @@ export function getAssignInstruction<
     TAccountUser,
     TAccountVault,
     TAccountPayer,
-    TAccountRewardsReflection,
-    TAccountRewardsVault,
     TAccountAuthority,
-    TAccountRewardsProgram,
     TAccountTokenProgram,
     TAccountSystemProgram,
     TAccountMarketSettings,
@@ -480,10 +421,7 @@ export function getAssignInstruction<
   TAccountUser,
   TAccountVault,
   TAccountPayer,
-  TAccountRewardsReflection,
-  TAccountRewardsVault,
   TAccountAuthority,
-  TAccountRewardsProgram,
   TAccountTokenProgram,
   TAccountSystemProgram,
   TAccountMarketSettings,
@@ -502,13 +440,7 @@ export function getAssignInstruction<
     user: { value: input.user ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     payer: { value: input.payer ?? null, isWritable: true },
-    rewardsReflection: {
-      value: input.rewardsReflection ?? null,
-      isWritable: true,
-    },
-    rewardsVault: { value: input.rewardsVault ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
-    rewardsProgram: { value: input.rewardsProgram ?? null, isWritable: false },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
     marketSettings: { value: input.marketSettings ?? null, isWritable: false },
@@ -527,10 +459,6 @@ export function getAssignInstruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.rewardsProgram.value) {
-    accounts.rewardsProgram.value =
-      "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp" as Address<"nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp">;
-  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
@@ -550,10 +478,7 @@ export function getAssignInstruction<
       getAccountMeta(accounts.user),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.rewardsReflection),
-      getAccountMeta(accounts.rewardsVault),
       getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.rewardsProgram),
       getAccountMeta(accounts.tokenProgram),
       getAccountMeta(accounts.systemProgram),
       getAccountMeta(accounts.marketSettings),
@@ -573,10 +498,7 @@ export function getAssignInstruction<
     TAccountUser,
     TAccountVault,
     TAccountPayer,
-    TAccountRewardsReflection,
-    TAccountRewardsVault,
     TAccountAuthority,
-    TAccountRewardsProgram,
     TAccountTokenProgram,
     TAccountSystemProgram,
     TAccountMarketSettings,
@@ -598,16 +520,13 @@ export type ParsedAssignInstruction<
     user: TAccountMetas[4];
     vault: TAccountMetas[5];
     payer: TAccountMetas[6];
-    rewardsReflection: TAccountMetas[7];
-    rewardsVault: TAccountMetas[8];
-    authority: TAccountMetas[9];
-    rewardsProgram: TAccountMetas[10];
-    tokenProgram: TAccountMetas[11];
-    systemProgram: TAccountMetas[12];
-    marketSettings?: TAccountMetas[13] | undefined;
+    authority: TAccountMetas[7];
+    tokenProgram: TAccountMetas[8];
+    systemProgram: TAccountMetas[9];
+    marketSettings?: TAccountMetas[10] | undefined;
     /** Only required when the market is restricted */
-    projectNft?: TAccountMetas[14] | undefined;
-    projectMetadata?: TAccountMetas[15] | undefined;
+    projectNft?: TAccountMetas[11] | undefined;
+    projectMetadata?: TAccountMetas[12] | undefined;
   };
   data: AssignInstructionData;
 };
@@ -620,7 +539,7 @@ export function parseAssignInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedAssignInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 16) {
+  if (instruction.accounts.length < 13) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -646,10 +565,7 @@ export function parseAssignInstruction<
       user: getNextAccount(),
       vault: getNextAccount(),
       payer: getNextAccount(),
-      rewardsReflection: getNextAccount(),
-      rewardsVault: getNextAccount(),
       authority: getNextAccount(),
-      rewardsProgram: getNextAccount(),
       tokenProgram: getNextAccount(),
       systemProgram: getNextAccount(),
       marketSettings: getNextOptionalAccount(),

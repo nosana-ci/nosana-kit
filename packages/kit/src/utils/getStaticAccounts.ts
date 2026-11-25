@@ -1,4 +1,5 @@
 import { Address } from '@solana/kit';
+import { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } from '@solana-program/token';
 import type { SolanaService } from '../services/solana/index.js';
 import type { ProgramConfig } from '../config/types.js';
 
@@ -7,6 +8,7 @@ export type StaticAccounts = {
   rewardsVault: Address;
   rewardsProgram: Address;
   jobsProgram: Address;
+  feeVault: Address;
 };
 
 export type StaticAccountsCache = {
@@ -40,6 +42,11 @@ export async function getStaticAccounts(
 
   // Start initialization and store the promise
   const promise = (async () => {
+    const [feeVault] = await findAssociatedTokenPda({
+      mint: programsConfig.nosTokenAddress,
+      owner: programsConfig.feeWalletAddress,
+      tokenProgram: TOKEN_PROGRAM_ADDRESS,
+    });
     const staticAccounts: StaticAccounts = {
       rewardsReflection: await solana.pda(['reflection'], programsConfig.rewardsAddress),
       rewardsVault: await solana.pda(
@@ -48,6 +55,7 @@ export async function getStaticAccounts(
       ),
       rewardsProgram: programsConfig.rewardsAddress,
       jobsProgram: programsConfig.jobsAddress,
+      feeVault,
     };
 
     // Cache the result

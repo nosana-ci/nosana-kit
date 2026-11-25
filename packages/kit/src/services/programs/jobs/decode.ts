@@ -17,6 +17,7 @@ import {
 } from '@nosana/jobs-program';
 import type { JobsInstructionName } from './computeUnits.generated.js';
 import { getJobsInstructionName } from './discriminators.js';
+import { isLayoutDependent, toFeeLayout } from './legacyLayout.js';
 
 /** A decoded jobs instruction: its name plus its labelled accounts and arguments. */
 export interface DecodedJobsInstruction {
@@ -63,7 +64,7 @@ const PARSERS: Record<JobsInstructionName, InstructionParser> = {
  * This is what lets a bulk `sendBatch` caller recover the accounts an instruction
  * created or acted on — for example the freshly generated `job` and `run`
  * addresses of a `list` — without threading that state through by hand. Account
- * keys match the program's account names.
+ * keys match the program's account names, in either jobs program layout.
  *
  * @param instruction The instruction to decode.
  * @returns The decoded instruction, or `undefined` if it is not a recognised
@@ -76,7 +77,9 @@ export function decodeJobsInstruction(
   const name = getJobsInstructionName(instruction);
   if (!name) return undefined;
   try {
-    const parsed = PARSERS[name](instruction);
+    const parsed = PARSERS[name](
+      isLayoutDependent(name) ? toFeeLayout(name, instruction) : instruction
+    );
     const accounts: Record<string, Address> = {};
     for (const [role, meta] of Object.entries(parsed.accounts)) {
       // an optional account that was not passed is encoded as the program id

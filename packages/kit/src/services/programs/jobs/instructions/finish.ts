@@ -41,7 +41,7 @@ export async function finish(
     const wallet = getRequiredWallet();
 
     // Get required accounts in parallel
-    const [jobAccount, [run], { jobsProgram, ...staticAccounts }] = await Promise.all([
+    const [jobAccount, [run], { jobsProgram, feeVault }] = await Promise.all([
       get(job, false),
       getRuns({ job }),
       getStaticAccounts(),
@@ -76,7 +76,7 @@ export async function finish(
         payerRun: run.payer,
         authority: wallet,
         ipfsResult,
-        ...staticAccounts,
+        feeVault,
       },
       {
         programAddress: jobsProgram,

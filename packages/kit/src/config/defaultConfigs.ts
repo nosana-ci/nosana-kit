@@ -36,6 +36,7 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
       merkleDistributorAddress: address(
         NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].merkleDistributor
       ),
+      feeWalletAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].feeWallet),
       rewardsPoolAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.MAINNET].rewardsPool),
     },
     logLevel: 'error' as LogLevel,
@@ -63,6 +64,7 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
       merkleDistributorAddress: address(
         NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].merkleDistributor
       ),
+      feeWalletAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].feeWallet),
       rewardsPoolAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.DEVNET].rewardsPool),
     },
     logLevel: 'debug' as LogLevel,
@@ -91,6 +93,7 @@ export const DEFAULT_CONFIGS: Record<NosanaNetwork, ClientConfig> = {
       merkleDistributorAddress: address(
         NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].merkleDistributor
       ),
+      feeWalletAddress: address(NOSANA_PROGRAM_ADDRESSES[NosanaNetwork.LOCALNET].feeWallet),
     },
     logLevel: 'debug' as LogLevel,
   },

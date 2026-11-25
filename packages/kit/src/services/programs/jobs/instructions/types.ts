@@ -4,6 +4,7 @@ import type { JobsProgram } from '../JobsProgram.js';
 import type { TokenService } from '../../../../services/token/index.js';
 import type { StaticAccounts } from '../../../../utils/getStaticAccounts.js';
 import * as programClient from '@nosana/jobs-program';
+import type { MatchDeployedLayout } from '../deployedLayout.js';
 
 export type InstructionsHelperParams = {
   deps: ProgramDeps;
@@ -14,4 +15,5 @@ export type InstructionsHelperParams = {
   getRequiredWallet: () => Wallet;
   getStaticAccounts: () => Promise<StaticAccounts>;
   getNosATA: TokenService['getATA'];
+  matchDeployedLayout: MatchDeployedLayout;
 };

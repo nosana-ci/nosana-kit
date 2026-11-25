@@ -57,20 +57,8 @@
           "signer": true
         },
         {
-          "name": "rewards_reflection",
-          "writable": true
-        },
-        {
-          "name": "rewards_vault",
-          "writable": true
-        },
-        {
           "name": "authority",
           "signer": true
-        },
-        {
-          "name": "rewards_program",
-          "address": "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp"
         },
         {
           "name": "token_program",
@@ -556,6 +544,10 @@
         {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "fee_vault",
+          "writable": true
         }
       ],
       "args": []
@@ -598,24 +590,12 @@
           ]
         },
         {
-          "name": "rewards_reflection",
-          "writable": true
-        },
-        {
-          "name": "rewards_vault",
-          "writable": true
-        },
-        {
           "name": "authority",
           "signer": true
         },
         {
           "name": "payer",
           "signer": true
-        },
-        {
-          "name": "rewards_program",
-          "address": "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp"
         },
         {
           "name": "token_program",
@@ -692,6 +672,10 @@
         {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "fee_vault",
+          "writable": true
         }
       ],
       "args": [
@@ -753,20 +737,8 @@
           "signer": true
         },
         {
-          "name": "rewards_reflection",
-          "writable": true
-        },
-        {
-          "name": "rewards_vault",
-          "writable": true
-        },
-        {
           "name": "authority",
           "signer": true
-        },
-        {
-          "name": "rewards_program",
-          "address": "nosRB8DUV67oLNrL45bo2pFLrmsWPiewe2Lk2DRNYCp"
         },
         {
           "name": "token_program",
@@ -1484,6 +1456,14 @@
           {
             "name": "timeout",
             "type": "i64"
+          },
+          {
+            "name": "fee_fraction",
+            "docs": [
+              "The `JOB_FEE_FRACTION` the job was created with. It must stay the last field: it takes a",
+              "padding byte of the account, so jobs created before it existed read `0` and pay no fee."
+            ],
+            "type": "u8"
           }
         ]
       }
@@ -1557,37 +1537,6 @@
           {
             "name": "project_access_key",
             "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ReflectionAccount",
-      "docs": [
-        "The `ReflectionAccount` struct holds all the information on the reflection pool."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "rate",
-            "type": "u128"
-          },
-          {
-            "name": "total_reflection",
-            "type": "u128"
-          },
-          {
-            "name": "total_xnos",
-            "type": "u128"
-          },
-          {
-            "name": "vault",
-            "type": "pubkey"
-          },
-          {
-            "name": "vault_bump",
-            "type": "u8"
           }
         ]
       }

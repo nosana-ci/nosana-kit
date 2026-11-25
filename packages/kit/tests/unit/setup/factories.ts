@@ -28,6 +28,7 @@ import * as stakingClient from '@nosana/stake-program';
 import * as merkleDistributorClient from '@nosana/merkle-distributor-program';
 import { JobState, MarketQueueType } from '../../../src/services/programs/jobs/index.js';
 import { NosanaNetwork } from '@nosana/types';
+import { simulateOnLegacyProgram } from './simulateOnLegacyProgram.js';
 
 /**
  * Signer Factory
@@ -206,6 +207,7 @@ export class MockClientFactory {
           stakeAddress: validAddr,
           poolsAddress: validAddr,
           merkleDistributorAddress: validAddr,
+          feeWalletAddress: validAddr,
         },
       },
       logger: {
@@ -215,7 +217,7 @@ export class MockClientFactory {
         warn: vi.fn(),
       },
       solana: {
-        rpc: {},
+        rpc: { simulateTransaction: simulateOnLegacyProgram() },
         pda: vi.fn().mockResolvedValue(validAddr),
       },
       nos: {
@@ -248,6 +250,7 @@ export class MockClientFactory {
           return [];
         }),
       })),
+      simulateTransaction: simulateOnLegacyProgram(),
     };
     const validAddr = AddressFactory.createValid();
     const sdk = MockClientFactory.createBasic({

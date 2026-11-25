@@ -18,7 +18,7 @@ function addr(seed: number) {
 
 const JOBS_PROGRAM = addr(0);
 
-// The account order parseListInstruction reads them in.
+// A list's accounts in the legacy layout; the fee layout drops the three rewards accounts.
 const LIST_ACCOUNT_ORDER = [
   'job',
   'market',
@@ -37,11 +37,13 @@ const LIST_ACCOUNT_ORDER = [
   'projectMetadata',
 ] as const;
 
-function makeListInstruction(): Instruction {
+const REWARDS_ACCOUNTS: readonly string[] = ['rewardsReflection', 'rewardsVault', 'rewardsProgram'];
+
+function makeListInstruction(layout: 'legacy' | 'fee' = 'legacy'): Instruction {
   const accounts = LIST_ACCOUNT_ORDER.map((_, i) => ({
     address: addr(i + 1),
     role: AccountRole.READONLY,
-  }));
+  })).filter((_, i) => layout === 'legacy' || !REWARDS_ACCOUNTS.includes(LIST_ACCOUNT_ORDER[i]));
   const data = getListInstructionDataEncoder().encode({
     ipfsJob: new Uint8Array(32),
     timeout: 0,
@@ -82,6 +84,15 @@ describe('decodeJobsInstruction', () => {
     expect(decoded?.accounts.market).toBe(addr(2));
     expect(decoded?.accounts.run).toBe(addr(3));
     expect(decoded?.accounts.authority).toBe(addr(9));
+    expect(decoded?.accounts.rewardsReflection).toBeUndefined();
+  });
+
+  it('labels the accounts of a fee layout list the same way', () => {
+    const decoded = decodeJobsInstruction(makeListInstruction('fee'));
+
+    expect(decoded?.accounts.job).toBe(addr(1));
+    expect(decoded?.accounts.authority).toBe(addr(9));
+    expect(decoded?.accounts.tokenProgram).toBe(addr(11));
   });
 
   it('decodes the instruction arguments', () => {
